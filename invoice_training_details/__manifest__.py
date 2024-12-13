@@ -14,12 +14,14 @@
     "license": "LGPL-3",
 
     # Dependency
-    "depends": ['account'],
+    "depends": ['account', 'crm', 'sale_management'],
 
     "data": [
         "data/report_paperformat.xml",
         "security/ir.model.access.csv",
         "views/account_move_views.xml",
+        "views/crm_lead_views.xml",
+        "views/sale_order_views.xml",
         # Report
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",

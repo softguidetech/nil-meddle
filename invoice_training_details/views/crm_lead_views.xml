@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="crm_reveal_lead_opportunity_form_training" model="ir.ui.view">
+        <field name="name">crm.lead.inherited.crm.training</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='internal_notes']" position="after">
+                <page id="training" name="Training">
+                    <group>
+                        <field name="training_name"/>
+                    </group>
+                    <field name="training_course_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="no_of_student"/>
+                            <field name="duration"/>
+                            <field name="training_date_start"/>
+                            <field name="training_date_end"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_training_price"/>
+                        </group>
+                        <group>
+                            <field name="half_advance_payment_before"/>
+                            <field name="half_payment_after"/>
+                        </group>
+                    </group>
+                </page>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

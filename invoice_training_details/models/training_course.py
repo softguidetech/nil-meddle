@@ -15,3 +15,5 @@ class TrainingCourse(models.Model):
     training_date_end = fields.Date(string='Training Date end')
     price = fields.Float(string='Training Price')
     move_id = fields.Many2one('account.move', string='Move')
+    lead_id = fields.Many2one('crm.lead', string='Lead')
+    sale_id = fields.Many2one('sale.order', string='Sale Order')

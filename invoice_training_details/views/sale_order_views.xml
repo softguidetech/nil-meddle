@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="sale_order_form_quote_training" model="ir.ui.view">
+        <field name="name">sale.order.form.inherit.training</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            <page name="order_lines" position="after">
+                <page id="training" name="Training">
+                    <group>
+                        <field name="training_name"/>
+                    </group>
+                    <field name="training_course_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="no_of_student"/>
+                            <field name="duration"/>
+                            <field name="training_date_start"/>
+                            <field name="training_date_end"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_training_price"/>
+                        </group>
+                        <group>
+                            <field name="half_advance_payment_before"/>
+                            <field name="half_payment_after"/>
+                        </group>
+                    </group>
+                </page>
+            </page>
+        </field>
+    </record>
+
+</odoo>

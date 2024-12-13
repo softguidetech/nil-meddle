@@ -138,16 +138,16 @@
                     </div>
 
                     <div class="row" style="page-break-inside:avoid;">
-                        <div name="ksa_qr" class="col-6">
+                        <div name="ksa_qr" class="col-4">
                             <t t-if="o.display_ksa_qr">
-                                KSA QR
+                                <img t-if="o.ks_qr_code" class="pt-5" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>
                             </t>
                         </div>
-                        <div name="stamp" class="col-3">
-                            <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 160px;" alt="Stamp"/>
+                        <div name="stamp" class="col-4">
+                            <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
                         </div>
-                        <div name="signature" class="col-3">
-                            <img t-if="o.company_id.signature and o.display_signature" class="pt-5" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 160px;" alt="Stamp"/>
+                        <div name="signature" class="col-4">
+                            <img t-if="o.company_id.signature and o.display_signature" class="pt-5" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 200px;" alt="Stamp"/>
                         </div>
                     </div>
 

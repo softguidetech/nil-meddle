@@ -18,6 +18,15 @@ class AccountMove(models.Model):
     display_stamp = fields.Boolean(string='Display Stamp', help='display Stamp in training invoice PDF.')
     display_ksa_qr = fields.Boolean(string='Display KSA QR', help='display KSA Qr in training invoice PDF.')
 
+    # extra information tab
+    clcs_qty = fields.Float(string='CLCs Qty')
+    so_no = fields.Char(string='SO#')
+    tr_expiry_date = fields.Date(string='Expiry Date')
+
+    # logistics tab
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Char(string='Catering')
+
     @api.depends('training_course_ids.price')
     def _compute_training_price(self):
         for rec in self:

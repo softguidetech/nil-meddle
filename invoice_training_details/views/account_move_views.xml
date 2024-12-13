@@ -30,6 +30,14 @@
                             <field name="half_payment_after"/>
                         </group>
                     </group>
+
+                    <group>
+                        <group>
+                            <field name="display_training_table"/>
+                            <field name="display_signature"/>
+                            <field name="display_stamp"/>
+                        </group>
+                    </group>
                 </page>
             </xpath>
         </field>

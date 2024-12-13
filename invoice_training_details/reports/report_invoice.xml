@@ -71,7 +71,7 @@
                         </div>
                     </div>
 
-                    <table class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
+                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>
                             <tr>
                                 <th name="th_item"><span>Item</span></th>
@@ -137,7 +137,17 @@
                         </div>
                     </div>
 
-                    <!-- need to add stamp image here -->
+                    <div class="row" style="page-break-inside:avoid;">
+                        <div name="ksa_qr" class="col-6">
+                            KSA QR
+                        </div>
+                        <div name="stamp" class="col-3">
+                            <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 160px;" alt="Stamp"/>
+                        </div>
+                        <div name="signature" class="col-3">
+                            <img t-if="o.company_id.signature and o.display_signature" class="pt-5" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 160px;" alt="Stamp"/>
+                        </div>
+                    </div>
 
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-12">

@@ -36,6 +36,7 @@
                             <field name="display_training_table"/>
                             <field name="display_signature"/>
                             <field name="display_stamp"/>
+                            <field name="display_ksa_qr"/>
                         </group>
                     </group>
                 </page>

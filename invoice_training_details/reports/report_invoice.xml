@@ -139,7 +139,9 @@
 
                     <div class="row" style="page-break-inside:avoid;">
                         <div name="ksa_qr" class="col-6">
-                            KSA QR
+                            <t t-if="o.display_ksa_qr">
+                                KSA QR
+                            </t>
                         </div>
                         <div name="stamp" class="col-3">
                             <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 160px;" alt="Stamp"/>

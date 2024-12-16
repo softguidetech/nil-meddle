@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_move_form_inherit_training" model="ir.ui.view">
+        <field name="name">account.move.form.inherit.training</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@id='other_tab']" position="before">
+                <page id="training" name="Training">
+                    <group>
+                        <field name="training_name"/>
+                    </group>
+                    <field name="training_course_ids">
+                        <tree editable="bottom">
+                            <field name="name"/>
+                            <field name="no_of_student"/>
+                            <field name="duration"/>
+                            <field name="training_date_start"/>
+                            <field name="training_date_end"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_training_price"/>
+                        </group>
+                        <group>
+                            <field name="half_advance_payment_before"/>
+                            <field name="half_payment_after"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <group>
+                            <field name="display_training_table"/>
+                            <field name="display_signature"/>
+                            <field name="display_stamp"/>
+                            <field name="display_ksa_qr"/>
+                        </group>
+                        <group>
+                            <field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start"/>
+                        </group>
+                    </group>
+                </page>
+
+                <page id="extra_information" string="Extra Information">
+                    <group>
+                        <group>
+                            <field name="clcs_qty"/>
+                            <field name="so_no"/>
+                            <field name="tr_expiry_date"/>
+                        </group>
+                    </group>
+                </page>
+
+                <page id="logistics" string="Logistics">
+                    <group>
+                        <group>
+                            <field name="instructor_logistics"/>
+                            <field name="catering"/>
+                        </group>
+                    </group>
+                </page>
+
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

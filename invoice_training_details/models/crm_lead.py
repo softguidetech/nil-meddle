@@ -12,7 +12,14 @@ class Lead(models.Model):
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
-
+    
+    #Add extera
+    instructor_id = fields.Many2one('res.employee',string="Instructor")
+    training_id = fields.Many2one('product.template',string='Training Name')
+    train_language = fields.Char(string='Training Language')
+    location = fields.Char(string='Location')
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    
     # extra information tab
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
@@ -39,5 +46,11 @@ class Lead(models.Model):
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
             'default_catering': self.catering,
+            
+            'default_instructor_id': self.instructor_id.id,
+            'default_training_id': self.training_id.id,
+            'default_train_language': self.train_language,
+            'default_location': self.location,
+            'default_payment_method': self.payment_method,
         })
         return quotation_context

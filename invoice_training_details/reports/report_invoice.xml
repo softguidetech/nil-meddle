@@ -76,13 +76,15 @@
                             <tr>
                                 <th name="th_item"><span>Item</span></th>
                                 <th name="th_training_name"><span>Training Name</span></th>
+                                <th name="th_training_name"><span>Instructor Name</span></th>
+                                <th name="th_training_name"><span>Language</span></th>
                                 <th name="th_of_students"><span># Of Students</span></th>
                                 <th name="th_duration"><span>Duration</span></th>
                                 <th name="th_training_date"><span>Training Dates</span></th>
                                 <th name="th_training_date"><span>Training Price</span></th>
                                 <th name="th_training_date" style="max-width:80px;"><span>Total Training Price</span></th>
-                                <th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>
-                                <th name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>
+                                <!--<th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</sp></t>-->
+                                <!--<th name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -91,23 +93,25 @@
                             <t t-foreach="o.training_course_ids" t-as="training">
                                 <tr>
                                     <td><span t-esc="item"/></td>
-                                    <td><span t-field="training.name"/></td>
+                                    <td><span t-field="training.training_id.name"/></td>
+                                    <td><span t-field="training.instructor_id.name"/></td>
+                                    <td><span t-field="training.itrain_language"/></td>
                                     <td><span t-field="training.no_of_student"/></td>
                                     <td><span t-field="training.duration"/></td>
                                     <td><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
                                     <td><span t-field="training.price"/></td>
                                     <t t-if="item == 1">
                                         <td t-att-rowspan="total_rows"><span t-field="o.total_training_price"/></td>
-                                        <td t-att-rowspan="total_rows"><span t-field="o.half_advance_payment_before"/></td>
-                                        <td t-att-rowspan="total_rows"><span t-field="o.half_payment_after"/></td>
+                                        <!--<td t-att-rowspan="total_rows"><span t-field="o.half_advance_payment_before"/></td>-->
+                                        <!--<td t-att-rowspan="total_rows"><span t-field="o.half_payment_after"/></td>-->
                                     </t>
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>
                             </t>
                             <tr>
                                 <td colspan="7" class="text-end"><span>Grand Total</span></td>
-                                <td><span t-field="o.half_advance_payment_before"/></td>
-                                <td><span t-field="o.half_payment_after"/></td>
+                                <!--<td><span t-field="o.half_advance_payment_before"/></td>-->
+                                <!--<td><span t-field="o.half_payment_after"/></td>-->
                             </tr>
                         </tbody>
                     </table>

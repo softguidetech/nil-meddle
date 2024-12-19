@@ -11,7 +11,15 @@ class SaleOrder(models.Model):
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
-
+    
+    #Add extera
+    instructor_id = fields.Many2one('res.employee',string="Instructor")
+    training_id = fields.Many2one('product.template',string='Training Name')
+    train_language = fields.Char(string='Training Language')
+    location = fields.Char(string='Location')
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    
+    
     # extra information tab
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
@@ -38,5 +46,11 @@ class SaleOrder(models.Model):
             'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
             'catering': self.catering,
+            
+            'instructor_id': self.instructor_id.id,
+            'training_id': self.training_id.id,
+            'train_language': self.train_language,
+            'location': self.location,
+            'payment_method': self.payment_method,
         })
         return vals

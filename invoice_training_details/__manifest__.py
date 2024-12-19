@@ -14,7 +14,7 @@
     "license": "LGPL-3",
 
     # Dependency
-    "depends": ['account', 'crm', 'sale_management'],
+    "depends": ['account', 'crm', 'sale_management','employee','product'],
 
     "data": [
         "data/report_paperformat.xml",

@@ -23,4 +23,5 @@ class TrainingCourse(models.Model):
     train_language = fields.Char(string='Training Language')
     location = fields.Char(string='Location')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    clcs_qty = fields.Float(string='CLCs Qty')
     

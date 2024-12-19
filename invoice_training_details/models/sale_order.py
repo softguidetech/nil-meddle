@@ -52,5 +52,6 @@ class SaleOrder(models.Model):
             'train_language': self.train_language,
             'location': self.location,
             'payment_method': self.payment_method,
+            'clcs_qty': self.clcs_qty,
         })
         return vals

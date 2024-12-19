@@ -14,11 +14,12 @@ class Lead(models.Model):
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     
     #Add extera
-    # instructor_id = fields.Many2one('res.employee',string="Instructor")
-    # training_id = fields.Many2one('product.template',string='Training Name')
-    # train_language = fields.Char(string='Training Language')
-    # location = fields.Char(string='Location')
-    # payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    instructor_id = fields.Many2one('res.employee',string="Instructor")
+    training_id = fields.Many2one('product.template',string='Training Name')
+    train_language = fields.Char(string='Training Language')
+    location = fields.Char(string='Location')
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    clcs_qty = fields.Float(string='CLCs Qty')
     
     # extra information tab
     clcs_qty = fields.Float(string='CLCs Qty')

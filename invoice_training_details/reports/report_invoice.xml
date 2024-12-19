@@ -49,7 +49,7 @@
                             <tr>
                                 <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>
                                 <th name="th_quantity" class="text-end"><span>QTY</span></th>
-                                <th name="th_rate" class="text-end"><span>RATE</span></th>
+                                <!--<th name="th_rate" class="text-end"><span>RATE</span></th>-->
                                 <th name="th_amount" class="text-end"><span>AMOUNT</span></th>
                             </tr>
                         </thead>
@@ -58,8 +58,8 @@
                                 <tr>
                                     <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>
                                     <td class="text-end"><span t-field="line.quantity"/></td>
-                                    <td class="text-end"><span t-field="line.quantity"/></td>
-                                    <td class="text-end"><span t-field="line.quantity"/></td>
+                                    <td class="text-end"><span t-field="line.price_unit"/></td>
+                                    <!--<td class="text-end"><span t-field="line.quantity"/></td>-->
                                 </tr>
                             </t>
                         </tbody>

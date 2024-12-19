@@ -18,7 +18,7 @@ class TrainingCourse(models.Model):
     lead_id = fields.Many2one('crm.lead', string='Lead')
     sale_id = fields.Many2one('sale.order', string='Sale Order')
     
-    instructor_id = fields.Many2one('res.employee',string="Instructor")
+    instructor_id = fields.Many2one('hr.employee',string="Instructor")
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Char(string='Location')

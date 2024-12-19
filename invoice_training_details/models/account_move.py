@@ -20,7 +20,14 @@ class AccountMove(models.Model):
     display_signature = fields.Boolean(string='Display Signature', help='display signature in training invoice PDF.')
     display_stamp = fields.Boolean(string='Display Stamp', help='display Stamp in training invoice PDF.')
     display_ksa_qr = fields.Boolean(string='Display KSA QR', help='display KSA Qr in training invoice PDF.')
-
+    
+    #Add extera
+    instructor_id = fields.Many2one('res.employee',string="Instructor")
+    training_id = fields.Many2one('product.template',string='Training Name')
+    train_language = fields.Char(string='Training Language')
+    location = fields.Char(string='Location')
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    
     # extra information tab
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')

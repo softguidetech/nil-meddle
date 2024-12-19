@@ -83,8 +83,8 @@
                                 <th name="th_training_date"><span>Training Dates</span></th>
                                 <th name="th_training_date"><span>Training Price</span></th>
                                 <th name="th_training_date" style="max-width:80px;"><span>Total Training Price</span></th>
-                                <!--<th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</sp></t>-->
-                                <!--<th name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>-->
+                                <th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</sp></t>
+                                <th name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,16 +102,16 @@
                                     <td><span t-field="training.price"/></td>
                                     <t t-if="item == 1">
                                         <td t-att-rowspan="total_rows"><span t-field="o.total_training_price"/></td>
-                                        <!--<td t-att-rowspan="total_rows"><span t-field="o.half_advance_payment_before"/></td>-->
-                                        <!--<td t-att-rowspan="total_rows"><span t-field="o.half_payment_after"/></td>-->
+                                        <td t-att-rowspan="total_rows"><span t-field="o.half_advance_payment_before"/></td>
+                                        <td t-att-rowspan="total_rows"><span t-field="o.half_payment_after"/></td>
                                     </t>
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>
                             </t>
                             <tr>
                                 <td colspan="7" class="text-end"><span>Grand Total</span></td>
-                                <!--<td><span t-field="o.half_advance_payment_before"/></td>-->
-                                <!--<td><span t-field="o.half_payment_after"/></td>-->
+                                <td><span t-field="o.half_advance_payment_before"/></td>
+                                <td><span t-field="o.half_payment_after"/></td>
                             </tr>
                         </tbody>
                     </table>

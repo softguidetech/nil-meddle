@@ -26,7 +26,7 @@ class TrainingCourse(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     
     
-    def _compute_date(training_date_start,training_date_end):
+    def _compute_date(self):
         if self.training_date_start and self.training_date_end:
             date2 = str(self.training_date_end)
             date1 = str(self.training_date_start)

@@ -49,8 +49,8 @@
                             <tr>
                                 <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>
                                 <th name="th_quantity" class="text-end"><span>QTY</span></th>
-                                <!--<th name="th_rate" class="text-end"><span>RATE</span></th>-->
-                                <th name="th_amount" class="text-end"><span>AMOUNT</span></th>
+                                <th name="th_rate" class="text-end"><span>RATE</span></th>
+                                <!--<th name="th_amount" class="text-end"><span>AMOUNT</span></th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -71,7 +71,7 @@
                         </div>
                     </div>
 
-                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
+                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center"name="training_line_table">
                         <thead>
                             <tr>
                                 <th name="th_item"><span>Item</span></th>
@@ -83,7 +83,7 @@
                                 <th name="th_training_date"><span>Training Dates</span></th>
                                 <th name="th_training_date"><span>Training Price</span></th>
                                 <th name="th_training_date" style="max-width:80px;"><span>Total Training Price</span></th>
-                                <th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</sp></t>
+                                <th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>
                                 <th name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>
                             </tr>
                         </thead>

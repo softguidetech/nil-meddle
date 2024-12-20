@@ -27,10 +27,15 @@ class TrainingCourse(models.Model):
     
     
     def _compute_date(self):
-        
-        d1 = datetime.str(self.training_date_start, "%Y/%m/%d")
-        d2 = datetime.str(self.training_date_end, "%Y/%m/%d")
-
-        # difference between dates in timedelta
-        delta = d2 - d1
-        self.duration = delta
+        if self.training_date_start and self.training_date_end:
+            d1 = datetime.strptime(self.training_date_start, "%Y/%m/%d")
+            d2 = datetime.strptime(self.training_date_end, "%Y/%m/%d")
+    
+            # difference between dates in timedelta
+            delta = d2 - d1
+            if delta >= 0:
+                self.duration = delta
+            else:
+                self.duration = 0
+        else:
+            self.duration = 0

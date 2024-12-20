@@ -30,8 +30,8 @@ class TrainingCourse(models.Model):
         if self.training_date_start and self.training_date_end:
             date2 = str(self.training_date_end)
             date1 = str(self.training_date_start)
-            d1 = datetime.strptime(date1, "%Y/%m/%d")
-            d2 = datetime.strptime(date2, "%Y/%m/%d")
+            d1 = datetime.strptime(date1, "%Y-%m-%d")
+            d2 = datetime.strptime(date2, "%Y-%m-%d")
     
             # difference between dates in timedelta
             delta = d2 - d1

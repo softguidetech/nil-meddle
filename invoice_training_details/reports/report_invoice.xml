@@ -71,7 +71,7 @@
                         </div>
                     </div>
 
-                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center"name="training_line_table">
+                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>
                             <tr>
                                 <th name="th_item"><span>Item</span></th>

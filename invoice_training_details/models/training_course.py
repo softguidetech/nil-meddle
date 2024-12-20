@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools
-
+from datetime import datetime
 
 class TrainingCourse(models.Model):
     _name = "training.course"
@@ -10,7 +10,7 @@ class TrainingCourse(models.Model):
 
     name = fields.Char(string='Training Name', required=True)
     no_of_student = fields.Integer(string='No of Student')
-    duration = fields.Char(string='Duration')
+    duration = fields.Date(string='Duration',compute='_compute_date')
     training_date_start = fields.Date(string='Training Date start')
     training_date_end = fields.Date(string='Training Date end')
     price = fields.Float(string='Training Price')
@@ -25,3 +25,12 @@ class TrainingCourse(models.Model):
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     
+    
+    def _compute_date(self):
+        
+        d1 = datetime.strptime(self.training_date_start, "%Y/%m/%d")
+        d2 = datetime.strptime(self.training_date_end, "%Y/%m/%d")
+
+        # difference between dates in timedelta
+        delta = d2 - d1
+        self.duration = delta

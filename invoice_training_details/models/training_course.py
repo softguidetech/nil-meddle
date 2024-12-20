@@ -3,6 +3,7 @@
 
 from odoo import api, fields, models, tools
 from datetime import datetime
+from odoo.exceptions import ValidationError
 
 class TrainingCourse(models.Model):
     _name = "training.course"
@@ -35,6 +36,7 @@ class TrainingCourse(models.Model):
     
             # difference between dates in timedelta
             delta = d2 - d1
+            raise ValidationError(type(delta))
             # if int(delta) >= 0:
             self.duration = delta
             # else:

@@ -26,7 +26,7 @@ class TrainingCourse(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     
     
-    def _compute_date(self):
+    def _compute_date(training_date_start,training_date_end):
         if self.training_date_start and self.training_date_end:
             date2 = str(self.training_date_end)
             date1 = str(self.training_date_start)
@@ -35,9 +35,9 @@ class TrainingCourse(models.Model):
     
             # difference between dates in timedelta
             delta = d2 - d1
-            if int(delta) >= 0:
-                self.duration = delta
-            else:
-                self.duration = 0
+            # if int(delta) >= 0:
+            self.duration = delta
+            # else:
+            #     self.duration = 0
         else:
             self.duration = 0

@@ -10,7 +10,7 @@ class TrainingCourse(models.Model):
 
     name = fields.Char(string='Training Name', required=True)
     no_of_student = fields.Integer(string='No of Student')
-    duration = fields.Date(string='Duration',compute='_compute_date')
+    duration = fields.Integer(string='Duration',compute='_compute_date')
     training_date_start = fields.Date(string='Training Date start')
     training_date_end = fields.Date(string='Training Date end')
     price = fields.Float(string='Training Price')
@@ -35,7 +35,7 @@ class TrainingCourse(models.Model):
     
             # difference between dates in timedelta
             delta = d2 - d1
-            if delta >= 0:
+            if int(delta) >= 0:
                 self.duration = delta
             else:
                 self.duration = 0

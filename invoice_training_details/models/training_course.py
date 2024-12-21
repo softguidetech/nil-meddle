@@ -9,7 +9,7 @@ class TrainingCourse(models.Model):
     _name = "training.course"
     _description = 'Training Course'
 
-    name = fields.Char(string='Training Name', required=True)
+    name = fields.Char(string='Training Name',)
     no_of_student = fields.Integer(string='No of Student')
     duration = fields.Integer(string='Duration',compute='_compute_date')
     training_date_start = fields.Date(string='Training Date start')

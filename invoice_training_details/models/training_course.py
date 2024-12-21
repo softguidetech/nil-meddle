@@ -9,7 +9,7 @@ class TrainingCourse(models.Model):
     _name = "training.course"
     _description = 'Training Course'
 
-    name = fields.Char(string='Training Name', required=True)
+    name = fields.Char(string='Training Name',)
     no_of_student = fields.Integer(string='No of Student')
     duration = fields.Integer(string='Duration',compute='_compute_date')
     training_date_start = fields.Date(string='Training Date start')
@@ -22,7 +22,7 @@ class TrainingCourse(models.Model):
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
-    location = fields.Char(string='Location')
+    location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     

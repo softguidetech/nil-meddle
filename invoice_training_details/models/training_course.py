@@ -38,7 +38,8 @@ class TrainingCourse(models.Model):
             delta = self.training_date_end - self.training_date_start
             # raise ValidationError(delta.day())
             # if int(delta) >= 0:
-            self.duration = delta
+            
+            self.duration = delta.days
             # else:
             #     self.duration = 0
         else:

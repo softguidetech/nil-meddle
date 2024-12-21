@@ -29,14 +29,14 @@ class TrainingCourse(models.Model):
     
     def _compute_date(self):
         if self.training_date_start and self.training_date_end:
-            date2 = str(self.training_date_end)
-            date1 = str(self.training_date_start)
-            d1 = datetime.strptime(date1, "%Y-%m-%d")
-            d2 = datetime.strptime(date2, "%Y-%m-%d")
+            # date2 = str(self.training_date_end)
+            # date1 = str(self.training_date_start)
+            # d1 = datetime.strptime(date1, "%Y-%m-%d")
+            # d2 = datetime.strptime(date2, "%Y-%m-%d")
     
             # difference between dates in timedelta
-            delta = d2 - d1
-            raise ValidationError(type(delta))
+            delta = self.training_date_end - self.training_date_start
+            # raise ValidationError(delta.day())
             # if int(delta) >= 0:
             self.duration = delta
             # else:

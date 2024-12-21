@@ -42,11 +42,11 @@
                             <field name="display_training_table"/>
                             <field name="display_signature"/>
                             <field name="display_stamp"/>
-                            <field name="display_ksa_qr"/>
+                            <!--<field name="display_ksa_qr"/>-->
                         </group>
-                        <group>
-                            <field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start"/>
-                        </group>
+                        <!--<group>-->
+                        <!--    <field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start"/>-->
+                        <!--</group>-->
                     </group>
                 </page>
 

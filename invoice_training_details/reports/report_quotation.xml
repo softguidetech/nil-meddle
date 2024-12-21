@@ -1,69 +1,69 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <template id="report_quotation_document_training" name="Invoice Report Training">
+    <template id="report_quotation_document_training" name="Quotation Report Training">
         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
-                    <t t-set="o" t-value="o.with_context(lang=lang)" />
+                    <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
-                            <span class="h4 text-info">INVOICE</span>
+                            <span class="h4 text-info">QUOTATION</span>
                         </div>
                     </div>
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
                                 <strong>INVOICE TO</strong>
-                                <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                                <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
                             </div>
                         </div>
                         <div class="col-4">
                             <div>
                                 <table class="table table-borderless">
                                     <tr class="p-0">
-                                        <td class="p-0">INVOICE</td>
+                                        <td class="p-0">QUOTATION</td>
                                         <td class="p-0"><span t-field="o.name"/></td>
                                     </tr>
                                     <tr class="p-0">
                                         <td class="p-0">DATE</td>
-                                        <td class="p-0"><span t-field="o.invoice_date"/></td>
+                                        <td class="p-0"><span t-field="o.date_order"/></td>
                                     </tr>
-                                    <tr class="p-0" t-if="o.invoice_payment_term_id">
-                                        <td class="p-0">TERMS</td>
-                                        <td class="p-0"><span t-field="o.invoice_payment_term_id"/></td>
-                                    </tr>
+                                    <!--<tr class="p-0" t-if="o.invoice_payment_term_id">-->
+                                    <!--    <td class="p-0">TERMS</td>-->
+                                    <!--    <td class="p-0"><span t-field="o.invoice_payment_term_id"/></td>-->
+                                    <!--</tr>-->
                                     <tr class="p-0">
                                         <td class="p-0">DUE DATE</td>
-                                        <td class="p-0"><span t-field="o.invoice_date_due"/></td>
+                                        <td class="p-0"><span t-field="o.validity_date"/></td>
                                     </tr>
                                 </table>
                             </div>
                         </div>
                     </div>
 
-                    <table class="table table-sm o_main_table table-borderless" name="invoice_line_table">
-                        <thead class="bg-light text-info">
-                            <tr>
-                                <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>
-                                <th name="th_quantity" class="text-end"><span>QTY</span></th>
-                                <th name="th_rate" class="text-end"><span>RATE</span></th>
+                    <!--<table class="table table-sm o_main_table table-borderless" name="order_lines">-->
+                    <!--    <thead class="bg-light text-info">-->
+                    <!--        <tr>-->
+                    <!--            <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>-->
+                    <!--            <th name="th_quantity" class="text-end"><span>QTY</span></th>-->
+                    <!--            <th name="th_rate" class="text-end"><span>RATE</span></th>-->
                                 <!--<th name="th_amount" class="text-end"><span>AMOUNT</span></th>-->
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <t t-foreach="o.invoice_line_ids" t-as="line">
-                                <tr>
-                                    <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>
-                                    <td class="text-end"><span t-field="line.quantity"/></td>
-                                    <td class="text-end"><span t-field="line.price_unit"/></td>
+                    <!--        </tr>-->
+                    <!--    </thead>-->
+                    <!--    <tbody>-->
+                    <!--        <t t-foreach="o.order_lines" t-as="line">-->
+                    <!--            <tr>-->
+                    <!--                <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>-->
+                    <!--                <td class="text-end"><span t-field="line.quantity"/></td>-->
+                    <!--                <td class="text-end"><span t-field="line.price_unit"/></td>-->
                                     <!--<td class="text-end"><span t-field="line.quantity"/></td>-->
-                                </tr>
-                            </t>
-                        </tbody>
-                    </table>
+                    <!--            </tr>-->
+                    <!--        </t>-->
+                    <!--    </tbody>-->
+                    <!--</table>-->
 
                     <div class="row pt-3 pb-2">
                         <div class="col-12">
@@ -129,7 +129,7 @@
                         </div>
                     </div>
 
-                    <hr />
+                    <hr/>
 
                     <div class="row" style="page-break-inside:avoid;">
                         <div class="col-6"/>
@@ -137,7 +137,7 @@
                             BALANCE DUE
                         </div>
                         <div class="col-3">
-                            <span t-field="o.amount_residual"/>
+                            <span t-field="o.total_training_price"/>
                         </div>
                     </div>
 
@@ -158,7 +158,7 @@
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-12">
                             <p>
-                            We kindly request you to transfer OR deposit cheque payment to below bank account details<br />
+                            We kindly request you to transfer OR deposit cheque payment to below bank account details<br/>
                             Account Name: NIL Data Communications Middle East DMCC<br/>
                             Emirates Islamic Bank<br/>
                             JLT Branch - Dubai- UAE<br/>

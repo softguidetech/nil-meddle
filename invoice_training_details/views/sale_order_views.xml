@@ -37,6 +37,17 @@
                             <field name="half_payment_after"/>
                         </group>
                     </group>
+                    <group>
+                        <group>
+                            <field name="display_training_table"/>
+                            <field name="display_signature"/>
+                            <field name="display_stamp"/>
+                            <field name="display_ksa_qr"/>
+                        </group>
+                        <group>
+                            <field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start"/>
+                        </group>
+                    </group>
                 </page>
 
                 <page id="extra_information" string="Extra Information">

@@ -6,10 +6,10 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
-            <xpath expr="//page[@name='tag_ids']" position="after">
+            <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
                 </xpath>
-                <xpath expr="//page[@name='partner_id']" position="after">
+                <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
                 </xpath>
                 

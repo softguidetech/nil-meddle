@@ -14,6 +14,8 @@ class SaleOrder(models.Model):
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    descriptions = fields.Char(string='Description')
+    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
@@ -50,6 +52,8 @@ class SaleOrder(models.Model):
             'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
             'catering': self.catering,
+            'descriptions': self.descriptions,
+            'ordering_partner_id': self.ordering_partner_id,
             
             'instructor_id': self.instructor_id.id,
             'training_id': self.training_id.id,

@@ -72,13 +72,17 @@
                     </div>
 
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
-                        <thead>
+                         <thead>
                             <tr>
                                 <th name="th_item"><span>Item</span></th>
                                 <th name="th_training_name"><span>Training Name</span></th>
+                                <th name="th_training_name"><span>Description</span></th>
+                             
                                 <th name="th_training_name"><span>Instructor Name</span></th>
                                 <th name="th_training_name"><span>Language</span></th>
                                 <th name="th_of_students"><span># Of Students</span></th>
+                                <th name="th_training_name"><span>Location</span></th>
+                                <th name="th_training_name"><span>Where?</span></th>
                                 <th name="th_duration"><span>Duration</span></th>
                                 <th name="th_training_date"><span>Training Dates</span></th>
                                 <th name="th_training_date"><span>Training Price</span></th>
@@ -94,8 +98,11 @@
                                 <tr>
                                     <td><span t-esc="item"/></td>
                                     <td><span t-field="training.training_id.name"/></td>
-                                    <td><span t-field="training.instructor_id.name"/></td>
+                                    <td><span t-field="training.descriptions"/></td>
+                                    <td><span t-field="training.where_location"/></td>
                                     <td><span t-field="training.train_language"/></td>
+                                    <td><span t-field="training.no_of_student"/></td>
+                                    <td><span t-field="training.location"/></td>
                                     <td><span t-field="training.no_of_student"/></td>
                                     <td><span t-field="training.duration"/></td>
                                     <td><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>

@@ -31,7 +31,7 @@ class Lead(models.Model):
 
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Char(string='Catering')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
 
     @api.depends('training_course_ids.price')
     def _compute_training_price(self):

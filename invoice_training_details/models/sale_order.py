@@ -55,7 +55,7 @@ class SaleOrder(models.Model):
             'instructor_logistics': self.instructor_logistics,
             'catering': self.catering,
             'descriptions': self.descriptions,
-            'ordering_partner_id': self.ordering_partner_id.id,
+            # 'ordering_partner_id': self.ordering_partner_id.id,
             'where_location': self.where_location,
             
             'instructor_id': self.instructor_id.id,

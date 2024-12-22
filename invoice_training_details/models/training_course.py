@@ -11,7 +11,7 @@ class TrainingCourse(models.Model):
 
     name = fields.Char(string='Training Name',)
     no_of_student = fields.Integer(string='No of Student')
-    duration = fields.Integer(string='Duration',compute='_compute_date')
+    duration = fields.Char(string='Duration',compute='_compute_date')
     training_date_start = fields.Date(string='Training Date start')
     training_date_end = fields.Date(string='Training Date end')
     price = fields.Float(string='Training Price')
@@ -48,7 +48,7 @@ class TrainingCourse(models.Model):
         duration = 0
         for rec in self:
             duration = rec.training_date_end - rec.training_date_start
-            if duration >0:
-                rec.duration = duration
-            else:
-                rec.duration = 0
+            # if duration >0:
+            rec.duration = str(duration)
+            # else:
+            #     rec.duration = 0

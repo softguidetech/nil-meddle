@@ -54,15 +54,15 @@ class SaleOrder(models.Model):
             'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
             'catering': self.catering,
-            'descriptions': self.descriptions,
+            # 'descriptions': self.descriptions,
             # 'ordering_partner_id': self.ordering_partner_id.id,
             # 'where_location': self.where_location,
             
             'instructor_id': self.instructor_id.id,
             'training_id': self.training_id.id,
-            'train_language': self.train_language,
-            'location': self.location,
-            'payment_method': self.payment_method,
+            # 'train_language': self.train_language,
+            # 'location': self.location,
+            # 'payment_method': self.payment_method,
             'clcs_qty': self.clcs_qty,
         })
         return vals

@@ -37,7 +37,7 @@ class AccountMove(models.Model):
 
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Char(string='Catering')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
 
     ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
 

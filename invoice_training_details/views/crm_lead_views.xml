@@ -6,18 +6,27 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <xpath expr="//page[@name='tag_ids']" position="after">
+                <field name="instructor_id"/>
+                </xpath>
+                <xpath expr="//page[@name='partner_id']" position="after">
+                <field name="ordering_partner_id"/>
+                </xpath>
+                
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
                         <field name="training_name"/>
+                        
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
                             
                             <field name="training_id"/>
-                            <field name="instructor_id"/>
+                            <field name="descriptions"/>
                             <field name="train_language"/>
                             <field name="location"/>
+                            <field name="where_location" invisible="location != 'Customer Choice'"/>
                             <field name="payment_method"/>
                             
                             <!--<field name="name"/>-->

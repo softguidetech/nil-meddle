@@ -20,9 +20,11 @@ class TrainingCourse(models.Model):
     sale_id = fields.Many2one('sale.order', string='Sale Order')
     
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
+    where_location = fields.Char(string='Where?')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     
@@ -43,4 +45,10 @@ class TrainingCourse(models.Model):
         #     # else:
         #     #     self.duration = 0
         # else:
-        self.duration = 0
+        duration = 0
+        for rec in self:
+            duration = rec.training_date_end - rec.training_date_start
+            if duration >0:
+                rec.duration = duration
+            else:
+                rec.duration = 0

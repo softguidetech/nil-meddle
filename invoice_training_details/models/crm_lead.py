@@ -16,6 +16,8 @@ class Lead(models.Model):
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    descriptions = fields.Char(string='Description')
+    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
@@ -48,7 +50,8 @@ class Lead(models.Model):
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
             'default_catering': self.catering,
-            
+            'default_descriptions': self.descriptions,
+            'default_ordering_partner': self.ordering_partner_id.id,
             'default_instructor_id': self.instructor_id.id,
             'default_training_id': self.training_id.id,
             'default_train_language': self.train_language,

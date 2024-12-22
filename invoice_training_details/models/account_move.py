@@ -28,6 +28,7 @@ class AccountMove(models.Model):
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
+    where_location = fields.Char(string='Where?')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     
     # extra information tab

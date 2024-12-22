@@ -22,9 +22,9 @@ class AccountMove(models.Model):
     display_ksa_qr = fields.Boolean(string='Display KSA QR', help='display KSA Qr in training invoice PDF.')
     
     #Add extera
-    instructor_id = fields.Many2one('res.employee',string="Instructor")
+    instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
-    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
+    # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])

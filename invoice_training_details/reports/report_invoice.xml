@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="report_invoice_document_training" name="Invoice Report Training">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang"/>
+                <t t-call="invoice_training_details.custom_invoice_report_layout">
+                    <t t-set="o" t-value="o.with_context(lang=lang)" />
+                    <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
+                    <div class="row">
+                        <div class="col-12">
+                            <span class="h4 text-info">INVOICE</span>
+                        </div>
+                    </div>
+                    <div class="row pt-3 pb-3">
+                        <div class="col-8">
+                            <div>
+                                <strong>INVOICE TO</strong>
+                                <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div>
+                                <table class="table table-borderless">
+                                    <tr class="p-0">
+                                        <td class="p-0">INVOICE</td>
+                                        <td class="p-0"><span t-field="o.name"/></td>
+                                    </tr>
+                                    <tr class="p-0">
+                                        <td class="p-0">DATE</td>
+                                        <td class="p-0"><span t-field="o.invoice_date"/></td>
+                                    </tr>
+                                    <tr class="p-0" t-if="o.invoice_payment_term_id">
+                                        <td class="p-0">TERMS</td>
+                                        <td class="p-0"><span t-field="o.invoice_payment_term_id"/></td>
+                                    </tr>
+                                    <tr class="p-0">
+                                        <td class="p-0">DUE DATE</td>
+                                        <td class="p-0"><span t-field="o.invoice_date_due"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm o_main_table table-borderless" name="invoice_line_table">
+                        <thead class="bg-light text-info">
+                            <tr>
+                                <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>
+                                <th name="th_quantity" class="text-end"><span>QTY</span></th>
+                                <th name="th_rate" class="text-end"><span>RATE</span></th>
+                                <th name="th_amount" class="text-end"><span>Sub Total</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                                <tr>
+                                    <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>
+                                    <td class="text-end"><span t-field="line.quantity"/></td>
+                                    <td class="text-end"><span t-field="line.price_unit"/></td>
+                                    <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div class="row pt-3 pb-2">
+                        <div class="col-12">
+                            Training Courses Details: <span t-field="o.training_name"/>
+                        </div>
+                    </div>
+
+                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
+                        <thead>
+                            <tr>
+                                <th name="th_item"><span>Item</span></th>
+                                <th name="th_training_name"><span>Training Name</span></th>
+                                <th name="th_training_name"><span>Description</span></th>
+                             
+                                <th name="th_training_name"><span>Instructor Name</span></th>
+                                <th name="th_training_name"><span>Language</span></th>
+                                <th name="th_of_students"><span># Of Students</span></th>
+                                <th name="th_training_name"><span>Location</span></th>
+                                <th name="th_training_name"><span>Where?</span></th>
+                                <th name="th_duration"><span>Duration</span></th>
+                                <th name="th_training_date"><span>Training Dates</span></th>
+                                <th name="th_training_date"><span>Training Price</span></th>
+                                <th name="th_training_date" style="max-width:80px;"><span>Total Training Price</span></th>
+                                <th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>
+                                <th name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="item" t-value="1"/>
+                            <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
+                            <t t-foreach="o.training_course_ids" t-as="training">
+                                <tr>
+                                    <td><span t-esc="item"/></td>
+                                    <td><span t-field="training.training_id.name"/></td>
+                                    <td><span t-field="training.descriptions"/></td>
+                                    <td><span t-field="training.instructor_id.name"/></td>
+                                    <td><span t-field="training.train_language"/></td>
+                                    <td><span t-field="training.no_of_student"/></td>
+                                    <td><span t-field="training.location"/></td>
+                                    <td><span t-field="training.where_location"/></td>
+                                    <td><span t-field="training.duration"/></td>
+                                    <td><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
+                                    <td><span t-field="training.price"/></td>
+                                    <t t-if="item == 1">
+                                        <td t-att-rowspan="total_rows"><span t-field="o.total_training_price"/></td>
+                                        <td t-att-rowspan="total_rows"><span t-field="o.half_advance_payment_before"/></td>
+                                        <td t-att-rowspan="total_rows"><span t-field="o.half_payment_after"/></td>
+                                    </t>
+                                </tr>
+                                <t t-set="item" t-value="item + 1"/>
+                            </t>
+                            <tr>
+                                <td colspan="7" class="text-end"><span>Grand Total</span></td>
+                                <td><span t-field="o.half_advance_payment_before"/></td>
+                                <td><span t-field="o.half_payment_after"/></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+                        <div class="col-8">
+                            <p>
+                            1. PO Reference #: PCD-006-2024<br/>
+                            2. PO Amendment PCD-006-2024<br/>
+                            3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia.<br/>
+                            4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.<br/>
+                            5. Taqnia Cyber will pay the taxes to KSA authorities directly.<br/>
+                            6. Taqnia Cyber must bear Money transfers or bank charges on payment.<br/>
+                            </p>
+                        </div>
+                    </div>
+
+                    <hr />
+
+                    <div class="row" style="page-break-inside:avoid;">
+                        <div class="col-6"/>
+                        <div class="col-3">
+                            BALANCE DUE
+                        </div>
+                        <div class="col-3">
+                            <span t-field="o.amount_residual"/>
+                        </div>
+                    </div>
+
+                    <div class="row" style="page-break-inside:avoid;">
+                        <div name="ksa_qr" class="col-4">
+                            <t t-if="o.display_ksa_qr">
+                                <img t-if="o.ks_qr_code" class="pt-5" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>
+                            </t>
+                        </div>
+                        <div name="stamp" class="col-4">
+                            <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
+                        </div>
+                        <div name="signature" class="col-4">
+                            <img t-if="o.company_id.signature and o.display_signature" class="pt-5" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 200px;" alt="Stamp"/>
+                        </div>
+                    </div>
+
+                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+                        <div class="col-12">
+                            <p>
+                            We kindly request you to transfer OR deposit cheque payment to below bank account details<br />
+                            Account Name: NIL Data Communications Middle East DMCC<br/>
+                            Emirates Islamic Bank<br/>
+                            JLT Branch - Dubai- UAE<br/>
+                            Swiftcode: MEBLAEAD<br/>
+                            Account Currency: USD<br/>
+                            IBAN: AE690340003528215597102<br/>
+                            </p>
+                        </div>
+                    </div>
+
+                </t>
+            </t>
+        </t>
+    </template>
+
+</odoo>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="custom_invoice_report_layout" inherit_id="web.external_layout_standard" primary="True">
+        <div t-attf-class="header o_company_#{company.id}_layout" position="replace">
+            <t t-set="company" t-value="request.env.company"/>
+            <div class="header o_company_#{company.id}_layout">
+                <div class="row mb-2">
+                    <div class="col-9">
+                        <strong id="company_name" class="h5 fw-bold">
+                            <t t-esc="company.name" />
+                        </strong>
+                        <div t-field="company.street" class="pt-1"/>
+                        <div t-field="company.street2" class="pt-1"/>
+                        <div t-field="company.city" class="pt-1"/>
+                        <div t-field="company.state_id.name" class="pt-1"/>
+                        <div t-field="company.country_id.name" class="pt-1"/>
+                        <div t-field="company.phone" class="pt-1"/>
+                        <div t-field="company.email" class="pt-1"/>
+                    </div>
+                    <div class="col-3">
+                        <img t-if="company.logo" class="pt-5" t-att-src="image_data_uri(company.logo)" style="max-height: 130px;" alt="Logo"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <xpath expr="//div[@t-attf-class='footer o_standard_footer o_company_#{company.id}_layout']" position="replace">
+        </xpath>
+    </template>
+
+</odoo>

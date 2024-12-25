@@ -49,6 +49,10 @@
                         <group>
                             <field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start"/>
                         </group>
+                        <group>
+                            <field name= "bank_details"/>
+                            <field name= "term_and_cond"/>
+                        </group>
                     </group>
                 </page>
                 

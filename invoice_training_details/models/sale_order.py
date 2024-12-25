@@ -7,6 +7,7 @@ class SaleOrder(models.Model):
     _inherit = "sale.order"
 
     training_name = fields.Char(string='Training Name')
+    service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
@@ -67,6 +68,8 @@ class SaleOrder(models.Model):
             # 'location': self.location,
             # 'payment_method': self.payment_method,
             'clcs_qty': self.clcs_qty,
+            'service_name': self.service_name,
+            
         })
         return vals
         

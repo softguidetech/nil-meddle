@@ -58,7 +58,7 @@
                 
                 <page id="pro" name="Professional Services">
                     <group>
-                        <field name="training_name"/>
+                        <field name="service_name"/>
                         
                     </group>
                     <field name="pro_service_ids">

@@ -117,8 +117,8 @@
                             </t>
                             <tr>
                                 <td colspan="7" class="text-end"><span>Grand Total</span></td>
-                                <td><span t-field="o.half_advance_payment_before"/></td>
-                                <td><span t-field="o.half_payment_after"/></td>
+                                <td><span t-field="o.total_training_price"/></td>
+                                <!--<td><span t-field="o.half_payment_after"/></td>-->
                             </tr>
                         </tbody>
                     </table>
@@ -126,7 +126,7 @@
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-8">
                             <p>
-                            <span t-field="term_and_cond"/>
+                            <span t-field="o.term_and_cond"/>
                             </p>
                         </div>
                     </div>
@@ -160,7 +160,7 @@
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-12">
                             <p>
-                            <span t-field="bank_details"/>
+                            <span t-field="o.bank_details"/>
                             </p>
                         </div>
                     </div>

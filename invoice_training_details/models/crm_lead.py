@@ -10,9 +10,9 @@ class Lead(models.Model):
 
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
-    total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
-    half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+    total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
+    half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
+    half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',srting='Professional Services')
     #Add extera
@@ -22,7 +22,7 @@ class Lead(models.Model):
     training_id = fields.Many2one('product.template',string='Training Name')
     
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
+    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     

@@ -11,6 +11,7 @@ class SaleOrder(models.Model):
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
+    pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -49,6 +50,7 @@ class SaleOrder(models.Model):
             'half_advance_payment_before': self.half_advance_payment_before,
             'half_payment_after': self.half_payment_after,
             'training_course_ids': [(6, 0, self.training_course_ids.ids)],
+            'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
             'clcs_qty': self.clcs_qty,
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,

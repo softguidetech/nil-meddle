@@ -15,7 +15,8 @@ class AccountMove(models.Model):
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'move_id', string='Training Courses')
-
+    pro_service_ids = fields.One2many('pro.service','pro_move_id',srting='Professional Services')
+    
     display_training_table = fields.Boolean(string='Display Training Table', help='display traning table in training invoice PDF.')
     display_signature = fields.Boolean(string='Display Signature', help='display signature in training invoice PDF.')
     display_stamp = fields.Boolean(string='Display Stamp', help='display Stamp in training invoice PDF.')

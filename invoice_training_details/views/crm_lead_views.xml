@@ -47,6 +47,40 @@
                         </group>
                     </group>
                 </page>
+                
+                 <page id="pro" name="Professional Services">
+                    <group>
+                        <field name="training_name"/>
+                        
+                    </group>
+                    <field name="pro_service_ids">
+                        <tree editable="bottom">
+                            
+                            <!--<field name="training_id"/>-->
+                            <field name="descriptions"/>
+                            <field name="train_language"/>
+                            <field name="location"/>
+                            <field name="where_location" invisible="location != 'Customer Choice'"/>
+                            <field name="payment_method"/>
+                            
+                            <!--<field name="name"/>-->
+                            <field name="no_of_student"/>
+                            <field name="duration"/>
+                            <field name="training_date_start"/>
+                            <field name="training_date_end"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_training_price"/>
+                        </group>
+                        <group>
+                            <field name="half_advance_payment_before"/>
+                            <field name="half_payment_after"/>
+                        </group>
+                    </group>
+                </page>
 
                 <page id="extra_information" string="Extra Information">
                     <group>

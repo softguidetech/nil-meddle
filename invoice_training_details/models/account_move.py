@@ -12,9 +12,9 @@ class AccountMove(models.Model):
 
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
-    total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
-    half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+    total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
+    half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
+    half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'move_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_move_id',srting='Professional Services')
     
@@ -44,7 +44,7 @@ class AccountMove(models.Model):
 
     ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
     
-    bank_details = fields.Html(string='Bank Details)
+    bank_details = fields.Html(string='Bank Details')
     term_and_cond = fields.Html(string='Term and conditions')
     
     def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):

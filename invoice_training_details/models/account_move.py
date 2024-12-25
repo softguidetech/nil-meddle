@@ -12,9 +12,9 @@ class AccountMove(models.Model):
 
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
-    total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
-    half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+    total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
+    half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
+    half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'move_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_move_id',srting='Professional Services')
     
@@ -29,8 +29,8 @@ class AccountMove(models.Model):
     # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
-    where_location = fields.Char(string='Where?')
+    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
+    where_location = fields.Char(string='Where?',default='Webex')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     
     # extra information tab
@@ -44,8 +44,8 @@ class AccountMove(models.Model):
 
     ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
     
-    bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
-    term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
+    bank_details = fields.Html(string='Bank Details)
+    term_and_cond = fields.Html(string='Term and conditions')
     
     def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):
         # Encode data in TLV format

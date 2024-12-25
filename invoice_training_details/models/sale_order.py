@@ -8,9 +8,9 @@ class SaleOrder(models.Model):
 
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
-    total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
-    half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+    total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
+    half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
+    half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
     
@@ -20,8 +20,8 @@ class SaleOrder(models.Model):
     # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
-    where_location = fields.Char(string='Where?')
+    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
+    where_location = fields.Char(string='Where?',default='Webex')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     
     display_training_table = fields.Boolean(string='Display Training Table', help='display traning table in training invoice PDF.')
@@ -69,6 +69,8 @@ class SaleOrder(models.Model):
             # 'payment_method': self.payment_method,
             'clcs_qty': self.clcs_qty,
             'service_name': self.service_name,
+            'bank_details': self.bank_details,
+            'term_and_cond': self.term_and_cond,
             
         })
         return vals

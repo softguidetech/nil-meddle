@@ -11,6 +11,7 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     training_name = fields.Char(string='Training Name')
+    service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')

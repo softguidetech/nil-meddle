@@ -9,6 +9,7 @@ class Lead(models.Model):
     _inherit = 'crm.lead'
 
     training_name = fields.Char(string='Training Name')
+    service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
@@ -60,5 +61,6 @@ class Lead(models.Model):
             'default_location': self.location,
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
+            'default_service_name': self.service_name,
         })
         return quotation_context

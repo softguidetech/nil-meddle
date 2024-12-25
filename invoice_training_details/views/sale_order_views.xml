@@ -60,7 +60,7 @@
                     <field name="pro_service_ids">
                         <tree editable="bottom">
                             
-                            <!--<field name="training_id"/>-->
+                            <field name="training_id"/>
                             <field name="descriptions"/>
                             <field name="train_language"/>
                             <field name="location"/>

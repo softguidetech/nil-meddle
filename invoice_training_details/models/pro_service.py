@@ -21,7 +21,7 @@ class ProService(models.Model):
     
     # instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
-    training_id = fields.Many2one('product.template',string='Training Name')
+    training_id = fields.Many2one('product.template',string='Service Name')
     train_language = fields.Char(string='Language')
     location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
     where_location = fields.Char(string='Where?')
@@ -30,25 +30,10 @@ class ProService(models.Model):
     
     
     def _compute_date(self):
-        # if self.training_date_start and self.training_date_end:
-        #     # date2 = str(self.training_date_end)
-        #     # date1 = str(self.training_date_start)
-        #     # d1 = datetime.strptime(date1, "%Y-%m-%d")
-        #     # d2 = datetime.strptime(date2, "%Y-%m-%d")
-    
-        #     # difference between dates in timedelta
-        #     delta = self.training_date_end - self.training_date_start
-        #     # raise ValidationError(delta.day())
-        #     # if int(delta) >= 0:
-            
-        #     self.duration = delta.days
-        #     # else:
-        #     #     self.duration = 0
-        # else:
+        
         duration = 0
         for rec in self:
             duration = rec.training_date_end - rec.training_date_start
-            # if duration >0:
+            duration.replace("00:00:00")
             rec.duration = str(duration)
-            # else:
-            #     rec.duration = 0
+           

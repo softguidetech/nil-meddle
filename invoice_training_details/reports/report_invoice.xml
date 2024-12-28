@@ -2,11 +2,11 @@
 <odoo>
 
     <template id="report_invoice_document_training" name="Invoice Report Training">
-        <t t-call="web.html_container">
+         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
-                    <t t-set="o" t-value="o.with_context(lang=lang)" />
+                    <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
@@ -18,6 +18,7 @@
                             <div>
                                 <strong>INVOICE TO</strong>
                                 <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                                <div t-field="o.partner_id.vat" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
                             </div>
                         </div>
                         <div class="col-4">
@@ -50,6 +51,7 @@
                                 <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>
                                 <th name="th_quantity" class="text-end"><span>QTY</span></th>
                                 <th name="th_rate" class="text-end"><span>RATE</span></th>
+                                <th name="th_taxes" t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Taxes</span></th>
                                 <th name="th_amount" class="text-end"><span>Sub Total</span></th>
                             </tr>
                         </thead>
@@ -59,6 +61,10 @@
                                     <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>
                                     <td class="text-end"><span t-field="line.quantity"/></td>
                                     <td class="text-end"><span t-field="line.price_unit"/></td>
+                                    <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_ids])"/>
+                                            <td name="td_taxes" t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
+                                                <span t-out="taxes" id="line_tax_ids">Tax 15%</span>
+                                            </td>
                                     <td class="text-end"><span t-field="line.price_subtotal"/></td>
                                 </tr>
                             </t>
@@ -131,7 +137,7 @@
                         </div>
                     </div>
 
-                    <hr />
+                    <hr/>
 
                     <div class="row" style="page-break-inside:avoid;">
                         <div class="col-6"/>

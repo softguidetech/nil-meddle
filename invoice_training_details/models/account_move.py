@@ -23,6 +23,13 @@ class AccountMove(models.Model):
     display_stamp = fields.Boolean(string='Display Stamp', help='display Stamp in training invoice PDF.')
     display_ksa_qr = fields.Boolean(string='Display KSA QR', help='display KSA Qr in training invoice PDF.')
     
+    
+    display_instructor = fields.Boolean(string='Display Instructor', help='display Instructor in training invoice PDF.')
+    display_location = fields.Boolean(string='Display Location', help='display Location in training invoice PDF.')
+    display_downpayment = fields.Boolean(string='Display Downpayment', help='display Downpayment in training invoice PDF.')
+    display_total = fields.Boolean(string='Display Total Amount', help='display Total amount in training invoice PDF.')
+    display_due_amount = fields.Boolean(string='Display Due Amount', help='display Due in training invoice PDF.')
+    
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')

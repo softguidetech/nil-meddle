@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="report_invoice_document_training" name="Invoice Report Training">
-         <t t-call="web.html_container">
+        <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
@@ -16,12 +16,12 @@
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
-                                <strong>INVOICE TO</strong><br></br>
-                                <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br></br>
-                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"></div>
+                                <strong>INVOICE TO</strong><br/>
+                                <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
+                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
                                 <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
                                  
-                               TAX#: <strong t-field="o.partner_id.vat"></strong>
+                               TAX#: <strong t-field="o.partner_id.vat"/>
                             </div>
                         </div>
                         <div class="col-4">
@@ -55,7 +55,8 @@
                                 <th name="th_quantity" class="text-end"><span>QTY</span></th>
                                 <th name="th_rate" class="text-end"><span>RATE</span></th>
                                 <th name="th_taxes" t-attf-class="text-start {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Taxes</span></th>
-                                <th name="th_amount" class="text-end"><span>Sub Total</span></th>
+                                <th name="th_amount" class="text-end"><span>Total Tax.exc</span></th>
+                                <th name="th_amount" class="text-end"><span>Total Tax.inc</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -69,6 +70,7 @@
                                                 <span t-out="taxes" id="line_tax_ids">Tax 15%</span>
                                             </td>
                                     <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                                    <td class="text-end"><span t-field="line.price_total"/></td>
                                 </tr>
                             </t>
                         </tbody>

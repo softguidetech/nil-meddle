@@ -19,7 +19,7 @@
 
     "data": [
         
-        "views/contract_views.xml",
+        "views/contract_view.xml",
        
     ],
 

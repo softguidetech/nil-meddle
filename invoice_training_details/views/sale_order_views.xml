@@ -38,17 +38,64 @@
                             <field name="half_advance_payment_before"/>
                             <field name="half_payment_after"/>
                         </group>
+                        <group>
+                            <field name= "bank_details"/>
+                            <field name= "term_and_cond"/>
+                        </group>
                     </group>
                     <group>
-                        <group>
+                        <group string="Report PDF Element Display">
+                            
                             <field name="display_training_table"/>
                             <field name="display_signature"/>
                             <field name="display_stamp"/>
-                            <!--<field name="display_ksa_qr"/>-->
+                          
                         </group>
-                        <!--<group>-->
-                        <!--    <field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start"/>-->
-                        <!--</group>-->
+                        <group string="Column Display">
+                           
+                            <field name="display_instructor"/>
+                            <field name="display_location"/>
+                            <field name="display_downpayment"/>
+                            <field name="display_total"/>
+                            <field name="display_due_amount"/>
+                            
+                        </group>
+                        
+                       
+                    </group>
+                </page>
+                
+                <page id="pro" name="Professional Services">
+                    <group>
+                        <field name="service_name"/>
+                        
+                    </group>
+                    <field name="pro_service_ids">
+                        <tree editable="bottom">
+                            
+                            <field name="training_id"/>
+                            <field name="descriptions"/>
+                            <field name="train_language"/>
+                            <field name="location"/>
+                            <field name="where_location" invisible="location != 'Customer Choice'"/>
+                            <field name="payment_method"/>
+                            
+                            <!--<field name="name"/>-->
+                            <field name="no_of_student"/>
+                            <field name="duration"/>
+                            <field name="training_date_start"/>
+                            <field name="training_date_end"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_training_price"/>
+                        </group>
+                        <group>
+                            <field name="half_advance_payment_before"/>
+                            <field name="half_payment_after"/>
+                        </group>
                     </group>
                 </page>
 

@@ -5,24 +5,24 @@ from odoo import api, fields, models, tools
 from datetime import datetime
 from odoo.exceptions import ValidationError
 
-class TrainingCourse(models.Model):
-    _name = "training.course"
-    _description = 'Training Course'
+class ProService(models.Model):
+    _name = "pro.service"
+    _description = 'Propfessional Services'
 
-    name = fields.Char(string='Training Name',)
+    name = fields.Char(string='Service Name',)
     no_of_student = fields.Integer(string='No of Student')
     duration = fields.Char(string='Duration',compute='_compute_date')
     training_date_start = fields.Date(string='Training Date start')
     training_date_end = fields.Date(string='Training Date end')
     price = fields.Float(string='Training Price')
-    move_id = fields.Many2one('account.move', string='Move')
-    lead_id = fields.Many2one('crm.lead', string='Lead')
-    sale_id = fields.Many2one('sale.order', string='Sale Order')
+    pro_move_id = fields.Many2one('account.move', string='Move')
+    pro_lead_id = fields.Many2one('crm.lead', string='Lead')
+    pro_sale_id = fields.Many2one('sale.order', string='Sale Order')
     
-    instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    # instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
-    training_id = fields.Many2one('product.template',string='Training Name')
-    train_language = fields.Char(string='Training Language')
+    training_id = fields.Many2one('product.template',string='Service Name')
+    train_language = fields.Char(string='Language')
     location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
     where_location = fields.Char(string='Where?',default='Webex')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
@@ -34,6 +34,6 @@ class TrainingCourse(models.Model):
         duration = 0
         for rec in self:
             duration = rec.training_date_end - rec.training_date_start
-            days= str(duration).replace('0:00:00','')
+            days = str(duration).replace('0:00:00','')
             rec.duration = days
-         
+           

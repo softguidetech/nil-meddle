@@ -16,8 +16,8 @@
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
-                                <strong>INVOICE TO</strong>
-                                <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                                <!--<strong>INVOICE TO</strong>-->
+                                <div t-field="o.partner_id" t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
                             </div>
                         </div>
                         <div class="col-4">
@@ -72,23 +72,23 @@
                     </div>
 
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
-                         <thead>
+                        <thead>
                             <tr>
                                 <th name="th_item"><span>Item</span></th>
                                 <th name="th_training_name"><span>Training Name</span></th>
                                 <th name="th_training_name"><span>Description</span></th>
                              
-                                <th name="th_training_name"><span>Instructor Name</span></th>
+                                <th t-if="o.display_instructor" name="th_training_name"><span>Instructor Name</span></th>
                                 <th name="th_training_name"><span>Language</span></th>
                                 <th name="th_of_students"><span># Of Students</span></th>
-                                <th name="th_training_name"><span>Location</span></th>
+                                <th t-if="o.display_location" name="th_training_name"><span>Location</span></th>
                                 <th name="th_training_name"><span>Where?</span></th>
                                 <th name="th_duration"><span>Duration</span></th>
                                 <th name="th_training_date"><span>Training Dates</span></th>
                                 <th name="th_training_date"><span>Training Price</span></th>
-                                <th name="th_training_date" style="max-width:80px;"><span>Total Training Price</span></th>
-                                <th name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>
-                                <th name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>
+                                <th t-if="o.display_total" name="th_training_date" style="max-width:80px;"><span>Total Training Price</span></th>
+                                <th  t-if="o.display_downpayment" name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>
+                                <th t-if="o.display_due_amount" name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -99,26 +99,26 @@
                                     <td><span t-esc="item"/></td>
                                     <td><span t-field="training.training_id.name"/></td>
                                     <td><span t-field="training.descriptions"/></td>
-                                    <td><span t-field="training.instructor_id.name"/></td>
+                                    <td t-if="o.display_instructor"><span t-field="training.instructor_id.name"/></td>
                                     <td><span t-field="training.train_language"/></td>
                                     <td><span t-field="training.no_of_student"/></td>
-                                    <td><span t-field="training.location"/></td>
+                                    <td  t-if="o.display_location"><span t-field="training.location"/></td>
                                     <td><span t-field="training.where_location"/></td>
                                     <td><span t-field="training.duration"/></td>
                                     <td><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
                                     <td><span t-field="training.price"/></td>
                                     <t t-if="item == 1">
-                                        <td t-att-rowspan="total_rows"><span t-field="o.total_training_price"/></td>
-                                        <td t-att-rowspan="total_rows"><span t-field="o.half_advance_payment_before"/></td>
-                                        <td t-att-rowspan="total_rows"><span t-field="o.half_payment_after"/></td>
+                                        <td t-if="o.display_total" t-att-rowspan="total_rows"><span t-field="o.total_training_price"/></td>
+                                        <td t-if="o.display_downpayment" t-att-rowspan="total_rows"><span t-field="o.half_advance_payment_before"/></td>
+                                        <td t-if="o.display_due_amount" t-att-rowspan="total_rows"><span t-field="o.half_payment_after"/></td>
                                     </t>
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>
                             </t>
                             <tr>
                                 <td colspan="7" class="text-end"><span>Grand Total</span></td>
-                                <td><span t-field="o.half_advance_payment_before"/></td>
-                                <td><span t-field="o.half_payment_after"/></td>
+                                <td><span t-field="o.total_training_price"/></td>
+                                <!--<td><span t-field="o.half_payment_after"/></td>-->
                             </tr>
                         </tbody>
                     </table>
@@ -126,12 +126,7 @@
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-8">
                             <p>
-                            1. PO Reference #: PCD-006-2024<br/>
-                            2. PO Amendment PCD-006-2024<br/>
-                            3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia.<br/>
-                            4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.<br/>
-                            5. Taqnia Cyber will pay the taxes to KSA authorities directly.<br/>
-                            6. Taqnia Cyber must bear Money transfers or bank charges on payment.<br/>
+                           <span t-field="o.term_and_cond"/>
                             </p>
                         </div>
                     </div>
@@ -165,13 +160,7 @@
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-12">
                             <p>
-                            We kindly request you to transfer OR deposit cheque payment to below bank account details<br/>
-                            Account Name: NIL Data Communications Middle East DMCC<br/>
-                            Emirates Islamic Bank<br/>
-                            JLT Branch - Dubai- UAE<br/>
-                            Swiftcode: MEBLAEAD<br/>
-                            Account Currency: USD<br/>
-                            IBAN: AE690340003528215597102<br/>
+                            <span t-field="o.bank_details"/>
                             </p>
                         </div>
                     </div>

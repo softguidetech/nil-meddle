@@ -11,15 +11,24 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     training_name = fields.Char(string='Training Name')
-    total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
-    half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+    service_name = fields.Char(string='Service Name')
+    total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
+    half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
+    half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'move_id', string='Training Courses')
-
+    pro_service_ids = fields.One2many('pro.service','pro_move_id',srting='Professional Services')
+    
     display_training_table = fields.Boolean(string='Display Training Table', help='display traning table in training invoice PDF.')
     display_signature = fields.Boolean(string='Display Signature', help='display signature in training invoice PDF.')
     display_stamp = fields.Boolean(string='Display Stamp', help='display Stamp in training invoice PDF.')
     display_ksa_qr = fields.Boolean(string='Display KSA QR', help='display KSA Qr in training invoice PDF.')
+    
+    
+    display_instructor = fields.Boolean(string='Display Instructor', help='display Instructor in training invoice PDF.')
+    display_location = fields.Boolean(string='Display Location', help='display Location in training invoice PDF.')
+    display_downpayment = fields.Boolean(string='Display Downpayment', help='display Downpayment in training invoice PDF.')
+    display_total = fields.Boolean(string='Display Total Amount', help='display Total amount in training invoice PDF.')
+    display_due_amount = fields.Boolean(string='Display Due Amount', help='display Due in training invoice PDF.')
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -27,8 +36,8 @@ class AccountMove(models.Model):
     # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','DXB'),('KSA','KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
-    where_location = fields.Char(string='Where?')
+    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
+    where_location = fields.Char(string='Where?',default='Webex')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     
     # extra information tab
@@ -41,7 +50,10 @@ class AccountMove(models.Model):
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
 
     ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
-
+    
+    bank_details = fields.Html(string='Bank Details')
+    term_and_cond = fields.Html(string='Term and conditions')
+    
     def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):
         # Encode data in TLV format
         def encode_tlv(tag, value):

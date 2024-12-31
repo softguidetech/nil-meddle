@@ -140,7 +140,7 @@ class SaleOrder(models.Model):
                 'product_id': rec.training_id.id,
                 'product_uom_qty': 1,
                 'price_unit': rec.price,
-                'order_id': self.id,
+                # 'order_id': self.id,
                 
             }
             l.append((6, 0, val))

@@ -106,3 +106,19 @@ class AccountMove(models.Model):
     def _compute_training_price(self):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+    
+    def synch_order(self):
+        l = []
+        for rec in self.training_course_ids:
+            val = {
+
+                'product_id': rec.training_id.id,
+                'quantity': 1,
+                'price_unit': rec.price,
+                
+            }
+            l.append((0, 0, val))
+        self.write({'invoice_line_ids': l})
+            
+            
+                  

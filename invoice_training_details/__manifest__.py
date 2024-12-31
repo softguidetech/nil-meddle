@@ -10,7 +10,7 @@
 
     # Author
     "author": "",
-    "website": "https://www.example.com",
+    "website": "https://www.softguidetech.com",
     "license": "LGPL-3",
 
     # Dependency

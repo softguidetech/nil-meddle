@@ -34,6 +34,8 @@ class SaleOrder(models.Model):
     display_downpayment = fields.Boolean(string='Display Downpayment', help='display Downpayment in training invoice PDF.')
     display_total = fields.Boolean(string='Display Total Amount', help='display Total amount in training invoice PDF.')
     display_due_amount = fields.Boolean(string='Display Due Amount', help='display Due in training invoice PDF.')
+    display_where = fields.Boolean(string="Display Where?")
+    display_description = fields.Boolean(string="Display Description")
     
     
     # extra information tab

@@ -58,8 +58,8 @@ class AccountMove(models.Model):
     term_and_cond = fields.Html(string='Term and conditions')
     
     def _compute_am_paid(self):
-        if self.amount_residual and self.price_total:
-            self.invoice_payment_am = self.price_total - self.amount_residual
+        if self.amount_residual and self.amount_total:
+            self.invoice_payment_am = self.amount_total - self.amount_residual
     
     def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):
         # Encode data in TLV format

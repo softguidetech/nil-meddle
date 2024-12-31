@@ -10,7 +10,7 @@
                 <page id="training" name="Training">
                     <group>
                         <field name="training_name"/>
-                        <button name="synch_order" string="Synch Order" class="highlight" type="object"/>
+                        <button name="synch_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">

@@ -8,12 +8,14 @@
         <field name="inherit_id" ref="hr_contract.hr_contract_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='wage']" position="after">
+                <group string="Salary Computation Details">
                 <field name="basic_salary"/>
                 <field name="mobile_allowance"/>
                 <field name="transport_allowance"/>
                 <field name="housing_allowance"/>
                 <field name="schooling_allowance"/>
                 <field name="other_allowance"/>
+                </group>
             </xpath>
         </field>
     </record>

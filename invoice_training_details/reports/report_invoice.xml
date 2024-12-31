@@ -16,7 +16,7 @@
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
-                                <strong>INVOICE TO</strong><br/>
+                                <!--<strong>INVOICE TO</strong><br/>-->
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
                                 <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>

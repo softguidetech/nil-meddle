@@ -134,6 +134,7 @@ class SaleOrder(models.Model):
             
     def synch_order(self):
         l = []
+        e = []
         for rec in self.training_course_ids:
             val = {
 
@@ -144,7 +145,9 @@ class SaleOrder(models.Model):
                 
             }
             l.append((0, 0, val))
-        self.write({'order_line',[]})
+            
+        e.append((0,0,{}))
+        self.write({'order_line',e})
         self.write({'order_line': l})
             
             

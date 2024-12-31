@@ -143,7 +143,7 @@ class SaleOrder(models.Model):
                 
             }
             l.append((0, 0, val))
-        self.write({'order_line': l})
+        self.update({'order_line': l})
             
             
 

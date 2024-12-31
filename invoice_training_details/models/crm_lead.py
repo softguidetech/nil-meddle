@@ -44,8 +44,8 @@ class Lead(models.Model):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context.update({
             'default_training_name': self.training_name,
-            'default_half_advance_payment_before': self.half_advance_payment_before,
-            'default_half_payment_after': self.half_payment_after,
+            # 'default_half_advance_payment_before': self.half_advance_payment_before,
+            # 'default_half_payment_after': self.half_payment_after,
             'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
             'default_clcs_qty': self.clcs_qty,

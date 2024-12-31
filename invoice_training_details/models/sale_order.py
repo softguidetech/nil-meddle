@@ -143,9 +143,9 @@ class SaleOrder(models.Model):
                 # 'order_id': self.id,
                 
             }
-            l.append((6, 0, val))
-        
-        self.update({'order_line': l})
+            l.append((0, 0, val))
+        self.write({'order_line',[]})
+        self.write({'order_line': l})
             
             
 

@@ -58,6 +58,9 @@
                             <field name="display_downpayment"/>
                             <field name="display_total"/>
                             <field name="display_due_amount"/>
+                            <field name="display_where"/>
+                            <field name="display_description"/>
+                            
                             
                         </group>
                         

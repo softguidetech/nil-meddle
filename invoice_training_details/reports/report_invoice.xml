@@ -132,9 +132,15 @@
                                 <!--<td><span t-field="o.half_payment_after"/></td>-->
                             </tr>
                             <tr>
-                                 <td colspan="7" t-if="o.display_downpayment" t-att-rowspan="total_rows"><span t-field="o.invoice_payment_am"/></td>
-                                        <td t-if="o.display_due_amount" t-att-rowspan="total_rows"><span t-field="o.amount_residual"/></td>
+                             <td t-if="o.display_downpayment" colspan="7" t-att-rowspan="total_rows">Amount Paid</td>
+                             <td t-if="o.display_downpayment" t-att-rowspan="total_rows"><span t-field="o.invoice_payment_am"/></td>
+                                        
                             </tr>
+                            <tr>
+                                 <td t-if="o.display_due_amount" colspan="7" t-att-rowspan="total_rows">Amount Due</td>
+                                <td t-if="o.display_due_amount" t-att-rowspan="total_rows"><span t-field="o.amount_residual"/></td>
+                            </tr>
+                            
                         </tbody>
                     </table>
 

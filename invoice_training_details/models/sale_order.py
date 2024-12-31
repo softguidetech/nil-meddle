@@ -140,10 +140,12 @@ class SaleOrder(models.Model):
                 'product_id': rec.training_id.id,
                 'product_uom_qty': 1,
                 'price_unit': rec.price,
+                'order_id': self.id,
                 
             }
             l.append((0, 0, val))
-        self.update({'order_line': l})
+        
+        self.create({'order_line': l})
             
             
 

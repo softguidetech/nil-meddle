@@ -138,7 +138,7 @@ class SaleOrder(models.Model):
             val = {
 
                 'product_id': rec.training_id.id,
-                'quantity': 1,
+                'product_uom_qty': 1,
                 'price_unit': rec.price,
                 
             }

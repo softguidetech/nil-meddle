@@ -17,6 +17,7 @@ class AccountMove(models.Model):
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'move_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_move_id',srting='Professional Services')
+    invoice_payment_am = fields.Monetary(string="Amount Paid",compute='_compute_am_paid')
     
     display_training_table = fields.Boolean(string='Display Training Table', help='display traning table in training invoice PDF.')
     display_signature = fields.Boolean(string='Display Signature', help='display signature in training invoice PDF.')
@@ -55,6 +56,10 @@ class AccountMove(models.Model):
     
     bank_details = fields.Html(string='Bank Details')
     term_and_cond = fields.Html(string='Term and conditions')
+    
+    def _compute_am_paid(self):
+        if self.amount_residual and self.price_total:
+            self.invoice_payment_am = self.price_total - self.amount_residual
     
     def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):
         # Encode data in TLV format

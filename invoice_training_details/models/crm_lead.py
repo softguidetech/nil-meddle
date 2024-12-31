@@ -30,7 +30,12 @@ class Lead(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
-
+    
+    # 
+    clc_cost = fields.Char(string="CLCs Cost")
+    rate_card = fields.Float(string="Rate Card $")
+    nilme_share = fields.Float(string="NIL ME Share $")
+    
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')

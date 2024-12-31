@@ -34,10 +34,10 @@
                         <group>
                             <field name="total_training_price"/>
                         </group>
-                        <group>
-                            <field name="half_advance_payment_before"/>
-                            <field name="half_payment_after"/>
-                        </group>
+                        <!--<group>-->
+                        <!--    <field name="half_advance_payment_before"/>-->
+                        <!--    <field name="half_payment_after"/>-->
+                        <!--</group>-->
                     </group>
 
                     <group>

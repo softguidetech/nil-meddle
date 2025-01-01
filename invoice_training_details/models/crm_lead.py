@@ -15,8 +15,8 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',srting='Professional Services')
-    ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',srting='Tickets')
-    hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',srting='Hotels')
+    ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
+    hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -96,11 +96,10 @@ class HotelHotel(models.Model):
             rec.price = rec.price_without_tax + rec.tax
             
     def _compute_nights(self):
-        
         duration = 0
         for rec in self:
             duration = rec.date_to - rec.date_from
-            days= str(duration).replace('days, 0:00:00','Nights')
+            days= str(duration).replace(', 0:00:00','Nights')
             rec.nights = days
             
     

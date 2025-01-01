@@ -103,6 +103,44 @@
                             <field name="instructor_logistics"/>
                             <field name="catering"/>
                         </group>
+                        <group string="Flights">
+                            <field name="ticket_ids">
+                            <tree>
+                                <field name="airline_id"/>
+                                <field name="origin_id"/>
+                                <field name="destination_id"/>
+                                <field name="date"/>
+                                <field name="duration"/>
+                                <field name="time_from"/>
+                                <field name="time_to"/>
+                                <field name="stop"/>
+                                <field name="class_type_id"/>
+                                <field name="currency_id"/>
+                                <field name="price"/>
+                            
+                            </tree>
+                            </field>
+                        </group>
+                        
+                        <group string="Hotels">
+                            <field name="hotel_ids">
+                            <tree>
+                                <field name="hotel_id"/>
+                                <field name="date_from"/>
+                                <field name="date_to"/>
+                                <field name="nights"/>
+                                <field name="location"/>
+                                <field name="pax"/>
+                                <field name="des"/>
+                                <field name="room_type"/>
+                                <field name="currency_id"/>
+                                <field name="price_without_tax"/>
+                                <field name="tax"/>
+                                <field name="price"/>
+                               
+                            </tree>
+                            </field>
+                        </group>
                     </group>
                 </page>
 

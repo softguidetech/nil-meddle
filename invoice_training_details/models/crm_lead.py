@@ -15,6 +15,9 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',srting='Professional Services')
+    ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',srting='Tickets')
+    hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',srting='Hotels')
+    
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
@@ -69,3 +72,86 @@ class Lead(models.Model):
             'default_service_name': self.service_name,
         })
         return quotation_context
+
+class HotelHotel(models.Model):
+    _name = 'hotel.hotel'
+    _description='Hotels'
+    
+    hotel_lead_id = fields.Many2one('crm.lead',string="Lead")
+    hotel_id = fields.Many2one('hotel.description',string="Hotel")
+    date_from = fields.Date(string="Date From")
+    date_to = fields.Date(string="Date To")
+    nights = fields.Char(string="Nights",compute='_compute_nights')
+    location = fields.Char(string="Location")
+    pax = fields.Char(string="PAX")
+    des = fields.Char(string="Description")
+    room_type = fields.Char(string="Room Type")
+    currency_id = fields.Many2one('res.currency',string="Currency",required=True)
+    price_without_tax = fields.Monetary(string="Price",required=True)
+    tax = fields.Monetary(string="Taxes",required=True)
+    price = fields.Monetary(string="Price with Tax",compute='_compute_total')
+    
+    def _compute_total(self):
+        for rec in self:
+            rec.price = rec.price_without_tax + rec.tax
+            
+    def _compute_nights(self):
+        
+        duration = 0
+        for rec in self:
+            duration = rec.date_to - rec.date_from
+            days= str(duration).replace('days, 0:00:00','Nights')
+            rec.nights = days
+            
+    
+class TicketTicket(models.Model):
+    _name = 'ticket.ticket'
+    _description='Tickets'   
+    
+    ticket_lead_id = fields.Many2one('crm.lead',string="Lead")
+    airline_id = fields.Many2one('airline.airline',string="Airlines")
+    origin_id = fields.Many2one('loca.loca',string="Origin")
+    destination_id = fields.Many2one('loca.loca',string="Destination")
+    date = fields.Date(string="Date")
+    duration = fields.Char(string="Duration")
+    time_from = fields.Float(string="Availabe Time From")
+    time_to = fields.Float(string="Availabe Time To")
+    stop = fields.Char(string="Stop")
+    class_type_id = fields.Many2one('flight.class.type',string="Class Type")
+    currency_id = fields.Many2one('res.currency',string="Currency",required=True)
+    price = fields.Monetary(string="Price with Taxes",required=True)
+    
+class AirlineAirline(models.Model):
+    _name = 'airline.airline'
+    _description= 'Airlines'
+    
+    name = fields.Char(string="Airline",required=True)
+    
+class LocaLoca(models.Model):
+    _name = 'loca.loca'
+    _description= 'Locations'
+    
+    name = fields.Char(string="Location",required=True)
+
+class FlightClassType(models.Model):
+    _name = 'flight.class.type'
+    _description= 'Classes'
+    
+    name = fields.Char(string="Class Type",required=True)
+    
+    
+class HotelDescription(models.Model):
+    _name = 'hotel.description'
+    _description= 'Hotel Description'
+    
+    name = fields.Char(string="Hotel",required=True)
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

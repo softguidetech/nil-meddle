@@ -99,10 +99,10 @@
 
                 <page id="logistics" string="Logistics">
                     <group>
-                        <group>
+                        <!--<group>-->
                             <field name="instructor_logistics"/>
                             <field name="catering"/>
-                        
+                    </group>
                         <!--<group string="Flights">-->
                             <!--<group>-->
                             <field name="ticket_ids">
@@ -144,8 +144,8 @@
                             </tree>
                             </field>
                             <!--</group>-->
-                        </group>
-                    </group>
+                        <!--</group>-->
+                    <!--</group>-->
                 </page>
 
             </xpath>

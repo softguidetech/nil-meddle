@@ -1,3 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_training_course,training.course,model_training_course,base.group_user,1,1,1,1
 access_pro_service,pro.service,model_pro_service,base.group_user,1,1,1,1
+access_hotel,hotel.hotel,model_hotel_hotel,base.group_user,1,1,1,1
+access_ticket,ticket.ticket,model_ticket_ticket,base.group_user,1,1,1,1
+access_airline,airline.airline,model_airline_airline,base.group_user,1,1,1,1
+access_loca,loca_loca,model_loca_loca,base.group_user,1,1,1,1
+access_flight_class_type,flight.class.type,model_flight_class_type,base.group_user,1,1,1,1
+access_hotel_des,hotel.description,model_hotel_description,base.group_user,1,1,1,1

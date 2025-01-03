@@ -146,6 +146,16 @@
                             <group>
                                 <field name="total_price_all"/>
                             </group>
+                           
+                            <group string="Visa Details">
+                                <field name="visa"/>
+                                <field name="start_date"/>
+                                <field name="to_date"/>
+                                <field name="book_details_id" widget="many2many_binary"/>
+                                <field name="details"/>
+                                <field name="cost"/>
+                                
+                            </group>
                             <!--</group>-->
                         <!--</group>-->
                     <!--</group>-->

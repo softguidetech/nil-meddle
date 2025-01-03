@@ -18,6 +18,14 @@ class Lead(models.Model):
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Amount",compute='_compute_total')
+    visa = fields.Boolean(string="Visa")
+    start_date = fields.Date(string="From Date")
+    to_date = fields.Date(string="To Date")
+    book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
+                                         string="Booking Details",
+                                         help='You can attach the copy of your document', copy=False)
+    details = fields.Html(string="Details")
+    cost = fields.Float(string="Cost")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

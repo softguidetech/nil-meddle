@@ -134,11 +134,18 @@
                                  <td colspan="5" t-if="o.display_downpayment"  ><span>Amount Paid</span></td>
                                  <td t-if="o.display_downpayment" ><span t-field="o.invoice_payment_am"/></td>
                               </tr>  
+                              
+                              <tr>
+                           
+                                 <td colspan="5" t-if="o.display_downpayment"  ><span>Amount Paid (%)</span></td>
+                                 <td t-if="o.display_downpayment" ><span t-field="o.invoice_payment_per"/></td>
+                              </tr>  
                               <tr>
                            
                                  <td colspan="5" t-if="o.display_due_amount" ><span>Amount Due </span></td>
                                  <td t-if="o.display_due_amount"><span t-field="o.amount_residual"/></td>
-                            </tr>
+                              </tr>
+                              
                             
                             
                         </tbody>

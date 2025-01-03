@@ -17,8 +17,7 @@ class SaleOrder(models.Model):
                               ('done','Locked'),
                               ('cancel','Cancelled')],default='draft')
     team_custom_id = fields.Many2one(
-        comodel_name="sale.team.custom", string="Sale Team", domain="[('company_id', '=', company_id)]",
-        , states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, ondelete="restrict"
+        comodel_name="sale.team.custom", string="Sale Team", domain="[('company_id', '=', company_id)]",states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, ondelete="restrict"
     )
 
     approver_ids = fields.One2many(

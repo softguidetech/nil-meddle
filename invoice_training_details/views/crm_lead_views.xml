@@ -143,9 +143,7 @@
                                
                             </tree>
                             </field>
-                            <group>
-                                <field name="total_price_all"/>
-                            </group>
+                            
                            
                             <group string="Visa Details">
                                 <field name="visa"/>
@@ -156,6 +154,10 @@
                                 <field name="cost"/>
                                 
                             </group>
+                            <group>
+                                <field name="total_price_all"/>
+                            </group>
+                            
                             <!--</group>-->
                         <!--</group>-->
                     <!--</group>-->

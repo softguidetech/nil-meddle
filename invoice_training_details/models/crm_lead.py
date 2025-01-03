@@ -55,13 +55,14 @@ class Lead(models.Model):
     def _compute_total(self):
         ticket_total =0
         hotel_toal=0
+        cost = 0
         for rec in self:
             if rec.ticket_ids and rec.hotel_ids:
                 for ticket in rec.ticket_ids:
                     ticket_total+=ticket.price
                 for hotel in rec.hotel_ids:
                     hotel_toal+=hotel.price
-                rec.total_price_all = ticket_total + hotel_toal
+                rec.total_price_all = ticket_total + hotel_toal + rec.cost
             else:
                 rec.total_price_all = 0
                 

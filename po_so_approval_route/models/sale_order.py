@@ -41,6 +41,14 @@ class SaleOrder(models.Model):
 
     amount_total = fields.Monetary(tracking=True)
 
+    # def _can_be_confirmed(self):
+    #     self.ensure_one()
+    #     return self.state in {'draft', 'sent'}
+
+    def _can_be_confirmed(self):
+        self.ensure_one()
+        return self.state in {'draft', 'to approve', 'sent'}
+
     def _track_subtype(self, init_values):
         self.ensure_one()
         if 'amount_total' in init_values and self.amount_total != init_values.get('amount_total'):

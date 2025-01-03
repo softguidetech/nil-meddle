@@ -62,19 +62,28 @@ class SaleOrder(models.Model):
                         # Send request to approve is there is next approver
                         order.send_to_approve()
                     else:
-                        # If there is not next approval, than assume that approval is finished and send notification
                         partner = order.user_id.partner_id if order.user_id else order.create_uid.partner_id
-                        order.message_post_with_view(
-                            'po_so_approval_route.order_approval',
-                            subject=_('SO Approved: %s') % (order.name,),
-                            composition_mode='mass_mail',
-                            partner_ids=[(4, partner.id)],
-                            auto_delete=True,
-                            auto_delete_message=True,
-                            parent_id=False,
-                            subtype_id=self.env.ref('mail.mt_note').id)
-                        # Do default behaviour to set state as "sale" and update date_approve
+                        order.message_post(
+                            body=_('Sale Order "%s" has been approved.') % order.name,
+                            partner_ids=[partner.id],
+                            subtype_id=self.env.ref('mail.mt_note').id
+                        )
                         return super(SaleOrder, order).action_confirm()
+
+                # else:
+                    #     # If there is not next approval, than assume that approval is finished and send notification
+                    #     partner = order.user_id.partner_id if order.user_id else order.create_uid.partner_id
+                    #     order.message_post_with_view(
+                    #         'po_so_approval_route.order_approval',
+                    #         subject=_('SO Approved: %s') % (order.name,),
+                    #         composition_mode='mass_mail',
+                    #         partner_ids=[(4, partner.id)],
+                    #         auto_delete=True,
+                    #         auto_delete_message=True,
+                    #         parent_id=False,
+                    #         subtype_id=self.env.ref('mail.mt_note').id)
+                    #     # Do default behaviour to set state as "sale" and update date_approve
+                    #     return super(SaleOrder, order).action_confirm()
 
     def action_confirm(self):
         for order in self:
@@ -202,15 +211,21 @@ class SaleOrder(models.Model):
             current_approver_partner = order.current_approver.user_id.partner_id
             if current_approver_partner not in order.message_partner_ids:
                 order.message_subscribe([current_approver_partner.id])
-            order.with_user(order.user_id).message_post_with_view(
-                'po_so_approval_route.request_to_approve_so',
-                subject=_('Sale Approval: %s') % (order.name,),
-                composition_mode='mass_mail',
-                partner_ids=[(4, current_approver_partner.id)],
-                auto_delete=True,
-                auto_delete_message=True,
-                parent_id=False,
-                subtype_id=self.env.ref('mail.mt_note').id)
+            order.message_post(
+                body=_('You are requested to approve the Sale Order <b>%s</b>.') % order.name,
+                partner_ids=[current_approver_partner.id],
+                subtype_id=self.env.ref('mail.mt_comment').id
+            )
+
+            # order.with_user(order.user_id).message_post_with_view(
+            #     'po_so_approval_route.request_to_approve_so',
+            #     subject=_('Sale Approval: %s') % (order.name,),
+            #     composition_mode='mass_mail',
+            #     partner_ids=[(4, current_approver_partner.id)],
+            #     auto_delete=True,
+            #     auto_delete_message=True,
+            #     parent_id=False,
+            #     subtype_id=self.env.ref('mail.mt_note').id)
 
     def _check_lock_amount_total(self):
         msg = _('Sorry, you are not allowed to change Amount Total of SO. ')

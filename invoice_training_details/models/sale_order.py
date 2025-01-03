@@ -34,6 +34,8 @@ class SaleOrder(models.Model):
     display_downpayment = fields.Boolean(string='Display Downpayment', help='display Downpayment in training invoice PDF.')
     display_total = fields.Boolean(string='Display Total Amount', help='display Total amount in training invoice PDF.')
     display_due_amount = fields.Boolean(string='Display Due Amount', help='display Due in training invoice PDF.')
+    display_where = fields.Boolean(string="Display Where?")
+    display_description = fields.Boolean(string="Display Description")
     
     
     # extra information tab
@@ -129,4 +131,24 @@ class SaleOrder(models.Model):
     def _compute_training_price(self):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+            
+    def synch_order(self):
+        l = []
+       
+        for rec in self.training_course_ids:
+            val = {
+
+                'product_id': rec.training_id.id,
+                'product_uom_qty': 1,
+                'price_unit': rec.price,
+                # 'order_id': self.id,
+                
+            }
+            l.append((0, 0, val))
+            
+        
+        self.write({'order_line': []})
+        self.write({'order_line': l})
+            
+            
 

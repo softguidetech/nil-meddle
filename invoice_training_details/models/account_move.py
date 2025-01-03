@@ -17,6 +17,8 @@ class AccountMove(models.Model):
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'move_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_move_id',srting='Professional Services')
+    invoice_payment_am = fields.Monetary(string="Amount Paid",compute='_compute_am_paid')
+    invoice_payment_per = fields.Float(string="Amount Paid Percentage %",compute='_compute_am_paid_per')
     
     display_training_table = fields.Boolean(string='Display Training Table', help='display traning table in training invoice PDF.')
     display_signature = fields.Boolean(string='Display Signature', help='display signature in training invoice PDF.')
@@ -29,6 +31,8 @@ class AccountMove(models.Model):
     display_downpayment = fields.Boolean(string='Display Downpayment', help='display Downpayment in training invoice PDF.')
     display_total = fields.Boolean(string='Display Total Amount', help='display Total amount in training invoice PDF.')
     display_due_amount = fields.Boolean(string='Display Due Amount', help='display Due in training invoice PDF.')
+    display_where = fields.Boolean(string="Display Where?")
+    display_description = fields.Boolean(string="Display Description")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -53,6 +57,16 @@ class AccountMove(models.Model):
     
     bank_details = fields.Html(string='Bank Details')
     term_and_cond = fields.Html(string='Term and conditions')
+    
+    def _compute_am_paid_per(self):
+        per = 0
+        if self.invoice_payment_am > 0  and self.amount_total > 0:
+            per = self.invoice_payment_am / self.amount_total
+            self.invoice_payment_per = per * 100
+            
+    def _compute_am_paid(self):
+        if self.amount_residual and self.amount_total:
+            self.invoice_payment_am = self.amount_total - self.amount_residual
     
     def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):
         # Encode data in TLV format
@@ -99,3 +113,19 @@ class AccountMove(models.Model):
     def _compute_training_price(self):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+    
+    def synch_order(self):
+        l = []
+        for rec in self.training_course_ids:
+            val = {
+
+                'product_id': rec.training_id.id,
+                'quantity': 1,
+                'price_unit': rec.price,
+                
+            }
+            l.append((0, 0, val))
+        self.write({'invoice_line_ids': l})
+            
+            
+                  

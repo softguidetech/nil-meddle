@@ -83,7 +83,8 @@ class SaleOrder(models.Model):
 
             if not order.team_custom_id:
                 # Do default behaviour if SO Team is not set
-                super(SaleOrder, order).button_confirm()
+                super(SaleOrder, order).action_confirm()
+                # super(SaleOrder, order).button_confirm()
             else:
                 # Generate approval route and send SO to approve
                 # raise ValidationError('hhhhhh')

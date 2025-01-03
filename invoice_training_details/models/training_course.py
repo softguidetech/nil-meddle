@@ -21,7 +21,7 @@ class TrainingCourse(models.Model):
     
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
-    training_id = fields.Many2one('product.template',string='Training Name')
+    training_id = fields.Many2one('product.product',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
     where_location = fields.Char(string='Where?',default='Webex')

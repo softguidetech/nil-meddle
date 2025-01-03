@@ -65,7 +65,7 @@ class AccountMove(models.Model):
                 per = rec.invoice_payment_am / rec.amount_total
                 rec.invoice_payment_per = per * 100
             else:
-                rec.invoice_payment_am = 0
+                rec.invoice_payment_per = 0
             
     def _compute_am_paid(self):
         if self.amount_residual and self.amount_total:

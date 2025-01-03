@@ -139,6 +139,7 @@ class SaleOrder(models.Model):
             val = {
 
                 'product_template_id': rec.training_id.id,
+                'name': rec.training_id.name,
                 'product_uom_qty': 1,
                 'price_unit': rec.price,
                 # 'order_id': self.id,

@@ -45,6 +45,10 @@
                                         <td class="p-0">DUE DATE</td>
                                         <td class="p-0"><span t-field="o.invoice_date_due"/></td>
                                     </tr>
+                                    <tr class="p-0">
+                                        <td class="p-0">Currency Rate</td>
+                                        <td class="p-0"><span t-field="o.currency_id.rate"/></td>
+                                    </tr>
                                 </table>
                             </div>
                         </div>

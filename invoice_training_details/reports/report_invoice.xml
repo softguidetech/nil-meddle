@@ -120,7 +120,7 @@
                                     <td><span t-field="training.train_language"/></td>
                                     <td><span t-field="training.no_of_student"/></td>
                                     <td t-if="o.display_location"><span t-field="training.location"/></td>
-                                    <td t-if="o.display_where"><span t-field="training.where_location"/></td>
+                                    <td t-if="o.display_where"><span t-field="training.where_location2"/></td>
                                     <td><span t-field="training.duration"/></td>
                                     <td><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
                                     <td><span t-field="training.price"/></td>

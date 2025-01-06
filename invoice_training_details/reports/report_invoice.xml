@@ -16,10 +16,12 @@
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
-                                <!--<strong>INVOICE TO</strong><br/>-->
+                                <!--<strong>INVOICE TO</strong>-->
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
+                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
+                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br></br>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                                <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
                                  
                                TAX#: <strong t-field="o.partner_id.vat"/>
                             </div>
@@ -108,7 +110,7 @@
                             <t t-foreach="o.training_course_ids" t-as="training">
                                 <tr>
                                     <td><span t-esc="item"/></td>
-                                    <td><span t-field="training.training_id.name"/></td>
+                                    <td><span t-field="training.training_id"/></td>
                                     <td t-if="o.display_description"><span t-field="training.descriptions"/></td>
                                     <td t-if="o.display_instructor"><span t-field="training.instructor_id.name"/></td>
                                     <td><span t-field="training.train_language"/></td>

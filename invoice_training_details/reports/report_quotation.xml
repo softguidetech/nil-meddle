@@ -18,8 +18,10 @@
                             <div>
                                 <!--<strong>INVOICE TO</strong>-->
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
+                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
+                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br></br>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                <div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>
+                                <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
                                  
                             </div>
                         </div>

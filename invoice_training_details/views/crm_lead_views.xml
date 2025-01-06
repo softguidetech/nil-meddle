@@ -113,8 +113,8 @@
                                 <field name="destination_id"/>
                                 <field name="date"/>
                                 <field name="duration"/>
-                                <field name="time_from"/>
-                                <field name="time_to"/>
+                                <field name="time_from" widget="timesheet_uom"/>
+                                <field name="time_to" widget="timesheet_uom"/>
                                 <field name="stop"/>
                                 <field name="class_type_id"/>
                                 <field name="currency_id"/>

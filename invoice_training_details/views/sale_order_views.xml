@@ -121,7 +121,7 @@
                             <field name="instructor_logistics"/>
                             <field name="catering"/>
                         </group>
-                         </group>
+                    
                         <!--<group string="Flights">-->
                             <!--<group>-->
                             <field name="ticket_ids">

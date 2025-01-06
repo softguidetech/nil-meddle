@@ -37,6 +37,33 @@ class SaleOrder(models.Model):
     display_where = fields.Boolean(string="Display Where?")
     display_description = fields.Boolean(string="Display Description")
     
+    # 
+    ticket_ids = fields.One2many('ticket.ticket','ticket_order_id',string='Tickets')
+    hotel_ids = fields.One2many('hotel.hotel','hotel_order_id',string='Hotels')
+    total_price_all = fields.Float(string="Total Amount",compute='_compute_total')
+    visa = fields.Boolean(string="Visa")
+    start_date = fields.Date(string="From Date")
+    to_date = fields.Date(string="To Date")
+    book_details_id = fields.Many2many('ir.attachment', 'doc_attach_order', 'doc_id', 'attach_order_id',
+                                         string="Booking Details",
+                                         help='You can attach the copy of your document', copy=False)
+    details = fields.Html(string="Details")
+    cost = fields.Float(string="Cost")
+    
+    
+    def _compute_total(self):
+        ticket_total =0
+        hotel_toal=0
+        cost = 0
+        for rec in self:
+            if rec.ticket_ids and rec.hotel_ids:
+                for ticket in rec.ticket_ids:
+                    ticket_total+=ticket.price
+                for hotel in rec.hotel_ids:
+                    hotel_toal+=hotel.price
+                rec.total_price_all = ticket_total + hotel_toal + rec.cost
+            else:
+                rec.total_price_all = 0
     
     # extra information tab
     clcs_qty = fields.Float(string='CLCs Qty')

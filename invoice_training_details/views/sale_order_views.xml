@@ -21,7 +21,8 @@
                             <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
-                            <field name="where_location" invisible="location != 'Customer Choice'"/>
+                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
+                            <field name="where_location2"/>
                             <field name="payment_method"/>
                             
                             <!--<field name="name"/>-->
@@ -130,8 +131,8 @@
                                 <field name="destination_id"/>
                                 <field name="date"/>
                                 <field name="duration"/>
-                                <field name="time_from"/>
-                                <field name="time_to"/>
+                                <field name="time_from" widget="timesheet_uom"/>
+                                <field name="time_to" widget="timesheet_uom"/>
                                 <field name="stop"/>
                                 <field name="class_type_id"/>
                                 <field name="currency_id"/>

@@ -93,6 +93,15 @@ class Lead(models.Model):
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
             'default_service_name': self.service_name,
+            
+            'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
+            'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
+            'default_visa': self.visa,
+            'default_start_date': self.start_date,
+            'default_to_date': self.to_date,
+            'default_book_details_id': [(6, 0, self.book_details_id.ids)],
+            'default_details': self.details,
+            'default_cost': self.cost,
         })
         return quotation_context
 
@@ -101,6 +110,7 @@ class HotelHotel(models.Model):
     _description='Hotels'
     
     hotel_lead_id = fields.Many2one('crm.lead',string="Lead")
+    hotel_order_id = fields.Many2one('sale.order',string="Order")
     hotel_id = fields.Many2one('hotel.description',string="Hotel")
     date_from = fields.Date(string="Date From")
     date_to = fields.Date(string="Date To")
@@ -131,6 +141,7 @@ class TicketTicket(models.Model):
     _description='Tickets'   
     
     ticket_lead_id = fields.Many2one('crm.lead',string="Lead")
+    ticket_order_id = fields.Many2one('sale.order',string="Order")
     airline_id = fields.Many2one('airline.airline',string="Airlines")
     origin_id = fields.Many2one('loca.loca',string="Origin")
     destination_id = fields.Many2one('loca.loca',string="Destination")

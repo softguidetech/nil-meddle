@@ -62,10 +62,10 @@ class AccountMove(models.Model):
     def _compute_cur_tot(self):
         total = 0
         for rec in self:
-            if rec.amount_total and rec.currency_id:
-                rec.currency_total = rec.amount_total * rec.currency_id.rate
-            else:
-                rec.currency_total = 0
+            # if rec.amount_total and rec.currency_id:
+            rec.currency_total = rec.amount_total * rec.currency_id.rate
+            # else:
+                # rec.currency_total = 0
         
         
     def _compute_am_paid_per(self):

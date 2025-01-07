@@ -59,11 +59,13 @@ class AccountMove(models.Model):
     term_and_cond = fields.Html(string='Term and conditions')
     currency_total = fields.Float(string="Total in Currency",comput='_compute_cur_tot')
     
+    @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
         total = 0
         for rec in self:
             # if rec.amount_total and rec.currency_id:
-            rec.currency_total = rec.amount_total * rec.currency_id.rate
+            
+            rec.currency_total = float(rec.amount_total) * float(rec.currency_id.rate)
             # else:
                 # rec.currency_total = 0
         

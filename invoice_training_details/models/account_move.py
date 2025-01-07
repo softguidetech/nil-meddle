@@ -57,7 +57,17 @@ class AccountMove(models.Model):
     
     bank_details = fields.Html(string='Bank Details')
     term_and_cond = fields.Html(string='Term and conditions')
+    currency_total = fields.Float(string="Total in Currency",comput='_compute_cur_tot')
     
+    def _compute_cur_tot(self):
+        total = 0
+        for rec in self:
+            # if rec.amount_total and rec.currency_id:
+            rec.currency_total = rec.amount_total * rec.currency_id.rate
+            # else:
+                # rec.currency_total = 0
+        
+        
     def _compute_am_paid_per(self):
         per = 0
         for rec in self:
@@ -68,8 +78,11 @@ class AccountMove(models.Model):
                 rec.invoice_payment_per = 0
             
     def _compute_am_paid(self):
-        if self.amount_residual and self.amount_total:
-            self.invoice_payment_am = self.amount_total - self.amount_residual
+        for rec in self:
+            if rec.amount_residual and rec.amount_total:
+                rec.invoice_payment_am = rec.amount_total - rec.amount_residual
+            else:
+                rec.invoice_payment_am = 0
     
     def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):
         # Encode data in TLV format
@@ -116,7 +129,7 @@ class AccountMove(models.Model):
     def _compute_training_price(self):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-    
+        
     def synch_order(self):
         l = []
         for rec in self.training_course_ids:

@@ -17,6 +17,9 @@
                         <div class="col-8">
                             <div>
                                 <!--<strong>INVOICE TO</strong>-->
+                                <strong t-if="o.partner_id.is_company == True">Company Name:</strong><br/>
+                                <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
+                                
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
                                 <strong t-if="o.partner_id.is_company == False">Attention:</strong><br></br>
@@ -132,23 +135,35 @@
                                 <t t-set="item" t-value="item + 1"/>
                             </t>
                            <tr>
-                                <td colspan="5" >Grand Total</td>
+                                <td colspan="6" >Training Price</td>
                                 <td ><span t-field="o.total_training_price"/></td>
                              </tr>
                              <tr>
+                                <td colspan="6" >TAX</td>
+                                <td ><span t-field="o.amount_tax"/></td>
+                             </tr>
+                             <tr>
+                                <td colspan="6" >Toal with TAX</td>
+                                <td ><span t-field="o.amount_total"/></td>
+                             </tr>
+                              <tr>
+                                <td colspan="6" >Total with TAX @AED</td>
+                                <td ><span t-field="o.currency_total"/></td>
+                             </tr>
+                             <tr>
                            
-                                 <td colspan="5" t-if="o.display_downpayment"  ><span>Amount Paid</span></td>
+                                 <td colspan="6" t-if="o.display_downpayment"  ><span>Amount Paid</span></td>
                                  <td t-if="o.display_downpayment" ><span t-field="o.invoice_payment_am"/></td>
                               </tr>  
                               
                               <tr>
                            
-                                 <td colspan="5" t-if="o.display_downpayment"  ><span>Amount Paid (%)</span></td>
+                                 <td colspan="6" t-if="o.display_downpayment"  ><span>Amount Paid (%)</span></td>
                                  <td t-if="o.display_downpayment" ><span t-field="o.invoice_payment_per"/></td>
                               </tr>  
                               <tr>
                            
-                                 <td colspan="5" t-if="o.display_due_amount" ><span>Amount Due </span></td>
+                                 <td colspan="6" t-if="o.display_due_amount" ><span>Amount Due </span></td>
                                  <td t-if="o.display_due_amount"><span t-field="o.amount_residual"/></td>
                               </tr>
                               

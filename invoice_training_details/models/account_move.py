@@ -64,7 +64,7 @@ class AccountMove(models.Model):
         total = 0
         for rec in self:
             if rec.amount_total and rec.currency_id:
-                rec.currency_total = float(rec.amount_total) * float(rec.currency_id.rate)
+                rec.currency_total = float(rec.amount_total) / float(rec.currency_id.rate)
             # raise ValidationError(rec.currency_total)
             else:
                 rec.currency_total = 0

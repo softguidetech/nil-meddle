@@ -5,7 +5,7 @@ import base64
 import qrcode
 from io import BytesIO
 from odoo import models, fields, api
-
+from odoo.exceptions import ValidationError
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -57,17 +57,18 @@ class AccountMove(models.Model):
     
     bank_details = fields.Html(string='Bank Details')
     term_and_cond = fields.Html(string='Term and conditions')
-    currency_total = fields.Float(string="Total in Currency",comput='_compute_cur_tot')
+    currency_total = fields.Integer(string="Total in Currency",compute='_compute_cur_tot')
     
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
         total = 0
         for rec in self:
-            # if rec.amount_total and rec.currency_id:
-            
-            rec.currency_total = float(rec.amount_total) * float(rec.currency_id.rate)
-            # else:
-                # rec.currency_total = 0
+            if rec.amount_total and rec.currency_id:
+                rec.currency_total = float(rec.amount_total) / float(rec.currency_id.rate)
+                # round(rec.currency_total,2)
+            # raise ValidationError(rec.currency_total)
+            else:
+                rec.currency_total = 0
         
         
     def _compute_am_paid_per(self):
@@ -81,7 +82,7 @@ class AccountMove(models.Model):
             
     def _compute_am_paid(self):
         for rec in self:
-            if rec.amount_residual and rec.amount_total:
+            if rec.amount_total:
                 rec.invoice_payment_am = rec.amount_total - rec.amount_residual
             else:
                 rec.invoice_payment_am = 0

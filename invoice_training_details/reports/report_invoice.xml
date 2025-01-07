@@ -137,9 +137,9 @@
                     
                     
                     
-                    <div class="col-4">
+                    <div class="col-16">
                             <div>
-                            <table class="table table-borderless">
+                            <table style="text-align:right;" class="table table-borderless">
                               <tr>
                                 <td class="p-0" >Training Price</td>
                                 <td class="p-0"><span t-field="o.total_training_price"/></td>

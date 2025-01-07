@@ -5,7 +5,7 @@ import base64
 import qrcode
 from io import BytesIO
 from odoo import models, fields, api
-
+from odoo.exceptions import ValidationError
 
 class AccountMove(models.Model):
     _inherit = "account.move"
@@ -66,6 +66,7 @@ class AccountMove(models.Model):
             # if rec.amount_total and rec.currency_id:
             
             rec.currency_total = float(rec.amount_total) * float(rec.currency_id.rate)
+            raise ValidationError(rec.currency_total)
             # else:
                 # rec.currency_total = 0
         

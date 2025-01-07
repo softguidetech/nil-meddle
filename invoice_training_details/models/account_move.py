@@ -82,7 +82,7 @@ class AccountMove(models.Model):
             
     def _compute_am_paid(self):
         for rec in self:
-            if rec.amount_residual and rec.amount_total:
+            if rec.amount_total:
                 rec.invoice_payment_am = rec.amount_total - rec.amount_residual
             else:
                 rec.invoice_payment_am = 0

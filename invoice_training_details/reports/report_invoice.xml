@@ -144,7 +144,7 @@
                              </tr>
                              <tr>
                                 <td colspan="6" >Toal with TAX</td>
-                                <td ><span t-field="o.price_total"/></td>
+                                <td ><span t-field="o.amount_total"/></td>
                              </tr>
                               <tr>
                                 <td colspan="6" >Toal with TAX @AED</td>

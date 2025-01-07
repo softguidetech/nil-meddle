@@ -63,7 +63,7 @@ class AccountMove(models.Model):
         total = 0
         for rec in self:
             if rec.amount_total and rec.currency_id:
-                rec.currency_total = rec.pamount_total * rec.currency_id.rate
+                rec.currency_total = rec.amount_total * rec.currency_id.rate
             else:
                 rec.currency_total = 0
         

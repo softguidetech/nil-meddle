@@ -131,47 +131,56 @@
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>
                             </t>
-                           <tr>
-                                <td text-align="right" colspan="10" >Training Price</td>
-                                <td text-align="right"><span t-field="o.total_training_price"/></td>
-                             </tr>
-                             <tr>
-                                <td text-align="right" colspan="10" >TAX</td>
-                                <td text-align="right"><span t-field="o.amount_tax"/></td>
-                             </tr>
-                             <tr>
-                                <td text-align="right" colspan="10" >Total with TAX</td>
-                                <td text-align="right"><span t-field="o.amount_total"/></td>
-                             </tr>
-                              <tr>
-                                <td text-align="right" colspan="10">Currency Rate</td>
-                                <td text-align="right"><span t-field="o.currency_id.rate"/></td>
-                                </tr>
-                              <tr>
-                                <td text-align="right" colspan="10">Total with TAX @ <span t-field="o.company_id.currency_id.name"></span></td>
-                                <td text-align="right"><span t-field="o.currency_total"/></td>
-                             </tr>
-                             <tr>
-                           
-                                 <td text-align="right" colspan="10" t-if="o.display_downpayment"  ><span>Amount Paid</span></td>
-                                 <td text-align="right" t-if="o.display_downpayment" ><span t-field="o.invoice_payment_am"/></td>
-                              </tr>  
                               
-                              <tr>
-                           
-                                 <td text-align="right" colspan="10" t-if="o.display_downpayment"  ><span>Amount Paid (%)</span></td>
-                                 <td text-align="right" t-if="o.display_downpayment" ><span t-field="o.invoice_payment_per"/></td>
-                              </tr>  
-                              <tr>
-                           
-                                 <td text-align="right" colspan="10" t-if="o.display_due_amount" ><span>Amount Due </span></td>
-                                 <td text-align="right" t-if="o.display_due_amount"><span t-field="o.amount_residual"/></td>
-                              </tr>
-                              
-                            
-                            
                         </tbody>
                     </table>
+                    
+                    
+                    
+                    <div class="col-4">
+                            <div>
+                            <table class="table table-borderless">
+                              <tr>
+                                <td class="p-0" >Training Price</td>
+                                <td class="p-0"><span t-field="o.total_training_price"/></td>
+                             </tr>
+                             <tr>
+                                <td class="p-0" >TAX</td>
+                                <td class="p-0"><span t-field="o.amount_tax"/></td>
+                             </tr>
+                             <tr>
+                                <td class="p-0" >Total with TAX</td>
+                                <td class="p-0"><span t-field="o.amount_total"/></td>
+                             </tr>
+                              <tr>
+                                <td class="p-0">Currency Rate</td>
+                                <td class="p-0"><span t-field="o.currency_id.rate"/></td>
+                                </tr>
+                              <tr>
+                                <td class="p-0">Total with TAX @ <span t-field="o.company_id.currency_id.name"></span></td>
+                                <td class="p-0"><span t-field="o.currency_total"/></td>
+                             </tr>
+                             <tr>
+                           
+                                 <td class="p-0" t-if="o.display_downpayment"  ><span>Amount Paid</span></td>
+                                 <td class="p-0" t-if="o.display_downpayment" ><span t-field="o.invoice_payment_am"/></td>
+                              </tr>  
+                              
+                              <tr>
+                           
+                                 <td class="p-0" t-if="o.display_downpayment"  ><span>Amount Paid (%)</span></td>
+                                 <td class="p-0" t-if="o.display_downpayment" ><span t-field="o.invoice_payment_per"/></td>
+                              </tr>  
+                              <tr>
+                           
+                                 <td class="p-0" t-if="o.display_due_amount" ><span>Amount Due </span></td>
+                                 <td class="p-0" t-if="o.display_due_amount"><span t-field="o.amount_residual"/></td>
+                              </tr>
+                           </table>
+                           </div>
+                          </div>
+                    
+                    
 
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-8">

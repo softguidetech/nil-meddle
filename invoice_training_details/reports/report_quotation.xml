@@ -17,6 +17,9 @@
                         <div class="col-8">
                             <div>
                                 <!--<strong>INVOICE TO</strong>-->
+                                 <strong t-if="o.partner_id.is_company == True">Company Name:</strong><br/>
+                                <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
+                                
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
                                 <strong t-if="o.partner_id.is_company == False">Attention:</strong><br></br>

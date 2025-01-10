@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="report_quotation_document_training" name="Quotation Report Training">
-        <t t-call="web.html_container">
+         <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
@@ -22,7 +22,7 @@
                                 
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br></br>
+                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
                                 <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
                                  
@@ -110,7 +110,7 @@
                                     <td t-if="o.display_instructor"><span t-field="training.instructor_id.name"/></td>
                                     <td><span t-field="training.train_language"/></td>
                                     <td><span t-field="training.no_of_student"/></td>
-                                    <td  t-if="o.display_location"><span t-field="training.location"/></td>
+                                    <td t-if="o.display_location"><span t-field="training.location"/></td>
                                     <td t-if="o.display_where"><span t-field="training.where_location2"/></td>
                                     <td><span t-field="training.duration"/></td>
                                     <td><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
@@ -123,13 +123,62 @@
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>
                             </t>
-                            <tr>
-                                <td colspan="7" class="text-end"><span>Grand Total</span></td>
-                                <td><span t-field="o.total_training_price"/></td>
+                            <!--<tr>-->
+                            <!--    <td colspan="7" class="text-end"><span>Grand Total</span></td>-->
+                            <!--    <td><span t-field="o.total_training_price"/></td>-->
                                 <!--<td><span t-field="o.half_payment_after"/></td>-->
-                            </tr>
+                            <!--</tr>-->
                         </tbody>
                     </table>
+               <div class="clearfix" name="so_total_summary">
+                  <div id="total" class="row" name="total">
+                    <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
+                        <table class="table table-sm table-borderless">
+                            <!-- Tax totals -->
+                            <t t-set="tax_totals" t-value="o.tax_totals"/>
+                            <t t-foreach="tax_totals.get('subtotals')" t-as="subtotal">
+                  <tr class="border-black o_subtotal">
+                    <td><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
+
+                    <td class="text-end">
+                        <span t-att-class="oe_subtotal_footer_separator" t-out="subtotal['formatted_amount']">27.00</span>
+                    </td>
+                </tr>
+
+                <t t-set="subtotal_to_show" t-value="subtotal['name']"/>
+                <t t-call="account.tax_groups_totals"/>
+            </t>
+
+            <tr t-if="'formatted_rounding_amount' in tax_totals and tax_totals.get('rounding_amount') != 0">
+                <td>Rounding</td>
+                <td class="text-end">
+                    <span t-out="tax_totals.get('formatted_rounding_amount')">0</span>
+                </td>
+            </tr>
+            
+            <!--Total amount with all taxes-->
+            <tr class="border-black o_total">
+                <td><strong>Total</strong></td>
+                <td class="text-end">
+                    <span t-out="tax_totals.get('formatted_amount_total')">31.05</span>
+                </td>
+            </tr>
+            <tr class="border-black o_total">
+                                                <td><strong>Currency Rate</strong></td>
+                                                <td class="text-end">
+                                                    <span t-field="o.currency_id.rate">31.05</span>
+                                                </td>
+                                            </tr>
+                                            <tr class="border-black o_total">
+                                                <td><strong>Total Currency @</strong></td>
+                                                <td class="text-end">
+                                                    <span t-field="o.currency_total">31.05</span>
+                                                </td>
+                                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
 
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-8">
@@ -141,15 +190,15 @@
 
                     <hr/>
 
-                    <div class="row" style="page-break-inside:avoid;">
-                        <div class="col-6"/>
-                        <div class="col-3">
-                            BALANCE DUE
-                        </div>
-                        <div class="col-3">
-                            <span t-field="o.total_training_price"/>
-                        </div>
-                    </div>
+                    <!--<div class="row" style="page-break-inside:avoid;">-->
+                    <!--    <div class="col-6"/>-->
+                    <!--    <div class="col-3">-->
+                    <!--        BALANCE DUE-->
+                    <!--    </div>-->
+                    <!--    <div class="col-3">-->
+                    <!--        <span t-field="o.total_training_price"/>-->
+                    <!--    </div>-->
+                    <!--</div>-->
 
                     <div class="row" style="page-break-inside:avoid;">
                         <!--<div name="ksa_qr" class="col-4">-->

@@ -23,9 +23,9 @@ class TrainingCourse(models.Model):
     descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.product',string='Training Name')
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
-    where_location = fields.Char(string='Where?',default='Webex')
-    where_location2 = fields.Selection([('CISCO U','CISCO U'),('ILT','ILT'),('VILT','VILT'),('Online Self Learniing','Online Self Learnining')])
+    
+    where_location2 = fields.Char(string='Where?')
+    location = fields.Selection([('CISCO U','CISCO U'),('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     

@@ -20,8 +20,8 @@ class SaleOrder(models.Model):
     # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
-    where_location = fields.Char(string='Where?',default='Webex')
+    location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
+    where_location = fields.Char(string='Where?')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     
     display_training_table = fields.Boolean(string='Display Training Table', help='display traning table in training invoice PDF.')
@@ -50,6 +50,8 @@ class SaleOrder(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     
+    training_vendor = fields.Char(string="Training Vendor")
+    training_type = fields.Char(string="Training Type")
     
     def _compute_total(self):
         ticket_total =0
@@ -107,6 +109,9 @@ class SaleOrder(models.Model):
             'service_name': self.service_name,
             'bank_details': self.bank_details,
             'term_and_cond': self.term_and_cond,
+            
+            'training_vendor': self.training_vendor,
+            'training_type': self.training_type,
             
         })
         return vals

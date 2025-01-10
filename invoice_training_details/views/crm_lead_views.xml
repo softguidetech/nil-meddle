@@ -18,6 +18,9 @@
                     <group>
                         <field name="training_name"/>
                         
+                        <field name="training_vendor"/>
+                        <field name="training_type"/>
+                        
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">

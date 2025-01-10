@@ -26,6 +26,8 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
+    training_vendor = fields.Char(string="Training Vendor")
+    training_type = fields.Char(string="Training Type")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -34,7 +36,7 @@ class Lead(models.Model):
     training_id = fields.Many2one('product.template',string='Training Name')
     
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
+    location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     
@@ -102,6 +104,9 @@ class Lead(models.Model):
             'default_book_details_id': [(6, 0, self.book_details_id.ids)],
             'default_details': self.details,
             'default_cost': self.cost,
+            
+            'default_training_vendor': self.training_vendor,
+            'default_training_type': self.training_type,
         })
         return quotation_context
 

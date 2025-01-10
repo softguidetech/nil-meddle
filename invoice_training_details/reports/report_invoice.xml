@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="report_invoice_document_training" name="Invoice Report Training">
-        <t t-call="web.html_container">
+       <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
@@ -22,7 +22,7 @@
                                 
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br></br>
+                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
                                 <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
                                  
@@ -136,48 +136,66 @@
                     </table>
                     
                     
-                    
-                    <div class="col-16">
-                            <div>
-                            <table style="text-align:right;" class="table table-borderless">
-                              <tr>
-                                <td class="p-0" >Training Price</td>
-                                <td class="p-0"><span t-field="o.total_training_price"/></td>
-                             </tr>
-                             <tr>
-                                <td class="p-0" >TAX</td>
-                                <td class="p-0"><span t-field="o.amount_tax"/></td>
-                             </tr>
-                             <tr>
-                                <td class="p-0" >Total with TAX</td>
-                                <td class="p-0"><span t-field="o.amount_total"/></td>
-                             </tr>
-                              <tr>
-                                <td class="p-0">Currency Rate</td>
-                                <td class="p-0"><span t-field="o.currency_id.rate"/></td>
-                                </tr>
-                              <tr>
-                                <td class="p-0">Total with TAX @ <span t-field="o.company_id.currency_id.name"></span></td>
-                                <td class="p-0"><span t-field="o.currency_total"/></td>
-                             </tr>
-                             <tr>
-                           
-                                 <td class="p-0" t-if="o.display_downpayment"  ><span>Amount Paid</span></td>
-                                 <td class="p-0" t-if="o.display_downpayment" ><span t-field="o.invoice_payment_am"/></td>
-                              </tr>  
+                    <div id="right-elements" t-attf-class="#{'col-5' if report_type != 'html' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
+                                <div id="total" class="clearfix row">
+                                    <div class="ms-auto">
+                                        <table class="table table-sm table-borderless avoid-page-break-inside">
+
+                                            <!--Tax totals-->
+                                            <t t-set="tax_totals" t-value="o.tax_totals or {}"/>
+                                            <t t-call="account.document_tax_totals"/>
+                                             <!--Payments-->
+                                                <t t-if="o.payment_state != 'invoicing_legacy'">
+                                                    <t t-set="payments_vals" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
+                                                    <t t-foreach="payments_vals" t-as="payment_vals">
+                                                        <tr t-if="payment_vals['is_exchange'] == 0">
+                                                            <td>
+                                                                <i class="oe_form_field text-end oe_payment_label">Paid on <t t-out="payment_vals['date']" t-options="{&quot;widget&quot;: &quot;date&quot;}">2021-09-19</t></i>
+                                                            </td>
+                                                            <td class="text-end">
+                                                                <span t-out="payment_vals['amount']" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}">20.00</span>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                    <t t-if="len(payments_vals) &gt; 0">
+                                                        <tr class="border-black fw-bold">
+                                                            <td>Amount Due</td>
+                                                            <td class="text-end">
+                                                                <span t-field="o.amount_residual">11.05</span>
+                                                            </td>
+                                                        </tr>
+                                                    </t>
+                                                </t>
+                                             <tr class="border-black o_total">
+                                                <td><strong>Currency Rate</strong></td>
+                                                <td class="text-end">
+                                                    <span t-field="o.currency_id.rate">31.05</span>
+                                                </td>
+                                            </tr>
+                                            <tr class="border-black o_total">
+                                                <td><strong>Total Currency @</strong></td>
+                                                <td class="text-end">
+                                                    <span t-field="o.currency_total">31.05</span>
+                                                </td>
+                                            </tr>
+                                           
+                                            
+                                        </table>
+                                    </div>
+                            </div>
+                    </div>
+                     <div id="right-elements" t-attf-class="#{'col-5' if report_type != 'html' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
+                                <div id="total" class="clearfix row">
+                                    <div class="ms-auto">
+                                        <table class="table table-sm table-borderless avoid-page-break-inside">
+
+                    <!--<div class="col-16">-->
+                    <!--        <div>-->
+                    <!--        <table style="text-align:right;" class="table table-borderless">-->
                               
-                              <tr>
-                           
-                                 <td class="p-0" t-if="o.display_downpayment"  ><span>Amount Paid (%)</span></td>
-                                 <td class="p-0" t-if="o.display_downpayment" ><span t-field="o.invoice_payment_per"/></td>
-                              </tr>  
-                              <tr>
-                           
-                                 <td class="p-0" t-if="o.display_due_amount" ><span>Amount Due </span></td>
-                                 <td class="p-0" t-if="o.display_due_amount"><span t-field="o.amount_residual"/></td>
-                              </tr>
                            </table>
                            </div>
+                          </div>
                           </div>
                     
                     
@@ -192,15 +210,15 @@
 
                     <hr/>
 
-                    <div class="row" style="page-break-inside:avoid;">
-                        <div class="col-6"/>
-                        <div class="col-3">
-                            BALANCE DUE
-                        </div>
-                        <div class="col-3">
-                            <span t-field="o.amount_residual"/>
-                        </div>
-                    </div>
+                    <!--<div class="row" style="page-break-inside:avoid;">-->
+                    <!--    <div class="col-6"/>-->
+                    <!--    <div class="col-3">-->
+                    <!--        BALANCE DUE-->
+                    <!--    </div>-->
+                    <!--    <div class="col-3">-->
+                    <!--        <span t-field="o.amount_residual"/>-->
+                    <!--    </div>-->
+                    <!--</div>-->
 
                     <div class="row" style="page-break-inside:avoid;">
                         <div name="ksa_qr" class="col-4">

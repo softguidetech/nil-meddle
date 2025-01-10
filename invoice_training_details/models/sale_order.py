@@ -49,10 +49,22 @@ class SaleOrder(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
+    currency_total = fields.Integer(string="Total in Currency",compute='_compute_cur_tot')
     
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
     
+    @api.depends('amount_total', 'currency_id')
+    def _compute_cur_tot(self):
+        total = 0
+        for rec in self:
+            if rec.amount_total and rec.currency_id:
+                rec.currency_total = float(rec.amount_total) / float(rec.currency_rate)
+                # round(rec.currency_total,2)
+            # raise ValidationError(rec.currency_total)
+            else:
+                rec.currency_total = 0
+                
     def _compute_total(self):
         ticket_total =0
         hotel_toal=0

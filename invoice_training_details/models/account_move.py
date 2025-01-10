@@ -57,7 +57,7 @@ class AccountMove(models.Model):
     
     bank_details = fields.Html(string='Bank Details')
     term_and_cond = fields.Html(string='Term and conditions')
-    currency_total = fields.Integer(string="Total in Currency",compute='_compute_cur_tot')
+    currency_total = fields.Float(string="Total in Currency",compute='_compute_cur_tot')
     
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")

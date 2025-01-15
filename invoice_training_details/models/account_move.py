@@ -40,8 +40,8 @@ class AccountMove(models.Model):
     # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
-    where_location = fields.Char(string='Where?',default='Webex')
+    location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
+    where_location = fields.Char(string='Where?')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     
     # extra information tab
@@ -57,7 +57,10 @@ class AccountMove(models.Model):
     
     bank_details = fields.Html(string='Bank Details')
     term_and_cond = fields.Html(string='Term and conditions')
-    currency_total = fields.Integer(string="Total in Currency",compute='_compute_cur_tot')
+    currency_total = fields.Float(string="Total in Currency",compute='_compute_cur_tot')
+    
+    training_vendor = fields.Char(string="Training Vendor")
+    training_type = fields.Char(string="Training Type")
     
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):

@@ -101,10 +101,33 @@
                         <group>
                             <field name="total_training_price"/>
                         </group>
-                        <group>
-                            <field name="half_advance_payment_before"/>
-                            <field name="half_payment_after"/>
+                        <!--<group>-->
+                        <!--    <field name="half_advance_payment_before"/>-->
+                        <!--    <field name="half_payment_after"/>-->
+                        <!--</group>-->
+                    </group>
+                    <group>
+                        <group string="Report PDF Element Display">
+                            
+                            <field name="display_training_table"/>
+                            <field name="display_signature"/>
+                            <field name="display_stamp"/>
+                          
                         </group>
+                        <group string="Column Display">
+                           
+                            <field name="display_instructor"/>
+                            <field name="display_location"/>
+                            <field name="display_downpayment"/>
+                            <field name="display_total"/>
+                            <field name="display_due_amount"/>
+                            <field name="display_where"/>
+                            <field name="display_description"/>
+                            
+                            
+                        </group>
+                        
+                       
                     </group>
                 </page>
 

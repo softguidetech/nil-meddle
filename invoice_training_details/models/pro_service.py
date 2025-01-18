@@ -11,16 +11,18 @@ class ProService(models.Model):
 
     name = fields.Char(string='Service Name',)
     no_of_student = fields.Integer(string='No of Student')
-    duration = fields.Char(string='Duration',compute='_compute_date')
+    duration = fields.Char(string='Duration',)
     training_date_start = fields.Date(string='Training Date start')
     training_date_end = fields.Date(string='Training Date end')
-    price = fields.Float(string='Training Price')
+    price = fields.Float(string='Price')
     pro_move_id = fields.Many2one('account.move', string='Move')
     pro_lead_id = fields.Many2one('crm.lead', string='Lead')
     pro_sale_id = fields.Many2one('sale.order', string='Sale Order')
     
     # instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
+    wor_hour_number = fields.Flat(string='Working Hour Number')
+    hourly_rate = fields.Float(string='Hourly Rate')
     training_id = fields.Many2one('product.template',string='Service Name')
     train_language = fields.Char(string='Language')
     location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
@@ -29,11 +31,11 @@ class ProService(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     
     
-    def _compute_date(self):
+    # def _compute_date(self):
         
-        duration = 0
-        for rec in self:
-            duration = rec.training_date_end - rec.training_date_start
-            days = str(duration).replace(', 0:00:00','')
-            rec.duration = days
+    #     duration = 0
+    #     for rec in self:
+    #         duration = rec.training_date_end - rec.training_date_start
+    #         days = str(duration).replace(', 0:00:00','')
+    #         rec.duration = days
            

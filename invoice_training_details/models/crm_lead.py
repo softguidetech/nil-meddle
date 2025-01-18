@@ -68,11 +68,16 @@ class Lead(models.Model):
             else:
                 rec.total_price_all = 0
                 
-    @api.depends('training_course_ids.price')
+    @api.depends('training_course_ids.price','pro_service_ids.price')
     def _compute_training_price(self):
         for rec in self:
-            rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-
+            if rec.training_course_ids:
+                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+            if rec.pro_service_ids:
+                rec.total_training_price = sum(rec.pro_service_ids.mapped('price'))
+            else:
+                rec.total_training_price = 0
+                
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context.update({

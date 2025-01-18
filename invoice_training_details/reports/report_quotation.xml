@@ -130,7 +130,7 @@
                             <!-- Tax totals -->
                             <t t-set="tax_totals" t-value="o.tax_totals"/>
                             <t t-foreach="tax_totals.get('subtotals')" t-as="subtotal">
-                  <tr class="border-black">
+                  <tr class="border-black o_subtotal">
                     <td><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
 
                     <td class="text-end">
@@ -150,19 +150,19 @@
             </tr>
             
             <!--Total amount with all taxes-->
-            <tr class="o_total">
+            <tr class="border-black o_total">
                 <td><strong>Total</strong></td>
                 <td class="text-end">
                     <span t-out="tax_totals.get('formatted_amount_total')">31.05</span>
                 </td>
             </tr>
-            <tr class=" o_total">
+            <tr class="border-black o_total">
                                                 <td><strong>Currency Rate</strong></td>
                                                 <td class="text-end">
                                                     <span t-field="o.currency_id.rate">31.05</span>
                                                 </td>
                                             </tr>
-                                            <tr class=" o_total">
+                                            <tr class="border-black o_total">
                                                 <td><strong>Total Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
                                                 <td class="text-end">
                                                     <span t-field="o.currency_total"/>
@@ -218,6 +218,7 @@
                 </t>
             </t>
         </t>
-    </template>
+        
+            </template>
 
 </odoo>

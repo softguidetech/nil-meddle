@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="report_quotation_document_training" name="Quotation Report Training">
-          <t t-call="web.html_container">
+        <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
@@ -130,7 +130,7 @@
                             <!-- Tax totals -->
                             <t t-set="tax_totals" t-value="o.tax_totals"/>
                             <t t-foreach="tax_totals.get('subtotals')" t-as="subtotal">
-                  <tr class="border-black o_subtotal">
+                  <tr class="border-black">
                     <td><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
 
                     <td class="text-end">
@@ -150,19 +150,19 @@
             </tr>
             
             <!--Total amount with all taxes-->
-            <tr class="border-black o_total">
+            <tr class="o_total">
                 <td><strong>Total</strong></td>
                 <td class="text-end">
                     <span t-out="tax_totals.get('formatted_amount_total')">31.05</span>
                 </td>
             </tr>
-            <tr class="border-black o_total">
+            <tr class=" o_total">
                                                 <td><strong>Currency Rate</strong></td>
                                                 <td class="text-end">
                                                     <span t-field="o.currency_id.rate">31.05</span>
                                                 </td>
                                             </tr>
-                                            <tr class="border-black o_total">
+                                            <tr class=" o_total">
                                                 <td><strong>Total Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
                                                 <td class="text-end">
                                                     <span t-field="o.currency_total"/>
@@ -218,6 +218,6 @@
                 </t>
             </t>
         </t>
-        </template>
+    </template>
 
 </odoo>

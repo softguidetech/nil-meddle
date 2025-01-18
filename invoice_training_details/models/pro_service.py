@@ -21,7 +21,7 @@ class ProService(models.Model):
     
     # instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
-    wor_hour_number = fields.Flat(string='Working Hour Number')
+    wor_hour_number = fields.Float(string='Working Hour Number')
     hourly_rate = fields.Float(string='Hourly Rate')
     training_id = fields.Many2one('product.template',string='Service Name')
     train_language = fields.Char(string='Language')

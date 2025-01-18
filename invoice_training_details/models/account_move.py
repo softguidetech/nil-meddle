@@ -130,12 +130,17 @@ class AccountMove(models.Model):
                 )
             else:
                 move.ks_qr_code = False
-
-    @api.depends('training_course_ids.price')
+                
+    @api.depends('training_course_ids.price','pro_service_ids.price')
     def _compute_training_price(self):
         for rec in self:
-            rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-        
+            if rec.training_course_ids:
+                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+            if rec.pro_service_ids:
+                rec.total_training_price = sum(rec.pro_service_ids.mapped('price'))
+            else:
+                rec.total_training_price = 0
+                
     def synch_order(self):
         l = []
         for rec in self.training_course_ids:

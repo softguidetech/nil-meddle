@@ -90,11 +90,17 @@ class SaleOrder(models.Model):
     
     bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
     term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
-    @api.depends('training_course_ids.price')
+    
+    @api.depends('training_course_ids.price','pro_service_ids.price')
     def _compute_training_price(self):
         for rec in self:
-            rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-
+            if rec.training_course_ids:
+                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+            if rec.pro_service_ids:
+                rec.total_training_price = sum(rec.pro_service_ids.mapped('price'))
+            else:
+                rec.total_training_price = 0
+                
     def _prepare_invoice(self):
         vals = super()._prepare_invoice()
         vals.update({

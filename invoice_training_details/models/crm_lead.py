@@ -68,7 +68,7 @@ class Lead(models.Model):
             else:
                 rec.total_price_all = 0
                 
-    @api.depends('training_course_ids.price','pro_service_ids.price')
+    # @api.depends('training_course_ids.price','pro_service_ids.price')
     def _compute_training_price(self):
         for rec in self:
             if rec.training_course_ids:

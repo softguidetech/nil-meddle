@@ -72,8 +72,8 @@ class Lead(models.Model):
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
-            if rec.training_course_ids:
-                rec.total_service_price = sum(rec.training_course_ids.mapped('price'))
+            if rec.pro_service_ids:
+                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
             
             else:
                 rec.total_service_price = 0

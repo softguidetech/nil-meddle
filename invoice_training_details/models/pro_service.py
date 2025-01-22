@@ -23,7 +23,7 @@ class ProService(models.Model):
     descriptions = fields.Char(string='Description')
     wor_hour_number = fields.Float(string='Working Hour Number')
     hourly_rate = fields.Float(string='Hourly Rate')
-    training_id = fields.Many2one('product.template',string='Service Name')
+    training_id = fields.Many2one('product.product',string='Service Name')
     train_language = fields.Char(string='Language')
     location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
     where_location = fields.Char(string='Where?',default='Webex')

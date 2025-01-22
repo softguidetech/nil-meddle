@@ -75,7 +75,7 @@
 
                     <div class="row pt-3 pb-2">
                         <div class="col-12">
-                            Training Courses Details: <span t-field="o.training_name"/>
+                            Professional Service Details: <span t-field="o.training_name"/>
                         </div>
                     </div>
 
@@ -101,8 +101,8 @@
                         </thead>
                         <tbody>
                             <t t-set="item" t-value="1"/>
-                            <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
-                            <t t-foreach="o.training_course_ids" t-as="training">
+                            <t t-set="total_rows" t-value="len(o.pro_service_ids)"/>
+                            <t t-foreach="o.pro_service_ids" t-as="training">
                                 <tr>
                                     <td style="text-align: center; vertical-align: middle;"><span t-esc="item"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_id"/></td>

@@ -98,7 +98,7 @@
                     </field>
                     <group>
                         <group>
-                            <field name="total_training_price"/>
+                            <field name="total_service_price"/>
                         </group>
                         <!--<group>-->
                         <!--    <field name="half_advance_payment_before"/>-->

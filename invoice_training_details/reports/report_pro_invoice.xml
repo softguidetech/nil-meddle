@@ -111,8 +111,8 @@
                         </thead>
                         <tbody>
                             <t t-set="item" t-value="1"/>
-                            <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
-                            <t t-foreach="o.training_course_ids" t-as="training">
+                            <t t-set="total_rows" t-value="len(o.pro_service_ids)"/>
+                            <t t-foreach="o.pro_service_ids" t-as="training">
                                 <tr>
                                     <td style="text-align: center; vertical-align: middle;"><span t-esc="item"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_id"/></td>

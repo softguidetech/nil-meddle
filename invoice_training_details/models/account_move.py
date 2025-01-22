@@ -13,6 +13,7 @@ class AccountMove(models.Model):
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
+    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'move_id', string='Training Courses')
@@ -131,13 +132,20 @@ class AccountMove(models.Model):
             else:
                 move.ks_qr_code = False
                 
-    # @api.depends('training_course_ids.price','pro_service_ids.price')
+    @api.depends('pro_service_ids.price')
+    def _compute_service_price(self):
+        for rec in self:
+            if rec.training_course_ids:
+                rec.total_service_price = sum(rec.training_course_ids.mapped('price'))
+            
+            else:
+                rec.total_service_price = 0
+                
+    @api.depends('training_course_ids.price')
     def _compute_training_price(self):
         for rec in self:
             if rec.training_course_ids:
                 rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-            if rec.pro_service_ids:
-                rec.total_training_price = sum(rec.pro_service_ids.mapped('price'))
             else:
                 rec.total_training_price = 0
                 

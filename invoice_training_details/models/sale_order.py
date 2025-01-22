@@ -9,6 +9,7 @@ class SaleOrder(models.Model):
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
+    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
@@ -91,13 +92,20 @@ class SaleOrder(models.Model):
     bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
     term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
     
-    # @api.depends('training_course_ids.price','pro_service_ids.price')
+    @api.depends('pro_service_ids.price')
+    def _compute_service_price(self):
+        for rec in self:
+            if rec.training_course_ids:
+                rec.total_service_price = sum(rec.training_course_ids.mapped('price'))
+            
+            else:
+                rec.total_service_price = 0
+                
+    @api.depends('training_course_ids.price')
     def _compute_training_price(self):
         for rec in self:
             if rec.training_course_ids:
                 rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-            if rec.pro_service_ids:
-                rec.total_training_price = sum(rec.pro_service_ids.mapped('price'))
             else:
                 rec.total_training_price = 0
                 

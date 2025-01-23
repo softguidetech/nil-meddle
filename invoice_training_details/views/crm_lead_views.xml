@@ -24,15 +24,15 @@
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
-                            
+                           
                             <field name="training_id"/>
                             <field name="descriptions"/>
+                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
-                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
-                            <field name="where_location2"/>
+                            <!--<field name="where_location"/>-->
+                            <field name="where_location2" />
                             <field name="payment_method"/>
-                            
                             <!--<field name="name"/>-->
                             <field name="no_of_student"/>
                             <field name="duration"/>
@@ -67,27 +67,28 @@
                             
                             <field name="training_id"/>
                             <field name="descriptions"/>
+                            <field name="wor_hour_number"/>
                             <field name="train_language"/>
-                            <field name="location"/>
-                            <field name="where_location" invisible="location != 'Customer Choice'"/>
-                            <field name="payment_method"/>
+                            <!--<field name="location"/>-->
+                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
+                            <!--<field name="payment_method"/>-->
                             
                             <!--<field name="name"/>-->
-                            <field name="no_of_student"/>
+                            <!--<field name="no_of_student"/>-->
                             <field name="duration"/>
                             <field name="training_date_start"/>
-                            <field name="training_date_end"/>
+                            <field name="hourly_rate"/>
                             <field name="price"/>
                         </tree>
                     </field>
                     <group>
                         <group>
-                            <field name="total_training_price"/>
+                            <field name="total_service_price"/>
                         </group>
-                        <group>
-                            <field name="half_advance_payment_before"/>
-                            <field name="half_payment_after"/>
-                        </group>
+                        <!--<group>-->
+                        <!--    <field name="half_advance_payment_before"/>-->
+                        <!--    <field name="half_payment_after"/>-->
+                        <!--</group>-->
                     </group>
                 </page>
 

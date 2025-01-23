@@ -27,6 +27,10 @@
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",
         "reports/report_quotation.xml",
+        
+        "reports/report_pro_invoice.xml",
+        "reports/report_pro_quotation.xml",
+        
         "reports/report_action.xml",
     ],
 

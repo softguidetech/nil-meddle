@@ -29,7 +29,7 @@ class ProService(models.Model):
     where_location = fields.Char(string='Where?',default='Webex')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    
+    default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')
     
     # def _compute_date(self):
         

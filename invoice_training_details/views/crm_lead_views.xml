@@ -27,6 +27,7 @@
                            
                             <field name="training_id"/>
                             <field name="descriptions"/>
+                            <field name="default_item_code"/>
                             <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
@@ -67,6 +68,7 @@
                             
                             <field name="training_id"/>
                             <field name="descriptions"/>
+                            <field name="default_item_code"/>
                             <field name="wor_hour_number"/>
                             <field name="train_language"/>
                             <!--<field name="location"/>-->

@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
+   
     <template id="report_quotation_pro_document_training" name="Quotation Professional Service Report Training">
-          <t t-call="web.html_container">
+    <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
@@ -10,7 +11,7 @@
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
-                            <span class="h4 text-info">QUOTATION</span>
+                            <span class="h4 text-info">Price Offer</span>
                         </div>
                     </div>
                     <div class="row pt-3 pb-3">
@@ -32,11 +33,11 @@
                             <div>
                                 <table class="table table-borderless">
                                     <tr class="p-0">
-                                        <td class="p-0">QUOTATION</td>
+                                        <td class="p-0">Price Offer</td>
                                         <td class="p-0"><span t-field="o.name"/></td>
                                     </tr>
                                     <tr class="p-0">
-                                        <td class="p-0">DATE</td>
+                                        <td class="p-0">Date</td>
                                         <td class="p-0"><span t-field="o.date_order"/></td>
                                     </tr>
                                     <!--<tr class="p-0" t-if="o.invoice_payment_term_id">-->
@@ -44,7 +45,7 @@
                                     <!--    <td class="p-0"><span t-field="o.invoice_payment_term_id"/></td>-->
                                     <!--</tr>-->
                                     <tr class="p-0">
-                                        <td class="p-0">DUE DATE</td>
+                                        <td class="p-0">Validity Date</td>
                                         <td class="p-0"><span t-field="o.validity_date"/></td>
                                     </tr>
                                 </table>
@@ -83,16 +84,14 @@
                         <thead>
                             <tr>
                                 <th name="th_item" style="text-align: center; vertical-align: middle;"><span>Item</span></th>
-                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Training Name</span></th>
+                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Service</span></th>
                                 <th t-if="o.display_description" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Description</span></th>
                                 <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Instructor Name</span></th>
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Language</span></th>
-                                <th name="th_of_students" style="text-align: center; vertical-align: middle;"><span># Of Students</span></th>
                                 <th t-if="o.display_location" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Location</span></th>
                                 <th t-if="o.display_where" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Location1</span></th>
                                 <th name="th_duration" style="text-align: center; vertical-align: middle;"><span>Duration</span></th>
-                                <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>Training Dates</span></th>
-                                <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>Training Price</span></th>
+                                <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>Monthly cost</span></th>
 
                                 <th t-if="o.display_total" name="th_training_date" style="max-width:80px;text-align: center; vertical-align: middle;"> <span>Total Price</span></th>
                                 <!--<th t-if="o.display_downpayment" name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>-->
@@ -109,11 +108,9 @@
                                     <td t-if="o.display_description" style="text-align: center; vertical-align: middle;"><span t-field="training.descriptions"/></td>
                                     <td t-if="o.display_instructor" style="text-align: center; vertical-align: middle;"><span t-field="training.instructor_id.name"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.no_of_student"/></td>
                                     <td t-if="o.display_location" style="text-align: center; vertical-align: middle;"><span t-field="training.location"/></td>
                                     <td t-if="o.display_where" style="text-align: center; vertical-align: middle;"><span t-field="training.where_location2"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.duration"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.price"/></td>
                                     <t t-if="item == 1">
                                         <td t-if="o.display_total" t-att-rowspan="total_rows" style="text-align: center; vertical-align: middle;"><span t-field="o.total_training_price"/></td>
@@ -142,13 +139,7 @@
                 <t t-call="account.tax_groups_totals"/>
             </t>
 
-            <tr t-if="'formatted_rounding_amount' in tax_totals and tax_totals.get('rounding_amount') != 0">
-                <td>Rounding</td>
-                <td class="text-end">
-                    <span t-out="tax_totals.get('formatted_rounding_amount')">0</span>
-                </td>
-            </tr>
-            
+
             <!--Total amount with all taxes-->
             <tr class="border-black o_total">
                 <td><strong>Total</strong></td>
@@ -156,18 +147,6 @@
                     <span t-out="tax_totals.get('formatted_amount_total')">31.05</span>
                 </td>
             </tr>
-            <tr class="border-black o_total">
-                                                <td><strong>Currency Rate</strong></td>
-                                                <td class="text-end">
-                                                    <span t-field="o.currency_id.rate">31.05</span>
-                                                </td>
-                                            </tr>
-                                            <tr class="border-black o_total">
-                                                <td><strong>Total Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
-                                                <td class="text-end">
-                                                    <span t-field="o.currency_total"/>
-                                                </td>
-                                            </tr>
                         </table>
                     </div>
                 </div>
@@ -218,6 +197,6 @@
                 </t>
             </t>
         </t>
-        </template>
+    </template>
 
 </odoo>

@@ -55,6 +55,7 @@ class SaleOrder(models.Model):
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
     
+    
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
         total = 0

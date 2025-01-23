@@ -28,7 +28,7 @@ class TrainingCourse(models.Model):
     location = fields.Selection([('CISCO U','CISCO U'),('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    
+    default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')
     
     def _compute_date(self):
         

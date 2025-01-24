@@ -20,7 +20,8 @@
                             
                             <field name="training_id"/>
                             <field name="descriptions"/>
-                            <field name="default_item_code"/>
+                            <field name="cost_clc"/>
+                            <field name="hyperlink"/>
                             <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
@@ -84,7 +85,10 @@
                             
                             <field name="training_id"/>
                             <field name="descriptions"/>
-                            <field name="default_item_code"/>
+                          
+                          <field name="cost_clc"/>
+                            <field name="hyperlink"/>
+                            
                             <field name="wor_hour_number"/>
                             <field name="train_language"/>
                             <!--<field name="location"/>-->
@@ -127,6 +131,10 @@
                             <field name="display_description"/>
                             
                             
+                        </group>
+                        <group>
+                            <field name= "bank_details"/>
+                            <field name= "term_and_cond"/>
                         </group>
                         
                        

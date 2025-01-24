@@ -197,6 +197,12 @@ class HotelDescription(models.Model):
     
     name = fields.Char(string="Hotel",required=True)
     
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
+
+    
+    cost_clc = fields.Char(string="Cost Clc")
+    hyperlink = fields.Char(string="Hyper Link")
     
     
     

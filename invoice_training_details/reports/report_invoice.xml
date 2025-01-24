@@ -2,7 +2,7 @@
 <odoo>
 
     <template id="report_invoice_document_training" name="Invoice Report Training">
-            <t t-call="web.html_container">
+          <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
@@ -138,7 +138,7 @@
                     <div id="right-elements" t-attf-class="#{'col-5' if report_type != 'html' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
                                 <div id="total" class="clearfix row">
                                     <div class="ms-auto">
-                                        <table class="table table-sm table-borderless avoid-page-break-inside">
+                                        <table class="table table-sm table-borderless avoid-page-break-inside" style="background-color:#fff;">
 
                                             <!--Tax totals-->
                                             <t t-set="tax_totals" t-value="o.tax_totals or {}"/>
@@ -148,32 +148,32 @@
                                                     <t t-set="payments_vals" t-value="o.sudo().invoice_payments_widget and o.sudo().invoice_payments_widget['content'] or []"/>
                                                     <t t-foreach="payments_vals" t-as="payment_vals">
                                                         <tr t-if="payment_vals['is_exchange'] == 0">
-                                                            <td>
+                                                            <td style="background-color:#fff;">
                                                                 <i class="oe_form_field text-end oe_payment_label">Paid on <t t-out="payment_vals['date']" t-options="{&quot;widget&quot;: &quot;date&quot;}">2021-09-19</t></i>
                                                             </td>
-                                                            <td class="text-end">
+                                                            <td style="background-color:#fff;" class="text-end">
                                                                 <span t-out="payment_vals['amount']" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}">20.00</span>
                                                             </td>
                                                         </tr>
                                                     </t>
                                                     <t t-if="len(payments_vals) &gt; 0">
                                                         <tr class="border-black fw-bold">
-                                                            <td>Amount Due</td>
-                                                            <td class="text-end">
+                                                            <td style="background-color:#fff;">Amount Due</td>
+                                                            <td style="background-color:#fff;" class="text-end">
                                                                 <span t-field="o.amount_residual">11.05</span>
                                                             </td>
                                                         </tr>
                                                     </t>
                                                 </t>
                                              <tr class="border-black o_total">
-                                                <td><strong>Currency Rate</strong></td>
-                                                <td class="text-end">
+                                                <td style="background-color:#fff;"><strong>Currency Rate</strong></td>
+                                                <td style="background-color:#fff;" class="text-end">
                                                     <span t-field="o.currency_id.rate">31.05</span>
                                                 </td>
                                             </tr>
                                             <tr class="border-black o_total">
-                                                <td><strong>Total Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
-                                                <td class="text-end">
+                                                <td style="background-color:#fff;"><strong>Total Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
+                                                <td style="background-color:#fff;" class="text-end">
                                                     <span t-field="o.currency_total">31.05</span>
                                                 </td>
                                             </tr>
@@ -244,6 +244,6 @@
                 </t>
             </t>
         </t>
-               </template>
+                         </template>
 
 </odoo>

@@ -105,6 +105,12 @@
                                 <tr>
                                     <td style="text-align: center; vertical-align: middle;"><span t-esc="item"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_id"/></td>
+                                    <td style="text-align: center; vertical-align: middle;">
+    <a t-att-href="training.training_id.hyperlink" target="_blank">
+        <span t-field="training.training_id"/>
+    </a>
+</td>
+
                                     <td t-if="o.display_description" style="text-align: center; vertical-align: middle;"><span t-field="training.descriptions"/></td>
                                     <td t-if="o.display_instructor" style="text-align: center; vertical-align: middle;"><span t-field="training.instructor_id.name"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
@@ -120,17 +126,17 @@
                             </t>
                         </tbody>
                     </table>
-               <div class="clearfix" name="so_total_summary">
+               <div name="so_total_summary" style="background-color:#fff;">
                   <div id="total" class="row" name="total">
                     <div t-attf-class="#{'col-6' if report_type != 'html' else 'col-sm-7 col-md-6'} ms-auto">
-                        <table class="table table-sm table-borderless">
+                        <table class="table table-sm table-borderless" style="background-color:#fff;">
                             <!-- Tax totals -->
                             <t t-set="tax_totals" t-value="o.tax_totals"/>
                             <t t-foreach="tax_totals.get('subtotals')" t-as="subtotal">
-                  <tr class="border-black o_subtotal">
-                    <td><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
+                  <tr class=" o_subtotal">
+                    <td style="background-color:#fff;"><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
 
-                    <td class="text-end">
+                    <td style="background-color:#fff;" class="text-end">
                         <span t-att-class="oe_subtotal_footer_separator" t-out="subtotal['formatted_amount']">27.00</span>
                     </td>
                 </tr>
@@ -142,8 +148,8 @@
 
             <!--Total amount with all taxes-->
             <tr class="border-black o_total">
-                <td><strong>Total</strong></td>
-                <td class="text-end">
+                <td style="background-color:#fff;"><strong>Total</strong></td>
+                <td style="background-color:#fff;" class="text-end">
                     <span t-out="tax_totals.get('formatted_amount_total')">31.05</span>
                 </td>
             </tr>
@@ -197,6 +203,6 @@
                 </t>
             </t>
         </t>
-    </template>
+       </template>
 
 </odoo>

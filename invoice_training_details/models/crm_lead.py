@@ -205,6 +205,12 @@ class ProductProduct(models.Model):
     hyperlink = fields.Char(string="Hyper Link")
     
     
+class ProductProduct(models.Model):
+    _inherit = 'product.template'
+
+    
+    cost_clc = fields.Char(string="Cost Clc")
+    hyperlink = fields.Char(string="Hyper Link")
     
     
     

@@ -25,7 +25,7 @@
     <record id="view_procuct_form_inherit_training" model="ir.ui.view">
         <field name="name">res.product.form.training</field>
         <field name="model">product.product</field>
-        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="inherit_id" ref="product.product_template_only_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='barcode']" position="after">
                 <field name="cost_clc"/>

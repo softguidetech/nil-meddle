@@ -6,9 +6,9 @@
         <field name="priority" eval="25"/>
         <field name="inherit_id" ref="purchase.res_config_settings_view_form_purchase"/>
         <field name="arch" type="xml">
-            <!-- Locate the correct setting block based on the updated Odoo 17 structure -->
             <xpath expr="//block[@name='purchase_setting_container']" position="inside">
-                <!-- Add your custom setting for PO approval route -->
+                
+                <!-- PO Approval Route -->
                 <div class="col-12 col-lg-6 o_setting_box" id="po_order_approval_route" groups="base.group_multi_company">
                     <div class="o_setting_left_pane"/>
                     <div class="o_setting_right_pane">
@@ -26,7 +26,7 @@
                     </div>
                 </div>
 
-                <!-- Add your custom setting for SO approval route -->
+                <!-- SO Approval Route -->
                 <div class="col-12 col-lg-6 o_setting_box" id="so_order_approval_route" groups="base.group_multi_company">
                     <div class="o_setting_left_pane"/>
                     <div class="o_setting_right_pane">
@@ -43,6 +43,7 @@
                         </div>
                     </div>
                 </div>
+
             </xpath>
         </field>
     </record>

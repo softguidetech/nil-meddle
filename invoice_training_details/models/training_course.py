@@ -20,11 +20,12 @@ class TrainingCourse(models.Model):
     sale_id = fields.Many2one('sale.order', string='Sale Order')
     
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.product',string='Training Name')
     train_language = fields.Char(string='Training Language')
     
     where_location2 = fields.Char(string='Where?')
-    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
+    location = fields.Selection([('CISCO U','CISCO U'),('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')

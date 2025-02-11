@@ -18,15 +18,11 @@
                     <group>
                         <field name="training_name" cccc/>
                         
-                        <field name="training_vendor" invisible="1"/>
-                        <field name="training_type" invisible="1"/>
-                        
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
                            
                             <field name="training_id"/>
-                            <field name="descriptions"/>
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="instructor_id"/>

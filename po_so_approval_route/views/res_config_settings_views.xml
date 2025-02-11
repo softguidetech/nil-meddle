@@ -1,50 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-    <record id="res_config_settings_view_form_purchase_approval_route" model="ir.ui.view">
-        <field name="name">res.config.settings.view.form.inherit.purchase.approval.route</field>
-        <field name="model">res.config.settings</field>
-        <field name="priority" eval="25"/>
-        <field name="inherit_id" ref="purchase.res_config_settings_view_form_purchase"/>
-        <field name="arch" type="xml">
-            <xpath expr="//block[@name='purchase_setting_container']" position="inside">
-                <div class="col-12 col-lg-6 o_setting_box" id="po_order_approval_route">
-                    <div class="o_setting_left_pane"/>
-                    <div class="o_setting_right_pane">
-                        <label for="po_order_approval_route"/>
-                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific."
-                              aria-label="Values set here are company-specific." groups="base.group_multi_company"
-                              role="img"/>
-                        <div class="text-muted">
-                            Use PO team based approval route for purchase orders
-                        </div>
-                        <div class="content-group">
-                            <div class="mt16">
-                                <field name="po_order_approval_route" class="o_light_label" widget="radio"/>
-                            </div>
-                        </div>
+    <record id="crm_res_config_settings_view_form" model="ir.ui.view">
+    <field name="name">crm.res.config.settings.view.form</field>
+    <field name="model">res.config.settings</field>
+    <field name="inherit_id" ref="base.res_config_settings_view_form"/>
+    <field name="arch" type="xml">
+        <xpath expr="//div[@id='some_container']" position="inside">
+            <div class="col-12 col-lg-6 o_setting_box" groups="base.group_user">
+                <label for="field_id"/>
+                <div class="text-muted"> Some setting description </div>
+                <div class="content-group">
+                    <div class="mt16">
+                        <field name="field_id" class="o_light_label"/>
                     </div>
                 </div>
+            </div>
+        </xpath>
+    </field>
+</record>
 
-                <div class="col-12 col-lg-6 o_setting_box" id="so_order_approval_route">
-                    <div class="o_setting_left_pane"/>
-                    <div class="o_setting_right_pane">
-                        <label for="so_order_approval_route"/>
-                        <span class="fa fa-lg fa-building-o" title="Values set here are company-specific."
-                              aria-label="Values set here are company-specific." groups="base.group_multi_company"
-                              role="img"/>
-                        <div class="text-muted">
-                            Use SO team based approval route for sales orders
-                        </div>
-                        <div class="content-group">
-                            <div class="mt16">
-                                <field name="so_order_approval_route" class="o_light_label" widget="radio"/>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </xpath>
-        </field>
-    </record>
 </odoo>
 
 

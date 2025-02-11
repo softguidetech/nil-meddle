@@ -15,21 +15,20 @@
 
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
-                            <tree editable="bottom">
-                                <field name="training_id"/>
-                                <field name="cost_clc"/>
-                                <field name="train_language"/>
-                                <field name="location"/>
-                                <field name="where_location2" />
-                                <field name="payment_method"/>
-                                <field name="no_of_student"/>
-                                <field name="duration"/>
-                                <field name="training_date_start"/>
-                                <field name="training_date_end"/>
-                                <field name="price"/>
-                            </tree>
-                        </field>
-                    </group>
+                    <tree editable="bottom">
+                        <field name="training_id"/>
+                        <field name="cost_clc"/>
+                        <field name="train_language"/>
+                        <field name="location"/>
+                        <field name="where_location2" />
+                        <field name="payment_method"/>
+                        <field name="no_of_student"/>
+                        <field name="duration"/>
+                        <field name="training_date_start"/>
+                        <field name="training_date_end"/>
+                        <field name="price"/>
+                    </tree>
+                    <!-- Close group properly -->
                     <group>
                         <field name="total_training_price"/>
                     </group>

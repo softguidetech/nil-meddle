@@ -15,16 +15,10 @@
                 
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
-                    <group>
-                                    <!-- Fields removed -->
-
-                        
-                    </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
                            
                             <field name="training_id"/>
-                            <field name="descriptions"/>
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="instructor_id"/>

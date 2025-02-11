@@ -8,7 +8,7 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id" 
-       attrs="{'invisible': [('stage_id.name', '!=', 'Lead')]}"/>
+                  attrs="{'invisible': [('stage_id', '!=', 'Lead')]}"/>
 
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">

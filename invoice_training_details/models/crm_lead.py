@@ -27,17 +27,14 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    training_vendor = fields.Char(string="Training Vendor")
-    training_type = fields.Char(string="Training Type")
-    
+
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
-    descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
+    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     

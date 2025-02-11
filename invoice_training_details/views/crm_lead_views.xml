@@ -27,7 +27,7 @@
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <!-- Hidden fields based on condition -->
-                            <field name="instructor_id" attrs="{'invisible': [('lead_id', '=', 'Lead')]}"/>
+                            <field name="instructor_id" attrs="{'invisible': [('stage_id', '=', 'Lead')]}"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <field name="where_location2" />

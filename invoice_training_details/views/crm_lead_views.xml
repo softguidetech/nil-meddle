@@ -4,7 +4,7 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
-            <!-- Inherit the 'stage_id' field and use it for conditional visibility -->
+            <!-- Make sure 'groups' is used within the field tags if required -->
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
             </xpath>

@@ -19,13 +19,7 @@ class TrainingCourse(models.Model):
     lead_id = fields.Many2one('crm.lead', string='Lead')
     sale_id = fields.Many2one('sale.order', string='Sale Order')
     
-    instructor_id = fields.Many2one('hr.employee', string="Instructor")
-    hide_instructor = fields.Boolean(string="Hide Instructor", compute="_compute_hide_instructor", store=True)
-    @api.depends('lead_id')
-    def _compute_hide_instructor(self):
-    for rec in self:
-        rec.hide_instructor = bool(rec.lead_id)  # Hide if lead_id has a value
-
+    instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.product',string='Training Name')
     train_language = fields.Char(string='Training Language')

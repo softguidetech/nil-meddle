@@ -16,7 +16,7 @@
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
-                        <field name="training_name" cccc/>
+                        <field name="training_name"/>
                         
                     </group>
                     <field name="training_course_ids">

@@ -37,7 +37,7 @@ class Lead(models.Model):
     training_id = fields.Many2one('product.template',string='Training Name')
     
     train_language = fields.Char(string='Training Language')
-    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
+    location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     
@@ -53,7 +53,7 @@ class Lead(models.Model):
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Selection([('NIL ME','NIL ME'),('Others','Others')],string='Catering')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
     def _compute_total(self):
         ticket_total =0

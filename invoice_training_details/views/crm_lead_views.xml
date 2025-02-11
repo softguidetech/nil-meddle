@@ -1,18 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="crm_reveal_lead_opportunity_form_training" model="ir.ui.view">
         <field name="name">crm.lead.inherited.crm.training</field>
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <!-- Inherit the 'stage_id' field and use it for conditional visibility -->
             <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="instructor_id"/>
+                <field name="instructor_id" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
             </xpath>
+
+            <!-- Add your custom 'ordering_partner_id' field after 'partner_id' -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
             </xpath>
-                
+
+            <!-- Training Page -->
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
@@ -23,20 +25,18 @@
                     <field name="training_course_ids">
                         <tree editable="bottom">
                             <field name="training_id"/>
-                            <!-- Removed descriptions field -->
+                            <field name="descriptions" invisible="1"/>
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
-                            <!-- Hidden fields based on condition -->
-                            <field name="instructor_id" attrs="{'invisible': [('stage_id', '=', 'Lead')]}"/>
+                            <field name="instructor_id" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
                             <field name="train_language"/>
                             <field name="location"/>
-                            <field name="where_location2" />
+                            <field name="where_location2"/>
                             <field name="payment_method"/>
                             <field name="no_of_student"/>
-                            <!-- Hidden fields based on condition -->
-                            <field name="duration" attrs="{'invisible': [('lead_id', '=', 'Lead')]}"/>
-                            <field name="training_date_start" attrs="{'invisible': [('lead_id', '=', 'Lead')]}"/>
-                            <field name="training_date_end" attrs="{'invisible': [('lead_id', '=', 'Lead')]}"/>
+                            <field name="duration" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
+                            <field name="training_date_start" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
+                            <field name="training_date_end" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
                             <field name="price"/>
                         </tree>
                     </field>
@@ -46,7 +46,8 @@
                         </group>
                     </group>
                 </page>
-                
+
+                <!-- CLC Details Page -->
                 <page id="clcs" name="CLC Details">
                     <group>
                         <field name="clc_cost"/>
@@ -54,7 +55,8 @@
                         <field name="nilme_share"/>
                     </group>
                 </page>
-                 
+
+                <!-- Professional Services Page -->
                 <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>
@@ -62,13 +64,13 @@
                     <field name="pro_service_ids">
                         <tree editable="bottom">
                             <field name="training_id"/>
-                            <!-- Removed descriptions field -->
+                            <field name="descriptions" invisible="1"/>
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="wor_hour_number"/>
                             <field name="train_language"/>
-                            <field name="duration" attrs="{'invisible': [('lead_id', '=', 'Lead')]}"/>
-                            <field name="training_date_start" attrs="{'invisible': [('lead_id', '=', 'Lead')]}"/>
+                            <field name="duration" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
+                            <field name="training_date_start" attrs="{'invisible': [('stage_id.name', '=', 'Lead')]}" />
                             <field name="hourly_rate"/>
                             <field name="price"/>
                         </tree>
@@ -80,6 +82,7 @@
                     </group>
                 </page>
 
+                <!-- Extra Information Page -->
                 <page id="extra_information" string="Extra Information">
                     <group>
                         <group>
@@ -90,6 +93,7 @@
                     </group>
                 </page>
 
+                <!-- Logistics Page -->
                 <page id="logistics" string="Logistics">
                     <group>
                         <field name="instructor_logistics"/>
@@ -110,7 +114,6 @@
                             <field name="price"/>
                         </tree>
                     </field>
-
                     <field name="hotel_ids">
                         <tree editable="bottom">
                             <field name="hotel_id"/>
@@ -139,9 +142,7 @@
                         <field name="total_price_all"/>
                     </group>
                 </page>
-
             </xpath>
         </field>
     </record>
-
 </odoo>

@@ -24,6 +24,7 @@
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
+                           
                             <field name="training_id"/>
                             <field name="descriptions"/>
                             <field name="cost_clc"/>
@@ -65,9 +66,10 @@
                     </group>
                     <field name="pro_service_ids">
                         <tree editable="bottom">
+                            
                             <field name="training_id"/>
                             <field name="descriptions"/>
-                            <field name="cost_clc"/>
+                           <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="wor_hour_number"/>
                             <field name="train_language"/>
@@ -173,5 +175,4 @@
             </xpath>
         </field>
     </record>
-
 </odoo>

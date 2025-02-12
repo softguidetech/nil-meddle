@@ -22,7 +22,7 @@
                         <field name="training_type"/>
                         
                     </group>
-                    <field name="training_course_ids">
+                    <field name="training_course">
                         <tree editable="bottom">
                            
                             <field name="training_id"/>

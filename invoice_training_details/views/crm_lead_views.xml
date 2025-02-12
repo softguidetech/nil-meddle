@@ -12,29 +12,7 @@
                 <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
                 </xpath>
-             <xpath expr="//page[@name='internal_notes']" position="before">
-                <page id="test" name="Test">
-                    <field name="training_course_ids">
-                        <tree editable="bottom">
-                            <field name="training_id"/>
-                            <field name="descriptions"/>
-                            <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            <field name="instructor_id"/>
-                            <field name="train_language"/>
-                            <field name="location"/>
-                            <!--<field name="where_location"/>-->
-                            <field name="where_location2" />
-                            <field name="payment_method"/>
-                            <!--<field name="name"/>-->
-                            <field name="no_of_student"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                </page>   
+                
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>

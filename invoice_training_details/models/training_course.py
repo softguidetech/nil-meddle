@@ -18,6 +18,7 @@ class TrainingCourse(models.Model):
     move_id = fields.Many2one('account.move', string='Move')
     lead_id = fields.Many2one('crm.lead', string='Lead')
     sale_id = fields.Many2one('sale.order', string='Sale Order')
+    
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.product',string='Training Name')
@@ -33,14 +34,10 @@ class TrainingCourse(models.Model):
     hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")
     
     def _compute_date(self):
+        
         duration = 0
         for rec in self:
             duration = rec.training_date_end - rec.training_date_start
             days= str(duration).replace(', 0:00:00','')
             rec.duration = days
-
-# Adding the Many2one field to crm.lead
-class CrmLead(models.Model):
-    _inherit = 'crm.lead'
-
-    training_course_id = fields.Many2one('training.course', string="Training Course")
+         

@@ -40,4 +40,3 @@ class TrainingCourse(models.Model):
             duration = rec.training_date_end - rec.training_date_start
             days= str(duration).replace(', 0:00:00','')
             rec.duration = days
-         

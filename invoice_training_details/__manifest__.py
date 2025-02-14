@@ -38,3 +38,16 @@
     "application": False,
     "auto_install": False
 }
+{
+    "name": "PO TD Model",
+    "version': '1.0",
+    "depends": ['purchase', 'product','account'],
+    "data": [
+        "security/ir.model.access.csv",
+        "data/report_paperformat.xml",
+        "views/porder_training.xml",
+    ],
+    "installable": True,
+    "application": False,
+}
+

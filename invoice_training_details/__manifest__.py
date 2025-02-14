@@ -44,8 +44,7 @@
     "depends": ['purchase', 'product','account'],
     "data": [
         "security/ir.model.access.csv",
-        "data/report_paperformat.xml",
-        "views/porder_training.xml",
+        "views/porder_training_views.xml",
     ],
     "installable": True,
     "application": False,

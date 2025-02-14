@@ -38,25 +38,3 @@
     "application": False,
     "auto_install": False
 }
-{
-    "name": "PO TD Model",
-    "version': '1.0",
-    "depends": ['purchase', 'product','account'],
-    "data": [
-        "security/ir.model.access.csv",
-        "views/porder_training_views.xml",
-    ],
-    "installable": True,
-    "application": False,
-}
-{
-    'name': 'Custom Purchase Order Tab',
-    'version': '1.0',
-    'category': 'Purchases',
-    'depends': ['purchase'],
-    'data': [
-        'views/purchase_order_view.xml',
-    ],
-    'installable': True,
-}
-

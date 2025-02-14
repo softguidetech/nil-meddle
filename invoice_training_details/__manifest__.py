@@ -49,4 +49,14 @@
     "installable": True,
     "application": False,
 }
+{
+    'name': 'Custom Purchase Order Tab',
+    'version': '1.0',
+    'category': 'Purchases',
+    'depends': ['purchase'],
+    'data': [
+        'views/purchase_order_view.xml',
+    ],
+    'installable': True,
+}
 

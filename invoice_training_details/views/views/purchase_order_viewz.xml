@@ -1,0 +1,24 @@
+<odoo>
+    <data>
+
+        <!-- Inherit the Purchase Order Form view -->
+        <record id="view_purchase_order_form_inherit" model="ir.ui.view">
+            <field name="name">purchase.order.form.inherit</field>
+            <field name="model">purchase.order</field>
+            <field name="inherit_id" ref="purchase.purchase_order_form"/>
+            <field name="arch" type="xml">
+                <!-- Add a new tab inside the notebook -->
+                <xpath expr="//page[@name='purchase_order']/notebook" position="inside">
+                    <page string="Custom Tab">
+                        <group>
+                            <!-- Add custom fields to the tab -->
+                            <field name="custom_field_1"/>
+                            <field name="custom_field_2"/>
+                        </group>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>

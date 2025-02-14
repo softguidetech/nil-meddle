@@ -5,6 +5,7 @@
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.view_purchase_order_form"/>
         <field name="arch" type="xml">
+            <!-- Add the new page after the order_lines page -->
             <page name="order_lines" position="after">
                 <page id="training" name="Training">
                     <group>

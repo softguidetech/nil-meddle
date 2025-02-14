@@ -1,18 +1,20 @@
 <?xml version="1.0"?>
 <odoo>
-
     <record id="purchase_order_form_inherit_training" model="ir.ui.view">
         <field name="name">purchase.order.form.inherit.training</field>
         <field name="model">purchase.order</field>
         <field name="inherit_id" ref="purchase.view_purchase_order_form"/>
         <field name="arch" type="xml">
-            <page name="order_line" position="after">
+            <page name="order_lines" position="after">
                 <page id="training" name="Training">
                     <group>
+                        <!-- Add instructor field and sync button -->
                         <field name="instructor_id"/> 
                         <button name="synch_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
-                    <field name="training_course_ids">
+
+                    <!-- Tree view for training courses -->
+                    <field name="training_ids">
                         <tree editable="bottom">
                             <field name="training_id"/>
                             <field name="cost_clc"/>
@@ -29,6 +31,8 @@
                             <field name="price"/>
                         </tree>
                     </field>
+
+                    <!-- Group for additional details -->
                     <group>
                         <group>
                             <field name="total_training_price"/>
@@ -38,6 +42,8 @@
                             <field name="term_and_cond"/>
                         </group>
                     </group>
+
+                    <!-- Group for report-related fields -->
                     <group>
                         <group string="Report PDF Element Display">
                             <field name="display_training_table"/>
@@ -58,5 +64,4 @@
             </page>
         </field>
     </record>
-
 </odoo>

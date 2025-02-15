@@ -25,7 +25,7 @@ class TrainingCourse(models.Model):
     train_language = fields.Char(string='Training Language')
     
     where_location2 = fields.Char(string='Where?')
-    location = fields.Selection([('CISCO U','CISCO U'),('ILT','ILT'),('VILT','VILT')])
+    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')
@@ -40,3 +40,4 @@ class TrainingCourse(models.Model):
             duration = rec.training_date_end - rec.training_date_start
             days= str(duration).replace(', 0:00:00','')
             rec.duration = days
+         

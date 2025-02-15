@@ -83,7 +83,7 @@
                             <!--<field name="name"/>-->
                             <!--<field name="no_of_student"/>-->
                             <field name="duration"/>
-                            <field name="training_date_start" attrs="{'invisible': [('stage_id', '=', 'potential')]}"/>
+                            <field name="training_date_start" attrs="{'invisible': [('stage_id', '=', 'Potential')]}"/>
                             <field name="hourly_rate"/>
                             <field name="price"/>
                         </tree>

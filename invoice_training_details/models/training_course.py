@@ -10,6 +10,7 @@ class TrainingCourse(models.Model):
     _description = 'Training Course'
 
     name = fields.Char(string='Training Name',)
+    cost_clc = fields.Char(string="Cost Clc"
     no_of_student = fields.Integer(string='#of Student')
     duration = fields.Char(string='Duration',compute='_compute_date')
     training_date_start = fields.Date(string='Start Date')

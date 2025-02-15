@@ -11,8 +11,7 @@
                  <page id="training" name="Training">
                     <field name="training_course_id">
                         <tree editable="bottom">
-                           
-                            
+                            <field name="training_id"/>
                             <field name="descriptions"/>
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>

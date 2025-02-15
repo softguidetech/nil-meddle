@@ -64,6 +64,7 @@
                  <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>
+                        <field name="stage_name" readonly="1"/>
                         
                     </group>
                     <field name="pro_service_ids">

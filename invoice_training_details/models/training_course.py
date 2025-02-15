@@ -10,11 +10,11 @@ class TrainingCourse(models.Model):
     _description = 'Training Course'
 
     name = fields.Char(string='Training Name',)
-    no_of_student = fields.Integer(string='No of Student')
+    no_of_student = fields.Integer(string='#of Student')
     duration = fields.Char(string='Duration',compute='_compute_date')
-    training_date_start = fields.Date(string='Training Date start')
-    training_date_end = fields.Date(string='Training Date end')
-    price = fields.Float(string='Training Price')
+    training_date_start = fields.Date(string='Start Date')
+    training_date_end = fields.Date(string='Delivery Date')
+    price = fields.Float(string='Selling Price')
     move_id = fields.Many2one('account.move', string='Move')
     lead_id = fields.Many2one('crm.lead', string='Lead')
     sale_id = fields.Many2one('sale.order', string='Sale Order')
@@ -25,7 +25,7 @@ class TrainingCourse(models.Model):
     train_language = fields.Char(string='Training Language')
     
     where_location2 = fields.Char(string='Where?')
-    location = fields.Selection([('CISCO U','CISCO U'),('ILT','ILT'),('VILT','VILT')])
+    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')

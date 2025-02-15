@@ -8,7 +8,6 @@ from odoo import fields, models, api
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
-    product_id = fields.Many2one('product.product', string="Product")
     cost_clc = fields.Char(string="Cost Clc", related='product_id.product_tmpl_id.cost_clc', readonly=True)    training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)

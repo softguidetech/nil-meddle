@@ -20,9 +20,8 @@
                         <field name="training_vendor"/>
                         <field name="training_type"/>
                           <!-- Adding stage_id after ordering_partner_id -->
-            <xpath expr="//field[@name='ordering_partner_id']" position="after">
-                <field name="stage_id"/>
-            </xpath>
+                        <field name="stage_name" readonly="1"/>
+
                         
                     </group>
                     <field name="training_course_ids">

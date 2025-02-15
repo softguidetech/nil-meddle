@@ -31,8 +31,8 @@
                             <!--<field name="name"/>-->
                             <field name="no_of_student"/>
                             <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
+                            <field name="training_date_start" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>
+                            <field name="training_date_end" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>        
                             <field name="price"/>
                         </tree>
                     </field>

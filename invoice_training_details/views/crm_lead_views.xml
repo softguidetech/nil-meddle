@@ -21,7 +21,7 @@
                         <field name="training_type"/>
                           <!-- Adding stage_id after ordering_partner_id -->
             <xpath expr="//field[@name='ordering_partner_id']" position="after">
-                <field name="name"/>
+                <field name="stage_id"/>
             </xpath>
                         
                     </group>

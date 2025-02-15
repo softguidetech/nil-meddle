@@ -9,6 +9,9 @@
             <page name="order_lines" position="after">
                 <page id="training" name="Training">
                     <group>
+                        <field name="training_name"/>
+                         <field name="training_vendor"/>
+                        <field name="training_type"/>
                         <field name="instructor_id"/> 
                          <button name="synch_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
@@ -16,6 +19,7 @@
                         <tree editable="bottom">
                             
                             <field name="training_id"/>
+                            <field name="descriptions"/>
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="instructor_id"/>

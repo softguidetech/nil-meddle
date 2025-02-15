@@ -27,8 +27,9 @@
                            
                             <field name="training_id"/>
                             <field name="cost_clc"/>
-                            <field name="hyperlink" attrs="{'invisible': True}"/>
-                            <field name="instructor_id"/>
+                            <xpath expr="//field[@name='hyperlink']" position="attributes">
+                                <attribute name="invisible">1</attribute>
+                            </xpath>                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location"/>-->

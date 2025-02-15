@@ -5,8 +5,12 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-    stage_name = fields.Char(string='Stage Name')  # Adding the missing field
-
+    stage_name = fields.Char('Stage Name', compute='_compute_stage_name')
+    
+        @api.depends('stage_id')
+        def _compute_stage_name(self):
+            for record in self:
+                record.stage_name = record.stage_id.name
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)

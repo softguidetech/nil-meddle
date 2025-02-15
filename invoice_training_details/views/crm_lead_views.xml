@@ -6,6 +6,7 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+        
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
             </xpath>
@@ -19,7 +20,6 @@
                         <field name="training_name"/>
                         <field name="training_vendor"/>
                         <field name="training_type"/>
-                        <!-- Adding stage_id after ordering_partner_id -->
                         <field name="stage_name" readonly="1"/>
                     </group>
                     <field name="training_course_ids">
@@ -46,7 +46,7 @@
                         </group>
                     </group>
                 </page>
-                
+
                 <page id="clcs" name="CLC Details">
                     <group>
                         <field name="clc_cost"/>
@@ -56,30 +56,30 @@
                 </page>
                 
                 <page id="pro" name="Professional Services">
-    <group>
-        <field name="service_name"/>
-        <field name="stage_name" readonly="1"/>
-    </group>
-    <field name="pro_service_ids">
-        <tree editable="bottom">
-            <field name="training_id"/>
-            <field name="descriptions" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-            <field name="cost_clc"/>
-            <field name="hyperlink"/>
-            <field name="wor_hour_number"/>
-            <field name="train_language"/>
-            <field name="duration" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-            <field name="training_date_start" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-            <field name="hourly_rate" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-            <field name="price" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-        </tree>
-    </field>
-    <group>
-        <group>
-            <field name="total_service_price"/>
-        </group>
-    </group>
-</page>
+                    <group>
+                        <field name="service_name"/>
+                        <field name="stage_name" readonly="1"/>
+                    </group>
+                    <field name="pro_service_ids">
+                        <tree editable="bottom">
+                            <field name="training_id"/>
+                            <field name="descriptions" attrs="{'invisible': [('stage_id.name', '=', 'Potential')]}"/>
+                            <field name="cost_clc"/>
+                            <field name="hyperlink"/>
+                            <field name="wor_hour_number"/>
+                            <field name="train_language"/>
+                            <field name="duration" attrs="{'invisible': [('stage_id.name', '=', 'Potential')]}"/>
+                            <field name="training_date_start" attrs="{'invisible': [('stage_id.name', '=', 'Potential')]}"/>
+                            <field name="hourly_rate" attrs="{'invisible': [('stage_id.name', '=', 'Potential')]}"/>
+                            <field name="price" attrs="{'invisible': [('stage_id.name', '=', 'Potential')]}"/>
+                        </tree>
+                    </field>
+                    <group>
+                        <group>
+                            <field name="total_service_price"/>
+                        </group>
+                    </group>
+                </page>
 
                 <page id="extra_information" string="Extra Information">
                     <group>
@@ -142,6 +142,7 @@
                         <field name="total_price_all"/>
                     </group>
                 </page>
+
             </xpath>
         </field>
     </record>

@@ -29,6 +29,9 @@ class Lead(models.Model):
     cost = fields.Float(string="Cost")
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
+
+    # Add stage_id field
+    stage_id = fields.Many2one('crm.stage', string='Stage', required=True, default=lambda self: self.env['crm.stage'].search([('sequence', '=', 1)], limit=1))
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

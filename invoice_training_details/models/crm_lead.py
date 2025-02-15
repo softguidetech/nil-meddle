@@ -211,3 +211,10 @@ class ProductProduct(models.Model):
     
     cost_clc = fields.Char(string="Cost Clc")
     hyperlink = fields.Char(string="Hyper Link")
+    
+    
+    
+    
+    
+    
+    

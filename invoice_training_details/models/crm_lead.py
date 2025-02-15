@@ -3,26 +3,17 @@
 
 from odoo import fields, models, api
 
-
-
 class Lead(models.Model):
     _inherit = 'crm.lead'
-    stage_name = fields.Char(string="Stage Name", compute="_compute_stage_name", store=True)
-
-    @api.depends('stage_id')
-    def _compute_stage_name(self):
-        for rec in self:
-            rec.stage_name = rec.stage_id.name if rec.stage_id else ''
-
 
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
+    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
-    pro_service_ids = fields.One2many('pro.service','pro_lead_id',srting='Professional Services')
+    pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Amount",compute='_compute_total')
@@ -36,18 +27,7 @@ class Lead(models.Model):
     cost = fields.Float(string="Cost")
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
-
-    # Stage Fields
-    stage_id = fields.Many2one('crm.stage', string='Stage', required=True, 
-                               default=lambda self: self.env['crm.stage'].search([('sequence', '=', 1)], limit=1))
-    stage_name = fields.Char(string='Stage Name', compute="_compute_stage_name", store=True)
-    
-    @api.depends("stage_id")
-    def _compute_stage_name(self):
-        for record in self:
-            record.stage_name = record.stage_id.name if record.stage_id else "Undefined"
-    
-    #Add extera
+    # Add extra
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
@@ -73,16 +53,16 @@ class Lead(models.Model):
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
     def _compute_total(self):
-        ticket_total =0
-        hotel_toal=0
+        ticket_total = 0
+        hotel_total = 0
         cost = 0
         for rec in self:
             if rec.ticket_ids and rec.hotel_ids:
                 for ticket in rec.ticket_ids:
-                    ticket_total+=ticket.price
+                    ticket_total += ticket.price
                 for hotel in rec.hotel_ids:
-                    hotel_toal+=hotel.price
-                rec.total_price_all = ticket_total + hotel_toal + rec.cost
+                    hotel_total += hotel.price
+                rec.total_price_all = ticket_total + hotel_total + rec.cost
             else:
                 rec.total_price_all = 0
     
@@ -91,7 +71,6 @@ class Lead(models.Model):
         for rec in self:
             if rec.pro_service_ids:
                 rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
-            
             else:
                 rec.total_service_price = 0
                 
@@ -142,7 +121,7 @@ class Lead(models.Model):
 
 class HotelHotel(models.Model):
     _name = 'hotel.hotel'
-    _description='Hotels'
+    _description = 'Hotels'
     
     hotel_lead_id = fields.Many2one('crm.lead',string="Lead")
     hotel_order_id = fields.Many2one('sale.order',string="Order")
@@ -167,13 +146,12 @@ class HotelHotel(models.Model):
         duration = 0
         for rec in self:
             duration = rec.date_to - rec.date_from
-            days= str(duration).replace(', 0:00:00','Nights')
+            days = str(duration).replace(', 0:00:00','Nights')
             rec.nights = days
-            
-    
+
 class TicketTicket(models.Model):
     _name = 'ticket.ticket'
-    _description='Tickets'   
+    _description = 'Tickets'   
     
     ticket_lead_id = fields.Many2one('crm.lead',string="Lead")
     ticket_order_id = fields.Many2one('sale.order',string="Order")
@@ -182,19 +160,19 @@ class TicketTicket(models.Model):
     destination_id = fields.Many2one('loca.loca',string="Destination")
     date = fields.Date(string="Date")
     duration = fields.Char(string="Duration")
-    time_from = fields.Float(string="Availabe Time From")
-    time_to = fields.Float(string="Availabe Time To")
+    time_from = fields.Float(string="Available Time From")
+    time_to = fields.Float(string="Available Time To")
     stop = fields.Char(string="Stop")
     class_type_id = fields.Many2one('flight.class.type',string="Class Type")
     currency_id = fields.Many2one('res.currency',string="Currency",required=True)
     price = fields.Monetary(string="Price with Taxes",required=True)
-    
+
 class AirlineAirline(models.Model):
     _name = 'airline.airline'
     _description= 'Airlines'
     
     name = fields.Char(string="Airline",required=True)
-    
+
 class LocaLoca(models.Model):
     _name = 'loca.loca'
     _description= 'Locations'
@@ -213,25 +191,15 @@ class HotelDescription(models.Model):
     _description= 'Hotel Description'
     
     name = fields.Char(string="Hotel",required=True)
-    
+
 class ProductProduct(models.Model):
     _inherit = 'product.product'
 
-    
     cost_clc = fields.Char(string="Cost Clc")
     hyperlink = fields.Char(string="Hyper Link")
-    
-    
-class ProductProduct(models.Model):
+
+class ProductTemplate(models.Model):
     _inherit = 'product.template'
 
-    
     cost_clc = fields.Char(string="Cost Clc")
     hyperlink = fields.Char(string="Hyper Link")
-    
-    
-    
-    
-    
-    
-    

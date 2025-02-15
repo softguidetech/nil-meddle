@@ -8,25 +8,22 @@
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
-                </xpath>
-                <xpath expr="//field[@name='partner_id']" position="after">
+            </xpath>
+            <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
-                </xpath>
-            
+            </xpath>
+        
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
                         <field name="training_name"/>
                         <field name="training_vendor"/>
                         <field name="training_type"/>
-                          <!-- Adding stage_id after ordering_partner_id -->
+                        <!-- Adding stage_id after ordering_partner_id -->
                         <field name="stage_name" readonly="1"/>
-
-                        
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
-                           
                             <field name="training_id"/>
                             <field name="descriptions"/>
                             <field name="cost_clc"/>
@@ -34,10 +31,8 @@
                             <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
-                            <!--<field name="where_location"/>-->
-                            <field name="where_location2" />
+                            <field name="where_location2"/>
                             <field name="payment_method"/>
-                            <!--<field name="name"/>-->
                             <field name="no_of_student"/>
                             <field name="duration"/>
                             <field name="training_date_start"/>
@@ -57,46 +52,32 @@
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
                         <field name="nilme_share"/>
-
                     </group>
-                    
                 </page>
-                 <page id="pro" name="Professional Services">
+                
+                <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>
                         <field name="stage_name" readonly="1"/>
-                        
                     </group>
                     <field name="pro_service_ids">
                         <tree editable="bottom">
-                            
                             <field name="training_id"/>
                             <field name="descriptions"/>
-                           <field name="cost_clc"/>
+                            <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="wor_hour_number"/>
                             <field name="train_language"/>
-                            <!--<field name="location"/>-->
-                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
-                            <!--<field name="payment_method"/>-->
-                            
-                            <!--<field name="name"/>-->
-                            <!--<field name="no_of_student"/>-->
-                            
-                            <field name="duration" groups="base.group_user" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-                            <field name="training_date_start" groups="base.group_user" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-                            <field name="hourly_rate" groups="base.group_user" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-                            <field name="price" groups="base.group_user" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="duration" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="training_date_start" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="hourly_rate" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="price" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
                         </tree>
                     </field>
                     <group>
                         <group>
                             <field name="total_service_price"/>
                         </group>
-                        <!--<group>-->
-                        <!--    <field name="half_advance_payment_before"/>-->
-                        <!--    <field name="half_payment_after"/>-->
-                        <!--</group>-->
                     </group>
                 </page>
 
@@ -112,70 +93,55 @@
 
                 <page id="logistics" string="Logistics">
                     <group>
-                        <!--<group>-->
-                            <field name="instructor_logistics"/>
-                            <field name="catering"/>
+                        <field name="instructor_logistics"/>
+                        <field name="catering"/>
                     </group>
-                        <!--<group string="Flights">-->
-                            <!--<group>-->
-                            <field name="ticket_ids">
-                            <tree editable="bottom">
-                                <field name="airline_id"/>
-                                <field name="origin_id"/>
-                                <field name="destination_id"/>
-                                <field name="date"/>
-                                <field name="duration"/>
-                                <field name="time_from" widget="timesheet_uom"/>
-                                <field name="time_to" widget="timesheet_uom"/>
-                                <field name="stop"/>
-                                <field name="class_type_id"/>
-                                <field name="currency_id"/>
-                                <field name="price"/>
-                            
-                            </tree>
-                            </field>
-                            <!--</group>-->
-                        <!--</group>-->
-                        
-                        <!--<group string="Hotels">-->
-                            <!--<group>-->
-                            <field name="hotel_ids">
-                            <tree editable="bottom">
-                                <field name="hotel_id"/>
-                                <field name="date_from"/>
-                                <field name="date_to"/>
-                                <field name="nights"/>
-                                <field name="location"/>
-                                <field name="pax"/>
-                                <field name="des"/>
-                                <field name="room_type"/>
-                                <field name="currency_id"/>
-                                <field name="price_without_tax"/>
-                                <field name="tax"/>
-                                <field name="price"/>
-                               
-                            </tree>
-                            </field>
-                            
-                           
-                            <group string="Visa Details">
-                                <field name="visa"/>
-                                <field name="start_date"/>
-                                <field name="to_date"/>
-                                <field name="book_details_id" widget="many2many_binary"/>
-                                <field name="details"/>
-                                <field name="cost"/>
-                                
-                            </group>
-                            <group>
-                                <field name="total_price_all"/>
-                            </group>
-                            
-                            <!--</group>-->
-                        <!--</group>-->
-                    <!--</group>-->
-                </page>
+                    <field name="ticket_ids">
+                        <tree editable="bottom">
+                            <field name="airline_id"/>
+                            <field name="origin_id"/>
+                            <field name="destination_id"/>
+                            <field name="date"/>
+                            <field name="duration"/>
+                            <field name="time_from" widget="timesheet_uom"/>
+                            <field name="time_to" widget="timesheet_uom"/>
+                            <field name="stop"/>
+                            <field name="class_type_id"/>
+                            <field name="currency_id"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
 
+                    <field name="hotel_ids">
+                        <tree editable="bottom">
+                            <field name="hotel_id"/>
+                            <field name="date_from"/>
+                            <field name="date_to"/>
+                            <field name="nights"/>
+                            <field name="location"/>
+                            <field name="pax"/>
+                            <field name="des"/>
+                            <field name="room_type"/>
+                            <field name="currency_id"/>
+                            <field name="price_without_tax"/>
+                            <field name="tax"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
+
+                    <group string="Visa Details">
+                        <field name="visa"/>
+                        <field name="start_date"/>
+                        <field name="to_date"/>
+                        <field name="book_details_id" widget="many2many_binary"/>
+                        <field name="details"/>
+                        <field name="cost"/>
+                    </group>
+
+                    <group>
+                        <field name="total_price_all"/>
+                    </group>
+                </page>
             </xpath>
         </field>
     </record>

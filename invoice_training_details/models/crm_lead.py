@@ -5,7 +5,7 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-    stage_id = fields.Many2one('crm.stage', string='Stage', readonly=True)
+    stage_id = fields.Many2one('crm.stage', string='Stage')
     stage_name = fields.Char(string='Stage Name', compute='_compute_stage_name')
 
     hide_fields = fields.Boolean(compute='_compute_hide_fields')

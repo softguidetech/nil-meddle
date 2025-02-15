@@ -7,9 +7,6 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-    class Lead(models.Model):
-    _inherit = 'crm.lead'
-
     stage_name = fields.Char(string="Stage Name", compute="_compute_stage_name", store=True)
 
     @api.depends('stage_id')

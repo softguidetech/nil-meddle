@@ -30,8 +30,15 @@ class Lead(models.Model):
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
 
-    # Add stage_id field
-    stage_id = fields.Many2one('crm.stage', string='Stage', required=True, default=lambda self: self.env['crm.stage'].search([('sequence', '=', 1)], limit=1))
+    # Stage Fields
+    stage_id = fields.Many2one('crm.stage', string='Stage', required=True, 
+                               default=lambda self: self.env['crm.stage'].search([('sequence', '=', 1)], limit=1))
+    stage_name = fields.Char(string='Stage Name', compute="_compute_stage_name", store=True)
+    
+    @api.depends("stage_id")
+    def _compute_stage_name(self):
+        for record in self:
+            record.stage_name = record.stage_id.name if record.stage_id else "Undefined"
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

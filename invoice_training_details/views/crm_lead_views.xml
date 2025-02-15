@@ -42,7 +42,7 @@
                         </group>
                     </group>
                 </page>
-                </page>
+                
                  <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>

@@ -26,7 +26,6 @@
                         <tree editable="bottom">
                            
                             <field name="training_id"/>
-                            <field name="descriptions"/>
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="instructor_id"/>

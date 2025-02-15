@@ -5,6 +5,7 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
+    stage_name = fields.Char(string='Stage Name')  # Adding the missing field
 
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')

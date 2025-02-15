@@ -8,8 +8,6 @@ class Lead(models.Model):
      def _compute_hide_fields(self):
         for record in self:
             record.hide_fields = record.stage_id.name == 'Potential'
-
-    hide_fields = fields.Boolean(compute='_compute_hide_fields')
     
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')

@@ -5,10 +5,20 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-     def _compute_hide_fields(self):
+    stage_id = fields.Many2one('crm.stage', string='Stage', readonly=True)
+    stage_name = fields.Char(string='Stage Name', compute='_compute_stage_name')
+
+    hide_fields = fields.Boolean(compute='_compute_hide_fields')
+
+    @api.depends('stage_id')
+    def _compute_stage_name(self):
+        for record in self:
+            record.stage_name = record.stage_id.name if record.stage_id else ''
+
+    @api.depends('stage_id')
+    def _compute_hide_fields(self):
         for record in self:
             record.hide_fields = record.stage_id.name == 'Potential'
-    
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)

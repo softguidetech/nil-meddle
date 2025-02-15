@@ -30,8 +30,8 @@ class TrainingCourse(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')
     
-    cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="Cost Clc")
-    hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")
+    cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="CLC Cost")
+    hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Link")
     
     def _compute_date(self):
         

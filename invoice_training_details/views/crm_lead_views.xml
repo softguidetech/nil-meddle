@@ -81,10 +81,11 @@
                             
                             <!--<field name="name"/>-->
                             <!--<field name="no_of_student"/>-->
-                            <field name="duration"/>
-                            <field name="training_date_start" attrs="{'invisible': [('stage_id', '=', 'Potential')]}"/>
-                            <field name="hourly_rate"/>
-                            <field name="price"/>
+                            <field name="duration" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="training_date_start" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="hourly_rate" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="price" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+
                         </tree>
                     </field>
                     <group>

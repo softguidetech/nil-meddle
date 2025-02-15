@@ -22,7 +22,7 @@ class TrainingCourse(models.Model):
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.product',string='Training Name')
-    train_language = fields.Char(string='Training Language')
+    train_language = fields.Char(string='Language')
     
     where_location2 = fields.Char(string='Where?')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])

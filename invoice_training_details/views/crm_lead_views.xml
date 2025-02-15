@@ -81,17 +81,12 @@
                             
                             <!--<field name="name"/>-->
                             <!--<field name="no_of_student"/>-->
-                            <form>
-                            <field name="stage_name"/>
                             
-                            <group>
-                                <field name="duration" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-                                <field name="training_date_start" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-                                <field name="hourly_rate" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-                                <field name="price" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
-                            </group>
-                        </form>
-
+                            <field name="duration" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="training_date_start" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="hourly_rate" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                            <field name="price" attrs="{'invisible': [('stage_name', '=', 'Potential')]}"/>
+                           
 
                         </tree>
                     </field>

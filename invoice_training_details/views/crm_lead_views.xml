@@ -10,7 +10,7 @@
                 
                  <page id="training" name="Training">
                     <group>
-                        <field name="service_name"/>
+                        <field name="training_course_ids"/>
                         
                     </group>
                     <field name="training_id">

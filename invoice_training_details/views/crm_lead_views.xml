@@ -12,17 +12,17 @@
                 <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
                 </xpath>
-                <!-- Adding stage_id after ordering_partner_id -->
-            <xpath expr="//field[@name='ordering_partner_id']" position="after">
-                <field name="stage_id"/>
-            </xpath>
+            
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
                         <field name="training_name"/>
-                        
                         <field name="training_vendor"/>
                         <field name="training_type"/>
+                          <!-- Adding stage_id after ordering_partner_id -->
+            <xpath expr="//field[@name='ordering_partner_id']" position="after">
+                <field name="stage_id"/>
+            </xpath>
                         
                     </group>
                     <field name="training_course_ids">

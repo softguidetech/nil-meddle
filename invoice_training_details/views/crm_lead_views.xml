@@ -17,13 +17,12 @@
                 <page id="training" name="Training">
                     <group>
                         <field name="training_vendor"/>
-                        
-                        
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
-                            <field name="cost_clc"/>
+                            
                             <field name="training_id"/>
+                            <field name="cost_clc"/>
                             <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>

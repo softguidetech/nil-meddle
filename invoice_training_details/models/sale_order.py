@@ -231,3 +231,4 @@ class SaleOrder(models.Model):
         self.write({'order_line': []})
         self.write({'order_line': l})
             
+

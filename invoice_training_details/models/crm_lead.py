@@ -216,7 +216,12 @@ class ProductProduct(models.Model):
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
-    training_cost_ids = fields.One2many('training.costs', 'lead_id', string='Training Costs')
+    training_cost_ids = fields.One2many(
+        'training.costs',  # Related model
+        'lead_id',          # Field on the 'training.costs' model that links back to crm.lead
+        string='Training Costs'  # Display name for the field
+    )
+
 
     
     

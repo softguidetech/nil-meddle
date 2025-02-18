@@ -212,6 +212,12 @@ class ProductProduct(models.Model):
     
     cost_clc = fields.Char(string="Cost Clc")
     hyperlink = fields.Char(string="Hyper Link")
+
+class Lead(models.Model):
+    _inherit = 'crm.lead'
+
+    training_cost_ids = fields.One2many('training.costs', 'lead_id', string='Training Costs')
+
     
     
     

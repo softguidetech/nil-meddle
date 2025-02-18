@@ -213,7 +213,7 @@ class ProductProduct(models.Model):
     cost_clc = fields.Char(string="Cost Clc")
     hyperlink = fields.Char(string="Hyper Link")
 
-class CrmLead(models.Model):
+class CTC(models.Model):
     _inherit = 'crm.lead'
 
     training_cost_ids = fields.One2many(

@@ -32,6 +32,8 @@
         "reports/report_pro_quotation.xml",
         
         "reports/report_action.xml",
+        # Add your training costs model view file here (if needed)
+        "views/training_costs_views.xml",  # Assuming this is the new view for the training costs model
     ],
 
     "installable": True,

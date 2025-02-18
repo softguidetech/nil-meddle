@@ -46,7 +46,6 @@
                 
                 <page id="clcs" name="CLC Details">
     <group>
-        <field name="clc_details_ids">
                 <field name="clc_cost"/>
                 <field name="rate_card"/>
                 <field name="CTC"/>

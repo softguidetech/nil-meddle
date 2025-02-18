@@ -12,5 +12,3 @@ class TrainingCosts(models.Model):
     name = fields.Float(string='Cisco Cost',)
     price = fields.Float(string='Selling Price')
     move_id = fields.Many2one('account.move', string='Move')
-    lead_id = fields.Many2one('crm.lead', string='Lead')
-    purchase_id = fields.Many2one('purchase.order', string='Purchase Order')

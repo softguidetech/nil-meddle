@@ -111,14 +111,10 @@ class Lead(models.Model):
         return quotation_context
 
 
-class CRMLead(models.Model):
-    _inherit = "crm.lead"
-
-    
     clc_cost = fields.Float("CLC Cost")
     rate_card = fields.Float("Rate Card")
     CTC = fields.Float("CTC")
-    ilme_share = fields.Float("NILME Share")
+    nilme_share = fields.Float("NILME Share")
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

@@ -1,51 +1,18 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- Tree (List) View for Training Costs -->
-    <record id="view_training_costs_tree" model="ir.ui.view">
-        <field name="name">training.costs.tree</field>
-        <field name="model">training.costs</field>
+    <record id="view_crm_lead_form" model="ir.ui.view">
+        <field name="name">crm.lead.form</field>
+        <field name="model">crm.lead</field>
         <field name="arch" type="xml">
-            <tree string="Training Costs">
-                <field name="name" />
-                <field name="price" />
-                <field name="move_id" />
-                <field name="purchase_id" />
-            </tree>
-        </field>
-    </record>
-
-    <!-- Form View for Training Costs -->
-    <record id="view_training_costs_form" model="ir.ui.view">
-        <field name="name">training.costs.form</field>
-        <field name="model">training.costs</field>
-        <field name="arch" type="xml">
-            <form string="Training Costs">
+            <form string="CRM Lead">
                 <sheet>
                     <group>
-                        <group>
-                            <field name="name"/>
-                            <field name="price"/>
-                        </group>
-                        <group>
-                            <field name="move_id"/>
-                            <field name="purchase_id"/>
-                        </group>
+                        <!-- Existing fields... -->
+                    </group>
+                    <group>
+                        <field name="training_cost_ids" widget="one2many_list" />
                     </group>
                 </sheet>
             </form>
         </field>
     </record>
-
-    <!-- Action to open the Training Costs model -->
-    <record id="action_training_costs" model="ir.actions.act_window">
-        <field name="name">Training Costs</field>
-        <field name="res_model">training.costs</field>
-        <field name="view_mode">tree,form</field>
-        <field name="target">current</field>
-    </record>
-
-    <!-- Menu item to access Training Costs -->
-    <menuitem id="menu_training_costs" name="Training Costs"
-              parent="crm.crm_menu_root"
-              action="action_training_costs"/>
 </odoo>

@@ -23,6 +23,8 @@
         "views/crm_lead_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
+        "views/training_costs_views.xml",  # Assuming this is the new view for the training costs model
+
         # Report
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",
@@ -33,7 +35,6 @@
         
         "reports/report_action.xml",
         # Add your training costs model view file here (if needed)
-        "views/training_costs_views.xml",  # Assuming this is the new view for the training costs model
     ],
 
     "installable": True,

@@ -213,20 +213,4 @@ class ProductProduct(models.Model):
     cost_clc = fields.Char(string="Cost Clc")
     hyperlink = fields.Char(string="Hyper Link")
 
-class CTC(models.Model):
-    _inherit = 'crm.lead'
-
-    training_cost_ids = fields.One2many(
-        'training.costs',  # Related model
-        'lead_id',          # Field on the 'training.costs' model that links back to crm.lead
-        string='Training Costs'  # Display name for the field
-    )
-
-
-    
-    
-    
-    
-    
-    
     

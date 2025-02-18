@@ -54,10 +54,7 @@
                 <field name="nilme_share"/>
             </tree>
         </field>
-    </group>
-</page>
-
-                    
+    </group>     
                 </page>
                  <page id="pro" name="Professional Services">
                     <group>

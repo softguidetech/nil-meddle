@@ -49,6 +49,7 @@ class Lead(models.Model):
     # 
     clc_cost = fields.Char(string="CLCs Cost")
     rate_card = fields.Float(string="Rate Card $")
+    CTC = fields.Float(string="Cisco Training Cost")
     nilme_share = fields.Float(string="NIL ME Share $")
     
     # logistics tab

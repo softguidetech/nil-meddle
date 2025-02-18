@@ -47,10 +47,19 @@ class Lead(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     
     # 
-    clc_cost = fields.Char(string="CLCs Cost")
-    rate_card = fields.Float(string="Rate Card $")
-    CTC = fields.Float(string="Cisco Training Cost")
-    nilme_share = fields.Float(string="NIL ME Share $")
+    class CRMLead(models.Model):
+    _inherit = "crm.lead"
+
+    clc_details_ids = fields.One2many("clc.details", "lead_id", string="CLC Details")
+
+class CLCDetails(models.Model):
+    _name = "clc.details"
+
+    lead_id = fields.Many2one("crm.lead", string="Lead")
+    clc_cost = fields.Float("CLC Cost")
+    rate_card = fields.Float("Rate Card")
+    CTC = fields.Float("CTC")
+    nilme_share = fields.Float("NILME Share")
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

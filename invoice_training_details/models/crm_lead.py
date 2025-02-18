@@ -114,8 +114,7 @@ class Lead(models.Model):
 class CRMLead(models.Model):
     _inherit = "crm.lead"
 
-    clc_details_ids = fields.One2many("clc.details", "lead_id", string="CLC Details")
-    lead_id = fields.Many2one("crm.lead", string="Lead")
+    
     clc_cost = fields.Float("CLC Cost")
     rate_card = fields.Float("Rate Card")
     CTC = fields.Float("CTC")

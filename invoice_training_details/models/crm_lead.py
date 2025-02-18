@@ -44,6 +44,10 @@ class Lead(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
 
     # Removed duplicate `clcs_qty` field here.
+    clc_cost = fields.Float("CLC Cost")
+    rate_card = fields.Float("Rate Card")
+    CTC = fields.Float("CTC")
+    nilme_share = fields.Float("NILME Share$")
 
     def _compute_total(self):
         ticket_total = 0
@@ -109,12 +113,6 @@ class Lead(models.Model):
             'default_training_type': self.training_type,
         })
         return quotation_context
-
-
-    clc_cost = fields.Float("CLC Cost")
-    rate_card = fields.Float("Rate Card")
-    CTC = fields.Float("CTC")
-    nilme_share = fields.Float("NILME Share")
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

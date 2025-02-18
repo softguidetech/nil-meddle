@@ -45,13 +45,13 @@
                 </page>
                 
                 <page id="clcs" name="CLC Details">
-    <group>
-                <field name="clc_cost"/>
-                <field name="rate_card"/>
-                <field name="CTC"/>
-                <field name="nilme_share"/>
-        </field>
-    </group>     
+                    <group>
+                        <field name="clc_cost"/>
+                        <field name="rate_card"/>
+                        <field name="nilme_share"/>
+
+                    </group>
+                    
                 </page>
                  <page id="pro" name="Professional Services">
                     <group>

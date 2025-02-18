@@ -9,5 +9,5 @@ class TrainingCosts(models.Model):
     _name = "training.costs"
     _description = 'Training Costs'
 
-    name = fields.Float(string='Cisco Cost',)
-    price = fields.Float(string='Selling Price')
+    CTC = fields.Float(string='Cisco Cost',)
+    price = fields.Float(string='Partner share')

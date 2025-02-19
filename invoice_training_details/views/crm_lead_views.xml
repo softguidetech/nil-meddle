@@ -8,6 +8,10 @@
                 <field name="name" />
                 <field name="price" />
                 <field name="cost" />
+                <field name="cisco_cost" />
+                <field name="partner_share" />
+                <field name="nil_me_share" />
+                <field name="other_costs" />
                 <field name="margin" />
             </tree>
         </field>
@@ -25,7 +29,11 @@
                             <field name="name"/>
                             <field name="price"/>
                             <field name="cost"/>
-                            <field name="margin"/>
+                            <field name="cisco_cost"/>
+                            <field name="partner_share"/>
+                            <field name="nil_me_share"/>
+                            <field name="other_costs"/>
+                            <field name="margin" readonly="1"/>
                         </group>
                     </group>
                 </sheet>
@@ -56,7 +64,11 @@
                 <group>
                     <field name="training_cost" string="Training Cost"/>
                     <field name="logistics_cost" string="Logistics Cost"/>
-                    <field name="training_margin" string="Training Margin" readonly="1"/>
+                    <field name="cisco_cost" string="Cisco Cost"/>
+                    <field name="partner_share" string="Partner Share"/>
+                    <field name="nil_me_share" string="NIL ME Share"/>
+                    <field name="other_costs" string="Other Costs"/>
+                    <field name="margin" string="Margin" readonly="1"/>
                 </group>
             </xpath>
         </field>
@@ -66,9 +78,13 @@
     <record id="model_crm_lead" model="ir.model">
         <field name="model">crm.lead</field>
         <field name="name">crm.lead</field>
-        <field name="field_ids" eval="[(0, 0, {'name': 'training_cost', 'ttype': 'float', 'string': 'Training Cost'}),
+        <field name="field_ids" eval="[(0, 0, {'name': 'training_cost', 'ttype': 'float', 'string': 'Training Cost'}), 
                                       (0, 0, {'name': 'logistics_cost', 'ttype': 'float', 'string': 'Logistics Cost'}),
-                                      (0, 0, {'name': 'training_margin', 'ttype': 'float', 'string': 'Training Margin'})]"/>
+                                      (0, 0, {'name': 'cisco_cost', 'ttype': 'float', 'string': 'Cisco Cost'}),
+                                      (0, 0, {'name': 'partner_share', 'ttype': 'float', 'string': 'Partner Share'}),
+                                      (0, 0, {'name': 'nil_me_share', 'ttype': 'float', 'string': 'NIL ME Share'}),
+                                      (0, 0, {'name': 'other_costs', 'ttype': 'float', 'string': 'Other Costs'}),
+                                      (0, 0, {'name': 'margin', 'ttype': 'float', 'string': 'Margin'})]"/>
     </record>
 
 </odoo>

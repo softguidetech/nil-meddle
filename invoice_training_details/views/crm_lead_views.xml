@@ -46,7 +46,6 @@
                 
                 <page id="clcs" name="Costs Details">
                     <group>
-                        <field name="ls_partner_c"/>
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
                         <field name="nilme_share"/>

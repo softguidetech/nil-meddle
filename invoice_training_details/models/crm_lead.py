@@ -47,20 +47,13 @@ class Lead(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     
     # 
-    clc_cost = fields.Float(string="Cisco Training Cost")
+    clc_cost = fields.Char(string="CLCs Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")
-    ls_part = fields.Selection([
-    ('koe', 'Koenig'),
-    ('mira', 'Mira'),
-    ('ltd', 'NIL LTD'),
-    ('nilsa', 'NIL SA')
-], string="LS Partner")
     
     # logistics tab
-    other_logistics = fields.Float(string="Venu")
-    catering = fields.Float(string="Catering")
-
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
     def _compute_total(self):
         ticket_total =0
@@ -72,7 +65,7 @@ class Lead(models.Model):
                     ticket_total+=ticket.price
                 for hotel in rec.hotel_ids:
                     hotel_toal+=hotel.price
-                rec.total_price_all = ticket_total + hotel_toal + other_logistics + catering + rec.cost
+                rec.total_price_all = ticket_total + hotel_toal + rec.cost
             else:
                 rec.total_price_all = 0
     
@@ -104,6 +97,7 @@ class Lead(models.Model):
             'default_clcs_qty': self.clcs_qty,
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
+            'default_instructor_logistics': self.instructor_logistics,
             'default_catering': self.catering,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,

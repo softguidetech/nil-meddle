@@ -43,8 +43,9 @@ class Lead(models.Model):
     # Extra Information Tab
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
+    where_location2 = fields.Char(string='Training Location')  # Added missing field
 
-    # Costs Page (Fixed One2many Relation)
+    # Costs Page
     cost_ids = fields.One2many('crm.lead.cost', 'lead_id', string="Costs")
 
     # Logistics Tab

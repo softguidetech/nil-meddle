@@ -46,8 +46,10 @@
                 
                 <page id="clcs" name="Costs Details">
                     <group>
+                        <field name="ls_part"/>
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
+                        <field name="par_share"/>
                         <field name="nilme_share"/>
 
                     </group>
@@ -101,7 +103,8 @@
                 <page id="logistics" string="Logistics">
                     <group>
                         <!--<group>-->
-                            <field name="instructor_logistics"/>
+                            <field name="other_logistics"/>
+                            <field name="catering"/>    
                         
                     </group>
                         <!--<group string="Flights">-->

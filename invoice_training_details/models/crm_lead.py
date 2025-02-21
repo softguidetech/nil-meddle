@@ -47,14 +47,14 @@ class Lead(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     
     clc_cost = fields.Char(string="CLCs Cost")
-rate_card = fields.Float(string="Rate Card $")
-nilme_share = fields.Float(string="NIL ME Share $")
-cisco_training_cost = fields.Float(string="Cisco Training Cost")
-partner = fields.Selection([
-    ('koenig', 'Koenig'),
-    ('nil_ltd', 'NIL LTD'),
-    ('nil_sa', 'NIL SA'),
-    ('mira', 'Mira')
+    rate_card = fields.Float(string="Rate Card $")
+    nilme_share = fields.Float(string="NIL ME Share $")
+    cisco_training_cost = fields.Float(string="Cisco Training Cost")
+    partner = fields.Selection([
+        ('koenig', 'Koenig'),
+        ('nil_ltd', 'NIL LTD'),
+        ('nil_sa', 'NIL SA'),
+        ('mira', 'Mira')
 ], string="Partner")
     
     # logistics tab

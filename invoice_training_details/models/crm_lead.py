@@ -57,3 +57,19 @@ class Lead(models.Model):
     def _compute_total_cost_price(self):
         for rec in self:
             rec.total_cost_price = sum(rec.costs_line_ids.mapped('clc_cost'))
+
+class CostDetails(models.Model):
+    _name = 'cost.details'
+    _description = 'Cost Details'
+
+    lead_id = fields.Many2one('crm.lead', string="Lead")
+    clc_cost = fields.Float(string="CLCs Cost")
+    rate_card = fields.Float(string="Rate Card $")
+    nilme_share = fields.Float(string="NIL ME Share $")
+    cisco_training_cost = fields.Float(string="Cisco Training Cost")
+    partner = fields.Selection([
+        ('koenig', 'Koenig'),
+        ('nil_ltd', 'NIL LTD'),
+        ('nil_sa', 'NIL SA'),
+        ('mira', 'Mira')
+    ], string="Partner")

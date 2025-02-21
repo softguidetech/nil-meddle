@@ -31,12 +31,12 @@ class Lead(models.Model):
     total_cost_price = fields.Float(string='Total Cost Price', compute="_compute_total_cost_price", store=True)
     
     # Extra fields
-    instructor_id = fields.Many2one('hr.employee',string="Instructor")
-    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
-    training_id = fields.Many2one('product.template',string='Training Name')
+    instructor_id = fields.Many2one('hr.employee', string="Instructor")
+    ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
+    training_id = fields.Many2one('product.template', string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
-    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')], default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
@@ -51,6 +51,8 @@ class Lead(models.Model):
         ('mira', 'Mira')
     ], string="Partner")
 
+    costs_line_ids = fields.One2many('cost.details', 'lead_id', string='Cost Details')
+    
     @api.depends('costs_line_ids.clc_cost')
     def _compute_total_cost_price(self):
         for rec in self:

@@ -44,15 +44,14 @@
                     </group>
                 </page>
                 
-                <page id="clcs" name="Costs Details">
+                <page id="clcs" name="CLC Details">
                     <group>
-                        <field name="partner"/>
+                        <field name="clc_cost"/>
                         <field name="rate_card"/>
-                        <firld name="part_share"/>
                         <field name="nilme_share"/>
-                        <field name="cisco_training_cost"/>
-                        
+
                     </group>
+                    
                 </page>
                  <page id="pro" name="Professional Services">
                     <group>
@@ -102,7 +101,7 @@
                 <page id="logistics" string="Logistics">
                     <group>
                         <!--<group>-->
-                            <field name="venu_costs"/>
+                            <field name="instructor_logistics"/>
                             <field name="catering"/>
                     </group>
                         <!--<group string="Flights">-->

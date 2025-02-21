@@ -44,12 +44,16 @@
 
                 <page id="clcs" name="Costs">
                     <group>
-                        <field name="total_training_price"/>
-                        <field name="cisco_cost"/>
-                        <field name="rate_card"/>
-                        <field name="nilme_share"/>
-                        <field name="par_share"/>
-                        <field name="partner_l"/>
+                        <field name="clcs">
+                            <tree editable="bottom">
+                                <field name="total_training_price"/>
+                                <field name="cisco_cost"/>
+                                <field name="rate_card"/>
+                                <field name="nilme_share"/>
+                                <field name="par_share"/>
+                                <field name="partner_l"/>
+                            </tree>
+                        </field>
                     </group>
                 </page>
 

@@ -48,12 +48,6 @@ class Lead(models.Model):
     clc_cost = fields.Char(string="CLCs Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")
-    # Add the missing 'par_share' field
-    par_share = fields.Char(string="Partner Share")
-
-    # Add the missing 'ls_part' field
-    ls_part = fields.Char(string="LS Part")  # Add this field to prevent the error
-
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
@@ -61,6 +55,9 @@ class Lead(models.Model):
 
     # Add the missing 'par_share' field
     par_share = fields.Char(string="Partner Share")
+
+    # Add the missing 'ls_part' field
+    ls_part = fields.Char(string="LS Part")  # Add this field to prevent the error
 
     def _compute_total(self):
         ticket_total = 0

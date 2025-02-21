@@ -29,7 +29,7 @@ class Lead(models.Model):
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
 
-    # Extra
+    # Extra Fields
     instructor_id = fields.Many2one('hr.employee', string="Instructor")
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
@@ -41,11 +41,10 @@ class Lead(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
 
     # Extra Information Tab
-    clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
 
-    # ✅ Fixed: One2many field for Costs page
+    # Costs Page (Fixed One2many Relation)
     cost_ids = fields.One2many('crm.lead.cost', 'lead_id', string="Costs")
 
     # Logistics Tab
@@ -54,18 +53,10 @@ class Lead(models.Model):
     catering = fields.Float(string='Catering')
 
     def _compute_total(self):
-        ticket_total = 0
-        hotel_total = 0
-        cost = 0
         for rec in self:
-            if rec.ticket_ids and rec.hotel_ids:
-                for ticket in rec.ticket_ids:
-                    ticket_total += ticket.price
-                for hotel in rec.hotel_ids:
-                    hotel_total += hotel.price
-                rec.total_price_all = ticket_total + hotel_total + rec.cost + rec.instructor_logistics + rec.Uber + rec.catering
-            else:
-                rec.total_price_all = 0
+            ticket_total = sum(rec.ticket_ids.mapped('price')) if rec.ticket_ids else 0
+            hotel_total = sum(rec.hotel_ids.mapped('price')) if rec.hotel_ids else 0
+            rec.total_price_all = ticket_total + hotel_total + rec.cost + rec.instructor_logistics + rec.Uber + rec.catering
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):

@@ -16,20 +16,14 @@
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
-                        <field name="training_name"/>
-                        
                         <field name="training_vendor"/>
-                        <field name="training_type"/>
-                        
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
-                           
+                            
+                            <field name="stage_id" invisible="1"/>  <!-- This adds the field but keeps it hidden -->
                             <field name="training_id"/>
-                            <field name="descriptions"/>
                             <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location"/>-->
@@ -38,8 +32,8 @@
                             <!--<field name="name"/>-->
                             <field name="no_of_student"/>
                             <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
+                            <field name="training_date_start" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>
+                            <field name="training_date_end" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>        
                             <field name="price"/>
                         </tree>
                     </field>
@@ -54,7 +48,6 @@
                     <group>
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
-                        <field name="prov_share"/>
                         <field name="nilme_share"/>
 
                     </group>
@@ -70,8 +63,6 @@
                             
                             <field name="training_id"/>
                             <field name="descriptions"/>
-                           <field name="cost_clc"/>
-                            <field name="hyperlink"/>
                             <field name="wor_hour_number"/>
                             <field name="train_language"/>
                             <!--<field name="location"/>-->

@@ -56,12 +56,11 @@ class Lead(models.Model):
     @api.depends('costs_line_ids.clc_cost')
     def _compute_total_cost_price(self):
         for rec in self:
-            rec.total_cost_price = sum(rec.costs_line_ids.mapped('clc_cost'))
+            rec.total_cost_price = sum(cost.clc_cost or 0.0 for cost in rec.costs_line_ids)
 
 class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
-    _rec_name = 'partner'  # Helps with display in dropdowns
 
     lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     clc_cost = fields.Float(string="CLCs Cost", default=0.0)
@@ -74,4 +73,3 @@ class CostDetails(models.Model):
         ('nil_sa', 'NIL SA'),
         ('mira', 'Mira')
     ], string="Partner")
-

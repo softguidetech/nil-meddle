@@ -49,7 +49,6 @@ class Lead(models.Model):
     # 
     clc_cost = fields.Float(string="Cisco Training Cost")
     rate_card = fields.Float(string="Rate Card $")
-    par_share = fields.Float(string="Partner Share"))
     nilme_share = fields.Float(string="NIL ME Share $")
     ls_part = fields.Selection([
     ('koe', 'Koenig'),

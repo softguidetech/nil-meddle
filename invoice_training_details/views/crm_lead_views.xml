@@ -23,7 +23,6 @@
                             
                             <field name="stage_id" invisible="1"/>  <!-- This adds the field but keeps it hidden -->
                             <field name="training_id"/>
-                            <field name="cost_clc"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location"/>-->
@@ -46,11 +45,12 @@
                 
                 <page id="clcs" name="Costs Details">
                     <group>
-                        <field name="clc_cost"/>
+                        <field name="partner"/>
                         <field name="rate_card"/>
+                        <firld name="part_share"/>
                         <field name="nilme_share"/>
                         <field name="cisco_training_cost"/>
-                        <field name="partner"/>
+                        
                     </group>
                 </page>
                  <page id="pro" name="Professional Services">
@@ -101,7 +101,7 @@
                 <page id="logistics" string="Logistics">
                     <group>
                         <!--<group>-->
-                            <field name="instructor_logistics"/>
+                            <field name="venu_costs"/>
                             <field name="catering"/>
                     </group>
                         <!--<group string="Flights">-->

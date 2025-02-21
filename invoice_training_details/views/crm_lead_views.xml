@@ -49,7 +49,6 @@
                         <field name="ls_part"/>
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
-                        <field name="par_share"/>
                         <field name="nilme_share"/>
 
                     </group>

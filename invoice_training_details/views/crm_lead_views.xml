@@ -45,7 +45,6 @@
                 <page id="clcs" name="Costs">
                     <group>
                         <field name="total_training_price"/>
-                        <field name="clc_cost"/>
                         <field name="cisco_cost"/>
                         <field name="rate_card"/>
                         <field name="nilme_share"/>

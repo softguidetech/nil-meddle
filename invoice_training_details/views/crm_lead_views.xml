@@ -42,9 +42,9 @@
                     </group>
                 </page>
 
-                <page id="clcs" name="Costs">
+                <page id="costs" name="Costs">
                     <group>
-                        <field name="clcs">
+                        <field name="costs_ids">
                             <tree editable="bottom">
                                 <field name="total_training_price"/>
                                 <field name="cisco_cost"/>

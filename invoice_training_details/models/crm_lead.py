@@ -54,14 +54,15 @@ class Lead(models.Model):
     ('Koeing', 'Koeing')
 ], string='Partner')
 
-    clc_cost = fields.Char(string="CLCs Cost")
-    cisco_cost = fields.Char(string="Cisco Cost")
+    cisco_cost = fields.Char(string="Cisco Training Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")
     par_share = fields.Float(string="Partner Share $")
     
     # logistics tab
-    instructor_logistics = fields.Float(string='Venu')    
+    instructor_logistics = fields.Float(string='Venu')
+    Uber = fields.Float(string='Uber')
+    catering = fields.Float(string='Catering') 
     
     def _compute_total(self):
         ticket_total =0
@@ -73,7 +74,7 @@ class Lead(models.Model):
                     ticket_total+=ticket.price
                 for hotel in rec.hotel_ids:
                     hotel_toal+=hotel.price
-                rec.total_price_all = ticket_total + hotel_toal + rec.cost+ rec.instructor_logistics
+                rec.total_price_all = ticket_total + hotel_toal + rec.cost+ rec.instructor_logistics + rec.Uber + rec.catering
             else:
                 rec.total_price_all = 0
     

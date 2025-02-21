@@ -59,8 +59,7 @@ class Lead(models.Model):
 ], string="LS Partner")
     
     # logistics tab
-    other_logistics = fields.float(string='Venu')
-    catering = fields.float(string='Catering')
+
 
     
     def _compute_total(self):

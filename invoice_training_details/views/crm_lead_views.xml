@@ -44,15 +44,21 @@
                     </group>
                 </page>
                 
-                <page id="clcs" name="Costs Details">
-                    <group>
-                        <field name="clc_cost"/>
-                        <field name="rate_card"/>
-                        <field name="nilme_share"/>
-                        <field name="cisco_training_cost"/>
-                        <field name="partner"/>
-                    </group>
-                </page>
+                <xpath expr="//notebook" position="inside">
+    <page string="Costs Details" id="clcs">
+        <group>
+            <tree editable="bottom">
+                <field name="clc_cost"/>
+                <field name="rate_card"/>
+                <field name="nilme_share"/>
+                <field name="cisco_training_cost"/>
+                <field name="partner"/>
+            </tree>
+        </group>
+    </page>
+</xpath>
+
+                
                  <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>

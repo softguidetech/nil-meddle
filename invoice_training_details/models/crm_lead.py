@@ -46,7 +46,10 @@ class Lead(models.Model):
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     
-    # Costs Details to put down
+    # 
+    clc_cost = fields.Char(string="CLCs Cost")
+    rate_card = fields.Float(string="Rate Card $")
+    nilme_share = fields.Float(string="NIL ME Share $")
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

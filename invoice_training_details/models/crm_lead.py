@@ -47,7 +47,6 @@ class Lead(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     
     # 
-    ls_partner_c = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Partner')
     clc_cost = fields.Float(string="Cisco Training Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")

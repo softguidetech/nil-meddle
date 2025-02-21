@@ -45,10 +45,14 @@
           </group>
         </page>
         
-        <!-- Costs Details page -->
-        <page string="Costs Details" id="clcs">
+        <!-- Costs Details page (formatted like Training page) -->
+        <page id="clcs" name="Costs Details">
+          <group>
+            <field name="cost_vendor"/>
+          </group>
           <field name="costs_line_ids">
             <tree editable="bottom">
+              <field name="stage_id" invisible="1"/>
               <field name="clc_cost"/>
               <field name="rate_card"/>
               <field name="nilme_share"/>
@@ -56,6 +60,9 @@
               <field name="partner"/>
             </tree>
           </field>
+          <group>
+            <field name="total_cost_price"/>
+          </group>
         </page>
         
         <!-- Professional Services page -->
@@ -138,9 +145,7 @@
             <field name="total_price_all"/>
           </group>
         </page>
-        
       </xpath>
-      
     </field>
   </record>
 </odoo>

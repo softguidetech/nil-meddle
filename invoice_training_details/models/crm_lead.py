@@ -54,12 +54,13 @@ class Lead(models.Model):
     ls_part = fields.Selection([
     ('koe', 'Koenig'),
     ('mira', 'Mira'),
-    ('ltd', 'NIL LTD')
+    ('ltd', 'NIL LTD'),
     ('nilsa', 'NIL SA')
 ], string="LS Partner")
     
     # logistics tab
-
+    other_logistics = fields.Float(string="Venu")
+    catering = fields.Float(string="Catering")
 
     
     def _compute_total(self):

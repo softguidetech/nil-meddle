@@ -43,6 +43,7 @@
                 
                 <page id="clcs" name="CLC Details">
                     <group>
+                        <field name="price"/>
                         <field name="clc_cost"/>
                         <field name="cisco_cost"/>
                         <field name="rate_card"/>

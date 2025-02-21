@@ -61,15 +61,17 @@ class Lead(models.Model):
 class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
+    _rec_name = 'partner'  # Helps with display in dropdowns
 
-    lead_id = fields.Many2one('crm.lead', string="Lead")
-    clc_cost = fields.Float(string="CLCs Cost")
-    rate_card = fields.Float(string="Rate Card $")
-    nilme_share = fields.Float(string="NIL ME Share $")
-    cisco_training_cost = fields.Float(string="Cisco Training Cost")
+    lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
+    clc_cost = fields.Float(string="CLCs Cost", default=0.0)
+    rate_card = fields.Float(string="Rate Card $", default=0.0)
+    nilme_share = fields.Float(string="NIL ME Share $", default=0.0)
+    cisco_training_cost = fields.Float(string="Cisco Training Cost", default=0.0)
     partner = fields.Selection([
         ('koenig', 'Koenig'),
         ('nil_ltd', 'NIL LTD'),
         ('nil_sa', 'NIL SA'),
         ('mira', 'Mira')
     ], string="Partner")
+

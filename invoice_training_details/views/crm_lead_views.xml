@@ -31,7 +31,6 @@
                             <field name="duration"/>
                             <field name="training_date_start" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>
                             <field name="training_date_end" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>        
-                            <field name="price"/>
                         </tree>
                     </field>
                     <group>
@@ -43,7 +42,7 @@
                 
                 <page id="clcs" name="CLC Details">
                     <group>
-                        <<field name="total_training_price"/>
+                        <field name="total_training_price"/>
                         <field name="clc_cost"/>
                         <field name="cisco_cost"/>
                         <field name="rate_card"/>
@@ -66,7 +65,6 @@
                             <field name="duration"/>
                             <field name="training_date_start"/>
                             <field name="hourly_rate"/>
-                            <field name="price"/>
                         </tree>
                     </field>
                     <group>

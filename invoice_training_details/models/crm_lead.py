@@ -46,20 +46,22 @@ class Lead(models.Model):
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     
-    clc_cost = fields.Char(string="CLCs Cost")
-    rate_card = fields.Float(string="Rate Card $")
-    nilme_share = fields.Float(string="NIL ME Share $")
-    cisco_training_cost = fields.Float(string="Cisco Training Cost")
     partner = fields.Selection([
         ('koenig', 'Koenig'),
         ('nil_ltd', 'NIL LTD'),
         ('nil_sa', 'NIL SA'),
         ('mira', 'Mira')
     ], string="Partner")
+    rate_card = fields.Float(string="Rate Card $")
+    part_share = fields.Float(string="Partner Share $")
+    
+    nilme_share = fields.Float(string="NIL ME Share $")
+    cisco_training_cost = fields.Float(string="Cisco Training Cost")
+    
         
     # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    venu_costs = fields.Float(string='Venu')
+    catering = fields.Float(string='Catering')
     
     def _compute_total(self):
         ticket_total =0

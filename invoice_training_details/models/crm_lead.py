@@ -53,7 +53,6 @@ class Lead(models.Model):
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
     def _compute_total(self):
         ticket_total =0

@@ -47,9 +47,12 @@ class Lead(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     
     # 
+    partner_l = fields.Selection([('NIL LTD','NIL LTD),('NIL SA','NIL SA'),('MIRA','MIRA'),('Koeing','Koeing')],string='Partner_l')
     clc_cost = fields.Char(string="CLCs Cost")
+    cisco_cost = fields.Char(string="Cisco Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")
+    par_share = fields.Float(string="Partner Share $")
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

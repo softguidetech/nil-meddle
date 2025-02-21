@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
     <record id="crm_reveal_lead_opportunity_form_training" model="ir.ui.view">
         <field name="name">crm.lead.inherited.crm.training</field>
         <field name="model">crm.lead</field>
@@ -12,7 +11,6 @@
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
             </xpath>
-            
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
@@ -25,12 +23,12 @@
                             <field name="cost_clc"/>
                             <field name="train_language"/>
                             <field name="location"/>
-                            <field name="where_location2" />
+                            <field name="where_location2"/>
                             <field name="payment_method"/>
                             <field name="no_of_student"/>
                             <field name="duration"/>
                             <field name="training_date_start" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>
-                            <field name="training_date_end" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>        
+                            <field name="training_date_end" attrs="{'invisible': [('parent.stage_id.name', '=', 'Potential')]}"/>
                             <field name="price"/>
                         </tree>
                     </field>
@@ -40,7 +38,6 @@
                         </group>
                     </group>
                 </page>
-                
                 <page id="clcs" name="Costs">
                     <group>
                         <field name="total_training_price"/>
@@ -52,7 +49,6 @@
                         <field name="partner_l"/>
                     </group>
                 </page>
-
                 <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>
@@ -74,7 +70,7 @@
                         </group>
                     </group>
                 </page>
-                <page id="extra_information" string="Extra Information">
+                <page id="extra_information" name="Extra Information">
                     <group>
                         <group>
                             <field name="clcs_qty"/>
@@ -84,6 +80,54 @@
                     </group>
                 </page>
             </xpath>
+            <page id="logistics" name="Logistics">
+                <group>
+                    <field name="instructor_logistics"/>
+                    <field name="catering"/>
+                </group>
+                <field name="ticket_ids">
+                    <tree editable="bottom">
+                        <field name="airline_id"/>
+                        <field name="origin_id"/>
+                        <field name="destination_id"/>
+                        <field name="date"/>
+                        <field name="duration"/>
+                        <field name="time_from" widget="timesheet_uom"/>
+                        <field name="time_to" widget="timesheet_uom"/>
+                        <field name="stop"/>
+                        <field name="class_type_id"/>
+                        <field name="currency_id"/>
+                        <field name="price"/>
+                    </tree>
+                </field>
+                <field name="hotel_ids">
+                    <tree editable="bottom">
+                        <field name="hotel_id"/>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                        <field name="nights"/>
+                        <field name="location"/>
+                        <field name="pax"/>
+                        <field name="des"/>
+                        <field name="room_type"/>
+                        <field name="currency_id"/>
+                        <field name="price_without_tax"/>
+                        <field name="tax"/>
+                        <field name="price"/>
+                    </tree>
+                </field>
+                <group name="Visa Details">
+                    <field name="visa"/>
+                    <field name="start_date"/>
+                    <field name="to_date"/>
+                    <field name="book_details_id" widget="many2many_binary"/>
+                    <field name="details"/>
+                    <field name="cost"/>
+                </group>
+                <group>
+                    <field name="total_price_all"/>
+                </group>
+            </page>
         </field>
     </record>
 </odoo>

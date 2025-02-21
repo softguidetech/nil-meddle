@@ -1,145 +1,88 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <record id="crm_reveal_lead_opportunity_form_training" model="ir.ui.view">
-        <field name="name">crm.lead.inherited.crm.training</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
-        <field name="arch" type="xml">
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-            <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="instructor_id"/>
-            </xpath>
+from odoo import fields, models, api
 
-            <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="ordering_partner_id"/>
-            </xpath>
 
-            <xpath expr="//page[@name='internal_notes']" position="before">
-                <page id="training" name="Training">
-                    <group>
-                        <field name="training_vendor"/>
-                    </group>
-                    <field name="training_course_ids">
-                        <tree editable="bottom">
-                            <field name="training_id"/>
-                            <field name="cost_clc"/>
-                            <field name="train_language"/>
-                            <field name="location"/>
-                            <field name="where_location2"/>
-                            <field name="payment_method"/>
-                            <field name="no_of_student"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <group>
-                        <group>
-                            <field name="total_training_price"/>
-                        </group>
-                    </group>
-                </page>
+class Lead(models.Model):
+    _inherit = 'crm.lead'
 
-                <page id="costs" name="Costs">
-                    <group>
-                        <field name="cost_ids">
-                            <tree editable="bottom">
-                                <field name="total_training_price"/>
-                                <field name="cisco_cost"/>
-                                <field name="rate_card"/>
-                                <field name="nilme_share"/>
-                                <field name="par_share"/>
-                                <field name="partner_l"/>
-                            </tree>
-                        </field>
-                    </group>
-                </page>
+    training_name = fields.Char(string='Training Name')
+    service_name = fields.Char(string='Service Name')
+    total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
+    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
+    half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
+    half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+    training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
+    pro_service_ids = fields.One2many('pro.service', 'pro_lead_id', string='Professional Services')
+    ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
+    hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
+    total_price_all = fields.Float(string="Total Amount", compute='_compute_total')
+    visa = fields.Boolean(string="Visa")
+    start_date = fields.Date(string="From Date")
+    to_date = fields.Date(string="To Date")
+    book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
+                                       string="Booking Details",
+                                       help='You can attach the copy of your document', copy=False)
+    details = fields.Html(string="Details")
+    cost = fields.Float(string="Cost")
+    training_vendor = fields.Char(string="Training Vendor")
+    training_type = fields.Char(string="Training Type")
 
-                <page id="pro" name="Professional Services">
-                    <group>
-                        <field name="service_name"/>
-                    </group>
-                    <field name="pro_service_ids">
-                        <tree editable="bottom">
-                            <field name="training_id"/>
-                            <field name="descriptions"/>
-                            <field name="wor_hour_number"/>
-                            <field name="train_language"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="hourly_rate"/>
-                        </tree>
-                    </field>
-                    <group>
-                        <group>
-                            <field name="total_service_price"/>
-                        </group>
-                    </group>
-                </page>
+    # Extra Fields
+    instructor_id = fields.Many2one('hr.employee', string="Instructor")
+    descriptions = fields.Char(string='Description')
+    ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
+    training_id = fields.Many2one('product.template', string='Training Name')
 
-                <page id="extra_information" name="Extra Information">
-                    <group>
-                        <group>
-                            <field name="clcs_qty"/>
-                            <field name="so_no"/>
-                            <field name="tr_expiry_date"/>
-                        </group>
-                    </group>
-                </page>
-            </xpath>
+    train_language = fields.Char(string='Training Language')
+    location = fields.Selection([('Cisco U', 'Cisco U'), ('ILT', 'ILT'), ('VILT', 'VILT')])
+    payment_method = fields.Selection([('cash', 'Cash'), ('clc', 'CLC')], default='cash')
+    clcs_qty = fields.Float(string='CLCs Qty')
 
-            <xpath expr="//notebook" position="inside">
-                <page id="logistics" name="Logistics">
-                    <group>
-                        <field name="instructor_logistics"/>
-                        <field name="Uber"/>
-                        <field name="catering"/>
-                    </group>
-                    <field name="ticket_ids">
-                        <tree editable="bottom">
-                            <field name="airline_id"/>
-                            <field name="origin_id"/>
-                            <field name="destination_id"/>
-                            <field name="date"/>
-                            <field name="duration"/>
-                            <field name="time_from" widget="timesheet_uom"/>
-                            <field name="time_to" widget="timesheet_uom"/>
-                            <field name="stop"/>
-                            <field name="class_type_id"/>
-                            <field name="currency_id"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <field name="hotel_ids">
-                        <tree editable="bottom">
-                            <field name="hotel_id"/>
-                            <field name="date_from"/>
-                            <field name="date_to"/>
-                            <field name="nights"/>
-                            <field name="location"/>
-                            <field name="pax"/>
-                            <field name="des"/>
-                            <field name="room_type"/>
-                            <field name="currency_id"/>
-                            <field name="price_without_tax"/>
-                            <field name="tax"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <group name="Visa Details">
-                        <field name="visa"/>
-                        <field name="start_date"/>
-                        <field name="to_date"/>
-                        <field name="book_details_id" widget="many2many_binary"/>
-                        <field name="details"/>
-                        <field name="cost"/>
-                    </group>
-                    <group>
-                        <field name="total_price_all"/>
-                    </group>
-                </page>
-            </xpath>
-        </field>
-    </record>
-</odoo>
+    # Extra Information Tab
+    so_no = fields.Char(string='SO#')
+    tr_expiry_date = fields.Date(string='Expiry Date')
+    where_location2 = fields.Char(string='Training Location')  # Added missing field
+
+    # Costs Page
+    cost_ids = fields.One2many('crm.lead.cost', 'lead_id', string="Costs")
+
+    # Logistics Tab
+    instructor_logistics = fields.Float(string='Venue')
+    Uber = fields.Float(string='Uber')
+    catering = fields.Float(string='Catering')
+
+    def _compute_total(self):
+        for rec in self:
+            ticket_total = sum(rec.ticket_ids.mapped('price')) if rec.ticket_ids else 0
+            hotel_total = sum(rec.hotel_ids.mapped('price')) if rec.hotel_ids else 0
+            rec.total_price_all = ticket_total + hotel_total + rec.cost + rec.instructor_logistics + rec.Uber + rec.catering
+
+    @api.depends('pro_service_ids.price')
+    def _compute_service_price(self):
+        for rec in self:
+            rec.total_service_price = sum(rec.pro_service_ids.mapped('price')) if rec.pro_service_ids else 0
+
+    @api.depends('training_course_ids.price')
+    def _compute_training_price(self):
+        for rec in self:
+            rec.total_training_price = sum(rec.training_course_ids.mapped('price')) if rec.training_course_ids else 0
+
+
+class CrmLeadCost(models.Model):
+    _name = 'crm.lead.cost'
+    _description = 'CRM Lead Costs'
+
+    lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
+    total_training_price = fields.Float(string="Total Training Price")
+    cisco_cost = fields.Float(string="Cisco Training Cost")
+    rate_card = fields.Float(string="Rate Card $")
+    nilme_share = fields.Float(string="NIL ME Share $")
+    par_share = fields.Float(string="Partner Share $")
+    partner_l = fields.Selection([
+        ('NIL LTD', 'NIL LTD'),
+        ('NIL SA', 'NIL SA'),
+        ('MIRA', 'MIRA'),
+        ('Koeing', 'Koeing')
+    ], string='Partner')

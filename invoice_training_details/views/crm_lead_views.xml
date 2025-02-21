@@ -41,7 +41,7 @@
                     </group>
                 </page>
                 
-                <page id="clcs" name="CLC Details">
+                <page id="clcs" name="Costs">
                     <group>
                         <field name="total_training_price"/>
                         <field name="clc_cost"/>

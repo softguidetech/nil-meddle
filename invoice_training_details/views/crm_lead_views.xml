@@ -103,7 +103,8 @@
                 <page id="logistics" string="Logistics">
                     <group>
                         <!--<group>-->
-#here
+                           <field name="other_logistics"/>
+                            <field name="catering"/>    
                         
                     </group>
                         <!--<group string="Flights">-->

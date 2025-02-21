@@ -46,7 +46,7 @@ class Lead(models.Model):
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     
-    # 
+    # costs page
     partner_l = fields.Selection([
     ('NIL LTD', 'NIL LTD'),
     ('NIL SA', 'NIL SA'),

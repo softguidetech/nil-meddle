@@ -91,7 +91,6 @@
                 <page id="logistics" name="Logistics">
                     <group>
                         <field name="instructor_logistics"/>
-                        <field name="catering"/>
                     </group>
                     <field name="ticket_ids">
                         <tree editable="bottom">

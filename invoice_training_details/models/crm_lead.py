@@ -55,8 +55,8 @@ class Lead(models.Model):
         ('nil_ltd', 'NIL LTD'),
         ('nil_sa', 'NIL SA'),
         ('mira', 'Mira')
-], string="Partner")
-    
+    ], string="Partner")
+        
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')

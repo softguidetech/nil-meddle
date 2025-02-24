@@ -45,6 +45,9 @@ class Lead(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
+    invref = fields.char(string='Invoice#')
+    poref = fields.char(string='PO#')
+    parref = field.char(string='Partner")
     
     # 
     clc_cost = fields.Char(string="CLCs Cost")

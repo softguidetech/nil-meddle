@@ -140,9 +140,6 @@
                 <page id="extra_information" string="Extra Information">
                     <group>
                         <group>
-                            <field name="parref"/>
-                            <field name="poref"/>
-                            <field name="invref"/>
                             <field name="clcs_qty"/>
                             <field name="so_no"/>
                             <field name="tr_expiry_date"/>

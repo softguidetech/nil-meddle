@@ -85,6 +85,9 @@ class SaleOrder(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
+    invref = fields.char(string='Invoice#')
+    poref = fields.char(string='PO#')
+    parref = field.char(string='Par')
 
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

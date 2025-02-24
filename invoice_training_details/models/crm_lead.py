@@ -47,7 +47,7 @@ class Lead(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     invref = fields.char(string='Invoice#')
     poref = fields.char(string='PO#')
-    parref = field.char(string='Partner")
+    parref = field.char(string='Partner')
     
     # 
     clc_cost = fields.Char(string="CLCs Cost")

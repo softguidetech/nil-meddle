@@ -118,9 +118,9 @@ class SaleOrder(models.Model):
             'half_payment_after': self.half_payment_after,
             'training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-            'default_clcs_qty': self.clcs_qty,
-            'default_so_no': self.so_no,
-            'default_tr_expiry_date': self.tr_expiry_date,
+            'clcs_qty': self.clcs_qty,
+            'so_no': self.so_no,
+            'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
             'catering': self.catering,
             # 'descriptions': self.descriptions,
@@ -231,4 +231,3 @@ class SaleOrder(models.Model):
         self.write({'order_line': []})
         self.write({'order_line': l})
             
-

@@ -46,7 +46,6 @@
                 
                 <page id="clcs" name="Customer CLC Details">
                     <group>
-                        <field name="clcs_qty"/>
                         <field name="so_no"/>
                         <field name="tr_expiry_date"/>
 

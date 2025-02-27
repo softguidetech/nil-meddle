@@ -48,13 +48,21 @@ class TrainingCourse(models.Model):
     cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="CLC Cost")
     hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Link")
     
+    from odoo import models, fields
+
+class YourModel(models.Model):
+    _name = "your.model"
+    
+    training_date_start = fields.Date(string="Training Start Date")
+    training_date_end = fields.Date(string="Training End Date")
+    duration = fields.Integer(string="Duration (Days)", compute="_compute_date", store=True)
+
     def _compute_date(self):
-        
-        duration = 0
         for rec in self:
-    if rec.training_date_start and rec.training_date_end:
-        duration = (rec.training_date_end - rec.training_date_start).days
-        rec.duration = duration + 1  # To include both start and end dates
-    else:
-        rec.duration = 0  # Default to 0 if dates are missing
+            if rec.training_date_start and rec.training_date_end:
+                duration = (rec.training_date_end - rec.training_date_start).days
+                rec.duration = duration + 1  # Include both start and end dates
+            else:
+                rec.duration = 0  # Default to 0 if dates are missing
+
          

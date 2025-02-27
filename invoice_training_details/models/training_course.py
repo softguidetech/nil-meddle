@@ -59,9 +59,6 @@ class YourModel(models.Model):
 
     def _compute_date(self):
     for rec in self:
-        if rec.training_date_end and rec.training_date_start:
-            duration = (rec.training_date_end - rec.training_date_start).days
-            rec.duration = duration
-        else:
-            rec.duration = 0  # Handle cases where dates are missing
+        rec.duration = (rec.training_date_end - rec.training_date_start + 1).days if rec.training_date_end and rec.training_date_start else 0
+
          

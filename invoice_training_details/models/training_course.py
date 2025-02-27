@@ -52,7 +52,7 @@ class TrainingCourse(models.Model):
         
         duration = 0
         for rec in self:
-            duration = rec.training_date_end - rec.training_date_start
-            days= str(duration).replace(', 0:00:00','')
-            rec.duration = days
+            rec.duration = duration + 1  # To include both start and end dates
+    else:
+        rec.duration = 0  # Default to 0 if dates are missing
          

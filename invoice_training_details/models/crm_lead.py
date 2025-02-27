@@ -41,7 +41,6 @@ class Lead(models.Model):
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     
     # extra information tab
-    clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     
@@ -93,7 +92,6 @@ class Lead(models.Model):
             # 'default_half_payment_after': self.half_payment_after,
             'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-            'default_clcs_qty': self.clcs_qty,
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,

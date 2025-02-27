@@ -58,10 +58,11 @@ class YourModel(models.Model):
     duration = fields.Integer(string="Duration (Days)", compute="_compute_date", store=True)
 
     def _compute_date(self):
-        
-        duration = 0
-        for rec in self:
-            duration = rec.training_date_end - rec.training_date_start + 1
-            days= str(duration).replace(', 0:00:00','')
-            rec.duration = days
+    for rec in self:
+        if rec.training_date_start and rec.training_date_end:
+            duration = (rec.training_date_end - rec.training_date_start).days + 1
+            rec.duration = duration
+        else:
+            rec.duration = 0  # Default to 0 if dates are missing
+
          

@@ -59,7 +59,7 @@ def _compute_date(self):
         
         duration = 0
         for rec in self:
-            duration = rec.training_date_end - rec.training_date_start 
+            duration = rec.training_date_end - rec.training_date_start
             days= str(duration).replace(', 0:00:00','')
             rec.duration = days
 

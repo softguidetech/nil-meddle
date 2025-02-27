@@ -50,12 +50,10 @@ class TrainingCourse(models.Model):
     
     from odoo import models, fields
 
-class YourModel(models.Model):
-    _name = "your.model"
-    
-    training_date_start = fields.Date(string="Training Start Date")
-    training_date_end = fields.Date(string="Training End Date")
-    duration = fields.Integer(string="Duration (Days)", compute="_compute_date", store=True)
+def _compute_date(self):
+    for rec in self:
+        rec.duration = (rec.training_date_end - rec.training_date_start).days + 1
+
 
     def _compute_date(self):
     for rec in self:

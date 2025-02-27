@@ -36,11 +36,20 @@ class TrainingCourse(models.Model):
     def _compute_date(self):
     for rec in self:
         if rec.training_date_start and rec.training_date_end:
-            duration = rec.training_date_end - rec.training_date_start
-            days = duration.days + 1  # Adding one extra day
-            rec.duration = str(days)  # Keeping it as a string if needed
+            start_date = rec.training_date_start
+            end_date = rec.training_date_end
+
+            # Ensure they are date objects
+            if hasattr(start_date, 'date'):
+                start_date = start_date.date()
+            if hasattr(end_date, 'date'):
+                end_date = end_date.date()
+
+            duration = (end_date - start_date).days + 1  # Add one extra day
+            rec.duration = str(duration)  # Convert to string if needed
         else:
             rec.duration = "0"  # Default to "0" if dates are missing
+
 
 
 

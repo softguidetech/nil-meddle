@@ -57,12 +57,15 @@ class YourModel(models.Model):
     training_date_end = fields.Date(string="Training End Date")
     duration = fields.Integer(string="Duration (Days)", compute="_compute_date", store=True)
 
-    def _compute_date(self):
-        for rec in self:
-            if rec.training_date_start and rec.training_date_end:
-                duration = (rec.training_date_end - rec.training_date_start).days
-                rec.duration = duration + 1  # Include both start and end dates
-            else:
-                rec.duration = 0  # Default to 0 if dates are missing
+    @api.depends('training_date_start', 'training_date_end')
+        def _compute_date(self):
+            for rec in self:
+                if rec.training_date_start and rec.training_date_end:
+                    if rec.training_date_end >= rec.training_date_start:
+                        rec.duration = (rec.training_date_end - rec.training_date_start).days + 1
+                    else:
+                        rec.duration = 0  # Ensure no negative durations
+                else:
+                    rec.duration = 0  # Default to 0 if missing
 
          

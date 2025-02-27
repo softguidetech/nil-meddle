@@ -39,7 +39,6 @@ class Lead(models.Model):
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
-    clcs_qty = fields.Float(string='CLCs Qty')
     
     # extra information tab
     clcs_qty = fields.Float(string='CLCs Qty')
@@ -106,7 +105,6 @@ class Lead(models.Model):
             'default_train_language': self.train_language,
             'default_location': self.location,
             'default_payment_method': self.payment_method,
-            'default_clcs_qty': self.clcs_qty,
             'default_service_name': self.service_name,
             
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],

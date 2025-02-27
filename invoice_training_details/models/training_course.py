@@ -52,7 +52,9 @@ class TrainingCourse(models.Model):
         
         duration = 0
         for rec in self:
-            rec.duration = duration + 1  # To include both start and end dates
+    if rec.training_date_start and rec.training_date_end:
+        duration = (rec.training_date_end - rec.training_date_start).days
+        rec.duration = duration + 1  # To include both start and end dates
     else:
         rec.duration = 0  # Default to 0 if dates are missing
          

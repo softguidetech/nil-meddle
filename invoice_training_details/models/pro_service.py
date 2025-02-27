@@ -28,7 +28,6 @@ class ProService(models.Model):
     location = fields.Selection([('DXB','NIL DXB'),('KSA','NIL KSA'),('Venue','Venue'),('Customer Choice','Customer Choice')])
     where_location = fields.Char(string='Where?',default='Webex')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
-    clcs_qty = fields.Float(string='CLCs Qty')
     default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')
     
     cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="Cost Clc")

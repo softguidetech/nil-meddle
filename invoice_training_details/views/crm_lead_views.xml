@@ -24,7 +24,7 @@
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location"/>-->
-                            <field name="where_location2" />
+                            <field name="where_location2" attrs="{'invisible': [('location', '!=', 'ILT')]}"/>
                             <field name="payment_method"/>
                             <!--<field name="name"/>-->
                             <field name="no_of_student"/>

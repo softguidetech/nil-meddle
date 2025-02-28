@@ -8,12 +8,7 @@ from odoo import fields, models, api
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
-@api.depends('training_name')
-def _compute_new_training_name(self):
-    for record in self:
-        record.new_training_name = record.training_name
-
-    new_training_name = fields.Char(string='New Training Name', compute='_compute_new_training_name', store=True)
+    training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
     total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)

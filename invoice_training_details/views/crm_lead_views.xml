@@ -52,8 +52,6 @@
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
                         <field name="nilme_share"/>
-                        <field name="training_name"/>
-                        
                         <field name="training_vendor"/>
                         <field name="training_type"/>
 

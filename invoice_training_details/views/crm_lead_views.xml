@@ -17,10 +17,7 @@
                 <page id="training" name="Training">
                     <group>
                         <field name="training_name"/>
-                        
-                        <field name="training_vendor"/>
-                        <field name="training_type"/>
-                        
+
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
@@ -50,11 +47,13 @@
                     </group>
                 </page>
                 
-                <page id="clcs" name="CLC Details">
+                <page id="clcs" name="Costs Details">
                     <group>
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
-                        <field name="nilme_share"/>
+                        <field name="nilme_share"/>          
+                        <field name="training_vendor"/>
+                        <field name="training_type"/>
 
                     </group>
                     

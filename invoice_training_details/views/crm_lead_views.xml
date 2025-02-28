@@ -15,16 +15,25 @@
                 
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
-                    
+                    <group>
+                        <field name="training_name"/>
+                        
+                        <field name="training_vendor"/>
+                        <field name="training_type"/>
+                        
+                    </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
                            
                             <field name="training_id"/>
+                            <field name="descriptions"/>
                             <field name="cost_clc"/>
+                            <field name="hyperlink"/>
+                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location"/>-->
-                            <field name="where_location2" attrs="{'invisible': [('location', '!=', 'ILT')]}"/>
+                            <field name="where_location2" />
                             <field name="payment_method"/>
                             <!--<field name="name"/>-->
                             <field name="no_of_student"/>
@@ -41,14 +50,12 @@
                     </group>
                 </page>
                 
-                <page id="clcs" name="Costs Details">
+                <page id="clcs" name="CLC Details">
                     <group>
                         <field name="clc_cost"/>
                         <field name="rate_card"/>
                         <field name="nilme_share"/>
-                        <field name="training_name"/>
-                        <field name="training_vendor"/>
-                        <field name="training_type"/>
+
                     </group>
                     
                 </page>

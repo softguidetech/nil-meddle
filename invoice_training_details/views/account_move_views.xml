@@ -9,7 +9,6 @@
             <xpath expr="//page[@id='other_tab']" position="before">
                 <page id="training" name="Training">
                     <group>
-                        <field name="training_name"/>
                          <field name="training_vendor"/>
                         <field name="training_type"/>
                         <field name="instructor_id"/>

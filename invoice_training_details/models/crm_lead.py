@@ -9,6 +9,7 @@ class Lead(models.Model):
     _inherit = 'crm.lead'
 
     training_name = fields.Char(string='Training Name')
+    kanb_view = fields.char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
     total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)

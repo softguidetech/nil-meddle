@@ -20,10 +20,7 @@
                         <tree editable="bottom">
                            
                             <field name="training_id"/>
-                            <field name="descriptions"/>
                             <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location"/>-->

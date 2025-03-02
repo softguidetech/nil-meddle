@@ -40,6 +40,8 @@ class Lead(models.Model):
     location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
+    custom_lead_notes = fields.Char(string="Lead Notes")  # This will store "test" or any text
+
     
     # extra information tab
     clcs_qty = fields.Float(string='CLCs Qty')

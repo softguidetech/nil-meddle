@@ -26,9 +26,9 @@ class Lead(models.Model):
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
-    cost = fields.Float(string="Cost")
-    training_vendor = fields.Float(string="Partner Share")
-    training_type = fields.Float(string="Training Cost")
+    cost = fields.Float(string="Cost", default=0.0)
+    training_vendor = fields.Chae(string="Partner Share")
+    training_type = fields.Char(string="Training Cost")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

@@ -23,22 +23,6 @@ class TrainingCourse(models.Model):
     descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.product',string='Training Name')
     train_language = fields.Char(string='Language')
-    # Add this computed field
-    stage_id = fields.Many2one(
-        'crm.stage', 
-        string='Stage', 
-        compute='_compute_stage',
-        store=False
-    )
-
-    # Add this compute method
-    @api.depends('lead_id.stage_id')
-    def _compute_stage(self):
-        for rec in self:
-            rec.stage_id = rec.lead_id.stage_id
-
-    # Rest of your existing fields...
-    
     where_location2 = fields.Char(string='Where?')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')

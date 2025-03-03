@@ -51,7 +51,7 @@ class Lead(models.Model):
     clc_cost = fields.Char(string="CLCs Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")
-    poref = fields.Char(string="PO Ref:")
+    poref = fields.Float(string="PO Ref:")
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

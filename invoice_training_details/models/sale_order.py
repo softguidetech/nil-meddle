@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 
 from odoo import api, models, fields
@@ -56,7 +55,6 @@ class SaleOrder(models.Model):
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
     
-    
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
         total = 0
@@ -97,8 +95,8 @@ class SaleOrder(models.Model):
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
-            if rec.pro_service_ids:
-                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
+            if rec.training_course_ids:
+                rec.total_service_price = sum(rec.training_course_ids.mapped('price'))
             
             else:
                 rec.total_service_price = 0

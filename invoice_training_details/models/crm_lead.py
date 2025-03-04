@@ -201,7 +201,7 @@ class ProductProduct(models.Model):
     _inherit = 'product.product'
 
     
-    cost_clc = fields.Char(string="Cost Clc")
+    cost_clc = fields.Char(string="CLCs Cost")
     hyperlink = fields.Char(string="Hyper Link")
     
     
@@ -209,7 +209,7 @@ class ProductProduct(models.Model):
     _inherit = 'product.template'
 
     
-    cost_clc = fields.Char(string="Cost Clc")
+    cost_clc = fields.Char(string="CLCs Cost")
     hyperlink = fields.Char(string="Hyper Link")
     
     

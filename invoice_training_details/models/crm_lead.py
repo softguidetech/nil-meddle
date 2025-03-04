@@ -37,7 +37,7 @@ class Lead(models.Model):
     training_id = fields.Many2one('product.template',string='Training Name')
     
     train_language = fields.Char(string='Language')
-    location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
+    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     

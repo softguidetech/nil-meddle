@@ -34,10 +34,7 @@ class TrainingCourse(models.Model):
     hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")
     
     def _compute_date(self):
-        
-        duration = 0
-        for rec in self:
-            duration = rec.training_date_end - rec.training_date_start
-            days= str(duration).replace(', 0:00:00','')
-            rec.duration = days
+    for rec in self:
+        duration = rec.training_date_end - rec.training_date_start
+        rec.duration = duration.days
          

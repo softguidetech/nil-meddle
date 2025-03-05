@@ -62,7 +62,7 @@ class Lead(models.Model):
     
     # logistics tab
     catering = fields.Float(string='Catering')
-    Venue = fields.Float(string='Catering')
+    venue = fields.Float(string='Venue')
     
     def _compute_total(self):
         ticket_total =0

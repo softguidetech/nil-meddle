@@ -43,7 +43,7 @@
                     </group>
                 </page>
                 
-                <!-- Tree view to display all training costs linked to this lead -->
+                <!-- Use the One2many relationship to display the related training costs -->
     <field name="training_cost_ids">
         <tree editable="bottom">
             <field name="clc_cost"/>

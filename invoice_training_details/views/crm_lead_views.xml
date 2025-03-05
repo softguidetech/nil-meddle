@@ -9,10 +9,9 @@
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
                 </xpath>
-                <xpath expr="//field[@name='partner_id']" position="before">
-    <field name="ordering_partner_id"/>
-</xpath>
-
+                <xpath expr="//field[@name='partner_id']" position="after">
+                <field name="ordering_partner_id"/>
+                </xpath>
                 
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
@@ -44,24 +43,16 @@
                 </page>
                 
                 <page id="clcs" name="Costs Details">
-    <group>
-        <!-- Display general fields (optional) -->
-        <field name="clcs_qty"/>
-        <field name="cost"/>
-    </group>
+                    <group>
+                        <field name="clc_cost"/>
+                        <field name="rate_card"/>
+                        <field name="nilme_share"/>          
+                        <field name="training_vendor"/>
+                        <field name="training_type"/>
 
-    <!-- Use the One2many relationship to display related training costs -->
-    <field name=" t_costs_ids">
-        <tree editable="bottom">
-            <field name="clc_cost"/>
-            <field name="rate_card"/>
-            <field name="nilme_share"/>
-            <field name="training_vendor"/>
-            <field name="training_type"/>
-        </tree>
-    </field>
-</page>
-
+                    </group>
+                    
+                </page>
                  <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>

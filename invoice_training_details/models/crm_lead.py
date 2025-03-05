@@ -42,9 +42,11 @@ class Lead(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     
     # extra information tab
-    clcs_qty = fields.Float(string='CLCs Qty')
+    clcs_qty = fields.Float(string='Customer CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
+    poref = fields.Char(string='PO Reference')
+    invref = fields.Char(string='Invoice Reference')
     
     # 
     clc_cost = fields.Char(string="Training Cost")

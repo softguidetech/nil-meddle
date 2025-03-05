@@ -61,8 +61,8 @@ class Lead(models.Model):
     nilme_share = fields.Float(string="NIL ME Share $")
     
     # logistics tab
-    catering = fields.Float(string='Catering')
-    venue = fields.Float(string='Venue')
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
     def _compute_total(self):
         ticket_total =0
@@ -106,7 +106,7 @@ class Lead(models.Model):
             'default_clcs_qty': self.clcs_qty,
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
-            'default_venue': self.venue,
+            'default_instructor_logistics': self.instructor_logistics,
             'default_catering': self.catering,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,

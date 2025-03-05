@@ -40,4 +40,3 @@ class TrainingCourse(models.Model):
             rec.duration = str(duration) + ' days'
         else:
             rec.duration = '0 days'
-         

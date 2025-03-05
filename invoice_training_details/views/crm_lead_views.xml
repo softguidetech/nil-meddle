@@ -43,7 +43,14 @@
                     </group>
                 </page>
                 
-                <!-- Use the One2many relationship to display the related training costs -->
+                <page id="clcs" name="Costs Details">
+    <group>
+        <!-- Display general fields (optional) -->
+        <field name="clcs_qty"/>
+        <field name="cost"/>
+    </group>
+
+    <!-- Use the One2many relationship to display related training costs -->
     <field name="training_cost_ids">
         <tree editable="bottom">
             <field name="clc_cost"/>
@@ -54,6 +61,7 @@
         </tree>
     </field>
 </page>
+
                  <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>

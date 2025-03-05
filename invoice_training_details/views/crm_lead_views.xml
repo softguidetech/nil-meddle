@@ -5,12 +5,6 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
-
-            <!-- Add instructor_id after tag_ids -->
-            <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="instructor_id"/>
-            </xpath>
-
             <!-- Insert the "Training" page before Internal Notes -->
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">

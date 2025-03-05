@@ -110,6 +110,7 @@
                         <!--<group>-->
                             <field name="instructor_logistics"/>
                             <field name="catering"/>
+                            <fiels name="venue"/>
                     </group>
                         <!--<group string="Flights">-->
                             <!--<group>-->

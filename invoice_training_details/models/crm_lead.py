@@ -48,7 +48,6 @@ class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
 
-    lead_id = fields.Many2one('crm.lead', string="Lead")
     clc_cost = fields.Float(string="CLC Cost")
     rate_card = fields.Float(string="Rate Card")
     nilme_share = fields.Float(string="NILME Share")

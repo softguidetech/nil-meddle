@@ -62,7 +62,7 @@ class Lead(models.Model):
     nilme_share = fields.Float(string="NIL ME Share $")
     
     # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')
+    instructor_logistics = fields.Float(string='Instructor Logistics')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue')

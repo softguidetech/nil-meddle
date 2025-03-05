@@ -66,15 +66,16 @@ class Lead(models.Model):
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     ctrng = fields.Float(string='Catering')
     
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue')
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue', 'ctrng')
     def _compute_total(self):
         for rec in self:
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
             instructor_logistics = rec.instructor_logistics if isinstance(rec.instructor_logistics, (int, float)) else 0
             venue = rec.venue if isinstance(rec.venue, (int, float)) else 0
+            ctrng = rec.ctrng if isinstance(rec.ctrng, (int, float) else 0
 
-            rec.total_price_all = ticket_total + hotel_total + rec.cost + instructor_logistics + venue
+            rec.total_price_all = ticket_total + hotel_total + rec.cost + instructor_logistics + venue + ctrng
     
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):

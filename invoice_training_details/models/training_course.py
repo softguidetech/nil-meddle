@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools
-from datetime import timedelta
+from datetime import datetime
 from odoo.exceptions import ValidationError
 
 class TrainingCourse(models.Model):
@@ -33,16 +33,10 @@ class TrainingCourse(models.Model):
     cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="CLCs Cost")
     hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")
     
-    def _compute_date(self):
-    for rec in self:
-        if rec.training_date_start and rec.training_date_end:
-            try:
-                duration = (rec.training_date_end - rec.training_date_start).days + 1
-                rec.duration = duration
-            except Exception as e:
-                rec.duration = 0
-                print(f"Error calculating duration for record {rec.id}: {e}")
-        else:
-            rec.duration = 0
-            print(f"Missing start or end date for record {rec.id}")
-         
+     def _compute_date(self):
+        
+        duration = 0
+        for rec in self:
+            duration = rec.training_date_end - rec.training_date_start
+            days= str(duration).replace(', 0:00:00','')
+            rec.duration = days

@@ -125,6 +125,7 @@ class Lead(models.Model):
             'default_visa': self.visa,
             'default_start_date': self.start_date,
             'default_to_date': self.to_date,
+            'default_venue': self.venue,
             'default_book_details_id': [(6, 0, self.book_details_id.ids)],
             'default_details': self.details,
             'default_cost': self.cost,

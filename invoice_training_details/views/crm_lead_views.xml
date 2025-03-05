@@ -42,6 +42,7 @@
                     </group>
                 </page>
                 
+                <xpath expr="//page[@name='internal_notes']" position="after">
                 <page id="clcs" name="Costs Details">
                     <group>
                         <field name="clc_cost"/>
@@ -49,10 +50,9 @@
                         <field name="nilme_share"/>          
                         <field name="training_vendor"/>
                         <field name="total_price_all"/>
-
                     </group>
-                    
                 </page>
+            </xpath>
                  <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>

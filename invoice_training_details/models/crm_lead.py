@@ -18,7 +18,7 @@ class Lead(models.Model):
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',srting='Professional Services')
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
-    total_price_all = fields.Float(string="Total Amount",compute='_compute_total')
+    total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
@@ -40,6 +40,7 @@ class Lead(models.Model):
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
+    learnig_partner = fields.Selection([('Koeinig','Koeinig'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
     
     # extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')

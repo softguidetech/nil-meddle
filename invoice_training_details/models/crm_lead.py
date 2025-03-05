@@ -25,7 +25,9 @@ class Lead(models.Model):
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)
-    details = fields.Html(string="Details")
+    
+    cost_details_ids = fields.One2many('cost.detail', 'lead_id', string='Cost Details')
+details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     training_vendor = fields.Float(string="Partner Share")
     training_type = fields.Float(string="Logistics Cost")

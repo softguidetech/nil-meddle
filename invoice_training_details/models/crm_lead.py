@@ -26,14 +26,17 @@ class Lead(models.Model):
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)
     
-class CrmLead(models.Model):
-    _inherit = "crm.lead"
+class CostDetail(models.Model):
+    _name = 'cost.detail'
+    _description = 'Cost Details'
 
-    cost_details_ids = fields.One2many('cost.detail', 'lead_id', string="Cost Details")
-    details = fields.Html(string="Details")
-    cost = fields.Float(string="Cost")
+    lead_id = fields.Many2one('crm.lead', string="Lead")  # Required for One2many to work
+    clc_cost = fields.Float(string="Training Cost")
+    rate_card = fields.Float(string="Rate Card $")
+    nilme_share = fields.Float(string="NIL ME Share $")
     training_vendor = fields.Float(string="Partner Share")
-    training_type = fields.Float(string="Logistics Cost")
+    total_price_all = fields.Float(string="Total Cost")
+
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

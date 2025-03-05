@@ -47,7 +47,7 @@ class Lead(models.Model):
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koeinig','Koeinig'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
     
     # extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')
@@ -63,7 +63,7 @@ class Lead(models.Model):
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    catering = fields.Float(string='Catering')
     
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue')
     def _compute_total(self):

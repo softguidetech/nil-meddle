@@ -63,7 +63,7 @@ class Lead(models.Model):
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Float(string='Catering')
+    ctrng = fields.Float(string='Catering')
     
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue')
     def _compute_total(self):
@@ -104,7 +104,7 @@ class Lead(models.Model):
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
-            'default_catering': self.catering,
+            'default_ctrng': self.catering,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,
             'default_instructor_id': self.instructor_id.id,

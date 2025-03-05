@@ -27,8 +27,8 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    training_vendor = fields.Char(string="Partner Share")
-    training_type = fields.Char(string="Logistics Cost")
+    training_vendor = fields.Float(string="Partner Share")
+    training_type = fields.Float(string="Logistics Cost")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -49,7 +49,7 @@ class Lead(models.Model):
     invref = fields.Char(string='Invoice Reference')
     
     # 
-    clc_cost = fields.Char(string="Training Cost")
+    clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")
     

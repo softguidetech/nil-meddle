@@ -23,6 +23,8 @@ class TrainingCourse(models.Model):
     descriptions = fields.Char(string='Description')
     training_id = fields.Many2one('product.product', string='Training Name')
     train_language = fields.Char(string='Language')
+    poref = fields.Char(string='PO Reference')
+    invref = fields.Char(string='Invoice Reference')
     
     where_location2 = fields.Char(string='Where?')
     location = fields.Selection([('ILT', 'ILT'), ('VILT', 'VILT')])

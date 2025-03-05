@@ -42,8 +42,15 @@
                     </group>
                 </page>
                 
+                
+                <xpath expr="//page[@name='internal_notes']" position="before">
+                <page id="training" name="Training">
+                    <field name="training_course_ids">
+                        <tree editable="bottom">
                 <xpath expr="//page[@name='internal_notes']" position="after">
                 <page id="clcs" name="Costs Details">
+                    <field name="cost_details_id">
+                        <tree editable="bottom">
                     <group>
                         <field name="clc_cost"/>
                         <field name="rate_card"/>

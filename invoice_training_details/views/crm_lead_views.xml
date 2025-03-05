@@ -10,8 +10,8 @@
                 <field name="instructor_id"/>
                 </xpath>
                 <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="ordering_partner_id"/>
-                </xpath>
+    <field name="ordering_partner_id"/>
+</xpath>
                 
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">

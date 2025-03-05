@@ -29,6 +29,12 @@ class Lead(models.Model):
     cost = fields.Float(string="Cost")
     training_vendor = fields.Float(string="Partner Share")
     training_type = fields.Float(string="Logistics Cost")
+    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
+
+    @api.depends('clc_cost', 'rate_card', 'total_price_all')
+    def _compute_margin1(self):
+        for record in self:
+            record.margin1 = record.clc_cost + record.rate_card + record.total_price_all
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -51,7 +57,7 @@ class Lead(models.Model):
     
     # 
     clc_cost = fields.Float(string="Training Cost")
-    rate_card = fields.Float(string="Rate Card $")
+    rate_card = fields.Float(string="Partner Share")
     nilme_share = fields.Float(string="NIL ME Share $")
     
     # logistics tab
@@ -109,10 +115,10 @@ class Lead(models.Model):
             'default_train_language': self.train_language,
             'default_location': self.location,
             'default_learnig_partner': self.learnig_partner,
+            'default_margin1': self.margin1
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
             'default_service_name': self.service_name,
-            
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
             'default_visa': self.visa,
@@ -121,7 +127,6 @@ class Lead(models.Model):
             'default_book_details_id': [(6, 0, self.book_details_id.ids)],
             'default_details': self.details,
             'default_cost': self.cost,
-            
             'default_training_vendor': self.training_vendor,
             'default_training_type': self.training_type,
         })

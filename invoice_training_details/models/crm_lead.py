@@ -115,7 +115,7 @@ class Lead(models.Model):
             'default_train_language': self.train_language,
             'default_location': self.location,
             'default_learnig_partner': self.learnig_partner,
-            'default_margin1': self.margin1
+            'default_margin1': self.margin1,
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
             'default_service_name': self.service_name,

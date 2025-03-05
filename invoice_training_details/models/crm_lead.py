@@ -26,8 +26,11 @@ class Lead(models.Model):
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)
     
-cost_details_id = fields.Many2one('cost.detail', string='Cost Details')
-details = fields.Html(string="Details")
+class CrmLead(models.Model):
+    _inherit = "crm.lead"
+
+    cost_details_ids = fields.One2many('cost.detail', 'lead_id', string="Cost Details")
+    details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     training_vendor = fields.Float(string="Partner Share")
     training_type = fields.Float(string="Logistics Cost")

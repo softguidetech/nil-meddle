@@ -2,7 +2,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, tools
-from datetime import datetime
+from datetime import timedelta
 from odoo.exceptions import ValidationError
 
 class TrainingCourse(models.Model):
@@ -35,6 +35,9 @@ class TrainingCourse(models.Model):
     
     def _compute_date(self):
     for rec in self:
-        duration = (rec.training_date_end - rec.training_date_start).days + 1
-        rec.duration = duration
+        if rec.training_date_start and rec.training_date_end:
+            duration = (rec.training_date_end - rec.training_date_start).days + 1
+            rec.duration = duration
+        else:
+            rec.duration = 0
          

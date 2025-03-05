@@ -51,7 +51,7 @@
     </group>
 
     <!-- Use the One2many relationship to display related training costs -->
-    <field name="training_cost_ids">
+    <field name=" t_costs_ids">
         <tree editable="bottom">
             <field name="clc_cost"/>
             <field name="rate_card"/>

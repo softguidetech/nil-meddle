@@ -73,7 +73,6 @@ class Lead(models.Model):
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
             instructor_logistics = rec.instructor_logistics if isinstance(rec.instructor_logistics, (int, float)) else 0
             venue = rec.venue if isinstance(rec.venue, (int, float)) else 0
-            ctrng = rec.ctrng if isinstance(rec.ctrng, (int, float) else 0
 
             rec.total_price_all = ticket_total + hotel_total + rec.cost + instructor_logistics + venue
     

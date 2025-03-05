@@ -50,6 +50,8 @@
                         <field name="nilme_share"/>          
                         <field name="training_vendor"/>
                         <field name="total_price_all"/>
+                        <field name="margin1"/>
+
 
                     </group>
                     

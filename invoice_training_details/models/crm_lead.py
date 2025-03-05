@@ -18,25 +18,17 @@ class Lead(models.Model):
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',srting='Professional Services')
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
-    total_price_all = fields.Float(string="Logistics Cost",compute='_compute_total')
+    total_price_all = fields.Float(string="Total Amount",compute='_compute_total')
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)
-    
-class CostDetail(models.Model):
-    _name = 'cost.detail'
-    _description = 'Cost Details'
-
-    lead_id = fields.Many2one('crm.lead', string="Lead")  # Required for One2many to work
-    clc_cost = fields.Float(string="Training Cost")
-    rate_card = fields.Float(string="Rate Card $")
-    nilme_share = fields.Float(string="NIL ME Share $")
+    details = fields.Html(string="Details")
+    cost = fields.Float(string="Cost")
     training_vendor = fields.Float(string="Partner Share")
-    total_price_all = fields.Float(string="Total Cost")
-
+    training_type = fields.Float(string="Logistics Cost")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

@@ -43,7 +43,7 @@
                     </group>
                 </page>
                 
-                <!-- Display related training costs in a tree view -->
+                <!-- Tree view to display all training costs linked to this lead -->
     <field name="training_cost_ids">
         <tree editable="bottom">
             <field name="clc_cost"/>

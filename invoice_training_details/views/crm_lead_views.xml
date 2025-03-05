@@ -43,17 +43,17 @@
                     </group>
                 </page>
                 
-                <page id="clcs" name="Costs Details">
-                    <group>
-                        <field name="clc_cost"/>
-                        <field name="rate_card"/>
-                        <field name="nilme_share"/>          
-                        <field name="training_vendor"/>
-                        <field name="training_type"/>
-
-                    </group>
-                    
-                </page>
+                <!-- Display related training costs in a tree view -->
+    <field name="training_cost_ids">
+        <tree editable="bottom">
+            <field name="clc_cost"/>
+            <field name="rate_card"/>
+            <field name="nilme_share"/>
+            <field name="training_vendor"/>
+            <field name="training_type"/>
+        </tree>
+    </field>
+</page>
                  <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>

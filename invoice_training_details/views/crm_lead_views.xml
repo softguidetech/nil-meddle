@@ -96,6 +96,8 @@
                             <field name="clcs_qty"/>
                             <field name="so_no"/>
                             <field name="tr_expiry_date"/>
+                            <field name="poref"/>
+                            <field name= "invref"/>
                         </group>
                     </group>
                 </page>

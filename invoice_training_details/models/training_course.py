@@ -41,7 +41,8 @@ class TrainingCourse(models.Model):
                 rec.duration = duration
             except Exception as e:
                 rec.duration = 0
-                print(f"Error calculating duration: {e}")
+                print(f"Error calculating duration for record {rec.id}: {e}")
         else:
             rec.duration = 0
+            print(f"Missing start or end date for record {rec.id}")
          

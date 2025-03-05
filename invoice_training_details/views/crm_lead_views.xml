@@ -48,7 +48,7 @@
                         <field name="rate_card"/>
                         <field name="nilme_share"/>          
                         <field name="training_vendor"/>
-                        <field name="training_type"/>
+                        <field name="total_price_all"/>
 
                     </group>
                     

@@ -27,8 +27,6 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    training_vendor = fields.Float(string="Partner Share")
-    training_type = fields.Float(string="Logistics Cost")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -48,10 +46,26 @@ class Lead(models.Model):
     poref = fields.Char(string='PO Reference')
     invref = fields.Char(string='Invoice Reference')
     
-    # 
+
+# crm.lead Model - Inheriting and adding the One2many relationship
+class CrmLead(models.Model):
+    _inherit = 'crm.lead'
+
+    # Link to the related training costs using One2many
+    training_cost_ids = fields.One2many('training.cost', 'lead_id', string="Training Costs")
+
+# training.cost Model - This is the new model to store the cost details
+class TrainingCost(models.Model):
+    _name = 'training.cost'
+    _description = 'Training Costs'
+
+    lead_id = fields.Many2one('crm.lead', string="Lead")  # This creates the link to crm.lead
     clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Rate Card $")
     nilme_share = fields.Float(string="NIL ME Share $")
+    training_vendor = fields.Float(string="Training Vendor")
+    training_type = fields.Float(string="Training Type")
+
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')

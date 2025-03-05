@@ -25,10 +25,19 @@ class Lead(models.Model):
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)
-    details = fields.Html(string="Details")
-    cost = fields.Float(string="Cost")
-    training_vendor = fields.Float(string="Partner Share")
-    training_type = fields.Float(string="Logistics Cost")
+    # Costs Details Section
+    cost_details_ids = fields.One2many('cost.details', 'lead_id', string='Costs Details')
+
+class CostDetails(models.Model):
+    _name = 'cost.details'
+    _description = 'Cost Details'
+
+    lead_id = fields.Many2one('crm.lead', string="Lead")
+    clc_cost = fields.Float(string="CLC Cost")
+    rate_card = fields.Float(string="Rate Card")
+    nilme_share = fields.Float(string="NILME Share")
+    training_vendor = fields.Char(string="Training Vendor")
+    total_price_all = fields.Float(string="Total Price")
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

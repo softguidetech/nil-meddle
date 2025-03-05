@@ -18,7 +18,7 @@ class Lead(models.Model):
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',srting='Professional Services')
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
-    total_price_all = fields.Float(string="Total Amount",compute='_compute_total')
+    total_price_all = fields.Float(string="Logistics",compute='_compute_total')
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")

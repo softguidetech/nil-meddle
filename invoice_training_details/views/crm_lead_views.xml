@@ -42,17 +42,21 @@
                     </group>
                 </page>
                 
-                <page id="clcs" name="Costs Details">
-    <field name="cost_details_ids">
-        <tree editable="bottom">
-            <field name="clc_cost"/>
-            <field name="rate_card"/>
-            <field name="nilme_share"/>          
-            <field name="training_vendor"/>
-            <field name="total_price_all"/>
-        </tree>
-    </field>
-</page>
+                <xpath expr="//page[@name='internal_notes']" position="after">
+    <notebook>
+        <page id="clcs" name="Costs Details">
+            <field name="cost_details_ids">
+                <tree editable="bottom">
+                    <field name="clc_cost"/>
+                    <field name="rate_card"/>
+                    <field name="nilme_share"/>          
+                    <field name="training_vendor"/>
+                    <field name="total_price_all"/>
+                </tree>
+            </field>
+        </page>
+    </notebook>
+</xpath>
 
                  <page id="pro" name="Professional Services">
                     <group>

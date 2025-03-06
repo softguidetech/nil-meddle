@@ -64,7 +64,7 @@ class Lead(models.Model):
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
-    ctrng = fields.Float(string='Catering')
+    ctrng = fields.Float(string='Catering', compute='_compute_total', store=True)
     
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue')
     def _compute_total(self):
@@ -75,6 +75,9 @@ class Lead(models.Model):
             venue = rec.venue if isinstance(rec.venue, (int, float)) else 0
 
             rec.total_price_all = ticket_total + hotel_total + rec.cost + instructor_logistics + venue
+            
+            # Assuming catering is a percentage of total costs, adjust the formula as needed
+            rec.ctrng = (rec.total_price_all * 0.1)  # Example: 10% of total costs
     
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):

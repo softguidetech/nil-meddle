@@ -105,7 +105,7 @@ class Lead(models.Model):
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
-            'default_catering': self.catering,
+'default_catering': str(self.catering),
             'default_ctrng': self.ctrng,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,

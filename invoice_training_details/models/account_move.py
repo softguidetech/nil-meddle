@@ -20,7 +20,7 @@ class AccountMove(models.Model):
     pro_service_ids = fields.One2many('pro.service','pro_move_id',srting='Professional Services')
     invoice_payment_am = fields.Monetary(string="Amount Paid",compute='_compute_am_paid')
     invoice_payment_per = fields.Float(string="Amount Paid Percentage %",compute='_compute_am_paid_per')
-    catering = fields.Boolean(string="Catering")
+    
     display_training_table = fields.Boolean(string='Display Training Table', help='display traning table in training invoice PDF.')
     display_signature = fields.Boolean(string='Display Signature', help='display signature in training invoice PDF.')
     display_stamp = fields.Boolean(string='Display Stamp', help='display Stamp in training invoice PDF.')
@@ -52,6 +52,7 @@ class AccountMove(models.Model):
 
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
 
     ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
     

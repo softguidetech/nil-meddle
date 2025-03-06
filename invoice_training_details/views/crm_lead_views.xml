@@ -110,6 +110,7 @@
                         <!--<group>-->
                             <field name="ctrng"/>
                             <field name="venue"/>
+                            <field name="uber"/>
                     </group>
                         <!--<group string="Flights">-->
                             <!--<group>-->

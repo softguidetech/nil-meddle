@@ -31,6 +31,7 @@ class Lead(models.Model):
     training_vendor = fields.Float(string="Partner Share")
     training_type = fields.Float(string="Logistics Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
+    catering = fields.Boolean(string="Catering")
 
     @api.depends('clc_cost', 'rate_card', 'total_price_all')
     def _compute_margin1(self):

@@ -63,21 +63,21 @@ class Lead(models.Model):
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
+    uber = fields.Float(string='Uber')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
-    ctrng = fields.Float(string='Catering', compute='_compute_total', store=True)
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
     
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue')
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
         for rec in self:
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
             instructor_logistics = rec.instructor_logistics if isinstance(rec.instructor_logistics, (int, float)) else 0
             venue = rec.venue if isinstance(rec.venue, (int, float)) else 0
+            catering = rec.ctrng if isinstance(rec.ctrng, (int, float)) else 0
+            uber = rec.uber if isinstance(rec.uber, (int, float)) else 0
 
-            rec.total_price_all = ticket_total + hotel_total + rec.cost + instructor_logistics + venue
-            
-            # Assuming catering is a percentage of total costs, adjust the formula as needed
-            rec.ctrng = (rec.total_price_all * 0.1)  # Example: 10% of total costs
+            rec.total_price_all = ticket_total + hotel_total + rec.cost + instructor_logistics + venue + catering + uber
     
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -118,6 +118,7 @@ class Lead(models.Model):
             'default_location': self.location,
             'default_learnig_partner': self.learnig_partner,
             'default_margin1': self.margin1,
+            'default_uber': self.uber,
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
             'default_service_name': self.service_name,

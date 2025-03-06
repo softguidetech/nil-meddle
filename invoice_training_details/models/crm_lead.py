@@ -31,7 +31,6 @@ class Lead(models.Model):
     training_vendor = fields.Float(string="Partner Share")
     training_type = fields.Float(string="Logistics Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
-    catering = fields.Boolean(string="Catering")
 
     @api.depends('clc_cost', 'rate_card', 'total_price_all')
     def _compute_margin1(self):
@@ -64,6 +63,7 @@ class Lead(models.Model):
     
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     ctrng = fields.Float(string='Catering')
     
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue')
@@ -105,6 +105,7 @@ class Lead(models.Model):
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
+            'default_catering': self.catering,
             'default_ctrng': self.ctrng,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,

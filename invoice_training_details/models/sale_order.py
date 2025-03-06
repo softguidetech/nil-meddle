@@ -14,7 +14,8 @@ class SaleOrder(models.Model):
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
-    
+        catering = fields.Boolean(string="Catering")
+
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')

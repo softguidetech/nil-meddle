@@ -14,8 +14,7 @@ class SaleOrder(models.Model):
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
-        catering = fields.Boolean(string="Catering")
-
+    
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
@@ -87,7 +86,9 @@ class SaleOrder(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
 
     # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')    
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    
     bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
     term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
     
@@ -120,6 +121,7 @@ class SaleOrder(models.Model):
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
+            'catering': self.catering,
             # 'descriptions': self.descriptions,
             # 'ordering_partner_id': self.ordering_partner_id.id,
             # 'where_location': self.where_location,

@@ -16,7 +16,7 @@ class Lead(models.Model):
     pro_service_ids = fields.One2many('pro.service', 'pro_lead_id', string='Professional Services')
     ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
-    cost_details_ids = fields.One2many('cost.details', 'lead_id', string="Cost Details")
+    cost_details_ids = fields.One2many('cost.details', 'cost_lead_id', string="Cost Details")
     total_price_all = fields.Float(string="Total Logistics", compute='_compute_total')
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
@@ -125,6 +125,7 @@ class Lead(models.Model):
             default_service_name: self.service_name,
             default_hotel_ids: [(6, 0, self.hotel_ids.ids)],
             default_ticket_ids: [(6, 0, self.ticket_ids.ids)],
+            default_cost_details_ids,
             default_visa: self.visa,
             default_start_date: self.start_date,
             default_to_date: self.to_date,

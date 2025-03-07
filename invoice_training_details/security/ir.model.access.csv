@@ -7,3 +7,4 @@ access_airline,airline.airline,model_airline_airline,base.group_user,1,1,1,1
 access_loca,loca_loca,model_loca_loca,base.group_user,1,1,1,1
 access_flight_class_type,flight.class.type,model_flight_class_type,base.group_user,1,1,1,1
 access_hotel_des,hotel.description,model_hotel_description,base.group_user,1,1,1,1
+access_cost_details_user,cost.details,model_cost_details,base.group_user,1,1,1,1

@@ -125,7 +125,7 @@ class Lead(models.Model):
             default_service_name: self.service_name,
             default_hotel_ids: [(6, 0, self.hotel_ids.ids)],
             default_ticket_ids: [(6, 0, self.ticket_ids.ids)],
-            default_cost_details_ids,
+            default_cost_details_ids:[(6, 0, self.cost_details_ids.ids)],
             default_visa: self.visa,
             default_start_date: self.start_date,
             default_to_date: self.to_date,

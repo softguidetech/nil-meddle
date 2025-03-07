@@ -59,7 +59,7 @@ class Lead(models.Model):
     @api.depends('clc_cost', 'rate_card', 'total_price_all')
     def _compute_margin1(self):
         for record in self:
-            record.margin1 = record.clc_cost + record.rate_card + record.total_price_all
+            record.margin1 = (record.clc_cost or 0) + (record.rate_card or 0) + (record.total_price_all or 0)
 
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
@@ -86,6 +86,7 @@ class CostDetails(models.Model):
     training_vendor = fields.Float(string="Partner Share")
     total_price_all = fields.Float(string="Total Price")
     margin1 = fields.Float(string="Margin")
+
 
 
 class HotelHotel(models.Model):

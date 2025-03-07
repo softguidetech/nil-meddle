@@ -20,7 +20,7 @@ class Lead(models.Model):
     ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
     
-    cost_details_ids = fields.One2many('cost.details', 'cost_lead_id', string='Cost Details')
+    cost_details_ids = fields.One2many('cost.details', 'lead_id', string='Cost Details')
 
     total_price_all = fields.Float(string="Total Logistics", compute='_compute_total')
     visa = fields.Boolean(string="Visa")

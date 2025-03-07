@@ -17,7 +17,7 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    cost_details_ids = fields.One2many('cost.details','cos_lead_id',string= 'Costs Details')
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Costs Details')
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')
@@ -29,15 +29,8 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    training_vendor = fields.Float(string="Partner Share")
-    training_type = fields.Float(string="Logistics Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
 
-    @api.depends('clc_cost', 'rate_card', 'total_price_all')
-    def _compute_margin1(self):
-        for record in self:
-            record.margin1 = record.clc_cost + record.rate_card + record.total_price_all
-    
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
@@ -57,28 +50,25 @@ class Lead(models.Model):
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
     
-    # 
-    clc_cost = fields.Float(string="Training Cost")
-    rate_card = fields.Float(string="Partner Share")
-    nilme_share = fields.Float(string="NIL ME Share $")
-    
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     ctrng = fields.Float(string='Catering')  # Now it's manually editable
     
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost', 'instructor_logistics', 'venue', 'ctrng', 'uber')
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
         for rec in self:
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            instructor_logistics = rec.instructor_logistics if isinstance(rec.instructor_logistics, (int, float)) else 0
-            venue = rec.venue if isinstance(rec.venue, (int, float)) else 0
-            catering = rec.ctrng if isinstance(rec.ctrng, (int, float)) else 0
-            uber = rec.uber if isinstance(rec.uber, (int, float)) else 0
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
+    
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 
-            rec.total_price_all = ticket_total + hotel_total + rec.cost + instructor_logistics + venue + catering + uber
     
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -110,7 +100,7 @@ class Lead(models.Model):
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
-'default_catering': str(self.catering),
+            'default_catering': str(self.catering),
             'default_ctrng': self.ctrng,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,
@@ -119,7 +109,6 @@ class Lead(models.Model):
             'default_train_language': self.train_language,
             'default_location': self.location,
             'default_learnig_partner': self.learnig_partner,
-            'default_margin1': self.margin1,
             'default_uber': self.uber,
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
@@ -133,8 +122,7 @@ class Lead(models.Model):
             'default_book_details_id': [(6, 0, self.book_details_id.ids)],
             'default_details': self.details,
             'default_cost': self.cost,
-            'default_training_vendor': self.training_vendor,
-            'default_training_type': self.training_type,
+
         })
         return quotation_context
 

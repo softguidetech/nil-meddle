@@ -8,8 +8,16 @@ class CostDetails(models.Model):
     name = fields.Char(string="Cost Name", required=True)
     description = fields.Text(string="Description")
     price = fields.Float(string="Price", required=True)
-    currency_id = fields.Many2one('res.currency', string="Currency", required=True)
-
-    def _compute_total_cost(self):
+    currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
+    
+    training_vendor = fields.Float(string="Partner Share")
+    training_type = fields.Float(string="Logistics Cost")
+    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
+    clc_cost = fields.Float(string="Training Cost")
+    rate_card = fields.Float(string="Partner Share")
+    nilme_share = fields.Float(string="NIL ME Share $")
+    
+    @api.depends('clc_cost', 'rate_card', 'price')
+    def _compute_margin1(self):
         for record in self:
-            record.price = sum(record.mapped('price'))
+            record.margin1 = (record.clc_cost or 0) + (record.rate_card or 0) + (record.price or 0)

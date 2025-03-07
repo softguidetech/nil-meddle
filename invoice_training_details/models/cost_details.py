@@ -1,8 +1,9 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
+
 
     cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     name = fields.Char(string="Cost Name", required=True)

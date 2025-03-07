@@ -23,7 +23,6 @@
         "views/crm_lead_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
-        "views/cost_details_views.xml",
         # Report
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",
@@ -39,7 +38,3 @@
     "application": False,
     "auto_install": False
 }
-'data': [
-    'security/ir.model.access.csv',  # Ensure this is here
-    'views/cost_details_views.xml',
-],

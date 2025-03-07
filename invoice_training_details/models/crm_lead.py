@@ -88,71 +88,43 @@ class Lead(models.Model):
                 rec.total_training_price = 0
                 
     def _prepare_opportunity_quotation_context(self):
-    quotation_context = super()._prepare_opportunity_quotation_context()
-    quotation_context.update({
-        'default_training_name': self.training_name,
-        # 'default_half_advance_payment_before': self.half_advance_payment_before,
-        # 'default_half_payment_after': self.half_payment_after,
-        'default_training_course_ids': [
-            (0, 0, {
-                'field1': course.field1,
-                'field2': course.field2,
-                # add necessary fields from training.course model
-            }) for course in self.training_course_ids
-        ],
-        'default_pro_service_ids': [
-            (0, 0, {
-                'field1': service.field1,
-                'field2': service.field2,
-                # add necessary fields from pro.service model
-            }) for service in self.pro_service_ids
-        ],
-        'default_cost_details_ids': [
-            (0, 0, {
-                'field1': detail.field1,
-                'field2': detail.field2,
-                # add necessary fields from cost.details model
-            }) for detail in self.cost_details_ids
-        ],
-        'default_clcs_qty': self.clcs_qty,
-        'default_so_no': self.so_no,
-        'default_tr_expiry_date': self.tr_expiry_date,
-        'default_instructor_logistics': self.instructor_logistics,
-        'default_catering': str(self.catering),
-        'default_ctrng': self.ctrng,
-        'default_descriptions': self.descriptions,
-        'default_ordering_partner': self.ordering_partner_id.id,
-        'default_instructor_id': self.instructor_id.id,
-        'default_training_id': self.training_id.id,
-        'default_train_language': self.train_language,
-        'default_location': self.location,
-        'default_learnig_partner': self.learnig_partner,
-        'default_uber': self.uber,
-        'default_payment_method': self.payment_method,
-        'default_service_name': self.service_name,
-        'default_hotel_ids': [
-            (0, 0, {
-                'field1': hotel.field1,
-                'field2': hotel.field2,
-                # add necessary fields from hotel.hotel model
-            }) for hotel in self.hotel_ids
-        ],
-        'default_ticket_ids': [
-            (0, 0, {
-                'field1': ticket.field1,
-                'field2': ticket.field2,
-                # add necessary fields from ticket.ticket model
-            }) for ticket in self.ticket_ids
-        ],
-        'default_visa': self.visa,
-        'default_start_date': self.start_date,
-        'default_to_date': self.to_date,
-        'default_venue': self.venue,
-        'default_book_details_id': [(6, 0, self.book_details_id.ids)],
-        'default_details': self.details,
-        'default_cost': self.cost,
-    })
-    return quotation_context
+        quotation_context = super()._prepare_opportunity_quotation_context()
+        quotation_context.update({
+            'default_training_name': self.training_name,
+            # 'default_half_advance_payment_before': self.half_advance_payment_before,
+            # 'default_half_payment_after': self.half_payment_after,
+            'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
+            'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
+            'default_cos_details_ids':[(6,0, self.cos_details_ids.ids)],
+            'default_clcs_qty': self.clcs_qty,
+            'default_so_no': self.so_no,
+            'default_tr_expiry_date': self.tr_expiry_date,
+            'default_instructor_logistics': self.instructor_logistics,
+            'default_catering': str(self.catering),
+            'default_ctrng': self.ctrng,
+            'default_descriptions': self.descriptions,
+            'default_ordering_partner': self.ordering_partner_id.id,
+            'default_instructor_id': self.instructor_id.id,
+            'default_training_id': self.training_id.id,
+            'default_train_language': self.train_language,
+            'default_location': self.location,
+            'default_learnig_partner': self.learnig_partner,
+            'default_uber': self.uber,
+            'default_payment_method': self.payment_method,
+            'default_clcs_qty': self.clcs_qty,
+            'default_service_name': self.service_name,
+            'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
+            'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
+            'default_visa': self.visa,
+            'default_start_date': self.start_date,
+            'default_to_date': self.to_date,
+            'default_venue': self.venue,
+            'default_book_details_id': [(6, 0, self.book_details_id.ids)],
+            'default_details': self.details,
+            'default_cost': self.cost,
+
+        })
+        return quotation_context
 
 class HotelHotel(models.Model):
     _name = 'hotel.hotel'

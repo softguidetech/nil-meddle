@@ -24,7 +24,7 @@ class CostDetails(models.Model):
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
 
-    @api.depends('training_vendor', 'total_price_all', 'clc_cost')
-def _compute_margin1(self):
-    for record in self:
-        record.margin1 = (record.training_vendor or 0) + (record.total_price_all or 0) + (record.clc_cost or 0)
+    @api.depends('clc_cost', 'rate_card', 'price')
+    def _compute_margin1(self):
+        for record in self:
+            record.margin1 = (record.clc_cost or 0) + (record.training_vendor or 0) + (record.total_price_all or 0)

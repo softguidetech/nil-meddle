@@ -30,6 +30,8 @@ class Lead(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
+    cost_details_ids = fields.Many2one('cost.details', string="Cost Details")  # This must exist
+
 
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

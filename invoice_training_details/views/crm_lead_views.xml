@@ -48,7 +48,7 @@
         <field name="total_price_all"/>
         <field name="clc_cost"/>
         <field name="rate_card"/>
-        <field name="nil_me_share"/>
+        <field name="nilme_share"/>
         <field name="ttl_costs"/>
     </tree>
 </field>

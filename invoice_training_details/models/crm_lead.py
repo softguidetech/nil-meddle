@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from odoo import fields, models, api
 
 class Lead(models.Model):
@@ -11,18 +12,11 @@ class Lead(models.Model):
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
 
-    cost_detail_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
-
-    @api.depends('cost_detail_ids.price')
-    def _compute_total_price_all(self):
-        for lead in self:
-            lead.total_price_all = sum(lead.cost_detail_ids.mapped('price'))
-
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service', 'pro_lead_id', string='Professional Services')
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
-    cos_lead_id = fields.Many2one('crm.lead', string='CRM Lead')
 
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
@@ -52,15 +46,23 @@ class Lead(models.Model):
 
     instructor_logistics = fields.Float(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
+    catering = fields.Selection([('NIL MM', 'NIL MN'), ('Others', 'Others')], string='Catering')
     ctrng = fields.Float(string='Catering')
 
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_detail_ids.price', 'venue', 'ctrng', 'uber', 'instructor_logistics')
+    total_price_all = fields.Float(string="Total Price All", compute="_compute_total", store=True, tracking=True)
+
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'venue', 'ctrng', 'uber', 'instructor_logistics')
     def _compute_total(self):
         for rec in self:
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cost_detail_ids) if rec.cost_detail_ids else 0
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + rec.venue + rec.ctrng + rec.uber + rec.instructor_logistics
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
+            instructor_logistics = rec.instructor_logistics if rec.instructor_logistics else 0
+
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + venue + catering + uber + instructor_logistics
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -72,12 +74,10 @@ class Lead(models.Model):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price')) if rec.training_course_ids else 0
 
-
-
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """
         for lead in self:
-            self.env['cost.details'].create({
+            cost = self.env['cost.details'].create({
                 'cos_lead_id': lead.id,
                 'name': 'New Cost Line',
                 'description': 'Automatically added cost',
@@ -94,7 +94,6 @@ class Lead(models.Model):
         """Force recalculation of total_price_all"""
         for lead in self:
             lead._compute_total()
-
 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()

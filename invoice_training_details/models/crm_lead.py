@@ -3,6 +3,8 @@
 
 from odoo import fields, models, api
 
+
+
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
@@ -10,7 +12,7 @@ class Lead(models.Model):
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
+    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
@@ -19,34 +21,11 @@ class Lead(models.Model):
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Logistics", compute='_compute_total_price_all', store=True, readonly=True)
-    training_vendor = fields.Float(string="Vendor Share")
-    clc_cost = fields.Float(string="Training Cost")
-    rate_card = fields.Float(string="Partner Rate")
-    nilme_share = fields.Float(string="NIL ME Share")
-    
-    @api.model
-    def create(self, vals):
-        """Automatically create a Cost Details entry when a new CRM Lead is created."""
-        lead = super(Lead, self).create(vals)
-        
-        self.env['cost.details'].create({
-            'cos_lead_id': lead.id,
-            'name': 'Default Cost Name',
-            'description': 'Automatically generated cost details',
-            'currency_id': lead.company_id.currency_id.id,
-            'training_vendor': vals.get('training_vendor', 0.0),
-            'clc_cost': vals.get('clc_cost', 0.0),
-            'rate_card': vals.get('rate_card', 0.0),
-            'nilme_share': vals.get('nilme_share', 0.0),
-            'price': 0.0,
-        })
-        return lead
-    
     @api.depends('cost_details_ids.total_price_all')
     def _compute_total_price_all(self):
         for rec in self:
             rec.total_price_all = sum(rec.cost_details_ids.mapped('total_price_all')) if rec.cost_details_ids else 0
-    
+
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
@@ -55,31 +34,45 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    margin1 = fields.Float(string="Margin 1")
+    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
 
+    #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
+    
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    clcs_qty = fields.Float(string='CLCs Qty')
     learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    
+    # extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
+    
+    # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
-    ctrng = fields.Float(string='Catering')  
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
     
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
         for rec in self:
-            rec.total_price_all = sum(rec.ticket_ids.mapped('price')) + sum(rec.hotel_ids.mapped('price')) + sum(rec.cost_details_ids.mapped('price')) + (float(rec.instructor_logistics) if rec.instructor_logistics else 0) + rec.venue + rec.ctrng + rec.uber
-
+            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
+    
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 
     
     @api.depends('pro_service_ids.price')

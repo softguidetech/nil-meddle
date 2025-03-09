@@ -102,6 +102,7 @@ class Lead(models.Model):
 
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + venue + catering + uber
 
+
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:

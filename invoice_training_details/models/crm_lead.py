@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
 from odoo import fields, models, api
-
-
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
@@ -12,105 +8,95 @@ class Lead(models.Model):
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
+    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
-    pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
+    pro_service_ids = fields.One2many('pro.service', 'pro_lead_id', string='Professional Services')
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
-    ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
-    hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
+    ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
+    hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
+
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
+
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
-                                         string="Booking Details",
-                                         help='You can attach the copy of your document', copy=False)
+                                       string="Booking Details", help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
 
-    #Add extera
-    instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    instructor_id = fields.Many2one('hr.employee', string="Instructor")
     descriptions = fields.Char(string='Description')
-    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
-    training_id = fields.Many2one('product.template',string='Training Name')
-    def action_create_cost_line(self):
-    """ Automatically create a new cost line when called """
-    for lead in self:
-        self.env['cost.details'].create({
-            'cos_lead_id': lead.id,
-            'name': 'New Cost Line',
-            'description': 'Automatically added cost',
-            'price': 150.0,
-            'currency_id': lead.env.company.currency_id.id,
-            'training_vendor': 50.0,
-            'clc_cost': 100.0,
-            'rate_card': 30.0,
-            'nilme_share': 20.0,
-        })
-
+    ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
+    training_id = fields.Many2one('product.template', string='Training Name')
 
     train_language = fields.Char(string='Language')
-    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
-    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    location = fields.Selection([('ILT', 'ILT'), ('VILT', 'VILT')])
+    payment_method = fields.Selection([('cash', 'Cash'), ('clc', 'CLC')], default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
-    
-    # extra information tab
-    clcs_qty = fields.Float(string='Customer CLCs Qty')
+    learnig_partner = fields.Selection([('Koeing', 'Koeing'), ('NIL LTD', 'NIL LTD'), ('NIL SA', 'NIL SA')])
+
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
-    
-    # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')
-    uber = fields.Float(string='Uber')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
-    
 
-class Lead(models.Model):
-    _inherit = 'crm.lead'
+    instructor_logistics = fields.Float(string='Instructor Logistics')  # FIXED: Converted to Float
+    uber = fields.Float(string='Uber')
+    catering = fields.Selection([('NIL MM', 'NIL MN'), ('Others', 'Others')], string='Catering')
+    ctrng = fields.Float(string='Catering')
 
     total_price_all = fields.Float(string="Total Price All", compute="_compute_total", store=True, tracking=True)
 
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 
-            'venue', 'ctrng', 'uber')
-def _compute_total(self):
-    for rec in self:
-        ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
-        hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-        cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
-        venue = rec.venue if rec.venue else 0
-        catering = rec.ctrng if rec.ctrng else 0
-        uber = rec.uber if rec.uber else 0
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'venue', 'ctrng', 'uber', 'instructor_logistics')
+    def _compute_total(self):
+        for rec in self:
+            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
+            instructor_logistics = rec.instructor_logistics if rec.instructor_logistics else 0
 
-        rec.total_price_all = (ticket_total + hotel_total + cost_details_total + 
-                               venue + catering + uber)
-        
-        print(f"Computed Total Price for Lead {rec.id}: {rec.total_price_all}")
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + venue + catering + uber + instructor_logistics
 
+            print(f"Computed Total Price for Lead {rec.id}: {rec.total_price_all}")
 
-
-    
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
-            if rec.pro_service_ids:
-                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
-            
-            else:
-                rec.total_service_price = 0
-                
+            rec.total_service_price = sum(rec.pro_service_ids.mapped('price')) if rec.pro_service_ids else 0
+
     @api.depends('training_course_ids.price')
     def _compute_training_price(self):
         for rec in self:
-            if rec.training_course_ids:
-                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-            else:
-                rec.total_training_price = 0
+            rec.total_training_price = sum(rec.training_course_ids.mapped('price')) if rec.training_course_ids else 0
+
+    def action_create_cost_line(self):
+        """ Automatically create a new cost line when called """
+        for lead in self:
+            self.env['cost.details'].create({
+                'cos_lead_id': lead.id,
+                'name': 'New Cost Line',
+                'description': 'Automatically added cost',
+                'price': 150.0,
+                'currency_id': lead.env.company.currency_id.id,
+                'training_vendor': 50.0,
+                'clc_cost': 100.0,
+                'rate_card': 30.0,
+                'nilme_share': 20.0,
+            })
+
+    def force_recompute_total(self):
+        """Force recalculation of total_price_all"""
+        for lead in self:
+            lead._compute_total()
+
+
                 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()

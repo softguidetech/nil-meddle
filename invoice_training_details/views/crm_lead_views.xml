@@ -5,18 +5,12 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
-            
-            <!-- Instructor Field -->
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
             </xpath>
-            
-            <!-- Ordering Partner -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
             </xpath>
-
-            <!-- Training Tab -->
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
@@ -24,17 +18,17 @@
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
-                            <field name="training_id"/>
-                            <field name="cost_clc"/>
-                            <field name="train_language"/>
-                            <field name="location"/>
-                            <field name="where_location2"/>
-                            <field name="payment_method"/>
-                            <field name="no_of_student"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
-                            <field name="price"/>
+                            <field name="training_id" width="15"/>
+                            <field name="cost_clc" width="15"/>
+                            <field name="train_language" width="15"/>
+                            <field name="location" width="15"/>
+                            <field name="where_location2" width="15"/>
+                            <field name="payment_method" width="10"/>
+                            <field name="no_of_student" width="5"/>
+                            <field name="duration" width="5"/>
+                            <field name="training_date_start" width="10"/>
+                            <field name="training_date_end" width="10"/>
+                            <field name="price" width="10"/>
                         </tree>
                     </field>
                     <group>
@@ -43,27 +37,23 @@
                         </group>
                     </group>
                 </page>
-
-                <!-- Costs Details Tab -->
                 <page id="clcs" name="Costs Details">
-                    <group>
-                        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
-                    </group>
-                    <field name="cost_details_ids">
-                        <tree editable="bottom">
-                            <field name="name"/>
-                            <field name="total_price_all"/>  <!-- ✅ INSIDE THE TREE NOW -->
-                            <field name="currency_id"/>
-                            <field name="training_vendor"/>
-                            <field name="clc_cost"/>
-                            <field name="rate_card"/>
-                            <field name="nilme_share"/>
-                            <field name="margin1"/>
-                        </tree>
-                    </field>
-                </page>
+    <group>
+        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
+    </group>
+    <field name="cost_details_ids">
+        <tree editable="bottom">
+            <field name="learnig_partner"/>
+            <field name="training_vendor" width="15"/>
+            <field name="total_price_all" width="15"/>
+            <field name="clc_cost" width="10"/>
+            <field name="rate_card" width="10"/>
+            <field name="nilme_share" width="10"/>
+        </tree>
+    </field>
+</page>
 
-                <!-- Professional Services Tab -->
+
                 <page id="pro" name="Professional Services">
                     <group>
                         <field name="service_name"/>
@@ -88,9 +78,7 @@
                         </group>
                     </group>
                 </page>
-
-                <!-- Extra Information Tab -->
-                <page id="extra_information" name="Extra Information">
+                <page id="extra_information" string="Extra Information">
                     <group>
                         <group>
                             <field name="clcs_qty"/>
@@ -101,9 +89,7 @@
                         </group>
                     </group>
                 </page>
-
-                <!-- Logistics Tab -->
-                <page id="logistics" name="Logistics">
+                <page id="logistics" string="Logistics">
                     <group>
                         <field name="ctrng"/>
                         <field name="venue"/>

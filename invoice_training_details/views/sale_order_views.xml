@@ -151,8 +151,6 @@
                 <page id="logistics" string="Logistics">
                     <group>
                         <group>
-                            <field name="instructor_logistics"/>
-                            <field name="catering"/>
                         </group>
                     
                         <!--<group string="Flights">-->

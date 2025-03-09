@@ -60,12 +60,7 @@ class Lead(models.Model):
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
             cost_details_total = sum(cost.price for cost in rec.cost_detail_ids) if rec.cost_detail_ids else 0
-            venue = rec.venue if rec.venue else 0
-            catering = rec.ctrng if rec.ctrng else 0
-            uber = rec.uber if rec.uber else 0
-            instructor_logistics = rec.instructor_logistics if rec.instructor_logistics else 0
-
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + venue + catering + uber + instructor_logistics
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + rec.venue + rec.ctrng + rec.uber + rec.instructor_logistics
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -76,6 +71,7 @@ class Lead(models.Model):
     def _compute_training_price(self):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price')) if rec.training_course_ids else 0
+
 
 
     def action_create_cost_line(self):

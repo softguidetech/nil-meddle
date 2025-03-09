@@ -5,14 +5,11 @@ class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
 
-    name = fields.Char(string="Name")
-    price = fields.Float(string="Price")  # Ensure this field exists
-    cos_lead_id = fields.Many2one('crm.lead', string='CRM Lead')
-
+    cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
+    name = fields.Char(string="Cost Name", required=True)
     description = fields.Text(string="Description")
     price = fields.Float(string="Price", required=True)
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
-    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
 
     # ✅ These cost fields now belong only to cost.details
     training_vendor = fields.Float(string="Vendor Share")  

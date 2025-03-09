@@ -44,7 +44,7 @@ class Lead(models.Model):
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
 
-    instructor_logistics = fields.Float(string='Instructor Logistics')  # FIXED: Converted to Float
+    instructor_logistics = fields.Float(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
     catering = fields.Selection([('NIL MM', 'NIL MN'), ('Others', 'Others')], string='Catering')
     ctrng = fields.Float(string='Catering')
@@ -64,8 +64,6 @@ class Lead(models.Model):
 
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + venue + catering + uber + instructor_logistics
 
-            print(f"Computed Total Price for Lead {rec.id}: {rec.total_price_all}")
-
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
@@ -79,7 +77,7 @@ class Lead(models.Model):
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """
         for lead in self:
-            self.env['cost.details'].create({
+            cost = self.env['cost.details'].create({
                 'cos_lead_id': lead.id,
                 'name': 'New Cost Line',
                 'description': 'Automatically added cost',
@@ -90,14 +88,13 @@ class Lead(models.Model):
                 'rate_card': 30.0,
                 'nilme_share': 20.0,
             })
+            lead._compute_total()  # Force recompute
 
     def force_recompute_total(self):
         """Force recalculation of total_price_all"""
         for lead in self:
             lead._compute_total()
 
-
-                
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context.update({

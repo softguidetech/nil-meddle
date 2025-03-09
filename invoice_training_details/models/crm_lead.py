@@ -21,6 +21,7 @@ class Lead(models.Model):
     ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
     cos_lead_id = fields.Many2one('crm.lead', string='CRM Lead')
+cost_detail_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
 
 
     visa = fields.Boolean(string="Visa")

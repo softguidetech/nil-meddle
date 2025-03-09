@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-# Part of Odoo. See LICENSE file for full copyright and licensing details.
-
-from odoo import fields, models, api
-
-
-
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
@@ -12,15 +5,15 @@ class Lead(models.Model):
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
+    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    cost_detail_ids = fields.One2many('cost.details', 'lead_id', string="Cost Details", compute="_compute_total", store=True)
+    cost_details_ids = fields.One2many('cost.details', 'lead_id', string="Cost Details")  # Fixed field definition
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
-    total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')
+    total_price_all = fields.Float(string="Total Logistics", compute='_compute_total')
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
@@ -31,86 +24,40 @@ class Lead(models.Model):
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
 
-    #Add extera
-    instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    instructor_id = fields.Many2one('hr.employee', string="Instructor")
     descriptions = fields.Char(string='Description')
-    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
-    training_id = fields.Many2one('product.template',string='Training Name')
-    def action_create_cost_line(self):
-        """ Automatically create a new cost line when called """
-        for lead in self:
-            self.env['cost.details'].create({
-                'cos_lead_id': lead.id,
-                'name': 'New Cost Line',
-                'description': 'Automatically added cost',
-                'price': 150.0,
-                'currency_id': lead.env.company.currency_id.id,
-                'training_vendor': 50.0,
-                'total_price_all': 200.0,
-                'clc_cost': 100.0,
-                'rate_card': 30.0,
-                'nilme_share': 20.0,
-            })
-    train_language = fields.Char(string='Language')
-    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
-    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
-    clcs_qty = fields.Float(string='CLCs Qty')
-    
-    # extra information tab
-    clcs_qty = fields.Float(string='Customer CLCs Qty')
-    so_no = fields.Char(string='SO#')
-    tr_expiry_date = fields.Date(string='Expiry Date')
-    poref = fields.Char(string='PO Ref:')
-    invref = fields.Char(string='Invoice Ref:')
-    
-    # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')
-    uber = fields.Float(string='Uber')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
-    
+    ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
+    training_id = fields.Many2one('product.template', string='Training Name')
+
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
-def _compute_total(self):
-    for rec in self:
-        cost_details_total = sum(cost.price for cost in rec.cost_details_ids if cost.price)  # Fix field name
-        rec.total_price_all = cost_details_total
-        ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
-        hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-        instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
-        venue = rec.venue if rec.venue else 0
-        catering = rec.ctrng if rec.ctrng else 0
-        uber = rec.uber if rec.uber else 0
+    def _compute_total(self):
+        for rec in self:
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids if cost.price)  # Fixed field name
+            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 
-        rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
-
-
-    
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
-            if rec.pro_service_ids:
-                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
-            
-            else:
-                rec.total_service_price = 0
-                
+            rec.total_service_price = sum(rec.pro_service_ids.mapped('price')) if rec.pro_service_ids else 0
+
     @api.depends('training_course_ids.price')
     def _compute_training_price(self):
         for rec in self:
-            if rec.training_course_ids:
-                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-            else:
-                rec.total_training_price = 0
-                
+            rec.total_training_price = sum(rec.training_course_ids.mapped('price')) if rec.training_course_ids else 0
+
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context.update({
             'default_training_name': self.training_name,
-            # 'default_half_advance_payment_before': self.half_advance_payment_before,
-            # 'default_half_payment_after': self.half_payment_after,
             'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-            'default_cos_details_ids':[(6,0, self.cos_details_ids.ids)],
+            'default_cost_details_ids': [(6, 0, self.cost_details_ids.ids)],  # Fixed key name
             'default_clcs_qty': self.clcs_qty,
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
@@ -123,10 +70,8 @@ def _compute_total(self):
             'default_training_id': self.training_id.id,
             'default_train_language': self.train_language,
             'default_location': self.location,
-            'default_learnig_partner': self.learnig_partner,
             'default_uber': self.uber,
             'default_payment_method': self.payment_method,
-            'default_clcs_qty': self.clcs_qty,
             'default_service_name': self.service_name,
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
@@ -137,9 +82,9 @@ def _compute_total(self):
             'default_book_details_id': [(6, 0, self.book_details_id.ids)],
             'default_details': self.details,
             'default_cost': self.cost,
-
         })
         return quotation_context
+
 
 class HotelHotel(models.Model):
     _name = 'hotel.hotel'

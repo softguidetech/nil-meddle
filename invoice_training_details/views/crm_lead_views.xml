@@ -48,7 +48,7 @@
                                 <field name="clc_cost" width="10"/>
                                 <field name="rate_card" width="10"/>
                                 <field name="nilme_share" width="10"/>
-                                <field name="margin1" width="10"/>
+                                <field name="ttl_costs" width="10"/>
                             </tree>
                         </field>
                     </group>

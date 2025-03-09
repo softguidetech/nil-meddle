@@ -38,7 +38,6 @@
                     </group>
                 </page>
                 <page id="clcs" name="Costs Details">
-                    <group>
     <field name="cost_details_ids">
         <tree editable="bottom">
             <field name="name" width="20"/>
@@ -53,8 +52,6 @@
             <field name="margin1" width="10"/>
         </tree>
     </field> <!-- Now properly closing the field before closing the group -->
-</group>
-
                 </page>
                 <page id="pro" name="Professional Services">
                     <group>

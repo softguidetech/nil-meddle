@@ -87,7 +87,16 @@ class Lead(models.Model):
             'nilme_share': 0.0,
             'price': 0.0,
         })
-        return lead
+
+        # Reload the form view after creation
+        return {
+            'type': 'ir.actions.act_window',
+            'res_model': 'crm.lead',
+            'res_id': lead.id,
+            'view_mode': 'form',
+            'view_type': 'form',
+            'target': 'current',
+        }
 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()

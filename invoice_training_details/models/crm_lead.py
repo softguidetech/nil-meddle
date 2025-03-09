@@ -36,6 +36,57 @@ class Lead(models.Model):
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
+    from odoo import models, fields, api
+
+class CostDetails(models.Model):
+    _name = 'cost.details'
+    _description = 'Cost Details'
+
+    cos_lead_id = fields.Many2one('crm.lead', string="Lead")
+    name = fields.Char(string="Name")
+    description = fields.Text(string="Description")
+    price = fields.Float(string="Price")
+    currency_id = fields.Many2one('res.currency', string="Currency")
+    training_vendor = fields.Float(string="Training Vendor")
+    clc_cost = fields.Float(string="CLC Cost")
+    rate_card = fields.Float(string="Rate Card")
+    nilme_share = fields.Float(string="NILME Share")
+
+    total_price_all = fields.Float(
+        string="Total Price All",
+        compute="_compute_total",
+        store=True,
+        readonly=True
+    )
+
+    train_language = fields.Char(string='Language')
+    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')], default='cash')
+    clcs_qty = fields.Float(string='Customer CLCs Qty')  # Fixed duplicate field
+    so_no = fields.Char(string='SO#')
+    tr_expiry_date = fields.Date(string='Expiry Date')
+    poref = fields.Char(string='PO Ref:')
+    invref = fields.Char(string='Invoice Ref:')
+
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    uber = fields.Float(string='Uber')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')], string='Catering')
+    ctrng = fields.Float(string='Catering')  # Manually editable field
+
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 
+                 'instructor_logistics', 'venue', 'ctrng', 'uber')
+    def _compute_total(self):
+        for rec in self:
+            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
+
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
+
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """
         for lead in self:
@@ -50,44 +101,7 @@ class Lead(models.Model):
                 'rate_card': 0.0,
                 'nilme_share': 0.0,
             })
-            total_price_all = fields.Float(
-        string="Total Price All",
-        compute="_compute_total_price_all",
-        store=True,
-        readonly=True
-    )
 
-    train_language = fields.Char(string='Language')
-    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
-    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
-    clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
-    
-    # extra information tab
-    clcs_qty = fields.Float(string='Customer CLCs Qty')
-    so_no = fields.Char(string='SO#')
-    tr_expiry_date = fields.Date(string='Expiry Date')
-    poref = fields.Char(string='PO Ref:')
-    invref = fields.Char(string='Invoice Ref:')
-    
-    # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')
-    uber = fields.Float(string='Uber')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
-    
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
-    def _compute_total(self):
-        for rec in self:
-            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
-            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
-            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
-            venue = rec.venue if rec.venue else 0
-            catering = rec.ctrng if rec.ctrng else 0
-            uber = rec.uber if rec.uber else 0
-    
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 
     
     @api.depends('pro_service_ids.price')

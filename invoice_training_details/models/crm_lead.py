@@ -37,20 +37,20 @@ class Lead(models.Model):
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     def action_create_cost_line(self):
-        """ Automatically create a new cost line when called """
-        for lead in self:
-            self.env['cost.details'].create({
-                'cos_lead_id': lead.id,
-                'name': 'New Cost Line',
-                'description': 'Automatically added cost',
-                'price': 150.0,
-                'currency_id': lead.env.company.currency_id.id,
-                'training_vendor': 50.0,
-                'total_price_all': 200.0,
-                'clc_cost': 100.0,
-                'rate_card': 30.0,
-                'nilme_share': 20.0,
-            })
+    """ Automatically create a new cost line when called """
+    for lead in self:
+        self.env['cost.details'].create({
+            'cos_lead_id': lead.id,
+            'name': 'New Cost Line',
+            'description': 'Automatically added cost',
+            'price': 150.0,
+            'currency_id': lead.env.company.currency_id.id,
+            'training_vendor': 50.0,
+            'clc_cost': 100.0,
+            'rate_card': 30.0,
+            'nilme_share': 20.0,
+        })
+
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
@@ -70,7 +70,14 @@ class Lead(models.Model):
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     ctrng = fields.Float(string='Catering')  # Now it's manually editable
     
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
+
+class Lead(models.Model):
+    _inherit = 'crm.lead'
+
+    total_price_all = fields.Float(string="Total Price All", compute="_compute_total", store=True, tracking=True)
+
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 
+                 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
         for rec in self:
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
@@ -80,8 +87,10 @@ class Lead(models.Model):
             venue = rec.venue if rec.venue else 0
             catering = rec.ctrng if rec.ctrng else 0
             uber = rec.uber if rec.uber else 0
-    
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
+
+            rec.total_price_all = (ticket_total + hotel_total + cost_details_total + 
+                                   instructor_logistics + venue + catering + uber)
+
 
     
     @api.depends('pro_service_ids.price')

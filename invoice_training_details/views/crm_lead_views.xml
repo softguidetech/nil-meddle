@@ -45,7 +45,6 @@
     </group>
     <tree editable="bottom">
         <field name="name"/>
-        <field name="currency"/>
         <field name="vendor_share"/>
         <field name="logistics_cost"/>
         <field name="training_cost"/>

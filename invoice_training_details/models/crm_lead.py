@@ -57,7 +57,6 @@ class Lead(models.Model):
     # Logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='no need')
     ctrng = fields.Float(string='Catering')  # Now it's manually editable
 
     def action_create_cost_line(self):
@@ -84,10 +83,9 @@ class Lead(models.Model):
             cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
             instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
             venue = rec.venue if rec.venue else 0
-            catering = rec.ctrng if rec.ctrng else 0
             uber = rec.uber if rec.uber else 0
 
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -116,7 +114,6 @@ class Lead(models.Model):
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
-            'default_catering': str(self.catering),
             'default_ctrng': self.ctrng,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,

@@ -7,8 +7,6 @@ class CostDetails(models.Model):
     cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     name = fields.Char(string="Cost Name", required=True)
     description = fields.Text(string="Description")
-    currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
-
     # ✅ These cost fields now belong only to cost.details
     training_vendor = fields.Float(string="Vendor Share")  
     total_price_all = fields.Float(string="Logistics Cost")  

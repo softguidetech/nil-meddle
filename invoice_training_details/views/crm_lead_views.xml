@@ -44,7 +44,7 @@
         <label for="cost_details_ids" string="Cost Details"/>
     </group>
     <tree editable="bottom">
-        <field name="cost_name"/>
+        <field name="name"/>
         <field name="currency"/>
         <field name="vendor_share"/>
         <field name="logistics_cost"/>

@@ -45,12 +45,11 @@
     </group>
     <tree editable="bottom">
         <field name="name"/>
-        <field name="vendor_share"/>
-        <field name="logistics_cost"/>
+        <field name="total_price_all"/>
         <field name="training_cost"/>
         <field name="partner_rate"/>
         <field name="nil_me_share"/>
-        <field name="total_costs"/>
+        <field name="ttl_costs"/>
     </tree>
 </field>
 

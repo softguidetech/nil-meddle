@@ -43,7 +43,7 @@
     </group>
     <field name="cost_details_ids">
         <tree editable="bottom">
-<field name="cost_details_ids.learnig_partner"/>
+<field name="learning_partner"/>  <!-- ✅ Correct way to reference a One2many field -->
             <field name="training_vendor" width="15"/>
             <field name="total_price_all" width="15"/>
             <field name="clc_cost" width="10"/>

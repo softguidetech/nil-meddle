@@ -12,7 +12,7 @@ class CostDetails(models.Model):
     # ✅ These cost fields now belong only to cost.details
     training_vendor = fields.Float(string="Vendor Share")  
     total_price_all = fields.Float(string="Logistics Cost")  
-    ttl_costs = fields.Float(string="Margin 1", compute='_compute_ttl_costs')
+    ttl_costs = fields.Float(string="Total Costs", compute='_compute_ttl_costs')
     clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Partner Rate")  
     nilme_share = fields.Float(string="NIL ME Share $")

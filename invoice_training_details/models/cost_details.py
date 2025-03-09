@@ -20,4 +20,4 @@ class CostDetails(models.Model):
     @api.depends('clc_cost', 'rate_card', 'price')
     def _compute_margin1(self):
         for record in self:
-            record.margin1 = (record.clc_cost or 0) + (record.rate_card or 0) + (record.price or 0)
+            record.margin1 = (record.clc_cost or 0) + (record.rate_card or 0) 

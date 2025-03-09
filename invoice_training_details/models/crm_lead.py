@@ -20,7 +20,6 @@ class Lead(models.Model):
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
-    total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
@@ -36,24 +35,26 @@ class Lead(models.Model):
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
-    def action_create_cost_line(self):
-    """Automatically create a new cost line when called"""
-    for lead in self:
-        new_cost_line = self.env['cost.details'].create({
-            'cos_lead_id': lead.id,
-            'name': 'New Cost Line',
-            'description': 'Automatically added cost',
-            'price': 0.0,
-            'currency_id': lead.env.company.currency_id.id,
-            'training_vendor': 0.0,
-            'clc_cost': 0.0,
-            'rate_card': 0.0,
-            'nilme_share': 0.0,
-        })
+    # Define the field as a computed field
+    total_price_all = fields.Float(string="Total Logistics", compute='_compute_total', store=True)
 
-        # Ensure the cost line is added to cost_details_ids (One2many relationship)
-        lead.write({'cost_details_ids': [(4, new_cost_line.id)]})
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 
+                 'cost_details_ids.training_vendor', 'cost_details_ids.clc_cost', 
+                 'cost_details_ids.rate_card', 'cost_details_ids.nilme_share', 
+                 'instructor_logistics', 'venue', 'ctrng', 'uber')
+    def _compute_total(self):
+        for rec in self:
+            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+            cost_details_total = sum(cost.price + cost.training_vendor + cost.clc_cost + cost.rate_card + cost.nilme_share
+                                     for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
 
+            rec.total_price_all = (ticket_total + hotel_total + cost_details_total +
+                                   instructor_logistics + venue + catering + uber)
         # Odoo should automatically recompute total_price_all via _compute_total()
 
     train_language = fields.Char(string='Language')

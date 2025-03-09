@@ -36,8 +36,9 @@ class CostDetails(models.Model):
             catering = rec.cos_lead_id.ctrng if rec.cos_lead_id.ctrng else 0
             uber = rec.cos_lead_id.uber if rec.cos_lead_id.uber else 0
 
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
-            rec.cost = rec.total_price_all  # Calculate the cost field
+            total = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
+            rec.total_price_all = total
+            rec.cost = total  # Calculate the cost field
 
     @api.depends('training_vendor', 'total_price_all', 'clc_cost')
     def _compute_margin1(self):

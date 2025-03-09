@@ -16,6 +16,7 @@ class CostDetails(models.Model):
     clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Partner Rate")  
     nilme_share = fields.Float(string="NIL ME Share $")
+    price = fields.Float(string="Price")
 
     @api.depends('clc_cost', 'rate_card', 'price')
     def _compute_ttl_costs(self):

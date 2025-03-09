@@ -21,30 +21,23 @@ class Lead(models.Model):
     ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
     cos_lead_id = fields.Many2one('crm.lead', string='CRM Lead')
-cost_detail_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
-
-
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
-
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
                                        string="Booking Details", help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
-
     instructor_id = fields.Many2one('hr.employee', string="Instructor")
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
     training_id = fields.Many2one('product.template', string='Training Name')
-
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT', 'ILT'), ('VILT', 'VILT')])
     payment_method = fields.Selection([('cash', 'Cash'), ('clc', 'CLC')], default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     learnig_partner = fields.Selection([('Koeing', 'Koeing'), ('NIL LTD', 'NIL LTD'), ('NIL SA', 'NIL SA')])
-
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     poref = fields.Char(string='PO Ref:')

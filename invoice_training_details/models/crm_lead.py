@@ -30,7 +30,7 @@ class Lead(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
-    cost_details_ids = fields.Many2one('cost.details', string="Cost Details")  # This must exist
+    cost_details_ids = fields.One2many('cost.details', 'crm_lead_id', string="Cost Details")
 
 
     #Add extera

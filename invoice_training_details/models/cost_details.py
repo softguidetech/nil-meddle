@@ -55,4 +55,4 @@ class CostDetails(models.Model):
     def _compute_margin(self):
         for record in self:
             total_training_price = record.cos_lead_id.total_training_price or 1  # Avoid division by zero
-            record.margin = ((record.margin1 or 0) / total_training_price) * 100  # Convert to percentage
+            record.margin = ((record.margin1 or 0) / total_training_price)

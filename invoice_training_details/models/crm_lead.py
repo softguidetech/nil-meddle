@@ -34,7 +34,7 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
+    ttl_costs = fields.Float(string="Total Costs", compute='_compute_ttl_costs')
 
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

@@ -87,7 +87,7 @@ class CostDetails(models.Model):
 
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 
-    def action_create_cost_line(self):
+        def action_create_cost_line(self):
         """ Automatically create a new cost line when called """
         for lead in self:
             self.env['cost.details'].create({
@@ -95,13 +95,12 @@ class CostDetails(models.Model):
                 'name': 'New Cost Line',
                 'description': 'Automatically added cost',
                 'price': 0.0,
-                'currency_id': lead.env.company.currency_id.id,
+                'currency_id': lead.company_id.currency_id.id,
                 'training_vendor': 0.0,
                 'clc_cost': 0.0,
                 'rate_card': 0.0,
                 'nilme_share': 0.0,
             })
-
 
     
     @api.depends('pro_service_ids.price')

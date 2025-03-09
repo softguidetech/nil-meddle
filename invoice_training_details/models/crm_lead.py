@@ -3,8 +3,6 @@
 
 from odoo import fields, models, api
 
-
-
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
@@ -12,7 +10,7 @@ class Lead(models.Model):
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
-    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
+    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
@@ -31,11 +29,30 @@ class Lead(models.Model):
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
 
-    #Add extera
+    # Add extra fields
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
+    train_language = fields.Char(string='Language')
+    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    clcs_qty = fields.Float(string='CLCs Qty')
+    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+
+    # Extra information tab
+    clcs_qty = fields.Float(string='Customer CLCs Qty')
+    so_no = fields.Char(string='SO#')
+    tr_expiry_date = fields.Date(string='Expiry Date')
+    poref = fields.Char(string='PO Ref:')
+    invref = fields.Char(string='Invoice Ref:')
+
+    # Logistics tab
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    uber = fields.Float(string='Uber')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
+
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """
         for lead in self:
@@ -48,27 +65,9 @@ class Lead(models.Model):
                 'clc_cost': 0.0,
                 'rate_card': 0.0,
                 'nilme_share': 0.0,
-                'learning_partner': lead.learning_partner,  # Include the learning_partner field
+                'learning_partner': lead.learnig_partner,  # Include the learning_partner field
             })
-    train_language = fields.Char(string='Language')
-    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
-    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
-    clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
-    
-    # extra information tab
-    clcs_qty = fields.Float(string='Customer CLCs Qty')
-    so_no = fields.Char(string='SO#')
-    tr_expiry_date = fields.Date(string='Expiry Date')
-    poref = fields.Char(string='PO Ref:')
-    invref = fields.Char(string='Invoice Ref:')
-    
-    # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')
-    uber = fields.Float(string='Uber')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
-    
+
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
         for rec in self:
@@ -79,19 +78,17 @@ class Lead(models.Model):
             venue = rec.venue if rec.venue else 0
             catering = rec.ctrng if rec.ctrng else 0
             uber = rec.uber if rec.uber else 0
-    
+
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 
-    
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
             if rec.pro_service_ids:
                 rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
-            
             else:
                 rec.total_service_price = 0
-                
+
     @api.depends('training_course_ids.price')
     def _compute_training_price(self):
         for rec in self:
@@ -99,16 +96,14 @@ class Lead(models.Model):
                 rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
             else:
                 rec.total_training_price = 0
-                
+
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context.update({
             'default_training_name': self.training_name,
-            # 'default_half_advance_payment_before': self.half_advance_payment_before,
-            # 'default_half_payment_after': self.half_payment_after,
             'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-            'default_cos_details_ids':[(6,0, self.cos_details_ids.ids)],
+            'default_cos_details_ids': [(6, 0, self.cost_details_ids.ids)],
             'default_clcs_qty': self.clcs_qty,
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
@@ -125,17 +120,6 @@ class Lead(models.Model):
             'default_uber': self.uber,
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
-            'default_service_name': self.service_name,
-            'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
-            'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
-            'default_visa': self.visa,
-            'default_start_date': self.start_date,
-            'default_to_date': self.to_date,
-            'default_venue': self.venue,
-            'default_book_details_id': [(6, 0, self.book_details_id.ids)],
-            'default_details': self.details,
-            'default_cost': self.cost,
-
         })
         return quotation_context
 

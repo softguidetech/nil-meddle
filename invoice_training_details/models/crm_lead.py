@@ -17,7 +17,7 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Costs Details')
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')
@@ -36,7 +36,21 @@ class Lead(models.Model):
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
-    
+    def action_create_cost_line(self):
+        """ Automatically create a new cost line when called """
+        for lead in self:
+            self.env['cost.details'].create({
+                'cos_lead_id': lead.id,
+                'name': 'New Cost Line',
+                'description': 'Automatically added cost',
+                'price': 150.0,
+                'currency_id': lead.env.company.currency_id.id,
+                'training_vendor': 50.0,
+                'total_price_all': 200.0,
+                'clc_cost': 100.0,
+                'rate_card': 30.0,
+                'nilme_share': 20.0,
+            })
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')

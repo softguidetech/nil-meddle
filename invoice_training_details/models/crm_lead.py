@@ -36,26 +36,21 @@ class Lead(models.Model):
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
-
-cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Cost Details")
-
     def action_create_cost_line(self):
-        """Automatically create an editable cost line when called"""
+        """ Automatically create a new cost line when called """
         for lead in self:
-            cost_line = self.env['cost.details'].create({
+            self.env['cost.details'].create({
                 'cos_lead_id': lead.id,
                 'name': 'New Cost Line',
                 'description': 'Automatically added cost',
                 'price': 150.0,
-                'currency_id': lead.company_id.currency_id.id,
+                'currency_id': lead.env.company.currency_id.id,
                 'training_vendor': 50.0,
                 'total_price_all': 200.0,
                 'clc_cost': 100.0,
                 'rate_card': 30.0,
                 'nilme_share': 20.0,
             })
-            # Ensure the new cost line is added to the One2many field
-            lead.cost_details_ids += cost_line
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')

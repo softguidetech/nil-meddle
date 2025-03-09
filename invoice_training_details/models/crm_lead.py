@@ -72,9 +72,10 @@ class Lead(models.Model):
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
         for rec in self:
+            cost_details_total = sum(cost.price for cost in rec.cost_detail_ids if cost.price)
+            rec.total_price_all = cost_details_total
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
             instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
             venue = rec.venue if rec.venue else 0
             catering = rec.ctrng if rec.ctrng else 0

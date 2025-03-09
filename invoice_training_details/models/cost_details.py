@@ -5,7 +5,7 @@ class CostDetails(models.Model):
     _description = 'Cost Details'
 
     cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
-    name = fields.Char(string="Cost Name", required=True)
+    name = fields.Char(string="Cost Name")
     description = fields.Text(string="Description")
     price = fields.Float(string="Price")  # Make the price field optional
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)

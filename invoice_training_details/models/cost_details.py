@@ -24,12 +24,14 @@ class CostDetails(models.Model):
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
 
-    @api.depends('training_vendor', 'total_price_all', 'clc_cost')
+   @api.depends('training_vendor', 'total_price_all', 'clc_cost')
     def _compute_margin1(self):
         for record in self:
             record.margin1 = (record.training_vendor or 0) + (record.total_price_all or 0) + (record.clc_cost or 0)
 
     @api.depends('margin1', 'cos_lead_id.total_training_price')
     def _compute_nilme_share(self):
+        for record in self:
+            record.nilme_share = (record.cos_lead_id.total_training_price or 0) - (record.margin1 or 0)
         for record in self:
             record.nilme_share = (record.cos_lead_id.total_training_price or 0) - (record.margin1 or 0)

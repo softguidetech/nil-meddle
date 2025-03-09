@@ -81,7 +81,7 @@ def _compute_margin1(self):
         for rec in self:
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            cost_details_total = sum(cost.total_price_all for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
             instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
             venue = rec.venue if rec.venue else 0
             catering = rec.ctrng if rec.ctrng else 0
@@ -115,7 +115,6 @@ def _compute_margin1(self):
             # 'default_half_payment_after': self.half_payment_after,
             'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-            'default_cos_details_ids':[(6,0, self.cos_details_ids.ids)],
             'default_clcs_qty': self.clcs_qty,
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,

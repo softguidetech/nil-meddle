@@ -12,7 +12,7 @@ class CostDetails(models.Model):
 
     # ✅ These cost fields now belong only to cost.details
     training_vendor = fields.Float(string="Partner Share")  
-    total_price_all = fields.Float(string="Logistics Cost")  
+    total_price_all = fields.Float(string="Logistics Cost", compute='_compute_total')  
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
     clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Partner Rate")  
@@ -23,6 +23,19 @@ class CostDetails(models.Model):
         ('NIL LTD', 'NIL LTD'),
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
+
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
+    def _compute_total(self):
+        for rec in self:
+            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+            venue = rec.venue if rec.venue else 0
+            catering = rec.ctrng if rec.ctrng else 0
+            uber = rec.uber if rec.uber else 0
+
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 
     @api.depends('training_vendor', 'total_price_all', 'clc_cost')
     def _compute_margin1(self):

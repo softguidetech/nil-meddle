@@ -78,18 +78,21 @@ class Lead(models.Model):
     total_price_all = fields.Float(string="Total Price All", compute="_compute_total", store=True, tracking=True)
 
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 
-                'venue', 'ctrng', 'uber')
-    def _compute_total(self):
-        for rec in self:
-            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
-            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
-            venue = rec.venue if rec.venue else 0
-            catering = rec.ctrng if rec.ctrng else 0
-            uber = rec.uber if rec.uber else 0
+            'venue', 'ctrng', 'uber')
+def _compute_total(self):
+    for rec in self:
+        ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+        hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+        cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+        venue = rec.venue if rec.venue else 0
+        catering = rec.ctrng if rec.ctrng else 0
+        uber = rec.uber if rec.uber else 0
 
-            rec.total_price_all = (ticket_total + hotel_total + cost_details_total + 
-                                  venue + catering + uber)
+        rec.total_price_all = (ticket_total + hotel_total + cost_details_total + 
+                               venue + catering + uber)
+        
+        print(f"Computed Total Price for Lead {rec.id}: {rec.total_price_all}")
+
 
 
     

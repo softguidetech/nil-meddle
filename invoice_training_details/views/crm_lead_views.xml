@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <record id="crm_reveal_lead_opportunity_form_training" model="ir.ui.view">
         <field name="name">crm.lead.inherited.crm.training</field>
@@ -16,54 +15,24 @@
                 <field name="ordering_partner_id"/>
             </xpath>
 
-            <!-- Training Tab -->
-            <xpath expr="//page[@name='internal_notes']" position="before">
-                <page id="training" name="Training">
-                    <group>
-                        <field name="training_name"/>
-                    </group>
-                    <field name="training_course_ids">
-                        <tree editable="bottom">
-                            <field name="training_id"/>
-                            <field name="cost_clc"/>
-                            <field name="train_language"/>
-                            <field name="location"/>
-                            <field name="where_location2"/>
-                            <field name="payment_method"/>
-                            <field name="no_of_student"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <group>
-                        <group>
-                            <field name="total_training_price"/>
-                        </group>
-                    </group>
-                </page>
-
-                <!-- Costs Details Tab -->
-                <page id="clcs" name="Costs Details">
-    <group>
-        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
-    </group>
-    <field name="cost_detail_ids">
-        <tree editable="bottom">
-            <field name="name"/>
-            <field name="total_price_all"/>
-            <field name="currency_id"/>
-            <field name="training_vendor"/>
-            <field name="clc_cost"/>
-            <field name="rate_card"/>
-            <field name="nilme_share"/>
-            <field name="margin1"/>
-        </tree>
-    </field>  <!-- ✅ Now correctly closing the field -->
-</page>
-
-
+            <!-- Costs Details Tab -->
+            <page id="clcs" name="Costs Details">
+                <group>
+                    <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
+                </group>
+                <field name="cost_detail_ids">
+                    <tree editable="bottom">
+                        <field name="name"/>
+                        <field name="total_price_all"/>
+                        <field name="currency_id"/>
+                        <field name="training_vendor"/>
+                        <field name="clc_cost"/>
+                        <field name="rate_card"/>
+                        <field name="nilme_share"/>
+                        <field name="margin1"/>
+                    </tree>
+                </field>
+            </page>
                 <!-- Professional Services Tab -->
                 <page id="pro" name="Professional Services">
                     <group>

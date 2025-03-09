@@ -23,6 +23,7 @@ class CostDetails(models.Model):
         ('NIL LTD', 'NIL LTD'),
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
+    cost = fields.Float(string="Cost", compute='_compute_total')
 
     @api.depends('cos_lead_id.ticket_ids.price', 'cos_lead_id.hotel_ids.price', 'cos_lead_id.cost_details_ids.price', 'cos_lead_id.instructor_logistics', 'cos_lead_id.venue', 'cos_lead_id.ctrng', 'cos_lead_id.uber')
     def _compute_total(self):
@@ -36,6 +37,7 @@ class CostDetails(models.Model):
             uber = rec.cos_lead_id.uber if rec.cos_lead_id.uber else 0
 
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
+            rec.cost = rec.total_price_all  # Calculate the cost field
 
     @api.depends('training_vendor', 'total_price_all', 'clc_cost')
     def _compute_margin1(self):

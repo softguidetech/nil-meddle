@@ -17,8 +17,15 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Costs Details')
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
+    cost_details_ids = fields.One2many(
+    'cost.details', 
+    'cos_lead_id', 
+    string="Costs Details", 
+    compute='_compute_cost_details', 
+    store=True
+)
+
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Logistics", compute='_compute_total_price_all', store=True, readonly=True)
     @api.depends('cost_details_ids.total_price_all')
@@ -34,8 +41,16 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
+    margin1 = fields.Float(
+    string="Total Margin 1", 
+    compute='_compute_margin1', 
+    store=True
+)
 
+@api.depends('cost_details_ids.margin1')
+def _compute_margin1(self):
+    for rec in self:
+        rec.margin1 = sum(rec.cost_details_ids.mapped('margin1')) if rec.cost_details_ids else 0
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')

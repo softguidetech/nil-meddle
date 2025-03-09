@@ -46,7 +46,7 @@
                                 <field name="price" width="10"/>
                                 <field name="currency_id" width="10"/>
                                 <field name="training_vendor" width="15"/>
-                                <field name="training_type" width="15"/>
+                                <field name="total_price_all" width="15"/>
                                 <field name="clc_cost" width="10"/>
                                 <field name="rate_card" width="10"/>
                                 <field name="nilme_share" width="10"/>

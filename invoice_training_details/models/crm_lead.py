@@ -11,7 +11,9 @@ class Lead(models.Model):
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     
-    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
+    # ✅ This must exist
+    cost_detail_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
+
 
     @api.depends('cost_details_ids.price')
     def _compute_total_price_all(self):

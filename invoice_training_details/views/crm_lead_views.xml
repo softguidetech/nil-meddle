@@ -50,7 +50,7 @@
             <field name="clc_cost" width="10"/>
             <field name="margin1" width="10"/>
             <field name="nilme_share" width="10"/>
-            <field name="margin"/>
+            <field name="margin" widget="percentage"/>  <!-- Display as percentage -->
             
         </tree>
     </field>

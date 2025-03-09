@@ -36,23 +36,26 @@ class Lead(models.Model):
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
-    from odoo import models, fields
 
-class CostDetails(models.Model):
-    _name = 'cost.details'
-    _description = 'Cost Details'
+cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Cost Details")
 
-    cos_lead_id = fields.Many2one('crm.lead', string='Lead')
-    name = fields.Char(string='Cost Line Name', required=True)
-    description = fields.Text(string='Description')
-    price = fields.Float(string='Price', readonly=False)
-    currency_id = fields.Many2one('res.currency', string='Currency', readonly=False)
-    training_vendor = fields.Float(string='Training Vendor Cost', readonly=False)
-    total_price_all = fields.Float(string='Total Price', readonly=False)
-    clc_cost = fields.Float(string='CLC Cost', readonly=False)
-    rate_card = fields.Float(string='Rate Card', readonly=False)
-    nilme_share = fields.Float(string='NILME Share', readonly=False)
-
+    def action_create_cost_line(self):
+        """Automatically create an editable cost line when called"""
+        for lead in self:
+            cost_line = self.env['cost.details'].create({
+                'cos_lead_id': lead.id,
+                'name': 'New Cost Line',
+                'description': 'Automatically added cost',
+                'price': 150.0,
+                'currency_id': lead.company_id.currency_id.id,
+                'training_vendor': 50.0,
+                'total_price_all': 200.0,
+                'clc_cost': 100.0,
+                'rate_card': 30.0,
+                'nilme_share': 20.0,
+            })
+            # Ensure the new cost line is added to the One2many field
+            lead.cost_details_ids += cost_line
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')

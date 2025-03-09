@@ -10,6 +10,13 @@ class Lead(models.Model):
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
+    @api.depends('training_course_ids.price')
+    def _compute_training_price(self):
+        for rec in self:
+            if rec.training_course_ids:
+                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+            else:
+                rec.total_training_price = 0
     total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')

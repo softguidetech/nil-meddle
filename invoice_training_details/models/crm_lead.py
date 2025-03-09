@@ -10,40 +10,41 @@ class Lead(models.Model):
     total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
-    
-    # ✅ This must exist
+
     cost_detail_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
 
-
-    @api.depends('cost_details_ids.price')
+    @api.depends('cost_detail_ids.price')
     def _compute_total_price_all(self):
         for lead in self:
-            lead.total_price_all = sum(lead.cost_details_ids.mapped('price'))
-    
+            lead.total_price_all = sum(lead.cost_detail_ids.mapped('price'))
+
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service', 'pro_lead_id', string='Professional Services')
     ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
     cos_lead_id = fields.Many2one('crm.lead', string='CRM Lead')
-    
+
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
+
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
                                        string="Booking Details", help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
+
     instructor_id = fields.Many2one('hr.employee', string="Instructor")
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
     training_id = fields.Many2one('product.template', string='Training Name')
-    
+
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT', 'ILT'), ('VILT', 'VILT')])
     payment_method = fields.Selection([('cash', 'Cash'), ('clc', 'CLC')], default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     learnig_partner = fields.Selection([('Koeing', 'Koeing'), ('NIL LTD', 'NIL LTD'), ('NIL SA', 'NIL SA')])
+
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     poref = fields.Char(string='PO Ref:')
@@ -53,12 +54,12 @@ class Lead(models.Model):
     uber = fields.Float(string='Uber')
     ctrng = fields.Float(string='Catering')
 
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'venue', 'ctrng', 'uber', 'instructor_logistics')
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_detail_ids.price', 'venue', 'ctrng', 'uber', 'instructor_logistics')
     def _compute_total(self):
         for rec in self:
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            cost_details_total = sum(cost.price for cost in rec.cost_detail_ids) if rec.cost_detail_ids else 0
             venue = rec.venue if rec.venue else 0
             catering = rec.ctrng if rec.ctrng else 0
             uber = rec.uber if rec.uber else 0
@@ -75,6 +76,7 @@ class Lead(models.Model):
     def _compute_training_price(self):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price')) if rec.training_course_ids else 0
+
 
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """

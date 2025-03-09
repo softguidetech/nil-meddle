@@ -1,4 +1,3 @@
-
 from odoo import models, fields, api
 
 class CostDetails(models.Model):
@@ -11,15 +10,29 @@ class CostDetails(models.Model):
     price = fields.Float(string="Price", required=True)
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
 
-    # ✅ These cost fields now belong only to cost.details
     training_vendor = fields.Float(string="Vendor Share")  
-    total_price_all = fields.Float(string="Logistics Cost")  
-    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
     clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Partner Rate")  
     nilme_share = fields.Float(string="NIL ME Share $")
+    
+    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
 
     @api.depends('clc_cost', 'rate_card', 'price')
     def _compute_margin1(self):
         for record in self:
             record.margin1 = (record.clc_cost or 0) + (record.rate_card or 0) + (record.price or 0)
+    
+    def write(self, vals):
+        res = super(CostDetails, self).write(vals)
+        if 'price' in vals:
+            for record in self:
+                if record.cos_lead_id:
+                    record.cos_lead_id._compute_total()  # Ensure CRM total updates when cost changes
+        return res
+
+    def unlink(self):
+        leads_to_update = self.mapped('cos_lead_id')
+        res = super(CostDetails, self).unlink()
+        for lead in leads_to_update:
+            lead._compute_total()
+        return res

@@ -39,7 +39,7 @@
                 </page>
                 <page id="clcs" name="Costs Details">
                     <group>
-<field name="cost_details_ids" invisible="1"/>
+                        <field name="cost_details_ids">
                             <tree editable="bottom">
                                 <field name="name" width="20"/>
                                 <field name="description" width="30"/>

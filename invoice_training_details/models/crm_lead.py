@@ -11,19 +11,16 @@ class Lead(models.Model):
     total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
-class CrmLead(models.Model):
-    _inherit = 'crm.lead'
-
     cost_detail_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
-    total_price_all = fields.Float(string='Total Price All', compute='_compute_total_price_all', store=True)
-
-    @api.depends('cost_details_ids.clc_cost', 'cost_detail_ids.rate_card')
-def _compute_total_price_all(self):
-    for lead in self:
-        total_clc_cost = sum(lead.cost_detail_ids.mapped('clc_cost'))
-        total_rate_card = sum(lead.cost_detail_ids.mapped('rate_card'))
-        lead.total_price_all = total_price = total_price = total_price = total_price = total_price = total_price = total_price = total_price = total_price = total_price =
-
+    @api.depends('cost_detail_ids.price')
+    def _compute_total_price_all(self):
+        for lead in self:
+            lead.total_price_all = sum(lead.cost_detail_ids.mapped('price'))
+    training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
+    pro_service_ids = fields.One2many('pro.service', 'pro_lead_id', string='Professional Services')
+    ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
+    hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
+    cos_lead_id = fields.Many2one('crm.lead', string='CRM Lead')
 
 
     visa = fields.Boolean(string="Visa")
@@ -54,11 +51,7 @@ def _compute_total_price_all(self):
 
     instructor_logistics = fields.Float(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
-    catering = fields.Selection([('NIL MM', 'NIL MN'), ('Others', 'Others')], string='Catering')
     ctrng = fields.Float(string='Catering')
-
-    total_price_all = fields.Float(string="Total Price All", compute="_compute_total", store=True, tracking=True)
-
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'venue', 'ctrng', 'uber', 'instructor_logistics')
     def _compute_total(self):
         for rec in self:

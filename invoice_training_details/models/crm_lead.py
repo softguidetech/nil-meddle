@@ -17,7 +17,7 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    cost_detail_ids = fields.One2many('related.model', 'lead_id', string="Cost Details", compute="_compute_total", store=True)
+    cost_detail_ids = fields.One2many('cost.details', 'lead_id', string="Cost Details", compute="_compute_total", store=True)
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')

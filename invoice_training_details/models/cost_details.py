@@ -4,32 +4,35 @@ class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
 
-    currency_id = fields.Many2one(
-        'res.currency',
-        string="Currency",
-        required=True,
-        default=lambda self: self.env.company.currency_id.id
-    )
+    cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
+    name = fields.Char(string="Cost Name", required=True)
+    description = fields.Text(string="Description")
+    price = fields.Float(string="Price", required=True)
+    currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
+
     training_vendor = fields.Float(string="Vendor Share")  
     clc_cost = fields.Float(string="Training Cost")
-    rate_card = fields.Float(string="Training Cost")
-    price = fields.Float(string='Price', required=True)
-    training_vendor = fields.Float(string="Vendor Share")
-    total_price_all = fields.Float(string='Total Price', compute='_compute_total_price_all', store=True)
+    rate_card = fields.Float(string="Partner Rate")  
+    nilme_share = fields.Float(string="NIL ME Share $")
+    
+    margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
 
-    @api.depends('price', 'training_vendor', 'clc_cost', 'rate_card')
-    def _compute_total_price_all(self):
+    @api.depends('clc_cost', 'rate_card', 'price')
+    def _compute_margin1(self):
         for record in self:
-            record.total_price_all = (record.price or 0) + (record.training_vendor or 0) + (record.clc_cost or 0)
+            record.margin1 = (record.clc_cost or 0) + (record.rate_card or 0) + (record.price or 0)
     
     def write(self, vals):
         res = super(CostDetails, self).write(vals)
-        if any(field in vals for field in ['price', 'training_vendor', 'clc_cost']):
-            self.mapped('cos_detail_lead_id')._compute_total()
+        if 'price' in vals:
+            for record in self:
+                if record.cos_lead_id:
+                    record.cos_lead_id._compute_total()  # Ensure CRM total updates when cost changes
         return res
 
     def unlink(self):
-        leads = self.mapped('cos_detail_lead_id')
+        leads_to_update = self.mapped('cos_lead_id')
         res = super(CostDetails, self).unlink()
-        leads._compute_total()
+        for lead in leads_to_update:
+            lead._compute_total()
         return res

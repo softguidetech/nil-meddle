@@ -54,19 +54,20 @@ class Lead(models.Model):
     ctrng = fields.Float(string='Catering')  # Now it's manually editable
 
     def action_create_cost_line(self):
-        """ Automatically create a new cost line when called """
-        for lead in self:
-            self.env['cost.details'].create({
-                'cos_lead_id': lead.id,
-                'name': 'New Cost Line',
-                'currency_id': lead.env.company.currency_id.id,
-                'training_vendor': 0.0,
-                'total_price_all': 0.0,
-                'clc_cost': 0.0,
-                'rate_card': 0.0,
-                'nilme_share': 0.0,
-                'learning_partner': lead.learnig_partner,  # Include the learning_partner field
-            })
+    """ Automatically create a new cost line when called """
+    for lead in self:
+        self.env['cost.details'].create({
+            'cos_lead_id': lead.id,
+            'name': 'New Cost Line',
+            'currency_id': lead.env.company.currency_id.id,
+            'training_vendor': 0.0,
+            'total_price_all': 0.0,
+            'clc_cost': 0.0,
+            'rate_card': 0.0,
+            'nilme_share': 0.0,
+            'learning_partner': lead.learnig_partner,  # Include the learning_partner field
+            'price': 0.0,  # Set a default value for the mandatory price field
+        })
 
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):

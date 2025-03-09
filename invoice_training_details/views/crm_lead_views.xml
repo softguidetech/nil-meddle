@@ -43,7 +43,7 @@
     </group>
     <field name="cost_details_ids">
         <tree editable="bottom">
-            <field name="learnig_partner"/>
+<field name="cost_details_id.learnig_partner"/>
             <field name="training_vendor" width="15"/>
             <field name="total_price_all" width="15"/>
             <field name="clc_cost" width="10"/>

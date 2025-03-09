@@ -39,7 +39,6 @@
                 </page>
                 <page id="clcs" name="Costs Details">
     <group>
-        <field name="cost_details_ids"/>
     </group>
     <field name="cost_details_ids">
         <tree editable="bottom">

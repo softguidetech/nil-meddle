@@ -35,7 +35,23 @@ class Lead(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Margin 1", compute='_compute_margin1')
-
+    @api.model
+        def create(self, vals):
+            lead = super(Lead, self).create(vals)
+            # Automatically create Cost Details
+            cost_details_vals = {
+                'cos_lead_id': lead.id,
+                'name': 'Auto-generated Cost',  # You can set this dynamically
+                'description': 'Automatically created from Lead',
+                'training_vendor': 0.0,
+                'total_price_all': 0.0,
+                'clc_cost': 0.0,
+                'rate_card': 0.0,
+                'nilme_share': 0.0,
+                'price': 0.0,
+            }
+        self.env['cost.details'].create(cost_details_vals)
+        return lead
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')

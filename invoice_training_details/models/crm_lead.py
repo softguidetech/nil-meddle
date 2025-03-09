@@ -55,7 +55,6 @@ class Lead(models.Model):
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
     
     # extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')

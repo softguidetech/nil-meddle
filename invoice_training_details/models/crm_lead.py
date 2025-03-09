@@ -42,14 +42,13 @@ class Lead(models.Model):
             self.env['cost.details'].create({
                 'cos_lead_id': lead.id,
                 'name': 'New Cost Line',
-                'description': 'Automatically added cost',
-                'price': 150.0,
                 'currency_id': lead.env.company.currency_id.id,
-                'training_vendor': 50.0,
-                'total_price_all': 200.0,
-                'clc_cost': 100.0,
-                'rate_card': 30.0,
-                'nilme_share': 20.0,
+                'training_vendor': 0.0,
+                'total_price_all': 0.0,
+                'clc_cost': 0.0,
+                'rate_card': 0.0,
+                'nilme_share': 0.0,
+                'learning_partner': lead.learning_partner,  # Include the learning_partner field
             })
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT','ILT'),('VILT','VILT')])

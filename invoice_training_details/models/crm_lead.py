@@ -1,10 +1,8 @@
-# -*- coding: utf-8 -*-
 from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
-    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
@@ -12,15 +10,20 @@ class Lead(models.Model):
     total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
-    @api.depends('cost_detail_ids.price')
+    
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
+
+    @api.depends('cost_details_ids.price')
     def _compute_total_price_all(self):
         for lead in self:
-            lead.total_price_all = sum(lead.cost_detail_ids.mapped('price'))
+            lead.total_price_all = sum(lead.cost_details_ids.mapped('price'))
+    
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service', 'pro_lead_id', string='Professional Services')
     ticket_ids = fields.One2many('ticket.ticket', 'ticket_lead_id', string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel', 'hotel_lead_id', string='Hotels')
     cos_lead_id = fields.Many2one('crm.lead', string='CRM Lead')
+    
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
@@ -33,6 +36,7 @@ class Lead(models.Model):
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
     training_id = fields.Many2one('product.template', string='Training Name')
+    
     train_language = fields.Char(string='Language')
     location = fields.Selection([('ILT', 'ILT'), ('VILT', 'VILT')])
     payment_method = fields.Selection([('cash', 'Cash'), ('clc', 'CLC')], default='cash')
@@ -46,6 +50,7 @@ class Lead(models.Model):
     instructor_logistics = fields.Float(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
     ctrng = fields.Float(string='Catering')
+
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'venue', 'ctrng', 'uber', 'instructor_logistics')
     def _compute_total(self):
         for rec in self:
@@ -72,7 +77,7 @@ class Lead(models.Model):
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """
         for lead in self:
-            cost = self.env['cost.details'].create({
+            self.env['cost.details'].create({
                 'cos_lead_id': lead.id,
                 'name': 'New Cost Line',
                 'description': 'Automatically added cost',
@@ -89,6 +94,7 @@ class Lead(models.Model):
         """Force recalculation of total_price_all"""
         for lead in self:
             lead._compute_total()
+
 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()

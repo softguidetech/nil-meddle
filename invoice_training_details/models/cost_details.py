@@ -1,4 +1,3 @@
-
 from odoo import models, fields, api
 
 class CostDetails(models.Model):
@@ -18,6 +17,11 @@ class CostDetails(models.Model):
     clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Partner Rate")  
     nilme_share = fields.Float(string="NIL ME Share $")
+    learning_partner = fields.Selection([
+        ('Koeing', 'Koeing'),
+        ('NIL LTD', 'NIL LTD'),
+        ('NIL SA', 'NIL SA')
+    ], string='Learning Partner')
 
     @api.depends('clc_cost', 'rate_card', 'price')
     def _compute_margin1(self):

@@ -4,6 +4,7 @@ from odoo import fields, models, api
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
@@ -11,7 +12,6 @@ class Lead(models.Model):
     total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
-cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Cost Details')
     @api.depends('cost_detail_ids.price')
     def _compute_total_price_all(self):
         for lead in self:

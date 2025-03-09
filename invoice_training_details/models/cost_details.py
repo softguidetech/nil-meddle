@@ -24,16 +24,16 @@ class CostDetails(models.Model):
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
 
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
+    @api.depends('cos_lead_id.ticket_ids.price', 'cos_lead_id.hotel_ids.price', 'cos_lead_id.cost_details_ids.price', 'cos_lead_id.instructor_logistics', 'cos_lead_id.venue', 'cos_lead_id.ctrng', 'cos_lead_id.uber')
     def _compute_total(self):
         for rec in self:
-            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
-            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
-            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
-            venue = rec.venue if rec.venue else 0
-            catering = rec.ctrng if rec.ctrng else 0
-            uber = rec.uber if rec.uber else 0
+            ticket_total = sum(ticket.price for ticket in rec.cos_lead_id.ticket_ids) if rec.cos_lead_id.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.cos_lead_id.hotel_ids) if rec.cos_lead_id.hotel_ids else 0
+            cost_details_total = sum(cost.price for cost in rec.cos_lead_id.cost_details_ids) if rec.cos_lead_id.cost_details_ids else 0
+            instructor_logistics = float(rec.cos_lead_id.instructor_logistics) if rec.cos_lead_id.instructor_logistics else 0
+            venue = rec.cos_lead_id.venue if rec.cos_lead_id.venue else 0
+            catering = rec.cos_lead_id.ctrng if rec.cos_lead_id.ctrng else 0
+            uber = rec.cos_lead_id.uber if rec.cos_lead_id.uber else 0
 
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
 

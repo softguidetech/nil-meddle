@@ -57,7 +57,7 @@ class Lead(models.Model):
     # Logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='no need')
     ctrng = fields.Float(string='Catering')  # Now it's manually editable
 
     def action_create_cost_line(self):

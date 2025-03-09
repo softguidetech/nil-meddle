@@ -24,7 +24,8 @@ class CostDetails(models.Model):
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
     cost = fields.Float(string="Cost", compute='_compute_total')
-    margin = fields.Float(string="Margin", compute='_compute_margin')  # New field
+    margin = fields.Float(string="Margin (%)", compute='_compute_margin')  # New field with percentage label
+    margin_ratio = fields.Float(string="Margin Ratio", compute='_compute_margin_ratio')  # Define the new field
 
     @api.depends('cos_lead_id.ticket_ids.price', 'cos_lead_id.hotel_ids.price', 'cos_lead_id.cost_details_ids.price', 'cos_lead_id.instructor_logistics', 'cos_lead_id.venue', 'cos_lead_id.ctrng', 'cos_lead_id.uber')
     def _compute_total(self):
@@ -55,4 +56,10 @@ class CostDetails(models.Model):
     def _compute_margin(self):
         for record in self:
             total_training_price = record.cos_lead_id.total_training_price or 1  # Avoid division by zero
-            record.margin = (record.margin1 or 0) / total_training_price
+            record.margin = ((record.margin1 or 0) / total_training_price) * 100  # Convert to percentage
+
+    @api.depends('margin1', 'cos_lead_id.total_training_price')
+    def _compute_margin_ratio(self):
+        for record in self:
+            total_training_price = record.cos_lead_id.total_training_price or 1  # Avoid division by zero
+            record.margin_ratio = (record.margin1 or 0) / total_training_price

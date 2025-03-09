@@ -37,29 +37,25 @@
                         </group>
                     </group>
                 </page>
-                <xpath expr="//sheet" position="inside">
-            <group>
-                <button name="action_create_cost_line"
-                        type="object"
-                        string="Create Cost Line"
-                        class="oe_highlight"/>
-            </group>
-            <group>
-                <field name="cost_details_ids">
-                    <tree editable="bottom">
-                        <field name="name"/>
-                        <field name="description"/>
-                        <field name="price"/>
-                        <field name="currency_id"/>
-                        <field name="training_vendor"/>
-                        <field name="total_price_all"/>
-                        <field name="clc_cost"/>
-                        <field name="rate_card"/>
-                        <field name="nilme_share"/>
-                    </tree>
-                </field>
-            </group>
-        </xpath>
+                <page id="clcs" name="Costs Details">
+    <group>
+        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
+    </group>
+    <field name="cost_details_ids">
+        <tree editable="bottom">
+            <field name="name" width="20"/>
+            <field name="description" width="30"/>
+            <field name="price" width="10"/>
+            <field name="currency_id" width="10"/>
+            <field name="training_vendor" width="15"/>
+            <field name="total_price_all" width="15"/>
+            <field name="clc_cost" width="10"/>
+            <field name="rate_card" width="10"/>
+            <field name="nilme_share" width="10"/>
+            <field name="margin1" width="10"/>
+        </tree>
+    </field>
+</page>
 
 
                 <page id="pro" name="Professional Services">

@@ -39,18 +39,22 @@
                 </page>
                 <page id="clcs" name="Costs Details">
                     <group>
-                        <field name="cost_details_ids">
-                            <tree editable="bottom">
-                                <field name="name" width="20"/>
-                                <field name="currency_id" width="10"/>
-                                <field name="training_vendor" width="15"/>
-                                <field name="total_price_all" readonly="1"/>
-                                <field name="clc_cost" width="10"/>
-                                <field name="rate_card" width="10"/>
-                                <field name="nilme_share" width="10"/>
-                                <field name="ttl_costs" width="10"/>
-                            </tree>
-                        </field>
+                        <field name="cost_details_ids" widget="one2many_list">
+    <group>
+        <label for="cost_details_ids" string="Cost Details"/>
+    </group>
+    <tree editable="bottom">
+        <field name="cost_name"/>
+        <field name="currency"/>
+        <field name="vendor_share"/>
+        <field name="logistics_cost"/>
+        <field name="training_cost"/>
+        <field name="partner_rate"/>
+        <field name="nil_me_share"/>
+        <field name="total_costs"/>
+    </tree>
+</field>
+
                     </group>
                 </page>
                 <page id="pro" name="Professional Services">

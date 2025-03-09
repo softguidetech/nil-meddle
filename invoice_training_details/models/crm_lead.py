@@ -18,7 +18,7 @@ class Lead(models.Model):
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string='Costs Details')
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
-    
+    total_price_all = fields.Float(string="Total Logistics", compute='_compute_total_price_all', store=True, readonly=True)
     training_vendor = fields.Float(string="Vendor Share")
     clc_cost = fields.Float(string="Training Cost")
     rate_card = fields.Float(string="Partner Rate")

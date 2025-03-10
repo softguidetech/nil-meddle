@@ -177,7 +177,6 @@
                         <group>
                             <field name="total_price_all"/>
                         </group>
-                    </group>
                 </page>
             </page>
         </field>

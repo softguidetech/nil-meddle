@@ -4,6 +4,11 @@ class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
 
+    class CostDetails(models.Model):
+    _name = "cost.details"
+    _description = "Cost Details"
+
+    sale_order_id = fields.Many2one('sale.order', string="Sale Order", ondelete='cascade')
     cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     name = fields.Char(string="Cost Name")
     description = fields.Text(string="Description")

@@ -126,6 +126,11 @@ class Lead(models.Model):
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
             'default_cost_details_ids': [(6, 0, self.cost_details_ids.ids)],  # Pass related Cost Details
+            'default_poref': self.poref,
+            'default_invref': self.invref,
+            'default_uber' : self.uber,
+            'default_ctrng': self.ctrng,
+            
 
         })
         return quotation_context

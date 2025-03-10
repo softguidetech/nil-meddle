@@ -14,6 +14,8 @@ class SaleOrder(models.Model):
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
+    cos_lead_id = fields.Many2one('some.model', string="Cos Lead")
+
 
     venue = fields.Float(string='Venue')
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")

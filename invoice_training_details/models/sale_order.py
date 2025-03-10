@@ -21,6 +21,7 @@ class SaleOrder(models.Model):
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
 
     # ✅ These cost fields now belong only to cost.details
+        cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     training_vendor = fields.Float(string="Partner Share")  
     total_price_all = fields.Float(string="Logistics Cost", compute='_compute_total')  
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')

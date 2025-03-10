@@ -51,10 +51,10 @@ class SaleOrder(models.Model):
         for record in self:
             record.margin1 = (record.training_vendor or 0) + (record.total_price_all or 0) + (record.clc_cost or 0)
 
-    @api.depends('margin1', 'cos_lead_id.total_training_price')
-    def _compute_nilme_share(self):
-        for record in self:
-            record.nilme_share = (record.cos_lead_id.total_training_price or 0) - (record.margin1 or 0)
+    @api.depends('total_training_price')
+def _compute_nilme_share(self):
+    for record in self:
+        record.nilme_share = record.total_training_price * 0.1  # Example computation
 
     @api.depends('margin1', 'cos_lead_id.total_training_price')
     def _compute_margin(self):

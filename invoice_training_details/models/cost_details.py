@@ -56,3 +56,24 @@ class CostDetails(models.Model):
         for record in self:
             total_training_price = record.cos_lead_id.total_training_price or 1  # Avoid division by zero
             record.margin = ((record.nilme_share or 0) / total_training_price)
+
+def _prepare_opportunity_quotation_context(self):
+    quotation_context = super()._prepare_opportunity_quotation_context()
+    quotation_context.update({
+        'default_cos_lead_id': self.cos_lead_id.id,
+        'default_name': self.name,
+        'default_description': self.description,
+        'default_price': self.price,
+        'default_currency_id': self.currency_id.id,
+        'default_training_vendor': self.training_vendor,
+        'default_total_price_all': self.total_price_all,
+        'default_margin1': self.margin1,
+        'default_clc_cost': self.clc_cost,
+        'default_rate_card': self.rate_card,
+        'default_nilme_share': self.nilme_share,
+        'default_learning_partner': self.learning_partner,
+        'default_cost': self.cost,
+        'default_margin': self.margin,
+    })
+    return quotation_context
+

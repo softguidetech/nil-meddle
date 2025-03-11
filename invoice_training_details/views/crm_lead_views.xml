@@ -47,9 +47,9 @@
                 <field name="currency_id"/>
                 <field name="training_vendor"/>
                 <field name="total_price_all"/>
-                <field name="clc_cost" string="Training Cost" colspan="1"/>
-                <field name="margin1" string="Total Costs" colspan="1"/>
-                <field name="nilme_share" string="NIL ME Share" colspan="1"/>
+                <field name="clc_cost"/>
+                <field name="margin1"/>
+                <field name="nilme_share"/>
                 <field name="margin" widget="percentage" string="Margin (%)" colspan="3"/>
             
         </tree>

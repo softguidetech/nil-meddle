@@ -4,19 +4,19 @@ class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
     def _register_hook(self):
-        """Dynamically inject CSS for auto-spacing in the list view"""
+        """Modify the tree view dynamically to force column auto-sizing."""
         view_id = self.env.ref('your_module.view_cost_details_tree', raise_if_not_found=False)
         if view_id:
             view_id.sudo().write({'arch_base': '''
-                <tree editable="bottom" class="auto_spacing">
-                    <field name="learning_partner"/>
-                    <field name="currency_id"/>
-                    <field name="training_vendor"/>
-                    <field name="total_price_all"/>
-                    <field name="clc_cost"/>
-                    <field name="margin1"/>
-                    <field name="nilme_share"/>
-                    <field name="margin" widget="percentage"/>
+                <tree editable="bottom">
+                    <field name="learning_partner" colspan="2" string="Learning Partner" />
+                    <field name="currency_id" colspan="1" string="Currency" />
+                    <field name="training_vendor" colspan="2" string="Partner Share" />
+                    <field name="total_price_all" colspan="2" string="Logistics Cost" />
+                    <field name="clc_cost" colspan="2" string="Training Cost" />
+                    <field name="margin1" colspan="2" string="Total Costs" />
+                    <field name="nilme_share" colspan="2" string="NIL ME Share" />
+                    <field name="margin" widget="percentage" colspan="2" string="Margin (%)" />
                 </tree>
             '''})
 

@@ -6,6 +6,7 @@ from odoo import fields, models, api
 class Lead(models.Model):
     _inherit = 'crm.lead'
 
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Cost Details")
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
@@ -22,7 +23,6 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
     total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')

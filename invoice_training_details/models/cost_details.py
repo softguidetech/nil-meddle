@@ -1,56 +1,8 @@
 from odoo import models, fields, api
 
 class CostDetails(models.Model):
-    _inherit = 'cost.details'  # Ensure the model extends correctly
-
-    def _register_hook(self):
-        """Modify the Cost Details tree view inside the CRM Lead form."""
-        view_id = self.env.ref('crm.crm_lead_view_form', raise_if_not_found=False)  # 🔥 FIXED: Correctly references the CRM Lead form
-
-        if view_id:
-            view_id.sudo().write({'arch_base': '''
-                <form>
-                    <sheet>
-                        <group>
-                            <notebook>
-                                <page string="Cost Details">
-                                    <field name="cost_details_ids">
-                                        <tree editable="bottom">
-                                            <field name="learning_partner" string="Learning Partner" colspan="3"/>
-                                            <field name="currency_id" string="Currency" colspan="2"/>
-                                            <field name="training_vendor" string="Partner Share" colspan="3"/>
-                                            <field name="total_price_all" string="Logistics Cost" colspan="3"/>
-                                            <field name="clc_cost" string="Training Cost" colspan="3"/>
-                                            <field name="margin1" string="Total Costs" colspan="3"/>
-                                            <field name="nilme_share" string="NIL ME Share" colspan="3"/>
-                                            <field name="margin" widget="percentage" string="Margin (%)" colspan="3"/>
-                                        </tree>
-                                    </field>
-                                </page>
-                            </notebook>
-                        </group>
-                    </sheet>
-                </form>
-            '''})
-
-        # Inject CSS dynamically using QWeb to force column widths inside CRM Lead
-        self.env['ir.ui.view'].sudo().create({
-            'name': 'AutoSpacingCSS',
-            'type': 'qweb',
-            'arch': '''
-                <t t-name="AutoSpacingCSS">
-                    <style>
-                    .o_list_view th, .o_list_view td {
-                        min-width: 180px !important;
-                        max-width: auto !important;
-                        white-space: nowrap !important;
-                        overflow: hidden !important;
-                        text-overflow: ellipsis !important;
-                    }
-                    </style>
-                </t>
-            '''
-        })
+    _name = 'cost.details'
+    _description = 'Cost Details'
 
     cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     name = fields.Char(string="Cost Name")

@@ -43,13 +43,13 @@
     </group>
     <field name="cost_details_ids">
         <tree editable="bottom">
-             <field name="learning_partner" string="Learning Partner" colspan="15"/>
-                <field name="currency_id" string="Currency" colspan="72"/>
-                <field name="training_vendor" string="Partner Share" colspan="72"/>
-                <field name="total_price_all" string="Logistics Cost" colspan="3"/>
-                <field name="clc_cost" string="Training Cost" colspan="3"/>
-                <field name="margin1" string="Total Costs" colspan="3"/>
-                <field name="nilme_share" string="NIL ME Share" colspan="3"/>
+             <field name="learning_partner" string="Learning Partner" colspan="1"/>
+                <field name="currency_id" string="Currency" colspan="1"/>
+                <field name="training_vendor" string="Partner Share" colspan="1"/>
+                <field name="total_price_all" string="Logistics Cost" colspan="1"/>
+                <field name="clc_cost" string="Training Cost" colspan="1"/>
+                <field name="margin1" string="Total Costs" colspan="1"/>
+                <field name="nilme_share" string="NIL ME Share" colspan="1"/>
                 <field name="margin" widget="percentage" string="Margin (%)" colspan="3"/>
             
         </tree>

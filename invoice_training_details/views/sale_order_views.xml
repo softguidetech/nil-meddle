@@ -73,7 +73,6 @@
                 </page>
                 <page id="clcs" name="Costs Details">
     <group>
-        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
     </group>
     <field name="cost_details_ids">
         <tree editable="bottom">

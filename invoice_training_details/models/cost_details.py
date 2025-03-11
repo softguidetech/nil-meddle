@@ -4,19 +4,19 @@ class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
     def _register_hook(self):
-        """Modify the tree view dynamically to force column auto-sizing."""
+        """Dynamically modify the tree view to force column widths in Odoo."""
         view_id = self.env.ref('your_module.view_cost_details_tree', raise_if_not_found=False)
         if view_id:
             view_id.sudo().write({'arch_base': '''
                 <tree editable="bottom">
-                    <field name="learning_partner" colspan="2" string="Learning Partner" />
-                    <field name="currency_id" colspan="1" string="Currency" />
-                    <field name="training_vendor" colspan="2" string="Partner Share" />
-                    <field name="total_price_all" colspan="2" string="Logistics Cost" />
-                    <field name="clc_cost" colspan="2" string="Training Cost" />
-                    <field name="margin1" colspan="2" string="Total Costs" />
-                    <field name="nilme_share" colspan="2" string="NIL ME Share" />
-                    <field name="margin" widget="percentage" colspan="2" string="Margin (%)" />
+                    <field name="learning_partner" string="Learning Partner" style="width: 200px;"/>
+                    <field name="currency_id" string="Currency" style="width: 150px;"/>
+                    <field name="training_vendor" string="Partner Share" style="width: 180px;"/>
+                    <field name="total_price_all" string="Logistics Cost" style="width: 180px;"/>
+                    <field name="clc_cost" string="Training Cost" style="width: 180px;"/>
+                    <field name="margin1" string="Total Costs" style="width: 180px;"/>
+                    <field name="nilme_share" string="NIL ME Share" style="width: 180px;"/>
+                    <field name="margin" widget="percentage" string="Margin (%)" style="width: 150px;"/>
                 </tree>
             '''})
 

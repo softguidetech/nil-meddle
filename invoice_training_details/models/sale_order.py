@@ -15,7 +15,7 @@ class SaleOrder(models.Model):
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
     
-    cos_lead_id = fields.Many2one('some.model', string="Cos Lead")
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     venue = fields.Float(string='Venue')
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     margin1 = fields.Float(string="Total Costs")

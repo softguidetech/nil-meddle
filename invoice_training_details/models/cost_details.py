@@ -3,6 +3,44 @@ from odoo import models, fields, api
 class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
+    def _register_hook(self):
+        """Dynamically inject CSS for auto-spacing in the list view"""
+        view_id = self.env.ref('your_module.view_cost_details_tree', raise_if_not_found=False)
+        if view_id:
+            view_id.sudo().write({'arch_base': '''
+                <tree editable="bottom" class="auto_spacing">
+                    <field name="learning_partner"/>
+                    <field name="currency_id"/>
+                    <field name="training_vendor"/>
+                    <field name="total_price_all"/>
+                    <field name="clc_cost"/>
+                    <field name="margin1"/>
+                    <field name="nilme_share"/>
+                    <field name="margin" widget="percentage"/>
+                </tree>
+            '''})
+
+        # Inject CSS dynamically in settings (forces Odoo to apply the new styling)
+        css_code = """
+            <style>
+            .o_list_view .auto_spacing td {
+                min-width: 150px !important;
+                max-width: auto !important;
+                white-space: nowrap !important;
+                overflow: hidden !important;
+                text-overflow: ellipsis !important;
+            }
+            .o_list_view .auto_spacing {
+                table-layout: auto !important;
+                width: 100% !important;
+            }
+            </style>
+        """
+        self.env['ir.ui.view'].sudo().create({
+            'name': 'AutoSpacingCSS',
+            'type': 'qweb',
+            'arch': f'''<t t-name="AutoSpacingCSS">{css_code}</t>'''
+        })
 
     cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     name = fields.Char(string="Cost Name")

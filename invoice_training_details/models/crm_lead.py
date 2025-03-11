@@ -35,19 +35,16 @@ class Lead(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
-class Lead(models.Model):
-    _inherit = 'crm.lead'
-
     tag_ids = fields.Many2many('crm.tag', string="Tags")  # Ensure this field exists
     margin = fields.Float(string="Margin (%)", compute='_compute_margin')  # New field with percentage label
 
-
     @api.depends('margin')
     def _update_margin_tag(self):
+        """Automatically add/remove 'Below Margin' tag based on margin value"""
         tag_name = "Below Margin"
 
         for rec in self:
-            if rec.margin1 <= 30%:
+            if rec.margin <= 0.3:  # FIX: Removed invalid '%'
                 # Search for the tag
                 tag = self.env['crm.tag'].search([('name', '=', tag_name)], limit=1)
 
@@ -57,15 +54,17 @@ class Lead(models.Model):
 
                 # Add the tag to the lead if not already added
                 if tag not in rec.tag_ids:
-                    rec.tag_ids = [(4, tag.id)]
+                    rec.write({'tag_ids': [(4, tag.id)]})  # Use write() instead of direct assignment
+
             else:
                 # Remove the tag if margin goes above 30
                 tag = self.env['crm.tag'].search([('name', '=', tag_name)], limit=1)
                 if tag and tag in rec.tag_ids:
-                    rec.tag_ids = [(3, tag.id)]
+                    rec.write({'tag_ids': [(3, tag.id)]})  # Use write() to remove tag
 
-    @api.onchange('margin1')
-    def _onchange_margin1(self):
+    @api.onchange('margin')
+    def _onchange_margin(self):
+        """Ensure the tag is updated when margin changes"""
         self._update_margin_tag()
 
 

@@ -45,8 +45,8 @@
         <tree editable="bottom">
             <field name="learning_partner"/>
             <field name="currency_id" width="10"/>
-            <field name="training_vendor" width="15"/>
-            <field name="total_price_all" width="15"/>
+            <field name="training_vendor" colspan="2"/>
+            <field name="total_price_all" colspan="2"/>
             <field name="clc_cost" width="10"/>
             <field name="margin1" width="10"/>
             <field name="nilme_share" width="10"/>

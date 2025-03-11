@@ -90,8 +90,11 @@ class Lead(models.Model):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context.update({
             'default_training_name': self.training_name,
-            # 'default_half_advance_payment_before': self.half_advance_payment_before,
-            # 'default_half_payment_after': self.half_payment_after,
+            'default_service_name': self.service_name,
+            'default_total_training_price': self.total_training_price,
+            'default_total_service_price': self.total_service_price,
+            'default_half_advance_payment_before': self.half_advance_payment_before,
+            'default_half_payment_after': self.half_payment_after,
             'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
             'default_clcs_qty': self.clcs_qty,
@@ -100,15 +103,12 @@ class Lead(models.Model):
             'default_instructor_logistics': self.instructor_logistics,
             'default_catering': self.catering,
             'default_descriptions': self.descriptions,
-            'default_ordering_partner': self.ordering_partner_id.id,
+            'default_ordering_partner_id': self.ordering_partner_id.id,
             'default_instructor_id': self.instructor_id.id,
             'default_training_id': self.training_id.id,
             'default_train_language': self.train_language,
             'default_location': self.location,
             'default_payment_method': self.payment_method,
-            'default_clcs_qty': self.clcs_qty,
-            'default_service_name': self.service_name,
-            
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
             'default_visa': self.visa,
@@ -117,9 +117,12 @@ class Lead(models.Model):
             'default_book_details_id': [(6, 0, self.book_details_id.ids)],
             'default_details': self.details,
             'default_cost': self.cost,
-            
             'default_training_vendor': self.training_vendor,
             'default_training_type': self.training_type,
+            'default_total_price_all': self.total_price_all,
+            'default_clc_cost': self.clc_cost,
+            'default_rate_card': self.rate_card,
+            'default_nilme_share': self.nilme_share,
         })
         return quotation_context
 

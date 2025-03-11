@@ -14,8 +14,6 @@ class SaleOrder(models.Model):
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
-    cos_lead_id = fields.Many2one('some.model', string="Cos Lead")
-
 
     venue = fields.Float(string='Venue')
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
@@ -51,10 +49,10 @@ class SaleOrder(models.Model):
         for record in self:
             record.margin1 = (record.training_vendor or 0) + (record.total_price_all or 0) + (record.clc_cost or 0)
 
-    @api.depends('total_training_price')
-def _compute_nilme_share(self):
-    for record in self:
-        record.nilme_share = record.total_training_price * 0.1  # Example computation
+    @api.depends('margin1', 'cos_lead_id.total_training_price')
+    def _compute_nilme_share(self):
+        for record in self:
+            record.nilme_share = (record.cos_lead_id.total_training_price or 0) - (record.margin1 or 0)
 
     @api.depends('margin1', 'cos_lead_id.total_training_price')
     def _compute_margin(self):

@@ -34,40 +34,7 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
-    training_vendor = fields.Many2one('res.partner', string="Training Vendor")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
-    tag_ids = fields.Many2many('crm.tag', string="Tags")  # Ensure this field exists
-    margin = fields.Float(string="Margin (%)", compute='_compute_margin')  # New field with percentage label
-
-    @api.depends('margin')
-    def _update_margin_tag(self):
-        """Automatically add/remove 'Below Margin' tag based on margin value"""
-        tag_name = "Below Margin"
-
-        for rec in self:
-            if rec.margin <= 0.3:  # FIX: Removed invalid '%'
-                # Search for the tag
-                tag = self.env['crm.tag'].search([('name', '=', tag_name)], limit=1)
-
-                # If the tag doesn't exist, create it
-                if not tag:
-                    tag = self.env['crm.tag'].create({'name': tag_name})
-
-                # Add the tag to the lead if not already added
-                if tag not in rec.tag_ids:
-                    rec.write({'tag_ids': [(4, tag.id)]})  # Use write() instead of direct assignment
-
-            else:
-                # Remove the tag if margin goes above 30
-                tag = self.env['crm.tag'].search([('name', '=', tag_name)], limit=1)
-                if tag and tag in rec.tag_ids:
-                    rec.write({'tag_ids': [(3, tag.id)]})  # Use write() to remove tag
-
-    @api.onchange('margin')
-    def _onchange_margin(self):
-        """Ensure the tag is updated when margin changes"""
-        self._update_margin_tag()
-
 
     # Add extra fields
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -140,40 +107,31 @@ class Lead(models.Model):
         quotation_context = super()._prepare_opportunity_quotation_context()
         quotation_context.update({
             'default_training_name': self.training_name,
-            'default_service_name': self.service_name,
-            'default_total_training_price': self.total_training_price,
-            'default_total_service_price': self.total_service_price,
-            'default_half_advance_payment_before': self.half_advance_payment_before,
-            'default_half_payment_after': self.half_payment_after,
             'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
+            'default_cos_details_ids': [(6, 0, self.cost_details_ids.ids)],
             'default_clcs_qty': self.clcs_qty,
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
-            'default_poref': self.poref,
-            'default_invref': self.invref,
             'default_instructor_logistics': self.instructor_logistics,
-            'default_uber': self.uber,
             'default_ctrng': self.ctrng,
             'default_descriptions': self.descriptions,
-            'default_ordering_partner_id': self.ordering_partner_id.id,
+            'default_ordering_partner': self.ordering_partner_id.id,
             'default_instructor_id': self.instructor_id.id,
             'default_training_id': self.training_id.id,
             'default_train_language': self.train_language,
             'default_location': self.location,
             'default_learnig_partner': self.learnig_partner,
+            'default_uber': self.uber,
             'default_payment_method': self.payment_method,
-            'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
-            'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
-            'default_visa': self.visa,
-            'default_start_date': self.start_date,
-            'default_to_date': self.to_date,
-            'default_book_details_id': [(6, 0, self.book_details_id.ids)],
-            'default_details': self.details,
-            'default_cost': self.cost,
-            'default_training_vendor': self.training_vendor,
-            'default_training_type': self.training_type,
-            'default_total_price_all': self.total_price_all,
+            'default_clcs_qty': self.clcs_qty,
+            'default_cost_details_ids': [(6, 0, self.cost_details_ids.ids)],  # Pass related Cost Details
+            'default_poref': self.poref,
+            'default_invref': self.invref,
+            'default_uber' : self.uber,
+            'default_ctrng': self.ctrng,
+            
+
         })
         return quotation_context
 

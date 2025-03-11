@@ -34,6 +34,7 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
+    training_vendor = fields.Many2one('res.partner', string="Training Vendor")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
     tag_ids = fields.Many2many('crm.tag', string="Tags")  # Ensure this field exists
     margin = fields.Float(string="Margin (%)", compute='_compute_margin')  # New field with percentage label

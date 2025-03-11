@@ -1,4 +1,3 @@
-
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
@@ -36,6 +35,32 @@ class Lead(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
+    @api.depends('margin1')
+def _update_margin_tag(self):
+    tag_name = "Below Margin"
+
+    for rec in self:
+        if rec.margin1 <= 30:
+            # Search for the tag
+            tag = self.env['crm.tag'].search([('name', '=', tag_name)], limit=1)
+
+            # If the tag doesn't exist, create it
+            if not tag:
+                tag = self.env['crm.tag'].create({'name': tag_name})
+
+            # Add the tag to the lead if not already added
+            if tag not in rec.tag_ids:
+                rec.tag_ids = [(4, tag.id)]
+        else:
+            # Remove the tag if margin goes above 30
+            tag = self.env['crm.tag'].search([('name', '=', tag_name)], limit=1)
+            if tag and tag in rec.tag_ids:
+                rec.tag_ids = [(3, tag.id)]
+
+@api.onchange('margin1')
+def _onchange_margin1(self):
+    self._update_margin_tag()
+
 
     # Add extra fields
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

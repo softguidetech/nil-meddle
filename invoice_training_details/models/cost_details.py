@@ -92,22 +92,3 @@ class CostDetails(models.Model):
             'default_margin': self.margin,
         })
         return quotation_context
-
-    ### AUTO-SPACING TREE VIEW FIX ###
-    
-    def init(self):
-        """Dynamically modifies the tree view to ensure proper auto-spacing."""
-        view_id = self.env.ref('your_module.view_cost_details_tree', raise_if_not_found=False)
-        if view_id:
-            view_id.write({'arch_base': '''
-                <tree editable="bottom" class="auto_spacing">
-                    <field name="learning_partner"/>
-                    <field name="currency_id"/>
-                    <field name="training_vendor"/>
-                    <field name="total_price_all"/>
-                    <field name="clc_cost"/>
-                    <field name="margin1"/>
-                    <field name="nilme_share"/>
-                    <field name="margin" widget="percentage"/>
-                </tree>
-            '''})

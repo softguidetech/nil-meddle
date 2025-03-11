@@ -39,6 +39,8 @@ class Lead(models.Model):
     _inherit = 'crm.lead'
 
     tag_ids = fields.Many2many('crm.tag', string="Tags")  # Ensure this field exists
+    margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
+
 
     @api.depends('margin1')
     def _update_margin_tag(self):

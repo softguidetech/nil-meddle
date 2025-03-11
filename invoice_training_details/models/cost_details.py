@@ -4,7 +4,7 @@ class CostDetails(models.Model):
     _name = 'cost.details'
     _description = 'Cost Details'
 
-    cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
+    cos_lead_id = fields.Many2one("crm.lead", string="Lead")  # Check if it expects an ID
     name = fields.Char(string="Cost Name")
     description = fields.Text(string="Description")
     price = fields.Float(string="Price")  # Make the price field optional

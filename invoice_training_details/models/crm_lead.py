@@ -39,15 +39,15 @@ class Lead(models.Model):
     _inherit = 'crm.lead'
 
     tag_ids = fields.Many2many('crm.tag', string="Tags")  # Ensure this field exists
-    margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
+    margin = fields.Float(string="Margin (%)", compute='_compute_margin')  # New field with percentage label
 
 
-    @api.depends('margin1')
+    @api.depends('margin')
     def _update_margin_tag(self):
         tag_name = "Below Margin"
 
         for rec in self:
-            if rec.margin1 <= 30:
+            if rec.margin1 <= 30%:
                 # Search for the tag
                 tag = self.env['crm.tag'].search([('name', '=', tag_name)], limit=1)
 

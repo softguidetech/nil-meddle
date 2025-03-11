@@ -43,7 +43,7 @@
     </group>
     <field name="cost_details_ids">
         <tree editable="bottom">
-             <field name="learning_partner" string="Learning Partner" colspan="3"/>
+             <field name="learning_partner" string="Learning Partner" colspan="15"/>
                 <field name="currency_id" string="Currency" colspan="2"/>
                 <field name="training_vendor" string="Partner Share" colspan="3"/>
                 <field name="total_price_all" string="Logistics Cost" colspan="3"/>

@@ -39,6 +39,9 @@ class Lead(models.Model):
     # Add extra fields
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
+    end_customer = fields.Char(string='End Client')
+ cisco_am = fields.Char(string='Cisco Account Manager')
+
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Language')

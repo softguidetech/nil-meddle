@@ -61,7 +61,6 @@
                     <group>
                         <field name="end_customer"/>
                         <field name="cisco_am"/>
-                        <field name="cisco_am"/>
 
                     </group>
                     <field name="pro_service_ids">

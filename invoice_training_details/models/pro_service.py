@@ -10,7 +10,7 @@ class ProService(models.Model):
     _description = 'Propfessional Services'
 
     name = fields.Char(string='Service Name',)
-    requester = filelds.Char(string='Requester')
+    requester = fields.Char(string='Requester')
     end_customer = fields.Char(string='End Client')
     cisco_am = fields.Char(string='Cisco Account Manager')
     

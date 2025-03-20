@@ -59,7 +59,7 @@
 
                 <page id="pro" name="Professional Services">
                     <group>
-                        <field name="end_customer"/>
+                        <field name="requester"/>
                         <field name="cisco_am"/>
 
                     </group>

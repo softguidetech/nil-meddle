@@ -55,6 +55,25 @@ class SaleOrder(models.Model):
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
     
+    #adding cost 
+
+    lead_cost = fields.Float(string="Lead Cost", readonly=True)
+
+    @api.model
+    def create(self, vals):
+        # Get the lead and associate the cost when creating a sales order
+        if vals.get('opportunity_id'):
+            lead = self.env['crm.lead'].browse(vals['opportunity_id'])
+            vals['lead_cost'] = lead.cost
+        return super(SaleOrder, self).create(vals)
+
+    def write(self, vals):
+        # Update cost when modifying the associated lead
+        if 'opportunity_id' in vals:
+            lead = self.env['crm.lead'].browse(vals['opportunity_id'])
+            vals['lead_cost'] = lead.cost
+        return super(SaleOrder, self).write(vals)
+
     
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):

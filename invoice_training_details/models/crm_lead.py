@@ -55,6 +55,15 @@ class Lead(models.Model):
     instructor_logistics = fields.Char(string='Instructor Logistics')
     catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
+    #
+    @api.onchange('cost')
+    def _onchange_cost(self):
+        # Update lead cost in sales order when it changes
+        sale_orders = self.env['sale.order'].search([('opportunity_id', '=', self.id)])
+        for order in sale_orders:
+            order.lead_cost = self.cost
+
+
     def _compute_total(self):
         ticket_total =0
         hotel_toal=0
@@ -156,6 +165,9 @@ class HotelHotel(models.Model):
             days= str(duration).replace(', 0:00:00','Nights')
             rec.nights = days
             
+
+    # to add data from cost
+    
     
 class TicketTicket(models.Model):
     _name = 'ticket.ticket'

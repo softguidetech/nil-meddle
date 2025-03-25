@@ -62,6 +62,20 @@ class AccountMove(models.Model):
     
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
+
+#adding cost 
+
+    lead_cost = fields.Float(string="Lead Cost", readonly=True)
+
+    @api.model
+    def create(self, vals):
+        # جلب تكلفة lead عند إنشاء الفاتورة
+        if vals.get('invoice_origin'):
+            sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
+            if sale_order:
+                vals['lead_cost'] = sale_order.lead_cost
+        return super(AccountMove, self).create(vals)
+    
     
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):

@@ -46,10 +46,10 @@ class Lead(models.Model):
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Language')
-    location = fields.Selection([('ILT','ILT'),('VILT','VILT')])
+    location = fields.Selection([('Online','Online'),('On site','On site')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koeing','Koeing'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    learnig_partner = fields.Selection([('Koenig','Koenig'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
 
     # Extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')

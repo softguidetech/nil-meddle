@@ -5,6 +5,11 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
+            <!-- Insert currency_id next to expected_revenue -->
+                <xpath expr="//field[@name='expected_revenue']" position="after">
+                    <field name="currency_id" readonly="1"/>
+                    <span><strong>USD</strong></span> <!-- Display USD next to expected_revenue -->
+                </xpath>
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
             </xpath>

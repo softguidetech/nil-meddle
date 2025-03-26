@@ -27,7 +27,7 @@ class TrainingCourse(models.Model):
     invref = fields.Char(string='Invoice Reference')
     
     where_location2 = fields.Char(string='Where?')
-    location = fields.Selection([('ILT', 'ILT'), ('VILT', 'VILT')])
+    location = fields.Selection([('Online', 'On site'), ('Online', 'On site')])
     payment_method = fields.Selection([('cash', 'Cash'), ('clc', 'CLC')], default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
     default_item_code = fields.Char(related='training_id.default_code', string='Internal Ref')

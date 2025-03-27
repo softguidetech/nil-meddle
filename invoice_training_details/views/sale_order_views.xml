@@ -1,3 +1,4 @@
+
 <?xml version="1.0"?>
 <odoo>
 
@@ -19,7 +20,9 @@
                         <tree editable="bottom">
                             
                             <field name="training_id"/>
-                            <field name="cost_clc"/>
+                            <field name="descriptions"/>
+                            <field name="default_item_code"/>
+                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
@@ -71,25 +74,6 @@
                        
                     </group>
                 </page>
-
-                 <page id="clcs" name="Costs Details">
-     <group>
-     </group>
-     <field name="cost_details_ids">
-         <tree editable="bottom">
-             <field name="learning_partner"/>
-             <field name="currency_id" width="10"/>
-             <field name="training_vendor" width="15"/>
-             <field name="total_price_all" width="15"/>
-             <field name="clc_cost" width="10"/>
-             <field name="margin1" width="10"/>
-             <field name="nilme_share" width="10"/>
-             <field name="margin" widget="percentage"/>  <!-- Display as percentage -->
-             
-         </tree>
-     </field>
- </page>
-                
                 
                 <page id="pro" name="Professional Services">
                     <group>
@@ -101,10 +85,7 @@
                             
                             <field name="training_id"/>
                             <field name="descriptions"/>
-                          
-                          <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            
+                            <field name="default_item_code"/>
                             <field name="wor_hour_number"/>
                             <field name="train_language"/>
                             <!--<field name="location"/>-->
@@ -148,10 +129,6 @@
                             
                             
                         </group>
-                        <group>
-                            <field name= "bank_details"/>
-                            <field name= "term_and_cond"/>
-                        </group>
                         
                        
                     </group>
@@ -170,6 +147,8 @@
                 <page id="logistics" string="Logistics">
                     <group>
                         <group>
+                            <field name="instructor_logistics"/>
+                            <field name="catering"/>
                         </group>
                     
                         <!--<group string="Flights">-->

@@ -5,7 +5,7 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-
+#test
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.USD'))
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')

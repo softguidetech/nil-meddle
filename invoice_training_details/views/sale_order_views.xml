@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0"?>
 <odoo>
 
     <record id="sale_order_form_quote_training" model="ir.ui.view">
@@ -19,7 +19,10 @@
                         <tree editable="bottom">
                             
                             <field name="training_id"/>
+                            <field name="descriptions"/>
                             <field name="cost_clc"/>
+                            <field name="hyperlink"/>
+                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
@@ -151,6 +154,8 @@
                 <page id="logistics" string="Logistics">
                     <group>
                         <group>
+                            <field name="instructor_logistics"/>
+                            <field name="catering"/>
                         </group>
                     
                         <!--<group string="Flights">-->

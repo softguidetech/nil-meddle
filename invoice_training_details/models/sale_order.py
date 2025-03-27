@@ -55,6 +55,26 @@ class SaleOrder(models.Model):
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
     
+    #adding cost 
+
+    lead_cost = fields.Float(string="Lead Cost", readonly=True)
+
+    @api.model
+    def create(self, vals):
+        # Get the lead and associate the cost when creating a sales order
+        if vals.get('opportunity_id'):
+            lead = self.env['crm.lead'].browse(vals['opportunity_id'])
+            vals['lead_cost'] = lead.cost
+        return super(SaleOrder, self).create(vals)
+
+    def write(self, vals):
+        # Update cost when modifying the associated lead
+        if 'opportunity_id' in vals:
+            lead = self.env['crm.lead'].browse(vals['opportunity_id'])
+            vals['lead_cost'] = lead.cost
+        return super(SaleOrder, self).write(vals)
+
+    
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
         total = 0
@@ -86,14 +106,17 @@ class SaleOrder(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
 
     # logistics tab
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    
     bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
     term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
     
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
-            if rec.training_course_ids:
-                rec.total_service_price = sum(rec.training_course_ids.mapped('price'))
+            if rec.pro_service_ids:
+                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
             
             else:
                 rec.total_service_price = 0
@@ -117,7 +140,8 @@ class SaleOrder(models.Model):
             'clcs_qty': self.clcs_qty,
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
-
+            'instructor_logistics': self.instructor_logistics,
+            'catering': self.catering,
             # 'descriptions': self.descriptions,
             # 'ordering_partner_id': self.ordering_partner_id.id,
             # 'where_location': self.where_location,
@@ -226,3 +250,4 @@ class SaleOrder(models.Model):
         self.write({'order_line': []})
         self.write({'order_line': l})
             
+

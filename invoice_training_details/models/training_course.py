@@ -9,37 +9,35 @@ class TrainingCourse(models.Model):
     _name = "training.course"
     _description = 'Training Course'
 
-    name = fields.Char(string='Training Name')
+    name = fields.Char(string='Training Name',)
     no_of_student = fields.Integer(string='No of Student')
-    duration = fields.Char(string='Duration', compute='_compute_date')
-    training_date_start = fields.Date(string='Start Date')
-    training_date_end = fields.Date(string='Delivery Date')
+    duration = fields.Char(string='Duration',compute='_compute_date')
+    training_date_start = fields.Date(string='Training Date start')
+    training_date_end = fields.Date(string='Training Date end')
     price = fields.Float(string='Training Price')
     move_id = fields.Many2one('account.move', string='Move')
     lead_id = fields.Many2one('crm.lead', string='Lead')
     sale_id = fields.Many2one('sale.order', string='Sale Order')
     
-    instructor_id = fields.Many2one('hr.employee', string="Instructor")
+    instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
-    training_id = fields.Many2one('product.product', string='Training Name')
-    train_language = fields.Char(string='Language')
-    poref = fields.Char(string='PO Reference')
-    invref = fields.Char(string='Invoice Reference')
+    training_id = fields.Many2one('product.product',string='Training Name')
+    train_language = fields.Char(string='Training Language')
     
     where_location2 = fields.Char(string='Where?')
-    location = fields.Selection([('Online', 'Online'), ('On site', 'On site')])
-    payment_method = fields.Selection([('cash', 'Cash'), ('clc', 'CLC')], default='cash')
+    location = fields.Selection([('CISCO U','CISCO U'),('ILT','ILT'),('VILT','VILT')])
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    default_item_code = fields.Char(related='training_id.default_code', string='Internal Ref')
+    default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')
     
-    cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc', string="CLCs Cost")
-    hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink', string="Hyper Link")
-
-    @api.depends('training_date_start', 'training_date_end')
+    cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="Cost Clc")
+    hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")
+    
     def _compute_date(self):
+        
+        duration = 0
         for rec in self:
-            if rec.training_date_start and rec.training_date_end:
-                duration = (rec.training_date_end - rec.training_date_start).days + 1
-                rec.duration = str(duration) + ' days'
-            else:
-                rec.duration = '0 days'
+            duration = rec.training_date_end - rec.training_date_start
+            days= str(duration).replace(', 0:00:00','')
+            rec.duration = days
+         

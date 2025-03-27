@@ -73,7 +73,6 @@
                             <field name="training_id"/>
                             <field name="descriptions"/>
                             <field name="training_date_end"/>
-                            <field name="price"/>
                         </tree>
                     </field>
                     <group>

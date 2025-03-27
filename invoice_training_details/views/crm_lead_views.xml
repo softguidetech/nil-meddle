@@ -72,7 +72,6 @@
                         <tree editable="bottom">
                             <field name="training_id"/>
                             <field name="descriptions"/>
-                            <field name="training_date_end"/>
                         </tree>
                     </field>
                     <group>

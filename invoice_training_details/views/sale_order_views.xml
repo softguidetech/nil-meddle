@@ -34,7 +34,6 @@
                             <field name="duration"/>
                             <field name="training_date_start"/>
                             <field name="training_date_end"/>
-                            <field name="price"/>
                         </tree>
                     </field>
                     <group>

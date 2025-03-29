@@ -9,7 +9,6 @@
                     <sheet>
                         <group>
                             <field name="check_in"/>
-                            <field name="late_arr"/>
                             <field name="grace_period_minutes"/>
                         </group>
                     </sheet>

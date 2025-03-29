@@ -13,6 +13,7 @@ class ProService(models.Model):
     no_of_student = fields.Integer(string='No of Student')
     duration = fields.Char(string='Duration',)
     ordering_partner_id = fields.Many2one("res.partner", string="Ordering Partner")
+    end_customer_id = fields.Many2one("res.partner", string="End Customer")
     training_date_start = fields.Date(string='Training Date start')
     training_date_end = fields.Date(string='Delivery Date')
     price = fields.Float(string='Price')

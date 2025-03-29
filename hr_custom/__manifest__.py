@@ -1,4 +1,5 @@
-# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*
+# Part of 4Minds. See LICENSE file for full copyright and licensing details.
 {
     "name": "HR Custom",
     "version": "17.0",
@@ -14,12 +15,12 @@
     "license": "LGPL-3",
 
     # Dependency
-    "depends": ['web', 'base', 'hr_contract', 'hr_attendance'],
+    "depends": ['web', 'base','hr_contract'],
 
     "data": [
+        
         "views/contract_view.xml",
-        "views/hr_attendance_view.xml",
-        "security/ir.model.access.csv",
+       
     ],
 
     "installable": True,

@@ -10,3 +10,7 @@ class HrAttendance(models.Model):
         if 'check_in' in vals:
             vals['checkin_comment'] = vals.get('checkin_comment', 'No comment')
         return super(HrAttendance, self).create(vals)
+
+    def submit_checkin_comment(self):
+        # Logic to handle the comment submission
+        pass

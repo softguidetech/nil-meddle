@@ -65,7 +65,7 @@
                         <tree editable="bottom">
                             <field name="training_id"/>
                             <field name="ordering_partner_id"/>
-                            <field name'"cisco_am"/>
+                            <field name="cisco_am"/>
                             <field name="duration"/>
                             <field name="training_date_end"/>
                             <field name="price"/>

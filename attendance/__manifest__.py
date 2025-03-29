@@ -1,14 +1,10 @@
 {
-    'name': 'Attendance Tracking',
+    'name': 'Attendance Late Calculation',
     'version': '1.0',
-    'depends': ['hr', 'base', 'hr_attendance'],  # Ensure this includes any dependencies for HR and base modules
-    'author': 'RK',
     'category': 'Human Resources',
-    'description': 'Module to track and calculate late arrivals with grace period',
+    'depends': ['hr_attendance'],
     'data': [
-        # Views for attendance (form view, tree view)
-        'views/attendance_view.xml',  # Add the path to your XML views here
+        'views/hr_attendance_views.xml',
     ],
     'installable': True,
-    'auto_install': False,
 }

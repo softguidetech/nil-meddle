@@ -1,4 +1,4 @@
-from odoo import models, fields, api
+from odoo import models, fields
 
 class HrCheckinComment(models.Model):
     _name = 'hr.checkin.comment'

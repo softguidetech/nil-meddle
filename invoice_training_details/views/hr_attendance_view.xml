@@ -6,6 +6,7 @@
         <field name="arch" type="xml">
             <xpath expr="//group" position="inside">
                 <field name="checkin_comment" placeholder="Add your check-in comment here..."/>
+                <button name="submit_checkin_comment" type="object" string="Submit Comment" class="oe_highlight"/>
             </xpath>
         </field>
     </record>

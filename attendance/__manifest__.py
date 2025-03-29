@@ -1,7 +1,7 @@
 {
     'name': 'Attendance Tracking',
     'version': '1.0',
-    'depends': ['hr', 'base'],  # Ensure this includes any dependencies for HR and base modules
+    'depends': ['hr', 'base', 'hr_attendance'],  # Ensure this includes any dependencies for HR and base modules
     'author': 'RK',
     'category': 'Human Resources',
     'description': 'Module to track and calculate late arrivals with grace period',

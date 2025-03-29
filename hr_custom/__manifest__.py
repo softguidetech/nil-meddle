@@ -19,8 +19,8 @@
 
     "data": [
         "views/contract_view.xml",
-        "views/hr_attendance_view.xml",  # Add this line to include the new view
-        "security/ir.model.access.csv",  # Add this line to include access rights
+        "views/hr_attendance_view.xml",  # Ensure this line is present
+        "security/ir.model.access.csv",  # Ensure this line is present
     ],
 
     "installable": True,

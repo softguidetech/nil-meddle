@@ -8,7 +8,7 @@
             <field name="check_out"/>
             <field name="worked_hours" string="Work Hours" widget="float_time"/>
             <field name="overtime_hours" string="Over Time" optional="show" widget="float_time"/>
-            <field name="late_minutes"/> <!-- Ensure this field is present -->
+            <field name="late_arr"/> <!-- Ensure this field is present -->
         </tree>
     </field>
 </record>

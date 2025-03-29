@@ -1,14 +1,20 @@
-<record id="view_hr_attendance_tree" model="ir.ui.view">
-    <field name="name">hr.attendance.tree</field>
-    <field name="model">hr.attendance</field>
-    <field name="arch" type="xml">
-        <tree>
-            <field name="employee_id" widget="many2one_avatar_user"/>
-            <field name="check_in"/>
-            <field name="check_out"/>
-            <field name="worked_hours" string="Work Hours" widget="float_time"/>
-            <field name="overtime_hours" string="Over Time" optional="show" widget="float_time"/>
-            <field name="late_arr"/> <!-- Ensure this field is present -->
-        </tree>
-    </field>
-</record>
+<odoo>
+    <data>
+        <!-- Example of custom view for Attendance model -->
+        <record id="view_hr_attendance_form" model="ir.ui.view">
+            <field name="name">hr.attendance.form</field>
+            <field name="model">hr.attendance</field>
+            <field name="arch" type="xml">
+                <form string="Attendance">
+                    <sheet>
+                        <group>
+                            <field name="check_in"/>
+                            <field name="late_arr"/>
+                            <field name="grace_period_minutes"/>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+    </data>
+</odoo>

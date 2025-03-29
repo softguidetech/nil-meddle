@@ -59,7 +59,7 @@
 
                 <page id="pro" name="Professional Services">
                     <group>
-                        <field name="service_name"/>
+                        <field name="ordering_partner_id"/>
                     </group>
                     <field name="pro_service_ids">
                         <tree editable="bottom">

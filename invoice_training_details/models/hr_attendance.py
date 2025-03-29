@@ -13,4 +13,7 @@ class HrAttendance(models.Model):
 
     def submit_checkin_comment(self):
         # Logic to handle the comment submission
-        pass
+        # For example, you can add validation or processing here
+        if not self.checkin_comment:
+            raise ValidationError("Please add a comment before submitting.")
+        # Additional logic can be added here

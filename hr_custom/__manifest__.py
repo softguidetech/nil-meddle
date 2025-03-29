@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-# Part of 4Minds. See LICENSE file for full copyright and licensing details.
 {
     "name": "HR Custom",
     "version": "17.0",
@@ -19,8 +18,8 @@
 
     "data": [
         "views/contract_view.xml",
-        "views/hr_attendance_view.xml",  # Ensure this line is present
-        "security/ir.model.access.csv",  # Ensure this line is present
+        "views/hr_attendance_view.xml",
+        "security/ir.model.access.csv",
     ],
 
     "installable": True,

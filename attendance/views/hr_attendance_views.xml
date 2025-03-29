@@ -1,17 +1,14 @@
-<?xml version="1.0" encoding="utf-8"?>
-<odoo>
-    <data>
-        <!-- Extend the hr.attendance tree view (list view) -->
-        <record id="view_hr_attendance_tree" model="ir.ui.view">
-            <field name="name">hr.attendance.tree</field>
-            <field name="model">hr.attendance</field>
-            <field name="inherit_id" ref="hr_attendance.view_attendance_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//tree" position="inside">
-                    <!-- Add the late_minutes field to the list view -->
-                    <field name="late_minutes"/>
-                </xpath>
-            </field>
-        </record>
-    </data>
-</odoo>
+<record id="view_hr_attendance_tree" model="ir.ui.view">
+    <field name="name">hr.attendance.tree</field>
+    <field name="model">hr.attendance</field>
+    <field name="arch" type="xml">
+        <tree>
+            <field name="employee_id" widget="many2one_avatar_user"/>
+            <field name="check_in"/>
+            <field name="check_out"/>
+            <field name="worked_hours" string="Work Hours" widget="float_time"/>
+            <field name="overtime_hours" string="Over Time" optional="show" widget="float_time"/>
+            <field name="late_minutes"/> <!-- Ensure this field is present -->
+        </tree>
+    </field>
+</record>

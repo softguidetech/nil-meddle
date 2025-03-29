@@ -1,0 +1,12 @@
+<odoo>
+    <record id="view_hr_attendance_form" model="ir.ui.view">
+        <field name="name">hr.attendance.form.inherit</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_form_view"/>
+        <field name="arch" type="xml">
+            <xpath expr="//group" position="inside">
+                <field name="checkin_comment" placeholder="Add your check-in comment here..."/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -5,8 +5,7 @@
         <field name="inherit_id" ref="hr_attendance.hr_attendance_form_view"/>
         <field name="arch" type="xml">
             <xpath expr="//group" position="inside">
-                <field name="checkin_comment" placeholder="Add your check-in comment here..."/>
-                <button name="submit_checkin_comment" type="object" string="Submit Comment" class="oe_highlight"/>
+                <field name="checkin_comment_ids" widget="one2many_list" placeholder="Add your check-in comment here..."/>
             </xpath>
         </field>
     </record>

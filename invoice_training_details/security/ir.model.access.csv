@@ -7,3 +7,6 @@ access_airline,airline.airline,model_airline_airline,base.group_user,1,1,1,1
 access_loca,loca_loca,model_loca_loca,base.group_user,1,1,1,1
 access_flight_class_type,flight.class.type,model_flight_class_type,base.group_user,1,1,1,1
 access_hotel_des,hotel.description,model_hotel_description,base.group_user,1,1,1,1
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_hr_attendance_user,access.hr.attendance,model_hr_attendance,base.group_user,1,1,1,1
+

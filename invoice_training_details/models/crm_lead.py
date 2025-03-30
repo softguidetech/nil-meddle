@@ -5,19 +5,11 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-    # Add USD field for revenue display
-    amount_usd = fields.Monetary(
-        string="Expected Revenue (USD)", 
-        currency_field="currency_id", 
-        help="Display in USD"
-    )
-    
-    # Ensure the default currency is AED for the company
+    # Override the currency_id field to set a default value of USD
     currency_id = fields.Many2one(
-        "res.currency", 
-        string="Currency", 
-        default=lambda self: self.env.ref("base.AED"), 
-        required=True
+        'res.currency', 
+        string='Currency', 
+        default=lambda self: self.env.ref('base.USD')  # Automatically set to USD
     )
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')

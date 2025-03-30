@@ -66,6 +66,7 @@
                             <field name="training_id"/>
                             <field name="end_customer_id"/>
                             <field name="cisco_am"/>
+                            <field name="con_per"/>
                             <field name="duration"/>
                             <field name="training_date_end"/>
                             <field name="price"/>

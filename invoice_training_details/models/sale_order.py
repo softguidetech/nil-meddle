@@ -47,8 +47,8 @@ class SaleOrder(models.Model):
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
-    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
-    book_details_id = fields.Many2many('ir.attachment', 'doc_attach_order', 'doc_id', 'attach_order_id', string="Booking Details", help='You can attach the copy of your document', copy=False)
+cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade'
+                              book_details_id = fields.Many2many('ir.attachment', 'doc_attach_order', 'doc_id', 'attach_order_id', string="Booking Details", help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     currency_total = fields.Float(string="Total in Currency", compute='_compute_cur_tot')

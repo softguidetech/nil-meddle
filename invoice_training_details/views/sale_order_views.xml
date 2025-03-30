@@ -58,7 +58,7 @@
 
     <page id="clcs" name="Costs Details">
         <group>
-<field name="cos_lead_id" invisible="1"/>  <!-- Ensure it’s properly used -->
+            <field name="cost_details_ids">
                 <tree editable="bottom">
                     <field name="learning_partner"/>
                     <field name="currency_id" width="10"/>

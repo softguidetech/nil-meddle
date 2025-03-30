@@ -85,6 +85,9 @@ class SaleOrder(models.Model):
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
     ctrng = fields.Float(string='Catering')  # Now it's manually editable
+    uber = fields.Float(string='Uber')
+    venue = fields.Float(string='Venue')
+
 
 
     # Logistics tab

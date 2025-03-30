@@ -41,6 +41,7 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
+    ins_time = fields.Float(string="Instructor")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
 
     # Add extra fields

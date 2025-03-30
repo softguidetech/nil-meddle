@@ -5,7 +5,6 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-#test
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.USD'))
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')
@@ -50,7 +49,8 @@ class Lead(models.Model):
     location = fields.Selection([('Online','Online'),('On site','On site')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koenig','Koenig'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    learnig_partner = fields.Selection([('Koenig','Koenig'),('Mira','Mira'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    con_per = fields.Char(string='Contact Person')
 
     # Extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')

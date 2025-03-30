@@ -10,19 +10,12 @@
                 <page id="training" name="Training">
                     <group>
                         <field name="training_name"/>
-                         <field name="training_vendor"/>
-                        <field name="training_type"/>
-                        <field name="instructor_id"/> 
                          <button name="synch_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
                             
                             <field name="training_id"/>
-                            <field name="descriptions"/>
-                            <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
@@ -74,33 +67,41 @@
                        
                     </group>
                 </page>
-                
+                </page>
+                <page id="clcs" name="Costs Details">
+                    <group>
+                        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
+                    </group>
+                    <field name="cost_details_ids">
+                        <tree editable="bottom">
+                            <field name="learning_partner"/>
+                            <field name="currency_id"/>
+                            <field name="training_vendor"/>
+                            <field name="total_price_all"/>
+                            <field name="clc_cost"/>
+                            <field name="ins_time"/>
+                            <field name="margin1"/>
+                            <field name="nilme_share"/>
+                            <field name="margin" widget="percentage" string="Margin (%)" colspan="3"/>
+                        </tree>
+                    </field>
+                </page>                
                 <page id="pro" name="Professional Services">
                     <group>
-                        <field name="service_name"/>
+                        <field name="ordering_partner_id"/>
                         <button name="synch_pro_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
                      <field name="pro_service_ids">
                         <tree editable="bottom">
-                            
                             <field name="training_id"/>
-                            <field name="descriptions"/>
-                          
-                          <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            
-                            <field name="wor_hour_number"/>
-                            <field name="train_language"/>
-                            <!--<field name="location"/>-->
-                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
-                            <!--<field name="payment_method"/>-->
-                            
-                            <!--<field name="name"/>-->
-                            <!--<field name="no_of_student"/>-->
+                            <field name="end_customer_id"/>
+                            <field name="cisco_am"/>
+                            <field name="con_per"/>
                             <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="hourly_rate"/>
+                            <field name="training_date_end"/>
                             <field name="price"/>
+                        </tree>
+                    </field>
                         </tree>
                     </field>
                     <group>
@@ -145,19 +146,18 @@
                     <group>
                         <group>
                             <field name="clcs_qty"/>
-                            <field name="so_no"/>
-                            <field name="tr_expiry_date"/>
+                            <field name="poref"/>
+                            <field name="invref"/>
                         </group>
                     </group>
                 </page>
 
                 <page id="logistics" string="Logistics">
                     <group>
-                        <group>
-                        </group>
-                    
-                        <!--<group string="Flights">-->
-                            <!--<group>-->
+                        <field name="ctrng"/>
+                        <field name="venue"/>
+                        <field name="uber"/>
+                    </group>
                             <field name="ticket_ids">
                             <tree editable="bottom">
                                 <field name="airline_id"/>

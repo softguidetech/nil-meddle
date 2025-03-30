@@ -84,7 +84,7 @@ class SaleOrder(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
-        ctrng = fields.Float(string='Catering')  # Add this to sale.order
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
 
 
     # Logistics tab

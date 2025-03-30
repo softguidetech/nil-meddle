@@ -142,8 +142,9 @@ class Lead(models.Model):
             'default_uber' : self.uber,
             'default_ctrng': self.ctrng,
             'default_ins_time': self.ins_time,
-            
-
+            # Add ticket and hotel details
+            'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
+            'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
         })
         return quotation_context
 

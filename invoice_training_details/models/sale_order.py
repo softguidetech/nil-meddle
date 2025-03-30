@@ -82,6 +82,8 @@ class SaleOrder(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
+    poref = fields.Char(string='PO Ref:')
+    invref = fields.Char(string='Invoice Ref:')
 
     # Logistics tab
     bank_details = fields.Html(string='Bank Details', default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')

@@ -5,7 +5,12 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.USD'))
+currency_id = fields.Many2one(
+        "res.currency", string="Currency", default=lambda self: self.env.ref("base.USD"), required=True
+    )
+    amount_usd = fields.Monetary(
+        string="Expected Revenue (USD)", currency_field="currency_id"
+    )
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')

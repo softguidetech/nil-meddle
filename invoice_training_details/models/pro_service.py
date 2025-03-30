@@ -34,6 +34,7 @@ class ProService(models.Model):
     default_item_code = fields.Char(related='training_id.default_code',string='Internal Ref')
     requester = fields.Char(string='Requester')
     end_customer = fields.Char(string='End Client')
+    con_per = fields.Char(string='Contact Person')
     cisco_am = fields.Char(string='Cisco Account Manager')
     cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="Cost Clc")
     hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")

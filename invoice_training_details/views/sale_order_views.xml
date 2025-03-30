@@ -60,13 +60,8 @@
                             <field name="display_due_amount"/>
                             <field name="display_where"/>
                             <field name="display_description"/>
-                            
-                            
                         </group>
-                        
-                       
                     </group>
-                </page>
                 </page>
                 <page id="clcs" name="Costs Details">
                     <group>

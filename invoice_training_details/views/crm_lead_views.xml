@@ -28,7 +28,8 @@
                             <field name="duration" width="5"/>
                             <field name="training_date_start" width="10"/>
                             <field name="training_date_end" width="10"/>
-                            <field name="price" width="10"/>
+                            <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+
                         </tree>
                     </field>
                     <group>

@@ -14,6 +14,11 @@ class SaleOrder(models.Model):
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_sale_id', string='Professional Services')
+    ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
+    con_per = fields.Char(string='Contact Person')
+    end_customer = fields.Char(string='End Client')
+    cisco_am = fields.Char(string='Cisco Account Manager')
+
 
     # Additional fields
     instructor_id = fields.Many2one('hr.employee', string="Instructor")

@@ -158,17 +158,16 @@ class SaleOrder(models.Model):
 
     # Action button example to trigger cost line creation
     def action_create_cost_line(self):
-    for lead in self:
-        self.env['cost.details'].create({
-            'cos_lead_id': lead.id,  # Ensure the correct lead ID is used
-            'name': 'New Cost Line',
-            'currency_id': lead.env.company.currency_id.id,
-            'training_vendor': 0.0,
-            'total_price_all': 0.0,
-            'clc_cost': 0.0,
-            'rate_card': 0.0,
-            'nilme_share': 0.0,
-            'learning_partner': lead.learning_partner,
-            'price': 0.0,
-        })
-
+        for lead in self:
+            self.env['cost.details'].create({
+                'cos_lead_id': lead.id,
+                'name': 'New Cost Line',
+                'currency_id': lead.env.company.currency_id.id,
+                'training_vendor': 0.0,
+                'total_price_all': 0.0,
+                'clc_cost': 0.0,
+                'rate_card': 0.0,
+                'nilme_share': 0.0,
+                'learning_partner': lead.learning_partner,
+                'price': 0.0,
+            })

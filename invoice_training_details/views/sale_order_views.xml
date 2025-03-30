@@ -57,6 +57,7 @@
     </page> <!-- Correctly closes the training page -->
 
     <page id="clcs" name="Costs Details">
+                <group>
                     <tree editable="bottom">
                     <field name="learning_partner"/>
                     <field name="currency_id" width="10"/>
@@ -67,6 +68,9 @@
                     <field name="nilme_share" width="10"/>
                     <field name="margin" widget="percentage"/>
                 </tree>
+                <group>
+                    </page>
+
 
     <page id="pro" name="Professional Services">
         <group>

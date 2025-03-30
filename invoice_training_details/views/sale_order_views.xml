@@ -57,9 +57,7 @@
     </page> <!-- Correctly closes the training page -->
 
     <page id="clcs" name="Costs Details">
-        <group>
-            <field name="cost_details_ids">
-                <tree editable="bottom">
+                    <tree editable="bottom">
                     <field name="learning_partner"/>
                     <field name="currency_id" width="10"/>
                     <field name="training_vendor" width="15"/>
@@ -69,9 +67,6 @@
                     <field name="nilme_share" width="10"/>
                     <field name="margin" widget="percentage"/>
                 </tree>
-            </field>
-        </group>
-    </page> <!-- Properly closes Costs Details page -->
 
     <page id="pro" name="Professional Services">
         <group>

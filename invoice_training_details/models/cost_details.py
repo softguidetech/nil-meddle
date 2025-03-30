@@ -71,6 +71,7 @@ def _prepare_opportunity_quotation_context(self):
         'default_margin1': self.margin1,
         'default_clc_cost': self.clc_cost,
         'default_rate_card': self.rate_card,
+        'default_margin': self.ins_time,
         'default_nilme_share': self.nilme_share,
         'default_learning_partner': self.learning_partner,
         'default_cost': self.cost,

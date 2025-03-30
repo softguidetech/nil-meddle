@@ -140,7 +140,7 @@ class SaleOrder(models.Model):
             'clcs_qty': self.clcs_qty,
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
-            'cost_details.cos_lead_id': self.cost_details.cos_lead_id,  # Add this line
+            'cos_lead_id': self.cos_lead_id.id if self.cos_lead_id else False,
 
 
             # 'descriptions': self.descriptions,

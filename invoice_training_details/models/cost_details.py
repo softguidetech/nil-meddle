@@ -10,7 +10,6 @@ class CostDetails(models.Model):
     price = fields.Float(string="Price")  # Make the price field optional
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
 
-    # ✅ These cost fields now belong only to cost.details
     training_vendor = fields.Float(string="Partner Share")  
     total_price_all = fields.Float(string="Logistics Cost", compute='_compute_total')  
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
@@ -37,7 +36,7 @@ class CostDetails(models.Model):
             venue = rec.cos_lead_id.venue if rec.cos_lead_id.venue else 0
             catering = rec.cos_lead_id.ctrng if rec.cos_lead_id.ctrng else 0
             uber = rec.cos_lead_id.uber if rec.cos_lead_id.uber else 0
-
+            ins_time = self.ins_time if self.ins_time else 0  
             total = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber + ins_time
             rec.total_price_all = total
             rec.cost = total  # Calculate the cost field

@@ -15,10 +15,11 @@ class CostDetails(models.Model):
     total_price_all = fields.Float(string="Logistics Cost", compute='_compute_total')  
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
     clc_cost = fields.Float(string="Training Cost")
-    rate_card = fields.Float(string="Partner Rate")  
+    rate_card = fields.Float(string="Partner Rate") 
+    ins_time = fields.Float(string="Instructor")
     nilme_share = fields.Float(string="NIL ME Share $", compute='_compute_nilme_share')
     learning_partner = fields.Selection([
-        ('Koeing', 'Koeing'),
+        ('Koenig', 'Koenig'),
         ('Mira', 'Mira'),
         ('NIL LTD', 'NIL LTD'),
         ('NIL SA', 'NIL SA')
@@ -37,7 +38,7 @@ class CostDetails(models.Model):
             catering = rec.cos_lead_id.ctrng if rec.cos_lead_id.ctrng else 0
             uber = rec.cos_lead_id.uber if rec.cos_lead_id.uber else 0
 
-            total = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
+            total = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber + ins_time
             rec.total_price_all = total
             rec.cost = total  # Calculate the cost field
 

@@ -140,6 +140,8 @@ class SaleOrder(models.Model):
             'clcs_qty': self.clcs_qty,
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
+            'cost_details.cos_lead_id': self.cost_details.cos_lead_id,  # Add this line
+
 
             # 'descriptions': self.descriptions,
             # 'ordering_partner_id': self.ordering_partner_id.id,

@@ -135,6 +135,7 @@ class Lead(models.Model):
             'default_invref': self.invref,
             'default_uber' : self.uber,
             'default_ctrng': self.ctrng,
+            'default_margin': self.ins_time,
             
 
         })

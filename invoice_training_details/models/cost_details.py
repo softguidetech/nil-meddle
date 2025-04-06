@@ -9,6 +9,8 @@ class CostDetails(models.Model):
     description = fields.Text(string="Description")
     price = fields.Float(string="Price")  # Make the price field optional
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
+    sale_order_id = fields.Many2one('sale.order', string="Sales Order")
+    account_move_id = fields.Many2one('account.move', string="Invoice")
 
     # ✅ These cost fields now belong only to cost.details
     training_vendor = fields.Float(string="Partner Share")  

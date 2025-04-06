@@ -58,7 +58,73 @@ class SaleOrder(models.Model):
     #adding cost 
 
     lead_cost = fields.Float(string="Lead Cost", readonly=True)
-
+    # Add these new fields
+    cost_details_ids = fields.One2many(
+        'cost.details', 
+        'sale_order_id', 
+        string="Cost Breakdown"
+    )
+    
+    total_cost = fields.Float(
+        string="Total Costs",
+        compute='_compute_total_cost',
+        store=True
+    )
+    
+    gross_margin = fields.Float(
+        string="Gross Margin",
+        compute='_compute_gross_margin',
+        store=True
+    )
+    
+    margin_percentage = fields.Float(
+        string="Margin %",
+        compute='_compute_margin_percentage',
+        store=True
+    )
+    
+    @api.depends('cost_details_ids.margin1')
+    def _compute_total_cost(self):
+        for order in self:
+            order.total_cost = sum(cost.margin1 for cost in order.cost_details_ids)
+    
+    @api.depends('amount_total', 'total_cost')
+    def _compute_gross_margin(self):
+        for order in self:
+            order.gross_margin = order.amount_total - order.total_cost
+    
+    @api.depends('gross_margin', 'amount_total')
+    def _compute_margin_percentage(self):
+        for order in self:
+            order.margin_percentage = (order.gross_margin / order.amount_total) * 100 if order.amount_total else 0
+    
+    @api.model
+    def create(self, vals):
+        order = super(SaleOrder, self).create(vals)
+        if order.opportunity_id:
+            # Copy cost details from lead to sales order
+            order._sync_cost_details_from_lead()
+        return order
+    
+    def write(self, vals):
+        res = super(SaleOrder, self).write(vals)
+        if 'opportunity_id' in vals:
+            # Update cost details when lead changes
+            self._sync_cost_details_from_lead()
+        return res
+    
+    def _sync_cost_details_from_lead(self):
+        for order in self:
+            if order.opportunity_id:
+                # Unlink existing cost details
+                order.cost_details_ids.unlink()
+                
+                # Create new cost details from lead
+                for cost in order.opportunity_id.cost_details_ids:
+                    cost.copy({
+                        'sale_order_id': order.id,
+                        'cos_lead_id': order.opportunity_id.id
+                    })
     @api.model
     def create(self, vals):
         # Get the lead and associate the cost when creating a sales order
@@ -131,36 +197,80 @@ class SaleOrder(models.Model):
                 
     def _prepare_invoice(self):
         vals = super()._prepare_invoice()
-        vals.update({
-            'training_name': self.training_name,
-            'half_advance_payment_before': self.half_advance_payment_before,
-            'half_payment_after': self.half_payment_after,
-            'training_course_ids': [(6, 0, self.training_course_ids.ids)],
-            'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-            'clcs_qty': self.clcs_qty,
-            'so_no': self.so_no,
-            'tr_expiry_date': self.tr_expiry_date,
-            'instructor_logistics': self.instructor_logistics,
-            'catering': self.catering,
-            # 'descriptions': self.descriptions,
-            # 'ordering_partner_id': self.ordering_partner_id.id,
-            # 'where_location': self.where_location,
-            
-            'instructor_id': self.instructor_id.id,
-            'training_id': self.training_id.id,
-            # 'train_language': self.train_language,
-            # 'location': self.location,
-            # 'payment_method': self.payment_method,
-            'clcs_qty': self.clcs_qty,
-            'service_name': self.service_name,
-            'bank_details': self.bank_details,
-            'term_and_cond': self.term_and_cond,
-            
-            'training_vendor': self.training_vendor,
-            'training_type': self.training_type,
-            
-        })
-        return vals
+    
+    # Prepare cost details for invoice
+    cost_details_vals = []
+    for cost in self.cost_details_ids:
+        cost_details_vals.append((0, 0, {
+            'name': cost.name,
+            'description': cost.description,
+            'price': cost.price,
+            'currency_id': cost.currency_id.id,
+            'training_vendor': cost.training_vendor,
+            'clc_cost': cost.clc_cost,
+            'rate_card': cost.rate_card,
+            'learning_partner': cost.learning_partner,
+            'margin1': cost.margin1,
+            'nilme_share': cost.nilme_share,
+            'margin': cost.margin,
+            'sale_order_id': self.id,
+            'cos_lead_id': cost.cos_lead_id.id,
+        }))
+    
+    # Update invoice values with all fields
+    vals.update({
+        # Training-related fields
+        'training_name': self.training_name,
+        'training_id': self.training_id.id,
+        'training_vendor': self.training_vendor,
+        'training_type': self.training_type,
+        'training_course_ids': [(6, 0, self.training_course_ids.ids)],
+        
+        # Payment-related fields
+        'half_advance_payment_before': self.half_advance_payment_before,
+        'half_payment_after': self.half_payment_after,
+        'payment_method': self.payment_method,
+        
+        # Service-related fields
+        'service_name': self.service_name,
+        'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
+        
+        # Logistics fields
+        'instructor_id': self.instructor_id.id,
+        'instructor_logistics': self.instructor_logistics,
+        'location': self.location,
+        'where_location': self.where_location,
+        'catering': self.catering,
+        
+        # Administrative fields
+        'clcs_qty': self.clcs_qty,
+        'so_no': self.so_no,
+        'tr_expiry_date': self.tr_expiry_date,
+        
+        # Financial details
+        'bank_details': self.bank_details,
+        'term_and_cond': self.term_and_cond,
+        
+        # Cost analysis fields
+        'cost_details_ids': cost_details_vals,
+        'total_cost': self.total_cost,
+        'gross_margin': self.gross_margin,
+        'margin_percentage': self.margin_percentage,
+        
+        # Display options
+        'display_training_table': self.display_training_table,
+        'display_signature': self.display_signature,
+        'display_stamp': self.display_stamp,
+        'display_ksa_qr': self.display_ksa_qr,
+        'display_instructor': self.display_instructor,
+        'display_location': self.display_location,
+        'display_downpayment': self.display_downpayment,
+        'display_total': self.display_total,
+        'display_due_amount': self.display_due_amount,
+        'display_where': self.display_where,
+        'display_description': self.display_description,
+    })
+    return vals
         
     # ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
 

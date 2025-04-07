@@ -146,7 +146,6 @@ class Lead(models.Model):
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_poref': self.poref,
             'default_invref': self.invref,
-            'default_end_customer': self.end_customer,
             'default_cisco_am': self.cisco_am,
             'default_learnig_partner': self.learnig_partner,
             'default_con_per': self.con_per,

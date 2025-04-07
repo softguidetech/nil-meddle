@@ -51,6 +51,7 @@ class SaleOrder(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     currency_total = fields.Float(string="Total in Currency",compute='_compute_cur_tot')
+
     
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")

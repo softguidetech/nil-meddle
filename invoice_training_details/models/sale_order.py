@@ -44,6 +44,7 @@ class SaleOrder(models.Model):
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
+    duration = fields.Char(string="Duration")
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_order', 'doc_id', 'attach_order_id',
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)

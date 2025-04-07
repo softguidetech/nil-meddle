@@ -18,7 +18,6 @@ class SaleOrder(models.Model):
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
-    # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
@@ -81,14 +80,26 @@ class SaleOrder(models.Model):
             else:
                 rec.total_price_all = 0
     
-    # extra information tab
-    clcs_qty = fields.Float(string='CLCs Qty')
+    # Extra information tab
+    clcs_qty = fields.Float(string='Customer CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
+    poref = fields.Char(string='PO Ref:')
+    invref = fields.Char(string='Invoice Ref:')
+    end_customer = fields.Char(string='End Client')
+    cisco_am = fields.Char(string='Cisco Account Manager')
+    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
+    learnig_partner = fields.Selection([('Koenig','Koenig'),('Mira','Mira'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    con_per = fields.Char(string='Contact Person')
+    ins_time = fields.Float(string="Instructor")
+    margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
+    venue = fields.Float(string='Venue')
 
-    # logistics tab
+
+    # Logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    uber = fields.Float(string='Uber')
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
     
     bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
     term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')

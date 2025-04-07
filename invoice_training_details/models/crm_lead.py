@@ -27,7 +27,7 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    end_customer = fields.Char(string='End Client')
+    end_customer_id = fields.Many2one('res.partner', string='End Customer')
     cisco_am = fields.Char(string='Cisco Account Manager')
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
@@ -152,6 +152,7 @@ class Lead(models.Model):
             'default_con_per': self.con_per,
             'default_ins_time': self.ins_time,
             'default_margin1': self.margin1,
+            'default_end_customer_id' : self.end_customer_id,
 
 
             # Add ticket and hotel details

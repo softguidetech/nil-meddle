@@ -80,27 +80,25 @@
                         <field name="service_name"/>
                         <button name="synch_pro_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
-                     <field name="pro_service_ids">
+                        <field name="ordering_partner_id"/>
                         <tree editable="bottom">
                             
                             <field name="training_id"/>
                             <field name="descriptions"/>
                           
-                          <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            
-                            <field name="wor_hour_number"/>
-                            <field name="train_language"/>
+                          <field name="training_id"/>
+                            <field name="end_customer_id"/>
+                            <field name="cisco_am"/>
+                            <field name="con_per"/>
+                            <field name="duration"/>
+                            <field name="training_date_end"/>
+                            <field name="price"/>
                             <!--<field name="location"/>-->
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
                             <!--<field name="payment_method"/>-->
                             
                             <!--<field name="name"/>-->
                             <!--<field name="no_of_student"/>-->
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="hourly_rate"/>
-                            <field name="price"/>
                         </tree>
                     </field>
                     <group>

@@ -27,7 +27,7 @@ class Lead(models.Model):
     half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
-    end_customer_id = fields.Many2one('res.partner', string='End Customer')
+    end_customer = fields.Char(string='End Client')
     cisco_am = fields.Char(string='Cisco Account Manager')
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
@@ -142,18 +142,6 @@ class Lead(models.Model):
             'default_uber' : self.uber,
             'default_ctrng': self.ctrng,
             'default_ins_time': self.ins_time,
-            'default_so_no': self.so_no,
-            'default_tr_expiry_date': self.tr_expiry_date,
-            'default_poref': self.poref,
-            'default_invref': self.invref,
-            'default_cisco_am': self.cisco_am,
-            'default_learnig_partner': self.learnig_partner,
-            'default_con_per': self.con_per,
-            'default_ins_time': self.ins_time,
-            'default_margin1': self.margin1,
-            'default_end_customer_id' : self.end_customer_id,
-
-
             # Add ticket and hotel details
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],

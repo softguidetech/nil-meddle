@@ -9,11 +9,11 @@ class SaleOrder(models.Model):
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
-    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
+    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
-    pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
+    pro_service_ids = fields.One2many('pro.service','pro_sale_id',string='Professional Services')
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -68,7 +68,7 @@ class SaleOrder(models.Model):
                 
     def _compute_total(self):
         ticket_total =0
-        hotel_toal=0
+        hotel_total=0
         cost = 0
         for rec in self:
             if rec.ticket_ids and rec.hotel_ids:
@@ -133,7 +133,7 @@ class SaleOrder(models.Model):
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
-            'catering': self.catering,
+            'ctrng': self.ctrng,
             # 'descriptions': self.descriptions,
             # 'ordering_partner_id': self.ordering_partner_id.id,
             # 'where_location': self.where_location,
@@ -143,7 +143,6 @@ class SaleOrder(models.Model):
             # 'train_language': self.train_language,
             # 'location': self.location,
             # 'payment_method': self.payment_method,
-            'clcs_qty': self.clcs_qty,
             'service_name': self.service_name,
             'bank_details': self.bank_details,
             'term_and_cond': self.term_and_cond,

@@ -86,7 +86,6 @@ class SaleOrder(models.Model):
     tr_expiry_date = fields.Date(string='Expiry Date')
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
-    end_customer = fields.Char(string='End Client')
     cisco_am = fields.Char(string='Cisco Account Manager')
     ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     learnig_partner = fields.Selection([('Koenig','Koenig'),('Mira','Mira'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
@@ -94,6 +93,8 @@ class SaleOrder(models.Model):
     ins_time = fields.Float(string="Instructor")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
     venue = fields.Float(string='Venue')
+    end_customer_id = fields.Many2one('res.partner', string='End Customer')
+
 
 
     # Logistics tab

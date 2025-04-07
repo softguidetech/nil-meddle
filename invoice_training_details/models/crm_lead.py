@@ -142,6 +142,17 @@ class Lead(models.Model):
             'default_uber' : self.uber,
             'default_ctrng': self.ctrng,
             'default_ins_time': self.ins_time,
+            'default_so_no': self.,
+            'default_tr_expiry_date': self.,
+            'default_poref': self.,
+            'default_invref': self.,
+            'default_end_customer': self.,
+            'default_cisco_am': self.,
+            'default_learnig_partner': self.,
+            'default_con_per': self.,
+            'default_ins_time': self.,
+            'default_margin1': self.,
+
             # Add ticket and hotel details
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],

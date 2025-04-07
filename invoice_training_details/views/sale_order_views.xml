@@ -10,20 +10,26 @@
                 <page id="training" name="Training">
                     <group>
                         <field name="training_name"/>
-                        <field name="training_vendor"/>
+                         <field name="training_vendor"/>
                         <field name="training_type"/>
-                        <field name="instructor_id"/>
-                        <button name="synch_order" string="Synch Order" class="oe_highlight" type="object"/>
+                        <field name="instructor_id"/> 
+                         <button name="synch_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
                     <field name="training_course_ids">
                         <tree editable="bottom">
+                            
                             <field name="training_id"/>
+                            <field name="descriptions"/>
                             <field name="cost_clc"/>
+                            <field name="hyperlink"/>
                             <field name="instructor_id"/>
                             <field name="train_language"/>
                             <field name="location"/>
+                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
                             <field name="where_location2"/>
                             <field name="payment_method"/>
+                            
+                            <!--<field name="name"/>-->
                             <field name="no_of_student"/>
                             <field name="duration"/>
                             <field name="training_date_start"/>
@@ -35,18 +41,25 @@
                         <group>
                             <field name="total_training_price"/>
                         </group>
+                        <!--<group>-->
+                        <!--    <field name="half_advance_payment_before"/>-->
+                        <!--    <field name="half_payment_after"/>-->
+                        <!--</group>-->
                         <group>
-                            <field name="bank_details"/>
-                            <field name="term_and_cond"/>
+                            <field name= "bank_details"/>
+                            <field name= "term_and_cond"/>
                         </group>
                     </group>
                     <group>
                         <group string="Report PDF Element Display">
+                            
                             <field name="display_training_table"/>
                             <field name="display_signature"/>
                             <field name="display_stamp"/>
+                          
                         </group>
                         <group string="Column Display">
+                           
                             <field name="display_instructor"/>
                             <field name="display_location"/>
                             <field name="display_downpayment"/>
@@ -54,38 +67,61 @@
                             <field name="display_due_amount"/>
                             <field name="display_where"/>
                             <field name="display_description"/>
+                            
+                            
                         </group>
+                        
+                       
                     </group>
                 </page>
-
+                
                 <page id="pro" name="Professional Services">
                     <group>
+                        <field name="service_name"/>
                         <button name="synch_pro_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
-
-                    <field name="ordering_partner_id"/>
-                    <tree editable="bottom">
-                        <field name="training_id"/>
-                        <field name="descriptions"/>
-                        <field name="training_id"/>
-                        <field name="end_customer_id"/>
-                        <field name="cisco_am"/>
-                        <field name="con_per"/>
-                        <field name="duration"/>
-                        <field name="training_date_end"/>
-                        <field name="price"/>
-                    </tree>
-
+                     <field name="pro_service_ids">
+                        <tree editable="bottom">
+                            
+                            <field name="training_id"/>
+                            <field name="descriptions"/>
+                          
+                          <field name="cost_clc"/>
+                            <field name="hyperlink"/>
+                            
+                            <field name="wor_hour_number"/>
+                            <field name="train_language"/>
+                            <!--<field name="location"/>-->
+                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
+                            <!--<field name="payment_method"/>-->
+                            
+                            <!--<field name="name"/>-->
+                            <!--<field name="no_of_student"/>-->
+                            <field name="duration"/>
+                            <field name="training_date_start"/>
+                            <field name="hourly_rate"/>
+                            <field name="price"/>
+                        </tree>
+                    </field>
                     <group>
-                        <field name="total_service_price"/>
+                        <group>
+                            <field name="total_service_price"/>
+                        </group>
+                        <!--<group>-->
+                        <!--    <field name="half_advance_payment_before"/>-->
+                        <!--    <field name="half_payment_after"/>-->
+                        <!--</group>-->
                     </group>
                     <group>
                         <group string="Report PDF Element Display">
+                            
                             <field name="display_training_table"/>
                             <field name="display_signature"/>
                             <field name="display_stamp"/>
+                          
                         </group>
                         <group string="Column Display">
+                           
                             <field name="display_instructor"/>
                             <field name="display_location"/>
                             <field name="display_downpayment"/>
@@ -93,11 +129,15 @@
                             <field name="display_due_amount"/>
                             <field name="display_where"/>
                             <field name="display_description"/>
+                            
+                            
                         </group>
                         <group>
-                            <field name="bank_details"/>
-                            <field name="term_and_cond"/>
+                            <field name= "bank_details"/>
+                            <field name= "term_and_cond"/>
                         </group>
+                        
+                       
                     </group>
                 </page>
 
@@ -117,7 +157,10 @@
                             <field name="instructor_logistics"/>
                             <field name="catering"/>
                         </group>
-                        <field name="ticket_ids">
+                    
+                        <!--<group string="Flights">-->
+                            <!--<group>-->
+                            <field name="ticket_ids">
                             <tree editable="bottom">
                                 <field name="airline_id"/>
                                 <field name="origin_id"/>
@@ -130,10 +173,15 @@
                                 <field name="class_type_id"/>
                                 <field name="currency_id"/>
                                 <field name="price"/>
+                            
                             </tree>
-                        </field>
-
-                        <field name="hotel_ids">
+                            </field>
+                            <!--</group>-->
+                        <!--</group>-->
+                        
+                        <!--<group string="Hotels">-->
+                            <!--<group>-->
+                            <field name="hotel_ids">
                             <tree editable="bottom">
                                 <field name="hotel_id"/>
                                 <field name="date_from"/>
@@ -147,21 +195,23 @@
                                 <field name="price_without_tax"/>
                                 <field name="tax"/>
                                 <field name="price"/>
+                               
                             </tree>
-                        </field>
-
-                        <group string="Visa Details">
-                            <field name="visa"/>
-                            <field name="start_date"/>
-                            <field name="to_date"/>
-                            <field name="book_details_id" widget="many2many_binary"/>
-                            <field name="details"/>
-                            <field name="cost"/>
-                        </group>
-
-                        <group>
-                            <field name="total_price_all"/>
-                        </group>
+                            </field>
+                            
+                           
+                            <group string="Visa Details">
+                                <field name="visa"/>
+                                <field name="start_date"/>
+                                <field name="to_date"/>
+                                <field name="book_details_id" widget="many2many_binary"/>
+                                <field name="details"/>
+                                <field name="cost"/>
+                                
+                            </group>
+                            <group>
+                                <field name="total_price_all"/>
+                            </group>
                     </group>
                 </page>
 

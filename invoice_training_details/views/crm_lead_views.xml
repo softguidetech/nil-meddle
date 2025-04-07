@@ -129,7 +129,7 @@
                         <field name="to_date"/>
                         <field name="book_details_id" widget="many2many_binary"/>
                         <field name="details"/>
-                        <field name="cost"/>
+<field name="cost" readonly="1"/>
                     </group>
                     <group>
                         <field name="total_price_all"/>

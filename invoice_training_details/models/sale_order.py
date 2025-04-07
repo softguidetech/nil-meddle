@@ -9,17 +9,16 @@ class SaleOrder(models.Model):
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
-    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
+    total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)
     half_advance_payment_before = fields.Monetary(string='Advance payment amount 50% (paid)')
     half_payment_after = fields.Monetary(string='50% Amount after Training Delivery (Not Yet Paid)')
     training_course_ids = fields.One2many('training.course', 'sale_id', string='Training Courses')
-    pro_service_ids = fields.One2many('pro.service','pro_sale_id',string='Professional Services')
-        training_date_end = fields.Date(string='Training End Date')
-
+    pro_service_ids = fields.One2many('pro.service','pro_sale_id',srting='Professional Services')
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
     descriptions = fields.Char(string='Description')
+    # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
     train_language = fields.Char(string='Training Language')
     location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
@@ -46,7 +45,6 @@ class SaleOrder(models.Model):
     visa = fields.Boolean(string="Visa")
     start_date = fields.Date(string="From Date")
     to_date = fields.Date(string="To Date")
-    duration = fields.Char(string="Duration")
     book_details_id = fields.Many2many('ir.attachment', 'doc_attach_order', 'doc_id', 'attach_order_id',
                                          string="Booking Details",
                                          help='You can attach the copy of your document', copy=False)
@@ -71,7 +69,7 @@ class SaleOrder(models.Model):
                 
     def _compute_total(self):
         ticket_total =0
-        hotel_total=0
+        hotel_toal=0
         cost = 0
         for rec in self:
             if rec.ticket_ids and rec.hotel_ids:
@@ -83,27 +81,14 @@ class SaleOrder(models.Model):
             else:
                 rec.total_price_all = 0
     
-    # Extra information tab
-    clcs_qty = fields.Float(string='Customer CLCs Qty')
+    # extra information tab
+    clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
-    poref = fields.Char(string='PO Ref:')
-    invref = fields.Char(string='Invoice Ref:')
-    cisco_am = fields.Char(string='Cisco Account Manager')
-    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
-    learnig_partner = fields.Selection([('Koenig','Koenig'),('Mira','Mira'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
-    con_per = fields.Char(string='Contact Person')
-    ins_time = fields.Float(string="Instructor")
-    margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
-    venue = fields.Float(string='Venue')
-    end_customer_id = fields.Many2one('res.partner', string='End Customer')
 
-
-
-    # Logistics tab
+    # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    uber = fields.Float(string='Uber')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
     
     bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
     term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
@@ -137,7 +122,7 @@ class SaleOrder(models.Model):
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
-            'ctrng': self.ctrng,
+            'catering': self.catering,
             # 'descriptions': self.descriptions,
             # 'ordering_partner_id': self.ordering_partner_id.id,
             # 'where_location': self.where_location,
@@ -147,6 +132,7 @@ class SaleOrder(models.Model):
             # 'train_language': self.train_language,
             # 'location': self.location,
             # 'payment_method': self.payment_method,
+            'clcs_qty': self.clcs_qty,
             'service_name': self.service_name,
             'bank_details': self.bank_details,
             'term_and_cond': self.term_and_cond,

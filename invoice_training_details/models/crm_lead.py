@@ -68,7 +68,6 @@ class Lead(models.Model):
     # Logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
 
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """

@@ -34,6 +34,8 @@ class AccountMove(models.Model):
     display_due_amount = fields.Boolean(string='Display Due Amount', help='display Due in training invoice PDF.')
     display_where = fields.Boolean(string="Display Where?")
     display_description = fields.Boolean(string="Display Description")
+        instructor_logistics = fields.Char(string="Instructor Logistics")
+
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

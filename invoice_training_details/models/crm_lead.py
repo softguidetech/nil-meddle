@@ -96,29 +96,7 @@ class Lead(models.Model):
             venue = rec.venue if rec.venue else 0
             uber = rec.uber if rec.uber else 0
 
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber@api.depends('ticket_ids', 'ticket_ids.price',
-             'hotel_ids', 'hotel_ids.price',
-             'cost_details_ids', 'cost_details_ids.price',
-             'instructor_logistics', 'venue', 'ctrng', 'uber')
-
-    @api.depends('ticket_ids', 'ticket_ids.price',
-             'hotel_ids', 'hotel_ids.price',
-             'cost_details_ids', 'cost_details_ids.price',
-             'instructor_logistics', 'venue', 'ctrng', 'uber')
-def _compute_total(self):
-    for rec in self:
-        ticket_total = sum(rec.ticket_ids.mapped('price'))
-        hotel_total = sum(rec.hotel_ids.mapped('price'))
-        cost_details_total = sum(rec.cost_details_ids.mapped('price'))
-
-        instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
-        venue = rec.venue or 0
-        uber = rec.uber or 0
-        ctrng = rec.ctrng or 0
-
-        rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber + ctrng
-
-
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -127,6 +105,14 @@ def _compute_total(self):
                 rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
             else:
                 rec.total_service_price = 0
+
+    @api.depends('training_course_ids.price')
+    def _compute_training_price(self):
+        for rec in self:
+            if rec.training_course_ids:
+                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+            else:
+                rec.total_training_price = 0
 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()
@@ -156,8 +142,6 @@ def _compute_total(self):
             'default_uber' : self.uber,
             'default_ctrng': self.ctrng,
             'default_ins_time': self.ins_time,
-            'default_end_customer' : self.end_customer,
-
             # Add ticket and hotel details
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
@@ -197,7 +181,7 @@ class TicketTicket(models.Model):
     _name = 'ticket.ticket'
     _description='Tickets'   
     
-ticket_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
+    ticket_lead_id = fields.Many2one('crm.lead',string="Lead")
     ticket_order_id = fields.Many2one('sale.order',string="Order")
     airline_id = fields.Many2one('airline.airline',string="Airlines")
     origin_id = fields.Many2one('loca.loca',string="Origin")

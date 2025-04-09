@@ -95,6 +95,7 @@ class Lead(models.Model):
             instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
             venue = rec.venue if rec.venue else 0
             uber = rec.uber if rec.uber else 0
+            ctrng = rec.ctrng if rec.ctrng else 0
 
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber + ctrng
 
@@ -140,7 +141,6 @@ class Lead(models.Model):
             'default_poref': self.poref,
             'default_invref': self.invref,
             'default_uber' : self.uber,
-            'default_ctrng': self.ctrng,
             'default_ins_time': self.ins_time,
             # Add ticket and hotel details
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],

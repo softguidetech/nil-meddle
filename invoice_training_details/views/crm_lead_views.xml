@@ -5,11 +5,6 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
-            <!-- Insert currency_id next to expected_revenue -->
-                <xpath expr="//field[@name='expected_revenue']" position="after">
-                    <field name="currency_id" readonly="1"/>
-                    <span><strong>USD</strong></span> <!-- Display USD next to expected_revenue -->
-                </xpath>
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
             </xpath>
@@ -33,7 +28,8 @@
                             <field name="duration" width="5"/>
                             <field name="training_date_start" width="10"/>
                             <field name="training_date_end" width="10"/>
-                            <field name="price" width="10"/>
+                            <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+
                         </tree>
                     </field>
                     <group>
@@ -43,35 +39,34 @@
                     </group>
                 </page>
                 <page id="clcs" name="Costs Details">
-    <group>
-        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
-    </group>
-    <field name="cost_details_ids">
-        <tree editable="bottom">
-             <field name="learning_partner"/>
-                <field name="currency_id"/>
-                <field name="training_vendor"/>
-                <field name="total_price_all"/>
-                <field name="clc_cost"/>
-                <field name="margin1"/>
-                <field name="nilme_share"/>
-                <field name="margin" widget="percentage" string="Margin (%)" colspan="3"/>
-            
-        </tree>
-    </field>
-</page>
-
-
+                    <group>
+                        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
+                    </group>
+                    <field name="cost_details_ids">
+                        <tree editable="bottom">
+                            <field name="learning_partner"/>
+                            <field name="currency_id"/>
+                            <field name="training_vendor"/>
+                            <field name="total_price_all"/>
+                            <field name="clc_cost"/>
+                            <field name="ins_time"/>
+                            <field name="margin1"/>
+                            <field name="nilme_share"/>
+                            <field name="margin" widget="percentage" string="Margin (%)" colspan="3"/>
+                        </tree>
+                    </field>
+                </page>
                 <page id="pro" name="Professional Services">
                     <group>
-                        <field name="requester"/>
-                        <field name="cisco_am"/>
-
+                        <field name="ordering_partner_id"/>
                     </group>
                     <field name="pro_service_ids">
                         <tree editable="bottom">
                             <field name="training_id"/>
-                            <field name="descriptions"/>
+                            <field name="end_customer_id"/>
+                            <field name="cisco_am"/>
+                            <field name="con_per"/>
+                            <field name="duration"/>
                             <field name="training_date_end"/>
                             <field name="price"/>
                         </tree>
@@ -86,8 +81,6 @@
                     <group>
                         <group>
                             <field name="clcs_qty"/>
-                            <field name="so_no"/>
-                            <field name="tr_expiry_date"/>
                             <field name="poref"/>
                             <field name="invref"/>
                         </group>
@@ -136,12 +129,20 @@
                         <field name="to_date"/>
                         <field name="book_details_id" widget="many2many_binary"/>
                         <field name="details"/>
-                        <field name="cost"/>
+<field name="cost" readonly="1"/>
                     </group>
                     <group>
                         <field name="total_price_all"/>
                     </group>
                 </page>
+            </xpath>
+            <!-- Modify Expected Revenue to display in USD -->
+            <xpath expr="//field[@name='expected_revenue']" position="attributes">
+                <attribute name="widget">monetary</attribute>
+                <attribute name="options">{'currency_field': 'currency_id'}</attribute>
+            </xpath>
+            <xpath expr="//field[@name='expected_revenue']" position="after">
+                <field name="currency_id" invisible="1"/>
             </xpath>
         </field>
     </record>

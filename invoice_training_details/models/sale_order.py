@@ -123,7 +123,7 @@ class SaleOrder(models.Model):
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
             'instructor_logistics': self.instructor_logistics,
-            'catering': self.catering,
+            'ctrng': self.ctrng,
             # 'descriptions': self.descriptions,
             # 'ordering_partner_id': self.ordering_partner_id.id,
             # 'where_location': self.where_location,

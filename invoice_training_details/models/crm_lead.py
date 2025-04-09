@@ -197,7 +197,7 @@ class TicketTicket(models.Model):
     _name = 'ticket.ticket'
     _description='Tickets'   
     
-    ticket_lead_id = fields.Many2one('crm.lead',string="Lead")
+ticket_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     ticket_order_id = fields.Many2one('sale.order',string="Order")
     airline_id = fields.Many2one('airline.airline',string="Airlines")
     origin_id = fields.Many2one('loca.loca',string="Origin")

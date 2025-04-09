@@ -96,7 +96,29 @@ class Lead(models.Model):
             venue = rec.venue if rec.venue else 0
             uber = rec.uber if rec.uber else 0
 
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber@api.depends('ticket_ids', 'ticket_ids.price',
+             'hotel_ids', 'hotel_ids.price',
+             'cost_details_ids', 'cost_details_ids.price',
+             'instructor_logistics', 'venue', 'ctrng', 'uber')
+
+    @api.depends('ticket_ids', 'ticket_ids.price',
+             'hotel_ids', 'hotel_ids.price',
+             'cost_details_ids', 'cost_details_ids.price',
+             'instructor_logistics', 'venue', 'ctrng', 'uber')
+def _compute_total(self):
+    for rec in self:
+        ticket_total = sum(rec.ticket_ids.mapped('price'))
+        hotel_total = sum(rec.hotel_ids.mapped('price'))
+        cost_details_total = sum(rec.cost_details_ids.mapped('price'))
+
+        instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+        venue = rec.venue or 0
+        uber = rec.uber or 0
+        ctrng = rec.ctrng or 0
+
+        rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber + ctrng
+
+
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -105,14 +127,6 @@ class Lead(models.Model):
                 rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
             else:
                 rec.total_service_price = 0
-
-    @api.depends('training_course_ids.price')
-    def _compute_training_price(self):
-        for rec in self:
-            if rec.training_course_ids:
-                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
-            else:
-                rec.total_training_price = 0
 
     def _prepare_opportunity_quotation_context(self):
         quotation_context = super()._prepare_opportunity_quotation_context()

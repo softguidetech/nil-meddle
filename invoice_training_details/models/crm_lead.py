@@ -95,8 +95,10 @@ class Lead(models.Model):
             instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
             venue = rec.venue if rec.venue else 0
             uber = rec.uber if rec.uber else 0
+            ctrng = rec.ctrng if rec.ctrng else 0
 
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber
+
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber + ctrng
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):

@@ -5,14 +5,13 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-    
-    # Override the currency_id field to set a default value of USD
+
     currency_id = fields.Many2one(
         'res.currency', 
         string='Currency', 
         default=lambda self: self.env.ref('base.USD')  # Automatically set to USD
     )
-    
+
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
@@ -38,7 +37,6 @@ class Lead(models.Model):
     ins_time = fields.Float(string="Instructor")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
 
-    # Add extra fields
     instructor_id = fields.Many2one('hr.employee', string="Instructor")
     descriptions = fields.Char(string='Description')
     ordering_partner_id = fields.Many2one('res.partner', string='Ordering Partner')
@@ -50,37 +48,20 @@ class Lead(models.Model):
     learnig_partner = fields.Selection([('Koenig', 'Koenig'), ('Mira', 'Mira'), ('NIL LTD', 'NIL LTD'), ('NIL SA', 'NIL SA')])
     con_per = fields.Char(string='Contact Person')
 
-    # Extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
     poref = fields.Char(string='PO Ref:')
     invref = fields.Char(string='Invoice Ref:')
 
-    # Logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
-
-    def action_create_cost_line(self):
-        """ Automatically create a new cost line when called """
-        for lead in self:
-            self.env['cost.details'].create({
-                'cos_lead_id': lead.id,
-                'name': 'New Cost Line',
-                'currency_id': lead.env.company.currency_id.id,
-                'training_vendor': 0.0,
-                'total_price_all': 0.0,
-                'clc_cost': 0.0,
-                'rate_card': 0.0,
-                'nilme_share': 0.0,
-                'learning_partner': lead.learnig_partner,  # Include the learning_partner field
-                'price': 0.0,  # Set a default value for the mandatory price field
-            })
+    ctrng = fields.Float(string='Catering')
 
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
         for rec in self:
+            # Calculate ticket, hotel, and cost details totals only once
             ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
             hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
             cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
@@ -89,12 +70,14 @@ class Lead(models.Model):
             uber = rec.uber if rec.uber else 0
             ctrng = rec.ctrng if rec.ctrng else 0
 
+            # Total logistics price is the sum of all the components
             rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber + ctrng
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
             if rec.pro_service_ids:
+                # Service price is based on professional services
                 rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
             else:
                 rec.total_service_price = 0
@@ -103,6 +86,7 @@ class Lead(models.Model):
     def _compute_training_price(self):
         for rec in self:
             if rec.training_course_ids:
+                # Training price is based on the training courses
                 rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
             else:
                 rec.total_training_price = 0
@@ -110,6 +94,7 @@ class Lead(models.Model):
     @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price')
     def _compute_margin1(self):
         for rec in self:
+            # The margin is calculated based on the difference between total logistics and the sum of training and service prices
             rec.margin1 = rec.total_price_all - (rec.total_training_price + rec.total_service_price)
 
     def _prepare_opportunity_quotation_context(self):
@@ -134,20 +119,17 @@ class Lead(models.Model):
             'default_uber': self.uber,
             'default_payment_method': self.payment_method,
             'default_clcs_qty': self.clcs_qty,
-            'default_cost_details_ids': [(6, 0, self.cost_details_ids.ids)],  # Pass related Cost Details
+            'default_cost_details_ids': [(6, 0, self.cost_details_ids.ids)],
             'default_poref': self.poref,
             'default_invref': self.invref,
             'default_uber': self.uber,
             'default_ctrng': self.ctrng,
             'default_ins_time': self.ins_time,
-            # Add ticket and hotel details
             'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
         })
         return quotation_context
 
-
-# Supporting models remain the same as in your original code (HotelHotel, TicketTicket, etc.)
 
 
 class HotelHotel(models.Model):

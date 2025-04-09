@@ -127,7 +127,6 @@ class Lead(models.Model):
             'default_so_no': self.so_no,
             'default_tr_expiry_date': self.tr_expiry_date,
             'default_instructor_logistics': self.instructor_logistics,
-            'default_ctrng': self.ctrng,
             'default_descriptions': self.descriptions,
             'default_ordering_partner': self.ordering_partner_id.id,
             'default_instructor_id': self.instructor_id.id,

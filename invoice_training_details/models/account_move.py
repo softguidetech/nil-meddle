@@ -51,7 +51,7 @@ class AccountMove(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
-        ctrng = fields.Float(string='Catering')  # Now it's manually editable
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
 
 
     # logistics tab

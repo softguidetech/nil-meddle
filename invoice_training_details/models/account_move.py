@@ -86,19 +86,23 @@ class AccountMove(models.Model):
             else:
                 rec.invoice_payment_am = 0
 
-    def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount):
+    def generate_ksa_qr_code(self, seller_name, vat_number, invoice_date, total_amount, vat_amount, invoice_number, qr_type='ZATCA'):
         def encode_tlv(tag, value):
             value_bytes = value.encode('utf-8')
             return bytes([tag, len(value_bytes)]) + value_bytes
 
+        # Update QR data to include the necessary fields for phase 2
         qr_data = (
-            encode_tlv(1, seller_name) +
-            encode_tlv(2, vat_number) +
-            encode_tlv(3, invoice_date) +
-            encode_tlv(4, str(total_amount)) +
-            encode_tlv(5, str(vat_amount))
+            encode_tlv(1, seller_name) +               # Seller name
+            encode_tlv(2, vat_number) +                # VAT number
+            encode_tlv(3, invoice_date) +             # Invoice date
+            encode_tlv(4, str(total_amount)) +        # Total amount
+            encode_tlv(5, str(vat_amount)) +          # VAT amount
+            encode_tlv(6, invoice_number) +           # Invoice number
+            encode_tlv(7, qr_type)                    # QR type (ZATCA)
         )
 
+        # Create the QR code
         qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L)
         qr.add_data(base64.b64encode(qr_data).decode('utf-8'))
         qr.make(fit=True)
@@ -113,14 +117,14 @@ class AccountMove(models.Model):
     @api.depends('partner_id', 'invoice_date', 'amount_total', 'amount_tax', 'company_id')
     def _compute_ksa_qr_code(self):
         for move in self:
-            # Check if the company is based in KSA, replace 'KSA' with the correct country name if needed
             if move.move_type in ['out_invoice', 'out_refund'] and move.company_id.country_id.name == 'Saudi Arabia':
                 move.ks_qr_code = self.generate_ksa_qr_code(
-                    move.company_id.name,
-                    move.company_id.vat,
-                    move.invoice_date.strftime('%Y-%m-%d %H:%M:%S') if move.invoice_date else '',
-                    move.amount_total,
-                    move.amount_tax
+                    move.company_id.name,  # Seller name
+                    move.company_id.vat,   # VAT number
+                    move.invoice_date.strftime('%Y-%m-%d %H:%M:%S') if move.invoice_date else '',  # Invoice date
+                    move.amount_total,     # Total amount
+                    move.amount_tax,       # VAT amount
+                    move.name               # Invoice number
                 )
             else:
                 move.ks_qr_code = False

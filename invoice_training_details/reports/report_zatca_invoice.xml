@@ -1,0 +1,10 @@
+<odoo>
+    <report 
+        id="action_zatca_invoice_report"
+        model="account.move"
+        string="ZATCA Invoice Report"
+        report_type="qweb-pdf"
+        name="nilmiddleeast.zatca_invoice_report"
+        file="nilmiddleeast.zatca_invoice_report"
+        attachment_use="True"/>
+</odoo>

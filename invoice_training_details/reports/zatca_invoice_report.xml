@@ -7,8 +7,8 @@
             string="ZATCA Invoice Report"
             model="account.move"
             report_type="qweb-pdf"
-            name="your_module.zatca_invoice"
-            file="your_module.zatca_invoice"
+            name="invoice_training_details.zatca_invoice"
+            file="invoice_training_details.zatca_invoice"
             attachment_use="False"/>
 
         <!-- القالب نفسه الذي يعرض الفاتورة -->

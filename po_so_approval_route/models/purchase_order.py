@@ -36,6 +36,13 @@ class PurchaseOrder(models.Model):
 
     amount_total = fields.Monetary(tracking=True)
 
+    # Training Details
+    training_details_ids = fields.One2many('purchase.training.details', 'purchase_order_id', string='Training Details')
+    has_training = fields.Boolean(compute='_compute_has_training', store=True)
+    total_training_cost = fields.Monetary(compute='_compute_total_training_cost', store=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', 
+                                 default=lambda self: self.env.company.currency_id)
+
     def _track_subtype(self, init_values):
         self.ensure_one()
         if 'amount_total' in init_values and self.amount_total != init_values.get('amount_total'):
@@ -199,4 +206,14 @@ class PurchaseOrder(models.Model):
                 reason = _('It is locked after generated approval route. ')
                 suggestion = _('To make changes, cancel and reset PO to draft. ')
                 raise UserError(msg + "\n\n" + reason + "\n\n" + suggestion)
+
+    @api.depends('training_details_ids')
+    def _compute_has_training(self):
+        for order in self:
+            order.has_training = bool(order.training_details_ids)
+
+    @api.depends('training_details_ids.training_cost')
+    def _compute_total_training_cost(self):
+        for order in self:
+            order.total_training_cost = sum(order.training_details_ids.mapped('training_cost'))
 

@@ -28,15 +28,15 @@
         "views/crm_lead_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
-        'views/report_zatca_invoice.xml',
+        "views/report_zatca_invoice.xml",  # Updated view file for ZATCA invoice
 
         # Reports
-        "reports/custom_invoice_layout.xml",
-        "reports/report_invoice.xml",
-        "reports/report_quotation.xml",
-        "reports/report_pro_invoice.xml",
-        "reports/report_pro_quotation.xml",
-        "reports/report_action.xml",
+        "reports/custom_invoice_layout.xml",  # Custom layout for invoice
+        "reports/report_invoice.xml",  # General invoice report
+        "reports/report_quotation.xml",  # Quotation report
+        "reports/report_pro_invoice.xml",  # Professional invoice report
+        "reports/report_pro_quotation.xml",  # Professional quotation report
+        "reports/report_action.xml",  # Custom action for reports
     ],
 
     # Installation Settings

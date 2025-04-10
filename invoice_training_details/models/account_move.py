@@ -11,6 +11,8 @@ class AccountMove(models.Model):
     _inherit = "account.move"
 
     training_name = fields.Char(string='Training Name')
+    # Adding a new field for the UUID
+    invoice_uuid = fields.Char(string="Invoice UUID", default=lambda self: str(uuid.uuid4()), readonly=True)
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Monetary(string='Total Training Price', compute="_compute_training_price", store=True)
     total_service_price = fields.Float(string='Total Servicr Price', compute="_compute_service_price", store=True)

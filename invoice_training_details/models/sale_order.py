@@ -214,14 +214,14 @@ class SaleOrder(models.Model):
                 'nilme_share': cost.nilme_share,
                 'margin': cost.margin,
                 'sale_order_id': self.id,
-                'cos_lead_id': cost.cos_lead_id.id,
+                'cos_lead_id': cost.cos_lead_id.id if cost.cos_lead_id else False,
             }))
     
         # Update invoice values with all fields
         vals.update({
             # Training-related fields
             'training_name': self.training_name,
-            'training_id': self.training_id.id,
+            'training_id': self.training_id.id if self.training_id else False,
             'training_vendor': self.training_vendor,
             'training_type': self.training_type,
             'training_course_ids': [(6, 0, self.training_course_ids.ids)],
@@ -236,7 +236,7 @@ class SaleOrder(models.Model):
             'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
             
             # Logistics fields
-            'instructor_id': self.instructor_id.id,
+            'instructor_id': self.instructor_id.id if self.instructor_id else False,
             'instructor_logistics': self.instructor_logistics,
             'location': self.location,
             'where_location': self.where_location,

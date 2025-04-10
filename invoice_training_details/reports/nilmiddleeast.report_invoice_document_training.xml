@@ -1,8 +1,8 @@
 from odoo import models, fields, api
 
 class InvoiceReport(models.AbstractModel):
-    _name = 'report.nilmiddleeast.report_invoice_document_training'
-    _description = 'Custom Invoice Report for Training'
+    _name = 'report.nilmiddleeast.zatca_invoice_report'
+    _description = 'ZATCA Invoice Report'
 
     @api.model
     def _get_report_values(self, docids, data=None):

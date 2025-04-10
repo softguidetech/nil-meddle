@@ -36,7 +36,6 @@
         "reports/report_pro_invoice.xml",  # Professional invoice report
         "reports/report_pro_quotation.xml",  # Professional quotation report
         "reports/report_action.xml",  # Custom action for reports
-        "reports/custom_zatca_invoice.xml", 
         "reports/zatca_invoice.xml", 
     ],
 

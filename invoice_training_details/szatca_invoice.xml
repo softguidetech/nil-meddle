@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+
+    <template id="report_invoice_document_training" name="Invoice Report Training">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-set="lang" t-value="o.partner_id.lang"/>
+                <t t-call="invoice_training_details.custom_invoice_report_layout">
+                    <t t-set="o" t-value="o.with_context(lang=lang)"/>
+                    <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
+                    <div class="row">
+                        <div class="col-12">
+                            <span class="h4 text-info">فاتورة ضريبية</span> <!-- Arabic for TAX INVOICE -->
+                        </div>
+                    </div>
+
+                    <div class="row pt-3 pb-3">
+                        <div class="col-8">
+                            <div>
+                                <strong t-if="o.partner_id.is_company == True">اسم الشركة:</strong><br/> <!-- Arabic for Company Name -->
+                                <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
+                                <strong t-if="o.partner_id.is_company == False">اسم الشركة:</strong><br/>
+                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
+                                <span>TAX#:</span> <strong t-field="o.partner_id.vat"/><br/>
+                                <strong t-if="o.partner_id.is_company == False">الاهتمام إلى:</strong><br/> <!-- Arabic for Attention -->
+                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div>
+                                <table class="table table-borderless">
+                                    <tr class="p-0">
+                                        <td class="p-0">رقم الفاتورة:</td> <!-- Arabic for INVOICE -->
+                                        <td class="p-0"><span t-field="o.name"/></td>
+                                    </tr>
+                                    <tr class="p-0">
+                                        <td class="p-0">التاريخ:</td> <!-- Arabic for Date -->
+                                        <td class="p-0"><span t-field="o.invoice_date"/></td>
+                                    </tr>
+                                    <tr class="p-0" t-if="o.invoice_payment_term_id">
+                                        <td class="p-0">شروط الدفع:</td> <!-- Arabic for Payment Terms -->
+                                        <td class="p-0"><span t-field="o.invoice_payment_term_id"/></td>
+                                    </tr>
+                                    <tr class="p-0">
+                                        <td class="p-0">تاريخ الاستحقاق:</td> <!-- Arabic for Due Date -->
+                                        <td class="p-0"><span t-field="o.invoice_date_due"/></td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <table class="table table-sm o_main_table table-borderless" name="invoice_line_table">
+                        <thead class="bg-light text-info">
+                            <tr>
+                                <th name="th_description" class="text-start"><span>الوصف</span></th> <!-- Arabic for DESCRIPTION -->
+                                <th name="th_quantity" class="text-end"><span>الكمية</span></th> <!-- Arabic for QTY -->
+                                <th name="th_rate" class="text-end"><span>السعر</span></th> <!-- Arabic for RATE -->
+                                <th name="th_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>الضرائب</span></th> <!-- Arabic for Taxes -->
+                                <th name="th_amount" class="text-end"><span>المبلغ القابل للضريبة</span></th> <!-- Arabic for Taxable Amount -->
+                                <th name="th_amount" class="text-end"><span>المجموع شامل الضريبة</span></th> <!-- Arabic for Total Tax.inc -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="o.invoice_line_ids" t-as="line">
+                                <tr>
+                                    <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>
+                                    <td class="text-end"><span t-field="line.quantity"/></td>
+                                    <td class="text-end"><span t-field="line.price_unit"/></td>
+                                    <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_ids])"/>
+                                    <td name="td_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
+                                        <span t-out="taxes" id="line_tax_ids">الضرائب</span> <!-- Arabic for Tax -->
+                                    </td>
+                                    <td class="text-end"><span t-field="line.price_subtotal"/></td>
+                                    <td class="text-end"><span t-field="line.price_total"/></td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div class="row pt-3 pb-2">
+                        <div class="col-12">
+                            تفاصيل الدورات التدريبية: <span t-field="o.training_name"/> <!-- Arabic for Training Courses Details -->
+                        </div>
+                    </div>
+
+                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
+                        <thead>
+                            <tr>
+                                <th name="th_item" style="text-align: center; vertical-align: middle;"><span>العنصر</span></th> <!-- Arabic for Item -->
+                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>اسم الدورة</span></th> <!-- Arabic for Training Name -->
+                                <th t-if="o.display_description" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>الوصف</span></th> <!-- Arabic for Description -->
+                                <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>اسم المدرب</span></th> <!-- Arabic for Instructor Name -->
+                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>اللغة</span></th> <!-- Arabic for Language -->
+                                <th name="th_of_students" style="text-align: center; vertical-align: middle;"><span>عدد الطلاب</span></th> <!-- Arabic for # Of Students -->
+                                <th t-if="o.display_location" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>الموقع</span></th> <!-- Arabic for Location -->
+                                <th t-if="o.display_where" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>أين؟</span></th> <!-- Arabic for Where? -->
+                                <th name="th_duration" style="text-align: center; vertical-align: middle;"><span>المدة</span></th> <!-- Arabic for Duration -->
+                                <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>تاريخ الدورة</span></th> <!-- Arabic for Training Dates -->
+                                <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>سعر الدورة</span></th> <!-- Arabic for Training Price -->
+                                <th t-if="o.display_total" name="th_training_date" style="max-width:80px;text-align: center; vertical-align: middle;"> <span>السعر الإجمالي</span></th> <!-- Arabic for Total Price -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="item" t-value="1"/>
+                            <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
+                            <t t-foreach="o.training_course_ids" t-as="training">
+                                <tr>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-esc="item"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_id"/></td>
+                                    <td t-if="o.display_description" style="text-align: center; vertical-align: middle;"><span t-field="training.descriptions"/></td>
+                                    <td t-if="o.display_instructor" style="text-align: center; vertical-align: middle;"><span t-field="training.instructor_id.name"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.no_of_student"/></td>
+                                    <td t-if="o.display_location" style="text-align: center; vertical-align: middle;"><span t-field="training.location"/></td>
+                                    <td t-if="o.display_where" style="text-align: center; vertical-align: middle;"><span t-field="training.where_location2"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.duration"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.price"/></td>
+                                    <t t-if="item == 1">
+                                        <td t-if="o.display_total" t-att-rowspan="total_rows" style="text-align: center; vertical-align: middle;"><span t-field="o.total_training_price"/></td>
+                                    </t>
+                                </tr>
+                                <t t-set="item" t-value="item + 1"/>
+                            </t>
+                        </tbody>
+                    </table>
+
+                    <div class="row pt-3 pb-2">
+                        <div class="col-12">
+                            <p>
+                            <span t-field="o.term_and_cond"/>
+                            </p>
+                        </div>
+                    </div>
+

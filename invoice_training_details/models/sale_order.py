@@ -152,17 +152,17 @@ class SaleOrder(models.Model):
             else:
                 rec.currency_total = 0
                 
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost')
     def _compute_total(self):
-        ticket_total =0
-        hotel_toal=0
-        cost = 0
         for rec in self:
+            ticket_total = 0
+            hotel_total = 0
             if rec.ticket_ids and rec.hotel_ids:
                 for ticket in rec.ticket_ids:
-                    ticket_total+=ticket.price
+                    ticket_total += ticket.price
                 for hotel in rec.hotel_ids:
-                    hotel_toal+=hotel.price
-                rec.total_price_all = ticket_total + hotel_toal + rec.cost
+                    hotel_total += hotel.price
+                rec.total_price_all = ticket_total + hotel_total + rec.cost
             else:
                 rec.total_price_all = 0
     
@@ -198,79 +198,79 @@ class SaleOrder(models.Model):
     def _prepare_invoice(self):
         vals = super()._prepare_invoice()
     
-    # Prepare cost details for invoice
-    cost_details_vals = []
-    for cost in self.cost_details_ids:
-        cost_details_vals.append((0, 0, {
-            'name': cost.name,
-            'description': cost.description,
-            'price': cost.price,
-            'currency_id': cost.currency_id.id,
-            'training_vendor': cost.training_vendor,
-            'clc_cost': cost.clc_cost,
-            'rate_card': cost.rate_card,
-            'learning_partner': cost.learning_partner,
-            'margin1': cost.margin1,
-            'nilme_share': cost.nilme_share,
-            'margin': cost.margin,
-            'sale_order_id': self.id,
-            'cos_lead_id': cost.cos_lead_id.id,
-        }))
+        # Prepare cost details for invoice
+        cost_details_vals = []
+        for cost in self.cost_details_ids:
+            cost_details_vals.append((0, 0, {
+                'name': cost.name,
+                'description': cost.description,
+                'price': cost.price,
+                'currency_id': cost.currency_id.id,
+                'training_vendor': cost.training_vendor,
+                'clc_cost': cost.clc_cost,
+                'rate_card': cost.rate_card,
+                'learning_partner': cost.learning_partner,
+                'margin1': cost.margin1,
+                'nilme_share': cost.nilme_share,
+                'margin': cost.margin,
+                'sale_order_id': self.id,
+                'cos_lead_id': cost.cos_lead_id.id,
+            }))
     
-    # Update invoice values with all fields
-    vals.update({
-        # Training-related fields
-        'training_name': self.training_name,
-        'training_id': self.training_id.id,
-        'training_vendor': self.training_vendor,
-        'training_type': self.training_type,
-        'training_course_ids': [(6, 0, self.training_course_ids.ids)],
-        
-        # Payment-related fields
-        'half_advance_payment_before': self.half_advance_payment_before,
-        'half_payment_after': self.half_payment_after,
-        'payment_method': self.payment_method,
-        
-        # Service-related fields
-        'service_name': self.service_name,
-        'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-        
-        # Logistics fields
-        'instructor_id': self.instructor_id.id,
-        'instructor_logistics': self.instructor_logistics,
-        'location': self.location,
-        'where_location': self.where_location,
-        'catering': self.catering,
-        
-        # Administrative fields
-        'clcs_qty': self.clcs_qty,
-        'so_no': self.so_no,
-        'tr_expiry_date': self.tr_expiry_date,
-        
-        # Financial details
-        'bank_details': self.bank_details,
-        'term_and_cond': self.term_and_cond,
-        
-        # Cost analysis fields
-        'cost_details_ids': cost_details_vals,
-        'total_cost': self.total_cost,
-        'gross_margin': self.gross_margin,
-        'margin_percentage': self.margin_percentage,
-        
-        # Display options
-        'display_training_table': self.display_training_table,
-        'display_signature': self.display_signature,
-        'display_stamp': self.display_stamp,
-        'display_ksa_qr': self.display_ksa_qr,
-        'display_instructor': self.display_instructor,
-        'display_location': self.display_location,
-        'display_downpayment': self.display_downpayment,
-        'display_total': self.display_total,
-        'display_due_amount': self.display_due_amount,
-        'display_where': self.display_where,
-        'display_description': self.display_description,
-    })
-    return vals
+        # Update invoice values with all fields
+        vals.update({
+            # Training-related fields
+            'training_name': self.training_name,
+            'training_id': self.training_id.id,
+            'training_vendor': self.training_vendor,
+            'training_type': self.training_type,
+            'training_course_ids': [(6, 0, self.training_course_ids.ids)],
+            
+            # Payment-related fields
+            'half_advance_payment_before': self.half_advance_payment_before,
+            'half_payment_after': self.half_payment_after,
+            'payment_method': self.payment_method,
+            
+            # Service-related fields
+            'service_name': self.service_name,
+            'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
+            
+            # Logistics fields
+            'instructor_id': self.instructor_id.id,
+            'instructor_logistics': self.instructor_logistics,
+            'location': self.location,
+            'where_location': self.where_location,
+            'catering': self.catering,
+            
+            # Administrative fields
+            'clcs_qty': self.clcs_qty,
+            'so_no': self.so_no,
+            'tr_expiry_date': self.tr_expiry_date,
+            
+            # Financial details
+            'bank_details': self.bank_details,
+            'term_and_cond': self.term_and_cond,
+            
+            # Cost analysis fields
+            'cost_details_ids': cost_details_vals,
+            'total_cost': self.total_cost,
+            'gross_margin': self.gross_margin,
+            'margin_percentage': self.margin_percentage,
+            
+            # Display options
+            'display_training_table': self.display_training_table,
+            'display_signature': self.display_signature,
+            'display_stamp': self.display_stamp,
+            'display_ksa_qr': self.display_ksa_qr,
+            'display_instructor': self.display_instructor,
+            'display_location': self.display_location,
+            'display_downpayment': self.display_downpayment,
+            'display_total': self.display_total,
+            'display_due_amount': self.display_due_amount,
+            'display_where': self.display_where,
+            'display_description': self.display_description,
+        })
+        return vals
         
     # ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
 

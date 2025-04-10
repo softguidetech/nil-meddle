@@ -19,12 +19,14 @@
                     <t t-call="invoice_training_details.custom_invoice_report_layout">
                         <t t-set="o" t-value="o.with_context(lang=lang)"/>
                         <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
+                        
                         <div class="row">
                             <div class="col-12">
                                 <span class="h4 text-info">TAX INVOICE / فاتورة ضريبية</span>
                             </div>
                         </div>
 
+                        <!-- تفاصيل الفاتورة -->
                         <div class="row pt-3 pb-3">
                             <div class="col-8">
                                 <strong t-if="o.partner_id.is_company == True">Company Name / اسم الشركة:</strong><br/>
@@ -59,6 +61,7 @@
                             </div>
                         </div>
 
+                        <!-- تفاصيل العناصر في الفاتورة -->
                         <table class="table table-sm o_main_table table-borderless" name="invoice_line_table">
                             <thead class="bg-light text-info">
                                 <tr>
@@ -87,7 +90,7 @@
                             </tbody>
                         </table>
 
-                        <!-- Course Details Table -->
+                        <!-- تفاصيل الدورة التدريبية -->
                         <div class="row pt-3 pb-2">
                             <div class="col-12">
                                 Training Courses Details: / تفاصيل الدورات التدريبية: <span t-field="o.training_name"/>
@@ -132,6 +135,14 @@
                                 </t>
                             </tbody>
                         </table>
+
+                        <!-- إضافة رمز QR -->
+                        <div class="row pt-4">
+                            <div class="col-12 text-center">
+                                <img t-att-src="'/report/qr_code?value=' + o.name" style="width:120px; height:120px;"/>
+                            </div>
+                        </div>
+
                     </t>
                 </t>
             </t>

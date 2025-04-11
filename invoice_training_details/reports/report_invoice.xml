@@ -100,7 +100,6 @@
                                         <td class="p-0">Due Date</td>
                                         <td class="p-0"><span t-field="o.invoice_date_due"/></td>
                                     </tr>
-                                   
                                 </table>
                             </div>
                         </div>
@@ -124,9 +123,9 @@
                                     <td class="text-end"><span t-field="line.quantity"/></td>
                                     <td class="text-end"><span t-field="line.price_unit"/></td>
                                     <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_ids])"/>
-                                            <td name="td_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
-                                                <span t-out="taxes" id="line_tax_ids">Tax</span>
-                                            </td>
+                                    <td name="td_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
+                                        <span t-out="taxes" id="line_tax_ids">Tax</span>
+                                    </td>
                                     <td class="text-end"><span t-field="line.price_subtotal"/></td>
                                     <td class="text-end"><span t-field="line.price_total"/></td>
                                 </tr>
@@ -156,8 +155,6 @@
                                 <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>Training Price</span></th>
 
                                 <th t-if="o.display_total" name="th_training_date" style="max-width:80px;text-align: center; vertical-align: middle;"> <span>Total Price</span></th>
-                                <!--<th t-if="o.display_downpayment" name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>-->
-                                <!--<th t-if="o.display_due_amount" name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -172,12 +169,12 @@
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.no_of_student"/></td>
                                     <td t-if="o.display_location" style="text-align: center; vertical-align: middle;"><span t-field="training.location"/></td>
-                                    <td t-if="o.display_where" style="text-align: center; vertical-align: middle;"><span t-field="training.where_location2"/></td>
+                                    <td t-if="o.display_where" style="text-align: center; vertical-align: middle;"><span t-field="training.where"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.duration"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.price"/></td>
-                                    <t t-if="item == 1">
-                                        <td t-if="o.display_total" t-att-rowspan="total_rows" style="text-align: center; vertical-align: middle;"><span t-field="o.total_training_price"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_date"/></td>
+                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_price"/></td>
+
+                                    <td t-if="o.display_total" style="text-align: center; vertical-align: middle;">
                                     </t>
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>

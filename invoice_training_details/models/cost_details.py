@@ -37,7 +37,7 @@ class CostDetails(models.Model):
             catering = rec.cos_lead_id.ctrng if rec.cos_lead_id.ctrng else 0
             uber = rec.cos_lead_id.uber if rec.cos_lead_id.uber else 0
             ins_time = self.ins_time if self.ins_time else 0  
-            total = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber + ins_time
+            total = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber
             rec.total_price_all = total
             rec.cost = total  # Calculate the cost field
 

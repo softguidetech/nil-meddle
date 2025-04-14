@@ -44,7 +44,7 @@ class CostDetails(models.Model):
     @api.depends('training_vendor', 'total_price_all', 'clc_cost')
     def _compute_margin1(self):
         for record in self:
-            record.margin1 = (record.training_vendor or 0) + (record.total_price_all or 0) + (record.clc_cost or 0)
+            record.margin1 = (record.training_vendor or 0) + (record.total_price_all or 0) + (record.ins_time or 0)
 
     @api.depends('margin1', 'cos_lead_id.total_training_price')
     def _compute_nilme_share(self):

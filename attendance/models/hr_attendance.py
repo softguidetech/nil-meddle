@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 class Attendance(models.Model):
     _inherit = 'hr.attendance'
 
-    grace_period_minutes = fields.Integer(string='Grace Period (Minutes)', default=15)
+    grace_period_minutes = fields.Integer(string="Grace Period (Minutes)")
     late_minutes = fields.Integer(string='Late Minutes', compute='_compute_late_minutes', store=True)
 
     @api.depends('check_in', 'grace_period_minutes')

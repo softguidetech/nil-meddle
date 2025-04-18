@@ -1,0 +1,67 @@
+# Translation of Odoo Server.
+# This file contains the translation of the following modules:
+# 	* bhs_attendance_auto_checkout
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Odoo Server 16.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2023-11-16 08:50+0000\n"
+"PO-Revision-Date: 2023-11-16 08:50+0000\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: bhs_attendance_auto_checkout
+#: model_terms:ir.ui.view,arch_db:bhs_attendance_auto_checkout.res_config_settings_view_form
+msgid "08:00:00"
+msgstr ""
+
+#. module: bhs_attendance_auto_checkout
+#: model_terms:ir.ui.view,arch_db:bhs_attendance_auto_checkout.res_config_settings_view_form
+msgid "18:00:00"
+msgstr ""
+
+#. module: bhs_attendance_auto_checkout
+#: model_terms:ir.ui.view,arch_db:bhs_attendance_auto_checkout.res_config_settings_view_form
+msgid "<span class=\"o_form_label\">Set default time check out</span>"
+msgstr "<span class=\"o_form_label\">Cài đặt giờ tự động checkout</span>"
+
+#. module: bhs_attendance_auto_checkout
+#: model_terms:ir.ui.view,arch_db:bhs_attendance_auto_checkout.res_config_settings_view_form
+msgid "<span class=\"o_form_label\">Set default working from</span>"
+msgstr "<span class=\"o_form_label\">Cài đặt giờ bắt đầu vào làm</span>"
+
+#. module: bhs_attendance_auto_checkout
+#: model:ir.model,name:bhs_attendance_auto_checkout.model_hr_attendance
+msgid "Attendance"
+msgstr "Chấm công"
+
+#. module: bhs_attendance_auto_checkout
+#: model_terms:ir.ui.view,arch_db:bhs_attendance_auto_checkout.res_config_settings_view_form
+msgid "Auto Checkout Configuration"
+msgstr "Cấu hình tự động checkout"
+
+#. module: bhs_attendance_auto_checkout
+#: model:ir.actions.server,name:bhs_attendance_auto_checkout.ir_cron_data_checkout_ir_actions_server
+#: model:ir.cron,cron_name:bhs_attendance_auto_checkout.ir_cron_data_checkout
+msgid "BHS HR Attendance: Auto Checkout"
+msgstr ""
+
+#. module: bhs_attendance_auto_checkout
+#: model:ir.model,name:bhs_attendance_auto_checkout.model_res_config_settings
+msgid "Config Settings"
+msgstr "Cấu hình"
+
+#. module: bhs_attendance_auto_checkout
+#: model:ir.model.fields,field_description:bhs_attendance_auto_checkout.field_res_config_settings__hr_attendance_end_time
+msgid "End Time"
+msgstr "Giờ kết thúc"
+
+#. module: bhs_attendance_auto_checkout
+#: model:ir.model.fields,field_description:bhs_attendance_auto_checkout.field_res_config_settings__hr_attendance_start_time
+msgid "Start Time"
+msgstr "Giờ bắt đầu"

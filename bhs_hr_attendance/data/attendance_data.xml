@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="bhs_ir_cron_data_checkout_17h30" model="ir.cron">
+            <field name="name">HR Attendance: Auto Checkout 17:30</field>
+            <field name="model_id" ref="model_hr_attendance"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_checkout_by_working_time(17.50)</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="DateTime.now().replace(hour=10, minute=30)"/>
+        </record>
+
+        <record id="bhs_ir_cron_data_checkout_18h00" model="ir.cron">
+            <field name="name">HR Attendance: Auto Checkout 18:00</field>
+            <field name="model_id" ref="model_hr_attendance"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_checkout_by_working_time(18.00)</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="DateTime.now().replace(hour=11, minute=00)"/>
+        </record>
+
+        <!--Check out all employee before work day (at 6AM)-->
+        <record id="bhs_ir_cron_data_checkout_6h" model="ir.cron">
+            <field name="name">HR Attendance: Auto Checkout 06:00</field>
+            <field name="model_id" ref="model_hr_attendance"/>
+            <field name="state">code</field>
+            <field name="code">model.auto_checkout()</field>
+            <field name="interval_number">1</field>
+            <field name="interval_type">days</field>
+            <field name="numbercall">-1</field>
+            <field name="nextcall" eval="DateTime.now().replace(hour=23, minute=0)"/>
+        </record>
+
+    </data>
+</odoo>

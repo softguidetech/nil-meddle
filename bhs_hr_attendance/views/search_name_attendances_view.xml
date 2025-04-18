@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<odoo>
+
+    <record id="hr_attendance_view_filter_inherit" model="ir.ui.view">
+        <field name="name">hr_attendance_view_filter.inherit</field>
+        <field name="model">hr.attendance</field>
+        <field name="inherit_id" ref="hr_attendance.hr_attendance_view_filter"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='employee_id']" position="attributes">
+                <attribute name="filter_domain">['|', ('employee_id.name', 'ilike', self), ('employee_id.work_email', 'ilike', self)]</attribute>
+            </xpath>
+
+            <xpath expr="//field[@name='department_id']" position="after">
+                <filter name="filter_active_employee" string ="Active employee" domain="[('employee_id.active','=', True)]"/>
+            </xpath>
+
+        </field>
+    </record>
+
+    <record id="hr_attendance.hr_attendance_action" model="ir.actions.act_window">
+        <field name="context">{'search_default_filter_active_employee': 1}</field>
+    </record>
+
+</odoo>

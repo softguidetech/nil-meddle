@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<templates xml:space="preserve">
+
+<t t-name="bhs_hr_attendance.attendance_menu">
+    <t t-if="this.state.isDisplayed">
+        <Dropdown position="'bottom-end'" beforeOpen.bind="searchReadEmployee" menuClass="`p-2 pb-3`">
+            <t t-set-slot="toggler">
+                <i class="fa fa-circle" t-attf-class="text-{{ this.state.checkedIn ? 'success' : 'danger' }}" role="img" aria-label="Attendance"/>
+            </t>
+            <t t-set-slot="default">
+                <div class="o_att_menu_container d-flex flex-column gap-3">
+                    <div class="d-flex flex-column gap-3">
+                        <div t-if="this.state.checkedIn" class="d-flex flex-wrap gap-3">
+                            <div t-if="!this.isFirstAttendance" class="att_container flex-grow-1 flex-shrink-0">
+                                <small class="d-block text-muted">Before <t t-esc="this.lastCheckIn"/></small>
+                                <div t-esc="this.hoursPreviouslyToday" class="fs-3 text-info text-end"/>
+                            </div>
+                            <div class="att_container flex-grow-1 flex-shrink-0">
+                                <small class="d-block text-muted">Since <t t-esc="this.lastCheckIn"/></small>
+                                <div t-esc="this.lastAttendanceWorkedHours" t-attf-class="fs-3 text-info {{ !this.isFirstAttendance ? 'text-end' : '' }}"/>
+                            </div>
+                        </div>
+                        <h6 class="text-muted" t-if="this.isLate and this.state.checkedIn">
+                            You checked in late <span class="text-danger" t-esc="this.lateMinutes"/><span class="text-danger"> minutes</span>
+                            <br/>
+                            You need to work until <span class="text-danger" t-esc="this.workingTo"/>
+                        </h6>
+                        <div t-if="!this.isFirstAttendance"
+                            class="att_container d-flex flex-column"
+                            t-att-class="this.state.checkedIn ? 'p-3 bg-100 rounded' : ''">
+                            <div class="d-flex" t-att-class="this.state.checkedIn ? 'align-items-center justify-content-between' : 'flex-column'">
+                                <small class="text-muted">Total today</small>
+                                <h2 t-esc="this.hoursToday" class="mb-0 fs-2"/>
+                            </div>
+<!--                        Check in -->
+                            <t t-if="!this.state.checkedIn">
+                                <t t-foreach="this.locations" t-as="loc" t-key="loc">
+                                    <button t-on-click="() => this.signInOut(loc.id)"
+                                            class="flex-basis-100 mt-3 checkinButton" style="text-align:left"
+                                            t-attf-class="btn btn-{{ loc.main_location ? 'success' : 'secondary' }}">
+                                        <img style="height:30px; margin-right:20px;"
+                                             t-attf-src="bhs_hr_attendance/static/description/{{loc.code}}.png"/>
+                                        <span>Check in at <t t-esc="loc.name"/>
+                                        </span>
+                                    </button>
+                                </t>
+                            </t>
+<!--                        Check out -->
+                            <t t-else="">
+                                <button t-on-click="() => this.onClickSignInOut()" class="flex-basis-100" t-attf-class="btn btn-warning">
+                                    <span>Check out</span>
+                                    <i t-attf-class="fa fa-sign-out ms-1"/>
+                                </button>
+                            </t>
+                        </div>
+                    </div>
+<!--                First attendance today-->
+                    <t t-if="this.isFirstAttendance">
+<!--                    Check in-->
+                        <t t-if="!this.state.checkedIn">
+                            <t t-foreach="this.locations" t-as="loc" t-key="loc">
+                                <button t-on-click="() => this.onClickSignInOut(loc.id)"
+                                        class="flex-basis-100 checkinButton" style="text-align:left"
+                                        t-attf-class="btn btn-{{ loc.main_location ? 'success' : 'secondary' }}">
+                                    <img style="height:30px; margin-right:20px"
+                                         t-attf-src="bhs_hr_attendance/static/description/{{loc.code}}.png"/>
+                                    <span>Check in at <t t-esc="loc.name"/></span>
+                                </button>
+                            </t>
+                        </t>
+<!--                    Check out-->
+                        <t t-else="">
+                            <button t-on-click="() => this.onClickSignInOut()" class="flex-basis-100" t-attf-class="btn btn-warning">
+                                <span>Check out</span>
+                                <i t-attf-class="fa fa-sign-out ms-1"/>
+                            </button>
+                        </t>
+                    </t>
+                </div>
+            </t>
+        </Dropdown>
+    </t>
+</t>
+
+</templates>

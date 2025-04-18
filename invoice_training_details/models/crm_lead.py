@@ -5,8 +5,12 @@ from odoo import fields, models, api
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
-#test
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.ref('base.USD'))
+    # Override the currency_id field to set a default value of USD
+    currency_id = fields.Many2one(
+        'res.currency', 
+        string='Currency', 
+        default=lambda self: self.env.ref('base.USD')  # Automatically set to USD
+    )
     training_name = fields.Char(string='Training Name')
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
@@ -37,6 +41,7 @@ class Lead(models.Model):
                                          help='You can attach the copy of your document', copy=False)
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
+    ins_time = fields.Float(string="Instructor")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
 
     # Add extra fields
@@ -50,7 +55,8 @@ class Lead(models.Model):
     location = fields.Selection([('Online','Online'),('On site','On site')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
     clcs_qty = fields.Float(string='CLCs Qty')
-    learnig_partner = fields.Selection([('Koenig','Koenig'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    learnig_partner = fields.Selection([('Koenig','Koenig'),('Mira','Mira'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    con_per = fields.Char(string='Contact Person')
 
     # Extra information tab
     clcs_qty = fields.Float(string='Customer CLCs Qty')
@@ -89,8 +95,9 @@ class Lead(models.Model):
             instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
             venue = rec.venue if rec.venue else 0
             uber = rec.uber if rec.uber else 0
+            ctrng = rec.ctrng if rec.ctrng else 0
 
-            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber + ctrng
 
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
@@ -134,9 +141,10 @@ class Lead(models.Model):
             'default_poref': self.poref,
             'default_invref': self.invref,
             'default_uber' : self.uber,
-            'default_ctrng': self.ctrng,
-            
-
+            'default_ins_time': self.ins_time,
+            # Add ticket and hotel details
+            'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
+            'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
         })
         return quotation_context
 
@@ -226,10 +234,6 @@ class ProductProduct(models.Model):
     
     cost_clc = fields.Char(string="CLCs Cost")
     hyperlink = fields.Char(string="Hyper Link")
-    
-    
-    
-    
     
     
     

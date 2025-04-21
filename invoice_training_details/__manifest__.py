@@ -15,7 +15,8 @@
     "depends": [
         "account", 
         "crm", 
-        "sale_management", 
+        "sale_management",
+        "puchase.order"
         "hr", 
         "product"
     ],
@@ -28,6 +29,7 @@
         "views/crm_lead_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
+        "views/po_views.xml",
 
         # Reports
         "reports/custom_invoice_layout.xml",  # Custom layout for invoice

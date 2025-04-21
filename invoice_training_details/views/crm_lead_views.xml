@@ -29,6 +29,7 @@
                             <field name="training_date_start" width="10"/>
                             <field name="training_date_end" width="10"/>
                             <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
+
                         </tree>
                     </field>
                     <group>
@@ -128,7 +129,7 @@
                         <field name="to_date"/>
                         <field name="book_details_id" widget="many2many_binary"/>
                         <field name="details"/>
-                        <field name="cost" readonly="1"/>
+                        <field name="cost"/>
                     </group>
                     <group>
                         <field name="total_price_all"/>

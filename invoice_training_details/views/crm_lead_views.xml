@@ -6,17 +6,17 @@
         <field name="inherit_id" ref="crm.crm_lead_view_form"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='tag_ids']" position="after">
-                <field name="instructor_id" groups="base.group_user"/>
+                <field name="instructor_id"/>
             </xpath>
             <xpath expr="//field[@name='partner_id']" position="after">
-                <field name="ordering_partner_id" groups="base.group_user"/>
+                <field name="ordering_partner_id"/>
             </xpath>
             <xpath expr="//page[@name='internal_notes']" position="before">
                 <page id="training" name="Training">
                     <group>
-                        <field name="training_name" groups="base.group_user"/>
+                        <field name="training_name"/>
                     </group>
-                    <field name="training_course_ids" groups="base.group_user">
+                    <field name="training_course_ids">
                         <tree editable="bottom">
                             <field name="training_id" width="15"/>
                             <field name="cost_clc" width="15"/>
@@ -33,15 +33,15 @@
                     </field>
                     <group>
                         <group>
-                            <field name="total_training_price" groups="base.group_user"/>
+                            <field name="total_training_price"/>
                         </group>
                     </group>
                 </page>
                 <page id="clcs" name="Costs Details">
                     <group>
-                        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight" groups="base.group_user"/>
+                        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
                     </group>
-                    <field name="cost_details_ids" groups="base.group_user">
+                    <field name="cost_details_ids">
                         <tree editable="bottom">
                             <field name="learning_partner"/>
                             <field name="currency_id"/>
@@ -57,9 +57,9 @@
                 </page>
                 <page id="pro" name="Professional Services">
                     <group>
-                        <field name="ordering_partner_id" groups="base.group_user"/>
+                        <field name="ordering_partner_id"/>
                     </group>
-                    <field name="pro_service_ids" groups="base.group_user">
+                    <field name="pro_service_ids">
                         <tree editable="bottom">
                             <field name="training_id"/>
                             <field name="end_customer_id"/>
@@ -72,26 +72,26 @@
                     </field>
                     <group>
                         <group>
-                            <field name="total_service_price" groups="base.group_user"/>
+                            <field name="total_service_price"/>
                         </group>
                     </group>
                 </page>
                 <page id="extra_information" string="Extra Information">
                     <group>
                         <group>
-                            <field name="clcs_qty" groups="base.group_user"/>
-                            <field name="poref" groups="base.group_user"/>
-                            <field name="invref" groups="base.group_user"/>
+                            <field name="clcs_qty"/>
+                            <field name="poref"/>
+                            <field name="invref"/>
                         </group>
                     </group>
                 </page>
                 <page id="logistics" string="Logistics">
                     <group>
-                        <field name="ctrng" groups="base.group_user"/>
-                        <field name="venue" groups="base.group_user"/>
-                        <field name="uber" groups="base.group_user"/>
+                        <field name="ctrng"/>
+                        <field name="venue"/>
+                        <field name="uber"/>
                     </group>
-                    <field name="ticket_ids" groups="base.group_user">
+                    <field name="ticket_ids">
                         <tree editable="bottom">
                             <field name="airline_id"/>
                             <field name="origin_id"/>
@@ -106,7 +106,7 @@
                             <field name="price"/>
                         </tree>
                     </field>
-                    <field name="hotel_ids" groups="base.group_user">
+                    <field name="hotel_ids">
                         <tree editable="bottom">
                             <field name="hotel_id"/>
                             <field name="date_from"/>
@@ -123,15 +123,15 @@
                         </tree>
                     </field>
                     <group string="Visa Details">
-                        <field name="visa" groups="base.group_user"/>
-                        <field name="start_date" groups="base.group_user"/>
-                        <field name="to_date" groups="base.group_user"/>
-                        <field name="book_details_id" widget="many2many_binary" groups="base.group_user"/>
-                        <field name="details" groups="base.group_user"/>
-                        <field name="cost" readonly="1" groups="base.group_user"/>
+                        <field name="visa"/>
+                        <field name="start_date"/>
+                        <field name="to_date"/>
+                        <field name="book_details_id" widget="many2many_binary"/>
+                        <field name="details"/>
+                        <field name="cost" readonly="1"/>
                     </group>
                     <group>
-                        <field name="total_price_all" groups="base.group_user"/>
+                        <field name="total_price_all"/>
                     </group>
                 </page>
             </xpath>

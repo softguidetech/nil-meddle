@@ -16,7 +16,7 @@
         "account", 
         "crm", 
         "sale_management",
-        "puchase_order"
+        "puchase_order",
         "hr", 
         "product"
     ],

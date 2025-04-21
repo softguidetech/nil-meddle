@@ -11,7 +11,7 @@ class Lead(models.Model):
         string='Currency', 
         default=lambda self: self.env.ref('base.USD')  # Automatically set to USD
     )
-    training_name = fields.Char(string='Training Name')
+    training_name = fields.Many2one("res.partner", string="Ordering Partner")
     venue = fields.Float(string='Venue')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)

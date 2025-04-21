@@ -7,4 +7,4 @@ from . import crm_lead
 from . import sale_order
 from . import res_company
 from . import cost_details
-
+from . import po_training

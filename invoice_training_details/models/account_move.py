@@ -34,8 +34,6 @@ class AccountMove(models.Model):
     display_due_amount = fields.Boolean(string='Display Due Amount', help='display Due in training invoice PDF.')
     display_where = fields.Boolean(string="Display Where?")
     display_description = fields.Boolean(string="Display Description")
-    instructor_logistics = fields.Char(string="Instructor Logistics")
-
     
     #Add extera
     instructor_id = fields.Many2one('hr.employee',string="Instructor")
@@ -51,10 +49,10 @@ class AccountMove(models.Model):
     clcs_qty = fields.Float(string='CLCs Qty')
     so_no = fields.Char(string='SO#')
     tr_expiry_date = fields.Date(string='Expiry Date')
-    ctrng = fields.Float(string='Catering')  # Now it's manually editable
-
 
     # logistics tab
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
 
     ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
     
@@ -137,8 +135,8 @@ class AccountMove(models.Model):
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
-            if rec.training_course_ids:
-                rec.total_service_price = sum(rec.training_course_ids.mapped('price'))
+            if rec.pro_service_ids:
+                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
             
             else:
                 rec.total_service_price = 0

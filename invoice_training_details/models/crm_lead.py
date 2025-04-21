@@ -43,6 +43,8 @@ class Lead(models.Model):
     cost = fields.Float(string="Cost")
     ins_time = fields.Float(string="Instructor")
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
+    nilme_share = fields.Float(string="NIL ME Share $", compute='_compute_nilme_share')
+
 
     # Add extra fields
     instructor_id = fields.Many2one('hr.employee',string="Instructor")

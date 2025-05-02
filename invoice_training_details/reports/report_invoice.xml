@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
-    <t name="Invoice Report Training" t-name="invoice_training_details.report_invoice_document_training">
+    <template id="Invoice Report Training" t-name="invoice_training_details.report_invoice_document_training">
             <t t-call="web.html_container">
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
@@ -319,6 +319,6 @@
             </t>
         </t>
         
-            </t>
+            <template>
 
 </odoo>

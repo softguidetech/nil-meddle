@@ -20,7 +20,6 @@
                         <tree editable="bottom">
                             <field name="training_id" width="15"/>
                             <field name="cost_clc" width="15"/>
-                            <field name="train_language" width="15"/>
                             <field name="location" width="15"/>
                             <field name="where_location2" width="15"/>
                             <field name="payment_method" width="10"/>

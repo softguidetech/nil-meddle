@@ -108,7 +108,6 @@
                     </table>
                     <div class="row pt-3 pb-2">
                         <div class="col-12">
-                            Training Courses Details: <span t-field="o.training_name"/>
                         </div>
                     </div>
 
@@ -159,22 +158,7 @@
                         </tbody>
                     </table>
                <div class="row pt-3 pb-2" style="page-break-inside:avoid; display: flex; justify-content: space-between; align-items: flex-start;">
-    <div class="col-auto" style="flex: 1 1 auto;">
-        <strong style="color: black;">Course Content:</strong>
-        <table class="table table-sm" style="background-color:#fff; color: white; width: auto; border: none;">
-            <tbody>
-                <t t-foreach="o.training_course_ids" t-as="training">
-                    <tr>
-                        <td style="color: white;">
-                            <a t-att-href="training.hyperlink" target="_blank" style="color: #0ecaf0;">
-                                <span t-field="training.training_id" style="color: black"/>
-                            </a>
-                        </td>
-                    </tr>
-                </t>
-            </tbody>
-        </table>
-                        </div>
+    
                         <div class="col-auto" style="min-width: 300px; flex: 0 0 auto; margin-left: auto; text-align: left; position: absolute; right: 20px;">
     <table class="table table-sm table-borderless" style="background-color:#fff; width: 300px; border-collapse: collapse;">
         <!-- Tax totals -->

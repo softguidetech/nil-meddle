@@ -117,7 +117,6 @@
                                 <th name="th_item" style="text-align: center; vertical-align: middle;"><span>Item</span></th>
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Description of Project</span></th>
                                 <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Instructor Name</span></th>
-                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Language</span></th>
                                 <th name="th_of_students" style="text-align: center; vertical-align: middle;"><span># Of Students</span></th>
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;">
                                 <span t-if="o.display_location">Location</span>
@@ -139,7 +138,6 @@
                                     <td style="text-align: center; vertical-align: middle;"><span t-esc="item"/></td>
                                     <td style="text-align: left; vertical-align: middle;"><span t-field="training.training_id"/></td>
                                     <td t-if="o.display_instructor" style="text-align: center; vertical-align: middle;"><span t-field="training.instructor_id.name"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.no_of_student"/></td>
                                     <td style="text-align: center; vertical-align: middle;">
                                     <span t-if="o.display_location" t-field="training.location"/>

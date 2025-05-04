@@ -13,7 +13,7 @@ class CostDetails(models.Model):
     training_vendor = fields.Float(string="Partner Share")  
     total_price_all = fields.Float(string="Logistics Cost", compute='_compute_total')  
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
-    clc_cost = fields.Float(string="Training Cost")
+    clc_cost = fields.Float(string="Kits & Labs")
     rate_card = fields.Float(string="Partner Rate") 
     ins_time = fields.Float(string="Instructor")
     nilme_share = fields.Float(string="NIL ME Share $", compute='_compute_nilme_share')

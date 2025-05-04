@@ -108,6 +108,7 @@
                     </table>
                     <div class="row pt-3 pb-2">
                         <div class="col-12">
+                            Training Courses Details: <span t-field="o.training_name"/>
                         </div>
                     </div>
 
@@ -159,8 +160,10 @@
                     </table>
                <div class="row pt-3 pb-2" style="page-break-inside:avoid; display: flex; justify-content: space-between; align-items: flex-start;">
     <div class="col-auto" style="flex: 1 1 auto;">
+        <table class="table table-sm" style="background-color:#fff; color: white; width: auto; border: none;">
             <tbody>
                     <tr>
+                        <td style="color: white;">
                             </a>
                         </td>
                     </tr>

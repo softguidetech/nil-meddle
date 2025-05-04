@@ -12,7 +12,7 @@
                     <div class="col-12">
                         <span class="h4 text-info">
                             <t t-if="o.tax_totals and o.tax_totals.get('subtotals')">TAX INVOICE</t>
-                            <t t-if="not (o.tax_totals and o.tax_totals.get('subtotals'))">INVOICE</t>
+                            <t t-if="not (o.tax_totals and o.tax_totals.get('subtotals'))">INmmmVOICE</t>
                         </span>
                     </div>
                 </div>

@@ -300,6 +300,12 @@
         <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
     </div>
 </div>
+                    
+<div class="footer">
+                        <p>Thank you for your business!</p>
+                        <p>Company Name | Address | Phone Number | Email</p>
+                    </div>
+
                 </t>
             </t>
         </t>

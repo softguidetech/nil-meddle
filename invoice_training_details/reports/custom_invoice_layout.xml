@@ -39,13 +39,11 @@
             </div>
         </div>
 
-        <xpath expr="//div[@t-attf-class='footer o_standard_footer o_company_#{company.id}_layout']" position="replace">
-            <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
-                <div class="text-center">
-                    <strong>Ruba</strong>
-                </div>
+        <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
+            <div class="text-center">
+                <strong>Ruba</strong>
             </div>
-        </xpath>
+        </div>
     </template>
 
 </odoo>

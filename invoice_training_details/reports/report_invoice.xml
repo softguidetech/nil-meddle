@@ -299,32 +299,16 @@
     <div class="col-4">
         <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
     </div>
-<t t-if="not o.get('is_copy')"/>
-    <div style="page-break-before: always;"></div>
-</t>
-<!-- Footer -->
-<div style="position: fixed; bottom: 0; width: 100%; text-align: center; padding: 10px;">
-    <table style="width: 100%; border-top: 1px solid #ddd; text-align: center;">
-        <tr>
-            <td style="font-size: 12px; padding-top: 10px;">
-                <strong>Company Name:</strong> <span t-field="o.company_id.name"/><br/>
-                <strong>Address:</strong> <span t-field="o.company_id.street"/> <span t-field="o.company_id.city"/>, <span t-field="o.company_id.country_id.name"/><br/>
-                <strong>Phone:</strong> <span t-field="o.company_id.phone"/><br/>
-                <strong>Email:</strong> <span t-field="o.company_id.email"/>
-            </td>
-        </tr>
-        <tr>
-            <td style="font-size: 10px; padding-top: 10px;">
-                <span>Thank you for your business!</span><br/>
-                <span>If you have any questions, please contact us.</span>
-            </td>
-        </tr>
-    </table>
-</div>
-
 </div>
                 </t>
             </t>
+                          <t t-call="web.external_layout_footer">
+    <div class="text-center" style="font-size: 10px; color: #888;">
+        <p>Your Company Name – Address – Phone – Email</p>
+        <p>Thank you for your business!</p>
+    </div>
+</t>
+
         </t>
                          </template>
 

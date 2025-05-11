@@ -114,11 +114,11 @@
                         </div>
                     </div>
 
-                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
+<table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table" style="font-size: 18px;">
                         <thead>
                             <tr>
                                 <th name="th_item" style="text-align: center; vertical-align: middle;"><span>Item</span></th>
-                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Description of Project</span></th>
+                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Description</span></th>
                                 <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Instructor Name</span></th>
                                 <th name="th_of_students" style="text-align: center; vertical-align: middle;"><span># Of Students</span></th>
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;">

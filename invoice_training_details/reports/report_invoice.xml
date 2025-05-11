@@ -271,13 +271,14 @@
 
                         
                     </div>
-                        <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
-                        <div class="col-8" style="width: 600px;">
-                            <p style="text-align: justify; margin: 0;">
-                                <span t-field="o.term_and_cond"/>
-                            </p>
-                        </div>
-                    </div>
+                       <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+    <div class="col-8" style="width: 600px;">
+        <p style="text-align: justify; margin: 0; font-size: 14px;">
+            <span t-field="o.term_and_cond"/>
+        </p>
+    </div>
+</div>
+
                     <br/>
 
                     <!--<div class="row" style="page-break-inside:avoid;">-->
@@ -292,7 +293,7 @@
 
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
     <div class="col-8" style="width: 600px;">
-        <p style="text-align: justify; margin: 0;">
+        <p style="text-align: justify; margin: 0;font-size: 14px;">
             <span t-field="o.bank_details"/>
         </p>
     </div>

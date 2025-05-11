@@ -13,7 +13,7 @@
                         <span class="h4 text-info">
 <div style="font-size: 30px; font-weight: bold;">
     <t t-if="o.tax_totals and o.tax_totals.get('subtotals')">TAX INVOICE</t>
-    <t t-if="not (o.tax_totals and o.tax_totals.get('subtotals'))">INVOICE</t>
+    <t t-if="not (o.tax_totals and o.tax_totals.get('subtotals'))">Test</t>
 </div>
 
                         </span>

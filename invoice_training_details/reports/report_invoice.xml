@@ -11,8 +11,11 @@
                     <div class="row">
                     <div class="col-12">
                         <span class="h4 text-info">
-                            <t t-if="o.tax_totals and o.tax_totals.get('subtotals')">TAX INVOICE</t>
-                            <t t-if="not (o.tax_totals and o.tax_totals.get('subtotals'))">INVOICE</t>
+                            <div style="font-size:12px;">
+    <t t-if="o.tax_totals and o.tax_totals.get('subtotals')">TAX INVOICE</t>
+    <t t-if="not (o.tax_totals and o.tax_totals.get('subtotals'))">INVOICE</t>
+</div>
+
                         </span>
                     </div>
                 </div>
@@ -54,11 +57,11 @@
                     <div>
                         <table class="table table-borderless">
                             <tr class="p-0">
-                                <td class="p-0" style="vertical-align: middle;">INVOICE</td>
+<td class="p-0" style="vertical-align: middle;"><strong>INVOICE</strong></td>
                                 <td class="p-0" style="vertical-align: middle;"><span t-field="o.name"/></td>
                             </tr>
                             <tr class="p-0">
-                                <td class="p-0" style="vertical-align: middle;">Date</td>
+                                <td class="p-0" style="vertical-align: middle;"><strong>Date</strong></td>
                                 <td class="p-0" style="vertical-align: middle;"><span t-field="o.invoice_date"/></td>
                             </tr>
                             <tr class="p-0" t-if="o.invoice_payment_term_id">

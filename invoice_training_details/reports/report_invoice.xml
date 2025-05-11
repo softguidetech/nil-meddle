@@ -181,8 +181,8 @@
         </t>
         <!-- Total Amount -->
         <tr class="border-white o_total" style="border-bottom: 1px solid #ddd;">
-    <td style="background-color:#fff; padding: 8px; font-size: 12px;"><strong>Total Amount</strong></td>
-    <td style="background-color:#fff; text-align: right; padding: 8px; font-size: 12px;">
+    <td style="background-color:#fff; padding: 8px; font-size: 15px;"><strong>Total Amount</strong></td>
+    <td style="background-color:#fff; text-align: right; padding: 8px; font-size: 15px;">
         <span t-out="o.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
     </td>
 </tr>
@@ -218,8 +218,8 @@
         <!-- Remaining Amount Due -->
         <t t-if="o.amount_residual and o.amount_residual &gt; 0">
     <tr class="border-whiteblack o_payment_details" style="border-bottom: 1px solid #ddd;">
-        <td style="background-color:#fff; padding: 8px; font-size: 12px;"><strong>Amount Due</strong></td>
-        <td style="background-color:#fff; text-align: right; padding: 8px; font-size: 12px;">
+        <td style="background-color:#fff; padding: 8px; font-size: 15px;"><strong>Amount Due</strong></td>
+        <td style="background-color:#fff; text-align: right; padding: 8px; font-size: 15px;">
             <span t-out="o.amount_residual" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
         </td>
     </tr>

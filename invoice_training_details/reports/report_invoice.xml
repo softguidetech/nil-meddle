@@ -299,7 +299,7 @@
     <div class="col-4">
         <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
     </div>
-                        <t t-if="not o.is_copy">
+<t t-if="not o.get('is_copy')"/>
     <div style="page-break-before: always;"></div>
 </t>
 <!-- Footer -->

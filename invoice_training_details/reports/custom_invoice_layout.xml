@@ -33,7 +33,7 @@
                         </t>
                     </div>
                     <div class="col-3 text-end">
-                        <img t-if="company.logo" class="pt-2" t-att-src="image_data_uri(company.logo)" style="max-height: 180px;" alt="Logo"/>
+                        <img t-if="company.logo" class="pt-2" t-att-src="image_data_uri(company.logo)" style="max-height: 150px;" alt="Logo"/>
                     </div>
                 </div>
             </div>

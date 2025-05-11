@@ -77,7 +77,7 @@
                 </div>
                     </div>
                     <table class="table table-sm o_main_table table-borderless" name="invoice_line_table">
-<thead class="text-info" style="background-color: #C4C4C4; text-color: #17a2b8;">
+<thead class="text-info" style="background-color: #D6DAE0; text-color: #17a2b8;">
                             <tr>
                                 <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>
                                 <th name="th_quantity" class="text-end"><span>QTY</span></th>

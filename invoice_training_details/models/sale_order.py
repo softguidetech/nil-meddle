@@ -93,17 +93,28 @@ class SaleOrder(models.Model):
     
 bank_details = fields.Html(
     string='Bank Details',
-    default="""
-        We kindly request you to transfer OR deposit cheque payment to the below bank account details:<br/>
-        Account Name: NIL Data Communications Middle East DMCC<br/>
-        Bank: Emirates Islamic Bank, JLT Branch - Dubai, UAE<br/>
-        Swift Code: MEBLAEAD<br/>
-        Account Currency: USD<br/>
-        IBAN: AE690340003528215597102
-    """
+    default=(
+        "We kindly request you to transfer OR deposit cheque payment to the below bank account details:<br/>"
+        "Account Name: NIL Data Communications Middle East DMCC<br/>"
+        "Bank: Emirates Islamic Bank, JLT Branch - Dubai, UAE<br/>"
+        "Swift Code: MEBLAEAD<br/>"
+        "Account Currency: USD<br/>"
+        "IBAN: AE690340003528215597102"
+    )
 )
-    term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
-    
+
+term_and_cond = fields.Html(
+    string='Term and conditions',
+    default=(
+        "1. PO Reference #: PCD-006-2024<br/>"
+        "2. PO Amendment PCD-006-2024<br/>"
+        "3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia.<br/>"
+        "4. The invoice amount does not include VAT or Withholding taxes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.<br/>"
+        "5. Taqnia Cyber will pay the taxes to KSA authorities directly.<br/>"
+        "6. Taqnia Cyber must bear Money transfers or bank charges on payment."
+    )
+)
+
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:

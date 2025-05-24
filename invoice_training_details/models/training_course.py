@@ -25,6 +25,7 @@ class TrainingCourse(models.Model):
     train_language = fields.Char(string='Language')
     poref = fields.Char(string='PO Reference')
     invref = fields.Char(string='Invoice Reference')
+    tr_expiry_date= fields.Char(string='Expiry')
     
     where_location2 = fields.Char(string='Where?')
     location = fields.Selection([('Online', 'Online'), ('On site', 'On site')])

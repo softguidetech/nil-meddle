@@ -7,7 +7,7 @@ class CostDetails(models.Model):
     cos_lead_id = fields.Many2one('crm.lead', string="Lead", ondelete='cascade')
     name = fields.Char(string="Cost Name")
     description = fields.Text(string="Description")
-    price = fields.Float(string="Price")  # Make the price field optional
+    price = fields.Float(string="Price")
     currency_id = fields.Many2one('res.currency', string="Currency", required=True, default=lambda self: self.env.company.currency_id.id)
     sale_order_id = fields.Many2one('sale.order', string="Sales Order")
     account_move_id = fields.Many2one('account.move', string="Invoice")
@@ -15,7 +15,7 @@ class CostDetails(models.Model):
     training_vendor = fields.Float(string="Partner Share")  
     total_price_all = fields.Float(string="Logistics Cost", compute='_compute_total')  
     margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
-    clc_cost = fields.Float(string="Training Cost")
+    clc_cost = fields.Float(string="Kits & Labs")
     rate_card = fields.Float(string="Partner Rate") 
     ins_time = fields.Float(string="Instructor")
     nilme_share = fields.Float(string="NIL ME Share $", compute='_compute_nilme_share')
@@ -26,56 +26,83 @@ class CostDetails(models.Model):
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
     cost = fields.Float(string="Cost", compute='_compute_total')
-    margin = fields.Float(string="Margin (%)", compute='_compute_margin')  # New field with percentage label
+    margin = fields.Float(string="Margin (%)", compute='_compute_margin')
 
-    @api.depends('cos_lead_id.ticket_ids.price', 'cos_lead_id.hotel_ids.price', 'cos_lead_id.cost_details_ids.price', 'cos_lead_id.instructor_logistics', 'cos_lead_id.venue', 'cos_lead_id.ctrng', 'cos_lead_id.uber')
+    @api.depends(
+        'cos_lead_id.ticket_ids.price',
+        'cos_lead_id.hotel_ids.price',
+        'cos_lead_id.cost_details_ids.price',
+        'cos_lead_id.instructor_logistics',
+        'cos_lead_id.venue',
+        'cos_lead_id.ctrng',
+        'cos_lead_id.uber',
+        'ins_time'
+    )
     def _compute_total(self):
         for rec in self:
-            ticket_total = sum(ticket.price for ticket in rec.cos_lead_id.ticket_ids) if rec.cos_lead_id.ticket_ids else 0
-            hotel_total = sum(hotel.price for hotel in rec.cos_lead_id.hotel_ids) if rec.cos_lead_id.hotel_ids else 0
-            cost_details_total = sum(cost.price for cost in rec.cos_lead_id.cost_details_ids) if rec.cos_lead_id.cost_details_ids else 0
-            instructor_logistics = float(rec.cos_lead_id.instructor_logistics) if rec.cos_lead_id.instructor_logistics else 0
-            venue = rec.cos_lead_id.venue if rec.cos_lead_id.venue else 0
-            catering = rec.cos_lead_id.ctrng if rec.cos_lead_id.ctrng else 0
-            uber = rec.cos_lead_id.uber if rec.cos_lead_id.uber else 0
-            ins_time = self.ins_time if self.ins_time else 0  
-            total = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + catering + uber + ins_time
-            rec.total_price_all = total
-            rec.cost = total  # Calculate the cost field
+            lead = rec.cos_lead_id
 
-    @api.depends('training_vendor', 'total_price_all', 'clc_cost')
+            ticket_total = sum(lead.ticket_ids.mapped('price'))
+            hotel_total = sum(lead.hotel_ids.mapped('price'))
+            cost_details_total = sum(lead.cost_details_ids.mapped('price'))
+
+            instructor_logistics = float(lead.instructor_logistics or 0)
+            venue = float(lead.venue or 0)
+            catering = float(lead.ctrng or 0)
+            uber = float(lead.uber or 0)
+
+            total = (
+                ticket_total +
+                hotel_total +
+                cost_details_total +
+                instructor_logistics +
+                venue +
+                catering +
+                uber
+            )
+
+            rec.total_price_all = total
+            rec.cost = total
+
+    @api.depends('training_vendor', 'total_price_all', 'clc_cost', 'ins_time')
     def _compute_margin1(self):
         for record in self:
-            record.margin1 = (record.training_vendor or 0) + (record.total_price_all or 0) + (record.clc_cost or 0)
+            record.margin1 = (
+                (record.training_vendor or 0) +
+                (record.total_price_all or 0) +
+                (record.clc_cost or 0) +
+                (record.ins_time or 0)
+            )
 
     @api.depends('margin1', 'cos_lead_id.total_training_price')
     def _compute_nilme_share(self):
         for record in self:
-            record.nilme_share = (record.cos_lead_id.total_training_price or 0) - (record.margin1 or 0)
+            record.nilme_share = (
+                (record.cos_lead_id.total_training_price or 0) -
+                (record.margin1 or 0)
+            )
 
     @api.depends('margin1', 'cos_lead_id.total_training_price')
     def _compute_margin(self):
         for record in self:
             total_training_price = record.cos_lead_id.total_training_price or 1  # Avoid division by zero
-            record.margin = ((record.nilme_share or 0) / total_training_price)
+            record.margin = (record.nilme_share or 0) / total_training_price
 
-def _prepare_opportunity_quotation_context(self):
-    quotation_context = super()._prepare_opportunity_quotation_context()
-    quotation_context.update({
-        'default_cos_lead_id': self.cos_lead_id.id,
-        'default_name': self.name,
-        'default_description': self.description,
-        'default_price': self.price,
-        'default_currency_id': self.currency_id.id,
-        'default_training_vendor': self.training_vendor,
-        'default_total_price_all': self.total_price_all,
-        'default_margin1': self.margin1,
-        'default_clc_cost': self.clc_cost,
-        'default_rate_card': self.rate_card,
-        'default_margin': self.ins_time,
-        'default_nilme_share': self.nilme_share,
-        'default_learning_partner': self.learning_partner,
-        'default_cost': self.cost,
-        'default_margin': self.margin,
-    })
-    return quotation_context
+    def _prepare_opportunity_quotation_context(self):
+        return {
+            'default_cos_lead_id': self.cos_lead_id.id,
+            'default_name': self.name,
+            'default_description': self.description,
+            'default_price': self.price,
+            'default_currency_id': self.currency_id.id,
+            'default_training_vendor': self.training_vendor,
+            'default_total_price_all': self.total_price_all,
+            'default_margin1': self.margin1,
+            'default_clc_cost': self.clc_cost,
+            'default_rate_card': self.rate_card,
+            'default_ins_time': self.ins_time,
+            'default_nilme_share': self.nilme_share,
+            'default_learning_partner': self.learning_partner,
+            'default_cost': self.cost,
+            'default_margin': self.margin,
+        }

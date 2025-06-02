@@ -20,7 +20,6 @@
                         <tree editable="bottom">
                             <field name="training_id" width="15"/>
                             <field name="cost_clc" width="15"/>
-                            <field name="train_language" width="15"/>
                             <field name="location" width="15"/>
                             <field name="where_location2" width="15"/>
                             <field name="payment_method" width="10"/>
@@ -81,6 +80,7 @@
                     <group>
                         <group>
                             <field name="clcs_qty"/>
+<field name="tr_expiry_date"/>
                             <field name="poref"/>
                             <field name="invref"/>
                         </group>
@@ -129,7 +129,7 @@
                         <field name="to_date"/>
                         <field name="book_details_id" widget="many2many_binary"/>
                         <field name="details"/>
-<field name="cost" readonly="1"/>
+                        <field name="cost"/>
                     </group>
                     <group>
                         <field name="total_price_all"/>

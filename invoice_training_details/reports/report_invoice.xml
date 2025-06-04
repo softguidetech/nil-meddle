@@ -225,7 +225,7 @@
 								</th>
 								<th name="th_training_date" style="text-align: center; vertical-align: middle;">
 									<span>
-										Training Pricexxxxxxx
+										Training Price
 									</span>
 								</th>
 								<th t-if="o.display_total" name="th_training_date" style="max-width:80px;text-align: center; vertical-align: middle;">
@@ -270,7 +270,9 @@
 										<span t-field="training.training_date_end" />
 									</td>
 									<td style="text-align: center; vertical-align: middle;">
-										<span t-field="training.price" t-options="{'widget': 'monetary', 'display_currency': o.currency_id}" />
+										<t t-set="formatted_price" t-value="'{:,.2f}'.format(training.price)" />
+										<span t-out="formatted_price" />
+										$
 									</td>
 									<t t-if="item == 1">
 										<td t-if="o.display_total" t-att-rowspan="total_rows" style="text-align: center; vertical-align: middle;">

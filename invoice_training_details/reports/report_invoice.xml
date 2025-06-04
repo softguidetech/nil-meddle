@@ -225,7 +225,7 @@
 								</th>
 								<th name="th_training_date" style="text-align: center; vertical-align: middle;">
 									<span>
-										Training Price
+										Training Pricexxxxxxx
 									</span>
 								</th>
 								<th t-if="o.display_total" name="th_training_date" style="max-width:80px;text-align: center; vertical-align: middle;">

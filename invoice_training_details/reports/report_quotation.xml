@@ -202,7 +202,8 @@
 										<span t-field="training.training_date_end" />
 									</td>
 									<td style="text-align: center; vertical-align: middle;">
-										<span t-esc="o.currency_id.symbol + '{:,.2f}'.format(training.price)" />
+										<span t-esc="'%.2f' % training.price" />
+										<span t-esc="o.currency_id.symbol" />
 									</td>
 									<t t-if="item == 1">
 										<td t-if="o.display_total" t-att-rowspan="total_rows" style="text-align: center; vertical-align: middle;">

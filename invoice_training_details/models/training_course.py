@@ -32,6 +32,9 @@ class TrainingCourse(models.Model):
     
     cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="Cost Clc")
     hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")
+
+    pricelist_id = fields.Many2one('product.pricelist', string='Pricelist')
+    currency_id = fields.Many2one('res.currency', related='pricelist_id.currency_id', store=True, readonly=True)
     
     def _compute_date(self):
         

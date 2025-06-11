@@ -55,8 +55,6 @@ class AccountMove(models.Model):
 
 
     # logistics tab
-    instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
 
     ks_qr_code = fields.Binary("KSA QR Code", compute="_compute_ksa_qr_code")
     
@@ -66,58 +64,6 @@ class AccountMove(models.Model):
     
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
-
-    # Cost details fields
-    cost_details_ids = fields.One2many(
-        'cost.details', 
-        'account_move_id', 
-        string="Cost Breakdown"
-    )
-    
-    total_cost = fields.Float(
-        string="Total Costs",
-        compute='_compute_total_cost',
-        store=True
-    )
-    
-    gross_margin = fields.Float(
-        string="Gross Margin",
-        compute='_compute_gross_margin',
-        store=True
-    )
-    
-    margin_percentage = fields.Float(
-        string="Margin %",
-        compute='_compute_margin_percentage',
-        store=True
-    )
-
-    #adding cost 
-    lead_cost = fields.Float(string="Lead Cost", readonly=True)
-
-    @api.model
-    def create(self, vals):
-        # جلب تكلفة lead عند إنشاء الفاتورة
-        if vals.get('invoice_origin'):
-            sale_order = self.env['sale.order'].search([('name', '=', vals['invoice_origin'])], limit=1)
-            if sale_order:
-                vals['lead_cost'] = sale_order.lead_cost
-        return super(AccountMove, self).create(vals)
-    
-    @api.depends('cost_details_ids.margin1')
-    def _compute_total_cost(self):
-        for move in self:
-            move.total_cost = sum(cost.margin1 for cost in move.cost_details_ids)
-    
-    @api.depends('amount_total', 'total_cost')
-    def _compute_gross_margin(self):
-        for move in self:
-            move.gross_margin = move.amount_total - move.total_cost
-    
-    @api.depends('gross_margin', 'amount_total')
-    def _compute_margin_percentage(self):
-        for move in self:
-            move.margin_percentage = (move.gross_margin / move.amount_total) * 100 if move.amount_total else 0
     
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
@@ -191,8 +137,8 @@ class AccountMove(models.Model):
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):
         for rec in self:
-            if rec.pro_service_ids:
-                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
+            if rec.training_course_ids:
+                rec.total_service_price = sum(rec.training_course_ids.mapped('price'))
             
             else:
                 rec.total_service_price = 0

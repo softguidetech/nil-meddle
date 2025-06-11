@@ -36,13 +36,6 @@ class PurchaseOrder(models.Model):
 
     amount_total = fields.Monetary(tracking=True)
 
-    # Training Details
-    training_details_ids = fields.One2many('purchase.training.details', 'purchase_order_id', string='Training Details')
-    has_training = fields.Boolean(compute='_compute_has_training', store=True)
-    total_training_cost = fields.Monetary(compute='_compute_total_training_cost', store=True)
-    currency_id = fields.Many2one('res.currency', string='Currency', 
-                                 default=lambda self: self.env.company.currency_id)
-
     def _track_subtype(self, init_values):
         self.ensure_one()
         if 'amount_total' in init_values and self.amount_total != init_values.get('amount_total'):
@@ -71,6 +64,21 @@ class PurchaseOrder(models.Model):
                             subtype_id=self.env.ref('mail.mt_note').id
                         )
                         return super(PurchaseOrder, order).button_approve(force)
+
+                # else:
+                    #     # If there is not next approval, than assume that approval is finished and send notification
+                    #     partner = order.user_id.partner_id if order.user_id else order.create_uid.partner_id
+                    #     order.message_post_with_view(
+                    #         'po_so_approval_route.order_approval',
+                    #         subject=_('PO Approved: %s') % (order.name,),
+                    #         composition_mode='mass_mail',
+                    #         partner_ids=[(4, partner.id)],
+                    #         auto_delete=True,
+                    #         auto_delete_message=True,
+                    #         parent_id=False,
+                    #         subtype_id=self.env.ref('mail.mt_note').id)
+                    #     # Do default behaviour to set state as "purchase" and update date_approve
+                    #     return super(PurchaseOrder, order).button_approve(force)
 
     def button_confirm(self):
         for order in self:
@@ -194,6 +202,35 @@ class PurchaseOrder(models.Model):
                 subtype_id=self.env.ref('mail.mt_note').id
             )
 
+    # def send_to_approve(self):
+    #     for order in self:
+    #         if order.state != 'to approve' and not order.team_id:
+    #             continue
+    #
+    #         main_error_msg = _("Unable to send approval request to next approver.")
+    #         if order.current_approver:
+    #             reason_msg = _("The order must be approved by %s") % order.current_approver.user_id.name
+    #             raise UserError("%s %s" % (main_error_msg, reason_msg))
+    #
+    #         if not order.next_approver:
+    #             reason_msg = _("There are no approvers in the selected PO team.")
+    #             raise UserError("%s %s" % (main_error_msg, reason_msg))
+    #         # use sudo as purchase user cannot update purchase.order.approver
+    #         order.sudo().next_approver.state = 'pending'
+    #         # Now next approver became as current
+    #         current_approver_partner = order.current_approver.user_id.partner_id
+    #         if current_approver_partner not in order.message_partner_ids:
+    #             order.message_subscribe([current_approver_partner.id])
+    #         order.with_user(order.user_id).message_post_with_view(
+    #             'po_so_approval_route.request_to_approve',
+    #             subject=_('PO Approval: %s') % (order.name,),
+    #             composition_mode='mass_mail',
+    #             partner_ids=[(4, current_approver_partner.id)],
+    #             auto_delete=True,
+    #             auto_delete_message=True,
+    #             parent_id=False,
+    #             subtype_id=self.env.ref('mail.mt_note').id)
+
     def _check_lock_amount_total(self):
         msg = _('Sorry, you are not allowed to change Amount Total of PO. ')
         for order in self:
@@ -206,14 +243,4 @@ class PurchaseOrder(models.Model):
                 reason = _('It is locked after generated approval route. ')
                 suggestion = _('To make changes, cancel and reset PO to draft. ')
                 raise UserError(msg + "\n\n" + reason + "\n\n" + suggestion)
-
-    @api.depends('training_details_ids')
-    def _compute_has_training(self):
-        for order in self:
-            order.has_training = bool(order.training_details_ids)
-
-    @api.depends('training_details_ids.training_cost')
-    def _compute_total_training_cost(self):
-        for order in self:
-            order.total_training_cost = sum(order.training_details_ids.mapped('training_cost'))
 

@@ -51,95 +51,11 @@ class SaleOrder(models.Model):
     details = fields.Html(string="Details")
     cost = fields.Float(string="Cost")
     currency_total = fields.Float(string="Total in Currency",compute='_compute_cur_tot')
+
     
     training_vendor = fields.Char(string="Training Vendor")
     training_type = fields.Char(string="Training Type")
     
-    #adding cost 
-
-    lead_cost = fields.Float(string="Lead Cost", readonly=True)
-    # Add these new fields
-    cost_details_ids = fields.One2many(
-        'cost.details', 
-        'sale_order_id', 
-        string="Cost Breakdown"
-    )
-    
-    total_cost = fields.Float(
-        string="Total Costs",
-        compute='_compute_total_cost',
-        store=True
-    )
-    
-    gross_margin = fields.Float(
-        string="Gross Margin",
-        compute='_compute_gross_margin',
-        store=True
-    )
-    
-    margin_percentage = fields.Float(
-        string="Margin %",
-        compute='_compute_margin_percentage',
-        store=True
-    )
-    
-    @api.depends('cost_details_ids.margin1')
-    def _compute_total_cost(self):
-        for order in self:
-            order.total_cost = sum(cost.margin1 for cost in order.cost_details_ids)
-    
-    @api.depends('amount_total', 'total_cost')
-    def _compute_gross_margin(self):
-        for order in self:
-            order.gross_margin = order.amount_total - order.total_cost
-    
-    @api.depends('gross_margin', 'amount_total')
-    def _compute_margin_percentage(self):
-        for order in self:
-            order.margin_percentage = (order.gross_margin / order.amount_total) * 100 if order.amount_total else 0
-    
-    @api.model
-    def create(self, vals):
-        order = super(SaleOrder, self).create(vals)
-        if order.opportunity_id:
-            # Copy cost details from lead to sales order
-            order._sync_cost_details_from_lead()
-        return order
-    
-    def write(self, vals):
-        res = super(SaleOrder, self).write(vals)
-        if 'opportunity_id' in vals:
-            # Update cost details when lead changes
-            self._sync_cost_details_from_lead()
-        return res
-    
-    def _sync_cost_details_from_lead(self):
-        for order in self:
-            if order.opportunity_id:
-                # Unlink existing cost details
-                order.cost_details_ids.unlink()
-                
-                # Create new cost details from lead
-                for cost in order.opportunity_id.cost_details_ids:
-                    cost.copy({
-                        'sale_order_id': order.id,
-                        'cos_lead_id': order.opportunity_id.id
-                    })
-    @api.model
-    def create(self, vals):
-        # Get the lead and associate the cost when creating a sales order
-        if vals.get('opportunity_id'):
-            lead = self.env['crm.lead'].browse(vals['opportunity_id'])
-            vals['lead_cost'] = lead.cost
-        return super(SaleOrder, self).create(vals)
-
-    def write(self, vals):
-        # Update cost when modifying the associated lead
-        if 'opportunity_id' in vals:
-            lead = self.env['crm.lead'].browse(vals['opportunity_id'])
-            vals['lead_cost'] = lead.cost
-        return super(SaleOrder, self).write(vals)
-
     
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
@@ -152,17 +68,17 @@ class SaleOrder(models.Model):
             else:
                 rec.currency_total = 0
                 
-    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost')
     def _compute_total(self):
+        ticket_total =0
+        hotel_toal=0
+        cost = 0
         for rec in self:
-            ticket_total = 0
-            hotel_total = 0
             if rec.ticket_ids and rec.hotel_ids:
                 for ticket in rec.ticket_ids:
-                    ticket_total += ticket.price
+                    ticket_total+=ticket.price
                 for hotel in rec.hotel_ids:
-                    hotel_total += hotel.price
-                rec.total_price_all = ticket_total + hotel_total + rec.cost
+                    hotel_toal+=hotel.price
+                rec.total_price_all = ticket_total + hotel_toal + rec.cost
             else:
                 rec.total_price_all = 0
     
@@ -173,7 +89,7 @@ class SaleOrder(models.Model):
 
     # logistics tab
     instructor_logistics = fields.Char(string='Instructor Logistics')
-    catering = fields.Selection([('NIL MM','NIL MN'),('Others','Others')],string='Catering')
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
     
     bank_details = fields.Html(string='Bank Details',default='We kindly request you to transfer OR deposit cheque payment to below bank account details </br> Account Name: NIL Data Communications Middle East DMCC Emirates Islamic Bank JLT Branch - Dubai- UAE </br> Swiftcode: MEBLAEAD </br> Account Currency: USD </br> IBAN: AE690340003528215597102')
     term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
@@ -197,78 +113,34 @@ class SaleOrder(models.Model):
                 
     def _prepare_invoice(self):
         vals = super()._prepare_invoice()
-    
-        # Prepare cost details for invoice
-        cost_details_vals = []
-        for cost in self.cost_details_ids:
-            cost_details_vals.append((0, 0, {
-                'name': cost.name,
-                'description': cost.description,
-                'price': cost.price,
-                'currency_id': cost.currency_id.id,
-                'training_vendor': cost.training_vendor,
-                'clc_cost': cost.clc_cost,
-                'rate_card': cost.rate_card,
-                'learning_partner': cost.learning_partner,
-                'margin1': cost.margin1,
-                'nilme_share': cost.nilme_share,
-                'margin': cost.margin,
-                'sale_order_id': self.id,
-                'cos_lead_id': cost.cos_lead_id.id if cost.cos_lead_id else False,
-            }))
-    
-        # Update invoice values with all fields
         vals.update({
-            # Training-related fields
             'training_name': self.training_name,
-            'training_id': self.training_id.id if self.training_id else False,
-            'training_vendor': self.training_vendor,
-            'training_type': self.training_type,
-            'training_course_ids': [(6, 0, self.training_course_ids.ids)],
-            
-            # Payment-related fields
             'half_advance_payment_before': self.half_advance_payment_before,
             'half_payment_after': self.half_payment_after,
-            'payment_method': self.payment_method,
-            
-            # Service-related fields
-            'service_name': self.service_name,
+            'training_course_ids': [(6, 0, self.training_course_ids.ids)],
             'pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
-            
-            # Logistics fields
-            'instructor_id': self.instructor_id.id if self.instructor_id else False,
-            'instructor_logistics': self.instructor_logistics,
-            'location': self.location,
-            'where_location': self.where_location,
-            'catering': self.catering,
-            
-            # Administrative fields
             'clcs_qty': self.clcs_qty,
             'so_no': self.so_no,
             'tr_expiry_date': self.tr_expiry_date,
+            'instructor_logistics': self.instructor_logistics,
+            'ctrng': self.ctrng,
+            # 'descriptions': self.descriptions,
+            # 'ordering_partner_id': self.ordering_partner_id.id,
+            # 'where_location': self.where_location,
             
-            # Financial details
+            'instructor_id': self.instructor_id.id,
+            'training_id': self.training_id.id,
+            # 'train_language': self.train_language,
+            # 'location': self.location,
+            # 'payment_method': self.payment_method,
+            'clcs_qty': self.clcs_qty,
+            'service_name': self.service_name,
             'bank_details': self.bank_details,
             'term_and_cond': self.term_and_cond,
             
-            # Cost analysis fields
-            'cost_details_ids': cost_details_vals,
-            'total_cost': self.total_cost,
-            'gross_margin': self.gross_margin,
-            'margin_percentage': self.margin_percentage,
+            'training_vendor': self.training_vendor,
+            'training_type': self.training_type,
             
-            # Display options
-            'display_training_table': self.display_training_table,
-            'display_signature': self.display_signature,
-            'display_stamp': self.display_stamp,
-            'display_ksa_qr': self.display_ksa_qr,
-            'display_instructor': self.display_instructor,
-            'display_location': self.display_location,
-            'display_downpayment': self.display_downpayment,
-            'display_total': self.display_total,
-            'display_due_amount': self.display_due_amount,
-            'display_where': self.display_where,
-            'display_description': self.display_description,
         })
         return vals
         
@@ -360,4 +232,3 @@ class SaleOrder(models.Model):
         self.write({'order_line': []})
         self.write({'order_line': l})
             
-

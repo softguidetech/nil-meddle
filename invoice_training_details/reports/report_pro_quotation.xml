@@ -206,16 +206,14 @@
                     <!--    </div>-->
                     <!--</div>-->
 
-                    <div class="row" style="page-break-inside:avoid;">
-                        <!--<div name="ksa_qr" class="col-4">-->
-                        <!--    <t t-if="o.display_ksa_qr">-->
-                        <!--        <img t-if="o.ks_qr_code" class="pt-5" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>-->
-                        <!--    </t>-->
-                        <!--</div>-->
-<t t-set="footer_stamp_signature">
-    <div class="row" style="page-break-inside:avoid;">
-    <!-- كود QR محذوف مؤقتًا -->
+<div class="row" style="page-break-inside:avoid;">
+    <!--<div name="ksa_qr" class="col-4">-->
+    <!--    <t t-if="o.display_ksa_qr">-->
+    <!--        <img t-if="o.ks_qr_code" class="pt-5" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>-->
+    <!--    </t>-->
+    <!--</div>-->
 
+    <!-- ختم وتوقيع بأسفل يمين الصفحة -->
     <div style="position: absolute; bottom: 30px; right: 30px; display: flex; gap: 40px;">
         <div name="stamp">
             <img t-if="o.company_id.stamp and o.display_stamp"
@@ -229,6 +227,7 @@
         </div>
     </div>
 
+    <!-- بيانات البنك -->
     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
         <div class="col-12">
             <p>

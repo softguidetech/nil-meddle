@@ -11,29 +11,48 @@
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
-                            <span class="h4 text-info">Price Offer</span>
+                            <span class="h4 text-info">Purchase Order</span>
                         </div>
                     </div>
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
-                            <div>
-                                <!--<strong>INVOICE TO</strong>-->
-                                 <strong t-if="o.partner_id.is_company == True">Company Name:</strong><br/>
-                                <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
-                                
-                                <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
-                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
-                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
-                                <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
-                                 
-                            </div>
-                        </div>
+    <div>
+        <strong t-if="o.partner_id.is_company == True">Company Name:</strong>
+        <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
+        <strong t-if="o.partner_id.is_company == False">Company Name:</strong>
+        <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
+        
+        <strong t-if="o.partner_id.is_company == True">Address:</strong>
+        
+        <strong t-if="o.partner_id.is_company == False">Address:</strong>
+        <div t-if="o.partner_id.is_company == False">
+            <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/>
+        </div>
+
+        <div t-if="o.partner_id.is_company == True">
+            <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/>
+        </div>
+        <div t-if="o.partner_id.is_company == False">
+            <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/>
+        </div>
+        <div t-if="o.partner_id.is_company == True">
+            <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/>
+        </div>
+        <strong t-if="o.partner_id.is_company == True and o.partner_id.vat">Tax Number:</strong>
+        <div t-if="o.partner_id.is_company == True and o.partner_id.vat" t-field="o.partner_id.vat"/>
+        <strong t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat">Tax Number:</strong>
+        <div t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat" t-field="o.partner_id.parent_id.vat"/>
+        
+        <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
+        <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
+    </div>
+</div>
+
                         <div class="col-4">
                             <div>
                                 <table class="table table-borderless">
                                     <tr class="p-0">
-                                        <td class="p-0">Price Offer</td>
+                                        <td class="p-0">Purchase Order</td>
                                         <td class="p-0"><span t-field="o.name"/></td>
                                     </tr>
                                     <tr class="p-0">
@@ -74,11 +93,7 @@
                     <!--    </tbody>-->
                     <!--</table>-->
 
-                    <div class="row pt-3 pb-2">
-                        <div class="col-12">
-                            Professional Service Details: <span t-field="o.training_name"/>
-                        </div>
-                    </div>
+
 
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>
@@ -87,9 +102,10 @@
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Service</span></th>
                                 <th t-if="o.display_description" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Description</span></th>
                                 <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Instructor Name</span></th>
-                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Language</span></th>
-                                <th t-if="o.display_location" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Location</span></th>
-                                <th t-if="o.display_where" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Location1</span></th>
+                                 <th t-if="o.display_location or o.display_where" name="th_training_name" style="text-align: center; vertical-align: middle;">
+                                  <span>Location</span>
+                                 </th>
+
                                 <th name="th_duration" style="text-align: center; vertical-align: middle;"><span>Duration</span></th>
                                 <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>Monthly cost</span></th>
 
@@ -113,9 +129,12 @@
 
                                     <td t-if="o.display_description" style="text-align: center; vertical-align: middle;"><span t-field="training.descriptions"/></td>
                                     <td t-if="o.display_instructor" style="text-align: center; vertical-align: middle;"><span t-field="training.instructor_id.name"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
-                                    <td t-if="o.display_location" style="text-align: center; vertical-align: middle;"><span t-field="training.location"/></td>
-                                    <td t-if="o.display_where" style="text-align: center; vertical-align: middle;"><span t-field="training.where_location2"/></td>
+                                    <td t-if="o.display_location or o.display_where" style="text-align: center; vertical-align: middle;">
+    <t t-set="loc1" t-value="training.location or ''"/>
+    <t t-set="loc2" t-value="training.where_location2 or ''"/>
+    <span t-esc="loc2 and loc1 + ', ' + loc2 or loc1"/>
+</td>
+
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.duration"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.price"/></td>
                                     <t t-if="item == 1">

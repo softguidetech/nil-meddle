@@ -20,26 +20,26 @@
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
-                                <strong t-if="o.partner_id.is_company == True" style="font-size:30px;">Company Name:</strong>
-                                <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name" style="font-size:30px;"/>
-                                <strong t-if="o.partner_id.is_company == False" style="font-size:30px;">Company Name:</strong>
-                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name" style="font-size:30px;"/>
+                                <strong t-if="o.partner_id.is_company == True" style="font-size:18px;">Company Name:</strong>
+                                <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name" style="font-size:18px;"/>
+                                <strong t-if="o.partner_id.is_company == False" style="font-size:18px;">Company Name:</strong>
+                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name" style="font-size:18px;"/>
 
-                                <strong style="font-size:30px;">Address:</strong>
-                                <div style="font-size:30px;">
+                                <strong style="font-size:18px;">Address:</strong>
+                                <div style="font-size:18px;">
                                     <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/>
                                 </div>
-                                <div style="font-size:30px;">
+                                <div style="font-size:18px;">
                                     <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/>
                                 </div>
 
-                                <strong t-if="o.partner_id.is_company == True and o.partner_id.vat" style="font-size:30px;">Tax Number:</strong>
-                                <div t-if="o.partner_id.is_company == True and o.partner_id.vat" t-field="o.partner_id.vat" style="font-size:30px;"/>
-                                <strong t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat" style="font-size:30px;">Tax Number:</strong>
-                                <div t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat" t-field="o.partner_id.parent_id.vat" style="font-size:30px;"/>
+                                <strong t-if="o.partner_id.is_company == True and o.partner_id.vat" style="font-size:18px;">Tax Number:</strong>
+                                <div t-if="o.partner_id.is_company == True and o.partner_id.vat" t-field="o.partner_id.vat" style="font-size:18px;"/>
+                                <strong t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat" style="font-size:18px;">Tax Number:</strong>
+                                <div t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat" t-field="o.partner_id.parent_id.vat" style="font-size:18px;"/>
 
-                                <strong t-if="o.partner_id.is_company == False" style="font-size:30px;">Attention:</strong>
-                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name" style="font-size:30px;"/>
+                                <strong t-if="o.partner_id.is_company == False" style="font-size:18px;">Attention:</strong>
+                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name" style="font-size:18px;"/>
                             </div>
                         </div>
 
@@ -48,16 +48,16 @@
                             <div>
                                 <table class="table table-borderless">
                                     <tr>
-                                        <td style="font-size:30px;">Purchase Order</td>
-                                        <td style="font-size:30px;"><span t-field="o.name"/></td>
+                                        <td style="font-size:18px;">Purchase Order</td>
+                                        <td style="font-size:18px;"><span t-field="o.name"/></td>
                                     </tr>
                                     <tr>
-                                        <td style="font-size:30px;">Date</td>
-                                        <td style="font-size:30px;"><span t-field="o.date_order"/></td>
+                                        <td style="font-size:18px;">Date</td>
+                                        <td style="font-size:18px;"><span t-field="o.date_order"/></td>
                                     </tr>
                                     <tr>
-                                        <td style="font-size:30px;">Validity Date</td>
-                                        <td style="font-size:30px;"><span t-field="o.validity_date"/></td>
+                                        <td style="font-size:18px;">Validity Date</td>
+                                        <td style="font-size:18px;"><span t-field="o.validity_date"/></td>
                                     </tr>
                                 </table>
                             </div>
@@ -68,18 +68,18 @@
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>
                             <tr>
-                                <th style="font-size:30px;">Item</th>
-                                <th style="font-size:30px;">Training Name</th>
-                                <th t-if="o.display_instructor" style="font-size:30px;">Instructor Name</th>
-                                <th style="font-size:30px;"># Of Students</th>
-                                <th style="font-size:30px;">
+                                <th style="font-size:18px;">Item</th>
+                                <th style="font-size:18px;">Training Name</th>
+                                <th t-if="o.display_instructor" style="font-size:18px;">Instructor Name</th>
+                                <th style="font-size:18px;"># Of Students</th>
+                                <th style="font-size:18px;">
                                     <span t-if="o.display_location">Location</span>
                                     <span t-elif="o.display_where">Location1</span>
                                 </th>
-                                <th style="font-size:30px;">Duration</th>
-                                <th style="font-size:30px;">Training Dates</th>
-                                <th style="font-size:30px;">Training Price</th>
-                                <th t-if="o.display_total" style="font-size:30px;">Total Price</th>
+                                <th style="font-size:18px;">Duration</th>
+                                <th style="font-size:18px;">Training Dates</th>
+                                <th style="font-size:18px;">Training Price</th>
+                                <th t-if="o.display_total" style="font-size:18px;">Total Price</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -87,20 +87,20 @@
                             <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
                             <t t-foreach="o.training_course_ids" t-as="training">
                                 <tr>
-                                    <td style="font-size:30px;"><span t-esc="item"/></td>
-                                    <td style="font-size:30px;"><span t-field="training.training_id"/></td>
-                                    <td t-if="o.display_instructor" style="font-size:30px;"><span t-field="training.instructor_id.name"/></td>
-                                    <td style="font-size:30px;"><span t-field="training.no_of_student"/></td>
-                                    <td style="font-size:30px;">
+                                    <td style="font-size:18px;"><span t-esc="item"/></td>
+                                    <td style="font-size:18px;"><span t-field="training.training_id"/></td>
+                                    <td t-if="o.display_instructor" style="font-size:18px;"><span t-field="training.instructor_id.name"/></td>
+                                    <td style="font-size:18px;"><span t-field="training.no_of_student"/></td>
+                                    <td style="font-size:18px;">
                                         <span t-if="o.display_location" t-field="training.location"/>
                                         <span t-if="o.display_location and o.display_where">, </span>
                                         <span t-if="o.display_where" t-field="training.where_location2"/>
                                     </td>
-                                    <td style="font-size:30px;"><span t-field="training.duration"/></td>
-                                    <td style="font-size:30px;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
-                                    <td style="font-size:30px;"><span t-field="training.price"/></td>
+                                    <td style="font-size:18px;"><span t-field="training.duration"/></td>
+                                    <td style="font-size:18px;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
+                                    <td style="font-size:18px;"><span t-field="training.price"/></td>
                                     <t t-if="item == 1">
-                                        <td t-if="o.display_total" t-att-rowspan="total_rows" style="font-size:30px;"><span t-field="o.total_training_price"/></td>
+                                        <td t-if="o.display_total" t-att-rowspan="total_rows" style="font-size:18px;"><span t-field="o.total_training_price"/></td>
                                     </t>
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>
@@ -112,14 +112,14 @@
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid; display: flex; justify-content: space-between; align-items: flex-start;">
                         <div class="col-auto" style="flex: 1 1 auto;">
                             <br/><br/>
-                            <strong style="color: #0DCAF0; font-size:30px;">Course Content:</strong>
+                            <strong style="color: #0DCAF0; font-size:18px;">Course Content:</strong>
                             <table class="table table-sm" style="background-color:#fff; color: white; width: auto; border: none;">
                                 <tbody>
                                     <t t-foreach="o.training_course_ids" t-as="training">
                                         <tr>
-                                            <td style="color: white; font-size:30px;">
+                                            <td style="color: white; font-size:18px;">
                                                 <a t-att-href="training.hyperlink" target="_blank" style="color: #0ecaf0;">
-                                                    <span t-field="training.training_id" style="color: black; font-size:30px;"/>
+                                                    <span t-field="training.training_id" style="color: black; font-size:18px;"/>
                                                 </a>
                                             </td>
                                         </tr>
@@ -135,8 +135,8 @@
                                 <t t-if="tax_totals.get('subtotals')">
                                     <t t-foreach="tax_totals.get('subtotals')" t-as="subtotal">
                                         <tr class="border-grey o_subtotal">
-                                            <td style="background-color:#fff; font-size:30px;"><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
-                                            <td style="background-color:#fff; text-align: right; font-size:30px;">
+                                            <td style="background-color:#fff; font-size:18px;"><strong t-out="subtotal['name']">Untaxed Amount</strong></td>
+                                            <td style="background-color:#fff; text-align: right; font-size:18px;">
                                                 <span t-att-class="oe_subtotal_footer_separator" t-out="subtotal['formatted_amount']"/>
                                             </td>
                                         </tr>
@@ -145,8 +145,8 @@
                                     </t>
                                 </t>
                                 <tr class="border-grey o_total">
-                                    <td style="background-color:#fff; font-size:30px;"><strong>NIL ME Invoice Amount</strong></td>
-                                    <td style="background-color:#fff; text-align: right; font-size:30px;">
+                                    <td style="background-color:#fff; font-size:18px;"><strong>NIL ME Invoice Amount</strong></td>
+                                    <td style="background-color:#fff; text-align: right; font-size:18px;">
                                         <span t-out="o.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                                     </td>
                                 </tr>
@@ -155,12 +155,12 @@
                         </div>
                     </div>
 
-                    <!-- الشروط -->
-                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
-                        <div class="col-8">
-                            <p style="font-size:30px;"><span t-field="o.term_and_cond"/></p>
-                        </div>
-                    </div>
+                   <!-- الشروط -->
+<div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+    <div class="col-8">
+        <p style="font-size:14px;"><span t-field="o.term_and_cond" style="font-size:14px;"/></p>
+    </div>
+</div>
 
                     <!-- الختم والتوقيع -->
                     <div class="row" style="page-break-inside:avoid; position: relative; min-height: 250px;">
@@ -179,11 +179,11 @@
                     </div>
 
                     <!-- بيانات البنك -->
-                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
-                        <div class="col-12">
-                            <p style="font-size:30px;"><span t-field="o.bank_details"/></p>
-                        </div>
-                    </div>
+<div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+    <div class="col-12">
+        <p style="font-size:14px;"><span t-field="o.bank_details" style="font-size:14px;"/></p>
+    </div>
+</div>
 
                 </t>
             </t>

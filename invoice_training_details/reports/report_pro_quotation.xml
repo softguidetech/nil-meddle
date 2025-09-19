@@ -213,31 +213,31 @@
                         <!--    </t>-->
                         <!--</div>-->
 <t t-set="footer_stamp_signature">
-                <div style="position: absolute; bottom: 30px; right: 30px; display: flex; gap: 40px;">
-                    <div name="stamp">
-                        <img t-if="o.company_id.stamp and o.display_stamp"
-                             t-att-src="image_data_uri(o.company_id.stamp)"
-                             style="max-height: 200px;" alt="Stamp"/>
+    <div style="position: absolute; bottom: 30px; right: 30px; display: flex; gap: 40px;">
+        <div name="stamp">
+            <img t-if="o.company_id.stamp and o.display_stamp"
+                 t-att-src="image_data_uri(o.company_id.stamp)"
+                 style="max-height: 200px;" alt="Stamp"/>
+        </div>
+        <div name="signature">
+            <img t-if="o.company_id.signature and o.display_signature"
+                 t-att-src="image_data_uri(o.company_id.signature)"
+                 style="max-height: 200px;" alt="Signature"/>
+        </div>
+    </div>
+</t>
+
+                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+                        <div class="col-12">
+                            <p>
+                            <span t-field="o.bank_details"/>
+                            </p>
+                        </div>
                     </div>
-                    <div name="signature">
-                        <img t-if="o.company_id.signature and o.display_signature"
-                             t-att-src="image_data_uri(o.company_id.signature)"
-                             style="max-height: 200px;" alt="Signature"/>
-                    </div>
-                </div>
+
+                </t>
             </t>
-
-            <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
-                <div class="col-12">
-                    <p>
-                        <span t-field="o.bank_details"/>
-                    </p>
-                </div>
-            </div>
         </t>
-    </t>
-</template>
-
-
+       </template>
 
 </odoo>

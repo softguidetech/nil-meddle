@@ -47,19 +47,20 @@
                         <div class="col-4">
                             <div>
                                 <table class="table table-borderless">
-                                    <tr>
-                                        <td style="font-size:20px;">Purchase Order</td>
-                                        <td style="font-size:20px;"><span t-field="o.name"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-size:20px;">Date</td>
-                                        <td style="font-size:20px;"><span t-field="o.date_order"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="font-size:20px;">Validity Date</td>
-                                        <td style="font-size:20px;"><span t-field="o.validity_date"/></td>
-                                    </tr>
-                                </table>
+    <tr>
+        <td style="font-size:20px; vertical-align: middle;">Purchase Order</td>
+        <td style="font-size:20px; vertical-align: middle;"><span t-field="o.name"/></td>
+    </tr>
+    <tr>
+        <td style="font-size:20px; vertical-align: middle;">Date</td>
+        <td style="font-size:20px; vertical-align: middle;"><span t-field="o.date_order"/></td>
+    </tr>
+    <tr>
+        <td style="font-size:20px; vertical-align: middle;">Validity Date</td>
+        <td style="font-size:20px; vertical-align: middle;"><span t-field="o.validity_date"/></td>
+    </tr>
+</table>
+
                             </div>
                         </div>
                     </div>
@@ -159,17 +160,17 @@
                    <!-- الشروط -->
 <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
     <div class="col-8">
-        <p style="font-size:22px;"><span t-field="o.term_and_cond" style="font-size:22px;"/></p>
+        <p style="font-size:28px;"><span t-field="o.term_and_cond" style="font-size:22px;"/></p>
     </div>
 </div>
 
                     <!-- الختم والتوقيع -->
-                    <div class="row" style="page-break-inside:avoid; position: relative; min-height: 200px;">
+                    <div class="row" style="page-break-inside:avoid; position: relative; min-height: 170px;">
                         <div style="position: absolute; bottom: 10px; right: 0; text-align: right; display: block;">
                             <div name="stamp" style="margin-bottom: 5px;">
                                 <img t-if="o.company_id.stamp and o.display_stamp" 
                                      t-att-src="image_data_uri(o.company_id.stamp)" 
-                                     style="height:200px; width:auto; object-fit:contain;" alt="Stamp"/>
+                                     style="height:170px; width:auto; object-fit:contain;" alt="Stamp"/>
                             </div>
                             <div name="signature">
                                 <img t-if="o.company_id.signature and o.display_signature" 

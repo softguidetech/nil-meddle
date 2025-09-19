@@ -2,45 +2,45 @@
 <odoo>
 
     <template id="custom_invoice_report_layout" inherit_id="web.external_layout_standard" primary="True">
-        <div t-attf-class="header o_company_#{company.id}_layout" position="replace">
+        <div t-attf-class="header o_company_#{company.id}_layout" position="replace" style="font-size: 14px;">
             <t t-set="company" t-value="request.env.company"/>
             <div class="header o_company_#{company.id}_layout" style="font-size: 14px;">
                 <div class="row mb-2">
                     <div class="col-9">
-                        <strong id="company_name" class="h5 fw-bold" style="font-size: 16px;">
+                        <strong id="company_name" class="h5 fw-bold" style="font-size: 18px;">
                             <t t-esc="company.name" />
                         </strong>
-                        <div t-field="company.street" class="pt-1" style="font-size: 14px;"/>
-                        <div t-field="company.street2" class="pt-1" style="font-size: 14px;"/>
-                        <div class="pt-1" style="font-size: 14px;">
+                        <div t-field="company.street" class="pt-1"/>
+                        <div t-field="company.street2" class="pt-1"/>
+                        <div class="pt-1">
                             <span t-field="company.city"/>
                             <t t-if="company.country_id.name">
                                 , <span t-field="company.country_id.name"/>
                             </t>
                         </div>
-                        <div t-field="company.state_id.name" class="pt-1" style="font-size: 14px;"/>
-                        <div t-field="company.phone" class="pt-1" style="font-size: 14px;"/>
-                        <div t-field="company.email" class="pt-1" style="font-size: 14px;"/>
-                        <div class="pt-1" style="font-size: 14px;">
+                        <div t-field="company.state_id.name" class="pt-1"/>
+                        <div t-field="company.phone" class="pt-1"/>
+                        <div t-field="company.email" class="pt-1"/>
+                        <div class="pt-1">
                             <strong>Tax Number:</strong>
                             <t t-esc="company.vat"/>
                         </div>
                         <t t-if="company.country_id.name == 'Saudi Arabia'">
-                            <div class="pt-1" style="font-size: 14px;">
+                            <div class="pt-1">
                                 <strong>CRN:</strong>
                                 <t t-esc="company.l10n_sa_additional_identification_number"/>
                             </div>
                         </t>
                     </div>
                     <div class="col-3 text-end">
-                        <img t-if="company.logo" class="pt-2" t-att-src="image_data_uri(company.logo)" style="max-height: 150px; font-size: 14px;" alt="Logo"/>
+                        <img t-if="company.logo" class="pt-2" t-att-src="image_data_uri(company.logo)" style="max-height: 150px;" alt="Logo"/>
                     </div>
                 </div>
             </div>
         </div>
 
         <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout" style="font-size: 14px;">
-            <div class="text-center">
+            <div class="text-center" style="font-size: 14px;">
                 <strong>Ruba</strong>
             </div>
         </div>

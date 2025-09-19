@@ -3,27 +3,34 @@
     <template id="report_po_document_training" name="Quotation Professional Service Report Training">
         <t t-call="web.html_container">
             <style>
-                body, table, td, th, span, div, p {
-                    font-size: 16px !important;
+                body, table, td, th, span, div, p, a {
+                    font-size: 30px !important;
                 }
                 .purchase-order-title {
+                    font-size: 40px !important;
+                    font-weight: bold !important;
+                    color: #0DCAF0 !important;
+                }
+                .table th, .table td {
                     font-size: 30px !important;
-                    font-weight: bold;
-                    color: #17a2b8;
+                }
+                a {
+                    color: #0ecaf0 !important;
                 }
             </style>
+
             <t t-foreach="docs" t-as="o">
                 <t t-set="lang" t-value="o.partner_id.lang"/>
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
+
                     <div class="row">
                         <div class="col-18">
-                            <span class="purchase-order-title">
-                                Purchase Order
-                            </span>
+                            <span class="purchase-order-title">Purchase Order</span>
                         </div>
                     </div>
+
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
@@ -31,27 +38,20 @@
                                 <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                
-                                <strong t-if="o.partner_id.is_company == True">Address:</strong>
-                                <strong t-if="o.partner_id.is_company == False">Address:</strong>
-                                <div t-if="o.partner_id.is_company == False">
+
+                                <strong>Address:</strong>
+                                <div>
+                                    <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/>
+                                </div>
+                                <div>
                                     <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/>
                                 </div>
 
-                                <div t-if="o.partner_id.is_company == True">
-                                    <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/>
-                                </div>
-                                <div t-if="o.partner_id.is_company == False">
-                                    <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/>
-                                </div>
-                                <div t-if="o.partner_id.is_company == True">
-                                    <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/>
-                                </div>
                                 <strong t-if="o.partner_id.is_company == True and o.partner_id.vat">Tax Number:</strong>
                                 <div t-if="o.partner_id.is_company == True and o.partner_id.vat" t-field="o.partner_id.vat"/>
                                 <strong t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat">Tax Number:</strong>
                                 <div t-if="o.partner_id.is_company == False and o.partner_id.parent_id.vat" t-field="o.partner_id.parent_id.vat"/>
-                                
+
                                 <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
                             </div>
@@ -60,17 +60,17 @@
                         <div class="col-4">
                             <div>
                                 <table class="table table-borderless">
-                                    <tr class="p-0">
-                                        <td class="p-0">Purchase Order</td>
-                                        <td class="p-0"><span t-field="o.name"/></td>
+                                    <tr>
+                                        <td>Purchase Order</td>
+                                        <td><span t-field="o.name"/></td>
                                     </tr>
-                                    <tr class="p-0">
-                                        <td class="p-0">Date</td>
-                                        <td class="p-0"><span t-field="o.date_order"/></td>
+                                    <tr>
+                                        <td>Date</td>
+                                        <td><span t-field="o.date_order"/></td>
                                     </tr>
-                                    <tr class="p-0">
-                                        <td class="p-0">Validity Date</td>
-                                        <td class="p-0"><span t-field="o.validity_date"/></td>
+                                    <tr>
+                                        <td>Validity Date</td>
+                                        <td><span t-field="o.validity_date"/></td>
                                     </tr>
                                 </table>
                             </div>
@@ -80,18 +80,18 @@
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>
                             <tr>
-                                <th name="th_item">Item</th>
-                                <th name="th_training_name">Training Name</th>
-                                <th t-if="o.display_instructor" name="th_training_name">Instructor Name</th>
-                                <th name="th_of_students"># Of Students</th>
-                                <th name="th_training_name">
+                                <th>Item</th>
+                                <th>Training Name</th>
+                                <th t-if="o.display_instructor">Instructor Name</th>
+                                <th># Of Students</th>
+                                <th>
                                     <span t-if="o.display_location">Location</span>
                                     <span t-elif="o.display_where">Location1</span>
                                 </th>
-                                <th name="th_duration">Duration</th>
-                                <th name="th_training_date">Training Dates</th>
-                                <th name="th_training_date">Training Price</th>
-                                <th t-if="o.display_total" name="th_training_date">Total Price</th>
+                                <th>Duration</th>
+                                <th>Training Dates</th>
+                                <th>Training Price</th>
+                                <th t-if="o.display_total">Total Price</th>
                             </tr>
                         </thead>
                         <tbody>

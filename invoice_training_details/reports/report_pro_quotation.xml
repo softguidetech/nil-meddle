@@ -11,8 +11,10 @@
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
-                            <span class="h4 text-info">Purchase Order</span>
-                        </div>
+    <span style="font-weight: bold; font-size: 20px; color: #17a2b8;">
+        Purchase Order
+    </span>
+</div>
                     </div>
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
@@ -101,7 +103,6 @@
                                 <th name="th_item" style="text-align: center; vertical-align: middle;"><span>Item</span></th>
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Training Name</span></th>
                                 <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Instructor Name</span></th>
-                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Language</span></th>
                                 <th name="th_of_students" style="text-align: center; vertical-align: middle;"><span># Of Students</span></th>
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;">
                                 <span t-if="o.display_location">Location</span>
@@ -123,7 +124,6 @@
                                     <td style="text-align: center; vertical-align: middle;"><span t-esc="item"/></td>
                                     <td style="text-align: left; vertical-align: middle;"><span t-field="training.training_id"/></td>
                                     <td t-if="o.display_instructor" style="text-align: center; vertical-align: middle;"><span t-field="training.instructor_id.name"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.no_of_student"/></td>
                                     <td style="text-align: center; vertical-align: middle;">
                                     <span t-if="o.display_location" t-field="training.location"/>
@@ -179,7 +179,7 @@
     </t>
     <!-- Total Amount -->
     <tr class="border-grey o_total">
-        <td style="background-color:#fff;"><strong>Total Amount</strong></td>
+        <td style="background-color:#fff;"><strong>NIL ME Invoice Amount</strong></td>
         <td style="background-color:#fff; text-align: right;">
             <span t-out="o.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
         </td>
@@ -195,7 +195,6 @@
                         </div>
                     </div>
 
-                    <hr/>
 
                     <!--<div class="row" style="page-break-inside:avoid;">-->
                     <!--    <div class="col-6"/>-->

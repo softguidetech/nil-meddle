@@ -101,7 +101,7 @@
                         <thead>
                             <tr>
                                 <th name="th_item" style="text-align: center; vertical-align: middle;"><span>Item</span></th>
-                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Training Name</span></th>
+                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Scope of Work</span></th>
                                 <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Instructor Name</span></th>
                                 <th name="th_of_students" style="text-align: center; vertical-align: middle;"><span># Of Students</span></th>
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;">
@@ -212,13 +212,20 @@
                         <!--        <img t-if="o.ks_qr_code" class="pt-5" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>-->
                         <!--    </t>-->
                         <!--</div>-->
-                        <div name="stamp" class="col-4">
-                            <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
-                        </div>
-                        <div name="signature" class="col-4">
-                            <img t-if="o.company_id.signature and o.display_signature" class="pt-5" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 200px;" alt="Stamp"/>
-                        </div>
-                    </div>
+<t t-set="footer_stamp_signature">
+    <div style="position: absolute; bottom: 30px; right: 30px; display: flex; gap: 40px;">
+        <div name="stamp">
+            <img t-if="o.company_id.stamp and o.display_stamp"
+                 t-att-src="image_data_uri(o.company_id.stamp)"
+                 style="max-height: 200px;" alt="Stamp"/>
+        </div>
+        <div name="signature">
+            <img t-if="o.company_id.signature and o.display_signature"
+                 t-att-src="image_data_uri(o.company_id.signature)"
+                 style="max-height: 200px;" alt="Signature"/>
+        </div>
+    </div>
+</t>
 
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-12">

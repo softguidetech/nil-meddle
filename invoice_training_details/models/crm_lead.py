@@ -28,7 +28,7 @@ class Lead(models.Model):
     training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
     pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
     end_customer = fields.Char(string='End Client')
-    cisco_am = fields.Char(string='Cisco Account Manager')
+    cisco_am = fields.Many2one('res.partner', string='Cisco Account Manager')
     cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
     ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
     hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')

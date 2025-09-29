@@ -116,7 +116,6 @@
                             <br/><br/>
                             <table class="table table-sm" style="background-color:#fff; color: white; width: auto; border: none;">
                                 <tbody>
-                                    <t t-foreach="o.training_course_ids" t-as="training">
                                         <tr>
                                             <td style="color: white; font-size:20px;">
                                                 <a t-att-href="training.hyperlink" target="_blank" style="color: #0ecaf0;">

@@ -20,6 +20,7 @@ class CostDetails(models.Model):
     learning_partner = fields.Selection([
         ('Koenig', 'Koenig'),
         ('Mira', 'Mira'),
+        ('EnterOne', 'EnterOne'),
         ('NIL LTD', 'NIL LTD'),
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')

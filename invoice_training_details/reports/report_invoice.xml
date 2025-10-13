@@ -18,14 +18,51 @@
                         <div class="col-8">
                             <div>
                                 <!--<strong>INVOICE TO</strong>-->
-                                <strong t-if="o.partner_id.is_company == True">Company Name:</strong><br/>
-                                <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
-                                <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
-                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                TAX#: <strong t-field="o.partner_id.vat"/><br/>
-                                <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
-                                <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
-                                <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
+                                <strong t-if="o.partner_id.is_company == True">Company Name:</strong>
+<div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
+<strong t-if="o.partner_id.is_company == False">Company Name:</strong>
+<div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
+
+<strong t-if="o.partner_id.is_company == True"/>
+<div t-if="o.partner_id.is_company == True">
+    <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/>
+</div>
+<strong t-if="o.partner_id.is_company == False"/>
+<div t-if="o.partner_id.is_company == False">
+    <span t-field="o.partner_id.city"/>, <span t-field="o.partner_id.country_id.name"/>
+</div>
+<strong t-if="o.partner_id.is_company == True"/>
+<div t-if="o.partner_id.is_company == True" t-field="o.partner_id.street"/>
+<strong t-if="o.partner_id.is_company == False"/>
+<div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.street"/>
+<strong t-if="o.partner_id.is_company == True"/>
+<div t-if="o.partner_id.is_company == True" t-field="o.partner_id.street2"/>
+<strong t-if="o.partner_id.is_company == False"/>
+<div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.street2"/>
+<strong t-if="o.partner_id.is_company == True"/>
+<div t-if="o.partner_id.is_company == True" t-field="o.partner_id.zip"/>
+<strong t-if="o.partner_id.is_company == False"/>
+<div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.zip"/>
+<div>
+    <span t-if="o.partner_id.is_company == True">CRN: </span>
+    <span t-if="o.partner_id.is_company == True" t-field="o.partner_id.l10n_sa_additional_identification_number"/>
+</div>
+
+<div>
+    <span t-if="o.partner_id.is_company == False">Identification Number: </span>
+    <span t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.l10n_sa_additional_identification_number"/>
+</div>
+
+<div>
+    <span t-if="o.partner_id.is_company == True">Tax Number: </span>
+    <span t-if="o.partner_id.is_company == True" t-field="o.partner_id.vat"/>
+</div>
+
+<div>
+    <span t-if="o.partner_id.is_company == False">Tax Number:</span>
+    <span t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.vat"/>
+</div>
+
                                  
                                
                             </div>
@@ -85,7 +122,7 @@
 
                     <div class="row pt-3 pb-2">
                         <div class="col-12">
-                            Training Courses Details: <span t-field="o.training_name"/>
+                            <span t-field="o.training_name"/>
                         </div>
                     </div>
 
@@ -207,7 +244,6 @@
                         </div>
                     </div>
 
-                    <hr/>
 
                     <!--<div class="row" style="page-break-inside:avoid;">-->
                     <!--    <div class="col-6"/>-->
@@ -219,32 +255,34 @@
                     <!--    </div>-->
                     <!--</div>-->
 
-                    <<div class="row" style="page-break-inside:avoid;">
+                    <div class="row" style="page-break-inside:avoid;">
     <div name="ksa_qr" class="col-4">
         <t t-if="o.display_ksa_qr">
-            <img t-if="o.ks_qr_code" class="pt-5" t-att-src="'data:image/png;base64,' + o.ks_qr_code" style="max-height: 200px;" alt="KSA QR"/>
+            <img t-if="o.ks_qr_code" class="pt-5" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>
         </t>
-    </div>
-    <div name="stamp" class="col-4">
-        <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
     </div>
     <div name="signature" class="col-4">
         <img t-if="o.company_id.signature and o.display_signature" class="pt-5" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 200px;" alt="Signature"/>
     </div>
 </div>
 
+<div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+    <div class="col-12">
+        <p>
+        <span t-field="o.bank_details"/>
+        </p>
+    </div>
+</div>
 
-                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
-                        <div class="col-12">
-                            <p>
-                            <span t-field="o.bank_details"/>
-                            </p>
-                        </div>
-                    </div>
+<!-- Move the stamp here -->
+<div class="row" style="page-break-inside:avoid;">
+    <div name="stamp" class="col-12 text-center">
+        <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
+    </div>
+</div>
+
 
                 </t>
             </t>
         </t>
-                         </template>
-
-</odoo>
+                         </t>

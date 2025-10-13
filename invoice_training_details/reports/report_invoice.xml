@@ -8,15 +8,12 @@
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
-                    
                     <div class="row">
-                        <div class="col-12" style="text-align: right; font-weight: bold; font-size: 16px; color: #000;">
-                            <t t-esc="o.company_id.name"/>
-                        </div>
                         <div class="col-12">
                             <span class="h4 text-info">TAX INVOICE</span>
                         </div>
                     </div>
+
                     <div class="row pt-3 pb-3">
                         <div class="col-8">
                             <div>
@@ -210,6 +207,7 @@
                         </div>
                     </div>
 
+                    <hr/>
 
                     <!--<div class="row" style="page-break-inside:avoid;">-->
                     <!--    <div class="col-6"/>-->

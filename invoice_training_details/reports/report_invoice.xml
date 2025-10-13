@@ -10,7 +10,8 @@
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
-                            <span class="h4 text-info">TAX INVOICE</span>
+                            <span class="h4 text-info">TAX INVOICE</span><br/>
+                            <span t-field="o.company_id.name"/>
                         </div>
                     </div>
 
@@ -105,8 +106,6 @@
                                 <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>Training Price</span></th>
 
                                 <th t-if="o.display_total" name="th_training_date" style="max-width:80px;text-align: center; vertical-align: middle;"> <span>Total Price</span></th>
-                                <!--<th t-if="o.display_downpayment" name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>-->
-                                <!--<th t-if="o.display_due_amount" name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -188,10 +187,6 @@
                                     <div class="ms-auto">
                                         <table class="table table-sm table-borderless avoid-page-break-inside">
 
-                    <!--<div class="col-16">-->
-                    <!--        <div>-->
-                    <!--        <table style="text-align:right;" class="table table-borderless">-->
-                              
                            </table>
                            </div>
                           </div>
@@ -208,16 +203,6 @@
                     </div>
 
                     <hr/>
-
-                    <!--<div class="row" style="page-break-inside:avoid;">-->
-                    <!--    <div class="col-6"/>-->
-                    <!--    <div class="col-3">-->
-                    <!--        BALANCE DUE-->
-                    <!--    </div>-->
-                    <!--    <div class="col-3">-->
-                    <!--        <span t-field="o.amount_residual"/>-->
-                    <!--    </div>-->
-                    <!--</div>-->
 
                     <div class="row" style="page-break-inside:avoid;">
                         <div name="ksa_qr" class="col-4">

@@ -34,7 +34,7 @@
         "reports/report_invoice.xml",  # General invoice report
         "reports/report_quotation.xml",  # Quotation report
         "reports/report_pro_invoice.xml",  # Professional invoice report
-        "reports/report_pro_quotation.xml",  # Professional quotation report
+        "reports/report_po_document.xml",  # Professional quotation report
         "reports/report_action.xml",  # Custom action for reports
         "reports/report_invoice_KSA.xml",
     ],

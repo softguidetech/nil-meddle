@@ -1,134 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <record id="view_move_form_inherit_training" model="ir.ui.view">
-        <field name="name">account.move.form.inherit.training</field>
-        <field name="model">account.move</field>
-        <field name="inherit_id" ref="account.view_move_form"/>
-        <field name="arch" type="xml">
-            <xpath expr="//page[@id='other_tab']" position="before">
-                <page id="training" name="Training">
-                    <group>
-                         <field name="training_vendor"/>
-                        <field name="training_type"/>
-                        <field name="instructor_id"/>
-                    </group>
-                    <field name="training_course_ids">
-                        <tree editable="bottom">
-                            <field name="training_id"/>
-                            <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            <field name="instructor_id"/>
-                            <field name="train_language"/>
-                            <field name="location"/>
-                            <field name="where_location2" />
-                            <field name="payment_method"/>
-                            <field name="no_of_student"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <group>
-                        <group>
-                            <field name="total_training_price"/>
-                        </group>
-                        <group>
-                            <field name="invoice_payment_am"/>
-                            <field name="invoice_payment_per"/>
-                        </group>
-                    </group>
-
-                    <group>
-                        <group string="Report PDF Element Display">
-                            <field name="display_training_table"/>
-                            <field name="display_signature"/>
-                            <field name="display_stamp"/>
-                            <field name="display_ksa_qr"/>
-                        </group>
-                        <group string="Column Display">
-                            <field name="display_instructor"/>
-                            <field name="display_location"/>
-                            <field name="display_downpayment"/>
-                            <field name="display_total"/>
-                            <field name="display_due_amount"/>
-                            <field name="display_where"/>
-                            <field name="display_description"/>
-                        </group>
-                        <!-- Display QR code only if display_ksa_qr is True -->
-<group modifiers="{'invisible': [('display_ksa_qr', '=', False)]}">
-                            <field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start"/>
-                        </group>
-                        <group string="Banks and Terms">
-                            <field name="bank_details"/>
-                            <field name="term_and_cond"/>
-                        </group>
-                    </group>
-                </page>
-                
-                <page id="pro" name="Professional Services">
-                    <group>
-                        <field name="service_name"/>
-                    </group>
-                     <field name="pro_service_ids">
-                        <tree editable="bottom">
-                            <field name="training_id"/>
-                            <field name="descriptions"/>
-                            <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            <field name="wor_hour_number"/>
-                            <field name="train_language"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="hourly_rate"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <group>
-                        <group>
-                            <field name="total_service_price"/>
-                        </group>
-                    </group>
-                    <group>
-                        <group string="Report PDF Element Display">
-                            <field name="display_training_table"/>
-                            <field name="display_signature"/>
-                            <field name="display_stamp"/>
-                        </group>
-                        <group string="Column Display">
-                            <field name="display_instructor"/>
-                            <field name="display_location"/>
-                            <field name="display_downpayment"/>
-                            <field name="display_total"/>
-                            <field name="display_due_amount"/>
-                            <field name="display_where"/>
-                            <field name="display_description"/>
-                        </group>
-                        <group>
-                            <field name="bank_details"/>
-                            <field name="term_and_cond"/>
-                        </group>
-                    </group>
-                </page>
-
-                <page id="extra_information" string="Extra Information">
-                    <group>
-                        <group>
-                            <field name="clcs_qty"/>
-                            <field name="so_no"/>
-                            <field name="tr_expiry_date"/>
-                        </group>
-                    </group>
-                </page>
-
-                <page id="logistics" string="Logistics">
-                    <group>
-                        <group></group>
-                    </group>
-                </page>
-
-            </xpath>
-        </field>
-    </record>
-
+	<record id="view_move_form_inherit_training" model="ir.ui.view">
+		<field name="name">
+			account.move.form.inherit.training
+		</field>
+		<field name="model">
+			account.move
+		</field>
+		<field name="inherit_id" ref="account.view_move_form" />
+		<field name="arch" type="xml">
+			<!-- Add cost analysis section after invoice lines -->
+			<xpath expr="//field[@name='invoice_line_ids']" position="after">
+				<group string="Cost Analysis">
+					<field name="total_cost" readonly="1" />
+					<field name="gross_margin" readonly="1" />
+					<field name="margin_percentage" readonly="1" widget="percentage" />
+					<field name="cost_details_ids">
+						<tree editable="bottom">
+							<field name="name" />
+							<field name="learning_partner" />
+							<field name="training_vendor" />
+							<field name="clc_cost" />
+							<field name="margin1" />
+							<field name="nilme_share" />
+							<field name="margin" widget="percentage" />
+						</tree>
+					</field>
+				</group>
+			</xpath>
+			<!-- Your existing pages structure -->
+			<xpath expr="//page[@id='other_tab']" position="before">
+				<page id="training" name="Training">
+					<group>
+						<field name="training_vendor" />
+						<field name="training_type" />
+						<field name="instructor_id" />
+					</group>
+					<field name="training_course_ids">
+						<tree editable="bottom">
+							<field name="training_id" />
+							<field name="cost_clc" />
+							<field name="hyperlink" />
+							<field name="instructor_id" />
+							<field name="train_language" />
+							<field name="location" />
+							<field name="where_location2" />
+							<field name="payment_method" />
+							<field name="no_of_student" />
+							<field name="duration" />
+							<field name="training_date_start" />
+							<field name="training_date_end" />
+							<field name="price" />
+						</tree>
+					</field>
+					<group>
+						<group>
+							<field name="total_training_price" />
+						</group>
+						<group>
+							<field name="invoice_payment_am" />
+							<field name="invoice_payment_per" />
+						</group>
+					</group>
+					<group>
+						<group string="Report PDF Element Display">
+							<field name="display_training_table" />
+							<field name="display_signature" />
+							<field name="display_stamp" />
+							<field name="display_ksa_qr" />
+						</group>
+						<group string="Column Display">
+							<field name="display_instructor" />
+							<field name="display_location" />
+							<field name="display_downpayment" />
+							<field name="display_total" />
+							<field name="display_due_amount" />
+							<field name="display_where" />
+							<field name="display_description" />
+						</group>
+						<group>
+							<field name="ks_qr_code" widget="image" class="oe_avatar w-auto float-start" />
+						</group>
+						<group string="Banks and Terms">
+							<field name="bank_details" />
+							<field name="term_and_cond" />
+						</group>
+					</group>
+				</page>
+				<page id="pro" name="Professional Services">
+					<group>
+						<field name="service_name" />
+					</group>
+					<field name="pro_service_ids">
+						<tree editable="bottom">
+							<field name="training_id" />
+							<field name="descriptions" />
+							<field name="cost_clc" />
+							<field name="hyperlink" />
+							<field name="wor_hour_number" />
+							<field name="train_language" />
+							<field name="duration" />
+							<field name="training_date_start" />
+							<field name="hourly_rate" />
+							<field name="price" />
+						</tree>
+					</field>
+					<group>
+						<group>
+							<field name="total_service_price" />
+						</group>
+					</group>
+					<group>
+						<group string="Report PDF Element Display">
+							<field name="display_training_table" />
+							<field name="display_signature" />
+							<field name="display_stamp" />
+						</group>
+						<group string="Column Display">
+							<field name="display_instructor" />
+							<field name="display_location" />
+							<field name="display_downpayment" />
+							<field name="display_total" />
+							<field name="display_due_amount" />
+							<field name="display_where" />
+							<field name="display_description" />
+						</group>
+						<group>
+							<field name="bank_details" />
+							<field name="term_and_cond" />
+						</group>
+					</group>
+				</page>
+				<page id="extra_information" string="Extra Information">
+					<group>
+						<group>
+							<field name="clcs_qty" />
+							<field name="so_no" />
+							<field name="tr_expiry_date" />
+						</group>
+					</group>
+				</page>
+				<page id="logistics" string="Logistics">
+					<group>
+						<group>
+						</group>
+					</group>
+				</page>
+			</xpath>
+		</field>
+	</record>
 </odoo>

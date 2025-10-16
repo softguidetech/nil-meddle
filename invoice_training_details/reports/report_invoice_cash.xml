@@ -10,7 +10,7 @@
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
-                            <span class="h4 text-info">TAX INVOICE</span>
+                            <span class="h4 text-info">TAX 00INVOICE</span>
                         </div>
                     </div>
 

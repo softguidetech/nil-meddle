@@ -36,7 +36,7 @@
         "reports/report_pro_invoice.xml",  # Professional invoice report
         "reports/report_pro_quotation.xml",  # Professional quotation report
         "reports/report_action.xml",  # Custom action for reports
-        "reports/report_invoice_cash.xml",
+        "reports/report_invoice_KSA.xml",
     ],
 
     # Installation Settings

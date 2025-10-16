@@ -41,7 +41,7 @@
         <field name="binding_type">report</field>
     </record>
     
-    <record id="quotation_pro_training_report" model="ir.actions.report">
+    <record id="quotation_po_training_report" model="ir.actions.report">
         <field name="name">Training PO</field>
         <field name="model">sale.order</field>
         <field name="report_type">qweb-pdf</field>

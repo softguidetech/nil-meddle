@@ -1,0 +1,6 @@
+<odoo>
+    <record id="action_current_location" model="ir.actions.client">
+        <field name="name">Current Location Fetcher</field>
+        <field name="tag">attendance_location_validator.current_location_action</field>
+    </record>
+</odoo>

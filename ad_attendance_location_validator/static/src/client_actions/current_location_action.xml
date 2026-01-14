@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates>
+    <t t-name="attendance_location_validator.CurrentLocationTemplate">
+        <div class="o_form_view o_form_sheet_bg p-4">
+            <div class="card shadow-sm rounded border-0">
+                <div class="card-body text-center">
+                    <h4 class="mb-3 text-primary">Fetching Current Location</h4>
+                    <t t-if="state.loading">
+                        <div class="spinner-border text-info" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <p class="mt-2 text-muted">Please wait while we retrieve your coordinates...</p>
+                    </t>
+                    <t t-if="!state.loading">
+                        <p class="text-success">Location fetched successfully.</p>
+                    </t>
+                </div>
+            </div>
+        </div>
+    </t>
+</templates>

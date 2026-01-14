@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="view_company_form_attendance_location" model="ir.ui.view">
+        <field name="name">res.company.form.attendance.location</field>
+        <field name="model">res.company</field>
+        <field name="inherit_id" ref="base.view_company_form" />
+        <field name="arch" type="xml">
+            <field name="currency_id" position="after">
+                <field name="attendance_latitude" />
+                <field name="attendance_longitude" />
+                <field name="attendance_radius_km" />
+            </field>
+            <xpath expr="//sheet" position="before">
+                <header>
+                    <button class="oe_stat_button" type="action"
+        name="%(action_current_location)d"
+        string="Get Current Location"
+        icon="fa-location-arrow"/>
+
+                </header>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -121,7 +121,6 @@
 
                     <div class="row pt-3 pb-2">
                         <div class="col-12">
-                            Training Courses Details: <span t-field="o.training_name"/>
                         </div>
                     </div>
 
@@ -204,7 +203,7 @@
                                              <tr class="border-black o_total">
                                                 <td style="background-color:#fff;"><strong>Currency Rate</strong></td>
                                                 <td style="background-color:#fff;" class="text-end">
-                                                    <span t-field="o.currency_id.rate">31.05</span>
+<span t-out="o.currency_id.rate" t-options='{"widget": "float", "precision_digits": 2}'>31.05</span>
                                                 </td>
                                             </tr>
                                             <tr class="border-black o_total">
@@ -243,7 +242,6 @@
                         </div>
                     </div>
 
-                    <hr/>
 
                     <!--<div class="row" style="page-break-inside:avoid;">-->
                     <!--    <div class="col-6"/>-->

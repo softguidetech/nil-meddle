@@ -3,7 +3,7 @@
 
     <template id="custom_invoice_report_layout" inherit_id="web.external_layout_standard" primary="True">
         <div t-attf-class="header o_company_#{company.id}_layout" position="replace">
-            <t t-set="company" t-value="request.env.company"/>
+<t t-set="company" t-value="o.company_id if o else request.env.company"/>
             <div class="header o_company_#{company.id}_layout">
                 <div class="row mb-2">
                     <div class="col-9">

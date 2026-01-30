@@ -203,7 +203,7 @@
                                              <tr class="border-black o_total">
                                                 <td style="background-color:#fff;"><strong>Currency Rate</strong></td>
                                                 <td style="background-color:#fff;" class="text-end">
-<span t-out="o.currency_id.rate" t-options='{"widget": "float", "precision_digits": 2}'>31.05</span>
+<span t-out="o.currency_id.rate" t-options='{"widget": "float", "precision": 2}'>31.05</span>
                                                 </td>
                                             </tr>
                                             <tr class="border-black o_total">

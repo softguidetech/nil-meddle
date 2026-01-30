@@ -22,16 +22,17 @@
                                 <div t-if="o.partner_id.is_company == True" t-field="o.partner_id.name"/>
                                 <strong t-if="o.partner_id.is_company == False">Company Name:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.name"/>
-                                TAX#: <strong t-field="o.partner_id.vat"/><br/>
+                                TAX#: <strong t-field="o.partner_id.vat"/>
                                 <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
 
                                 <!-- ================== ADDED: CUSTOMER CR + FULL ADDRESS (EN) ================== -->
-                                <div class="pt-1">
-                                    <strong>Commercial Registration (CR):</strong><br/>
-                                    <span t-if="o.partner_id.is_company == True" t-field="o.partner_id.l10n_sa_additional_identification_number"/>
-                                    <span t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.l10n_sa_additional_identification_number"/>
-                                </div>
+                               <div class="pt-1">
+    <strong>Commercial Registration:</strong>
+    <span t-if="o.partner_id.is_company" t-field="o.partner_id.l10n_sa_additional_identification_number"/>
+    <span t-if="not o.partner_id.is_company" t-field="o.partner_id.parent_id.l10n_sa_additional_identification_number"/>
+</div>
+
 
                                 <div class="pt-1">
                                     <strong>Customer Address:</strong><br/>

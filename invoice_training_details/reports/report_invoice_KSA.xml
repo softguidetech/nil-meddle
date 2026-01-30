@@ -25,6 +25,42 @@
                                 TAX#: <strong t-field="o.partner_id.vat"/><br/>
                                 <strong t-if="o.partner_id.is_company == False">Attention:</strong><br/>
                                 <div t-if="o.partner_id.is_company == False" t-field="o.partner_id.name"/>
+
+                                <!-- ================== ADDED: CUSTOMER CR + FULL ADDRESS (EN) ================== -->
+                                <div class="pt-1">
+                                    <strong>Commercial Registration (CR):</strong><br/>
+                                    <span t-if="o.partner_id.is_company == True" t-field="o.partner_id.l10n_sa_additional_identification_number"/>
+                                    <span t-if="o.partner_id.is_company == False" t-field="o.partner_id.parent_id.l10n_sa_additional_identification_number"/>
+                                </div>
+
+                                <div class="pt-1">
+                                    <strong>Customer Address:</strong><br/>
+                                    <t t-if="o.partner_id.is_company == True">
+                                        <span t-if="o.partner_id.street" t-field="o.partner_id.street"/><br t-if="o.partner_id.street"/>
+                                        <span t-if="o.partner_id.street2" t-field="o.partner_id.street2"/><br t-if="o.partner_id.street2"/>
+                                        <t t-if="o.partner_id.city or o.partner_id.state_id or o.partner_id.zip">
+                                            <span t-if="o.partner_id.city" t-field="o.partner_id.city"/>
+                                            <t t-if="o.partner_id.state_id">, <span t-field="o.partner_id.state_id.name"/></t>
+                                            <t t-if="o.partner_id.zip"> <span t-field="o.partner_id.zip"/></t>
+                                            <br/>
+                                        </t>
+                                        <span t-if="o.partner_id.country_id" t-field="o.partner_id.country_id.name"/>
+                                    </t>
+
+                                    <t t-if="o.partner_id.is_company == False">
+                                        <span t-if="o.partner_id.parent_id.street" t-field="o.partner_id.parent_id.street"/><br t-if="o.partner_id.parent_id.street"/>
+                                        <span t-if="o.partner_id.parent_id.street2" t-field="o.partner_id.parent_id.street2"/><br t-if="o.partner_id.parent_id.street2"/>
+                                        <t t-if="o.partner_id.parent_id.city or o.partner_id.parent_id.state_id or o.partner_id.parent_id.zip">
+                                            <span t-if="o.partner_id.parent_id.city" t-field="o.partner_id.parent_id.city"/>
+                                            <t t-if="o.partner_id.parent_id.state_id">, <span t-field="o.partner_id.parent_id.state_id.name"/></t>
+                                            <t t-if="o.partner_id.parent_id.zip"> <span t-field="o.partner_id.parent_id.zip"/></t>
+                                            <br/>
+                                        </t>
+                                        <span t-if="o.partner_id.parent_id.country_id" t-field="o.partner_id.parent_id.country_id.name"/>
+                                    </t>
+                                </div>
+                                <!-- ================== /ADDED ================== -->
+
                                 <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
                                  
                                

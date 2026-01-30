@@ -28,11 +28,10 @@
 
                                 <!-- ================== ADDED: CUSTOMER CR + FULL ADDRESS (EN) ================== -->
                                <div class="pt-1">
-    <strong>Commercial Registration:</strong>
-    <span t-if="o.partner_id.is_company" t-field="o.partner_id.l10n_sa_additional_identification_number"/>
-    <span t-if="not o.partner_id.is_company" t-field="o.partner_id.parent_id.l10n_sa_additional_identification_number"/>
-</div>
-
+                                    <strong>Commercial Registration:</strong>
+                                    <span t-if="o.partner_id.is_company" t-field="o.partner_id.l10n_sa_additional_identification_number"/>
+                                    <span t-if="not o.partner_id.is_company" t-field="o.partner_id.parent_id.l10n_sa_additional_identification_number"/>
+                                </div>
 
                                 <div class="pt-1">
                                     <strong>Customer Address:</strong><br/>
@@ -213,71 +212,66 @@
                                             </tr>
                                             <!-- ================== /CURRENCY (ONLY CHANGE HERE) ================== -->
                                            
-                                            
                                         </table>
                                     </div>
                             </div>
                     </div>
-                     <div id="right-elements" t-attf-class="#{'col-5' if report_type != 'html' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
-                                <div id="total" class="clearfix row">
-                                    <div class="ms-auto">
-                                        <table class="table table-sm table-borderless avoid-page-break-inside">
 
-                    <!--<div class="col-16">-->
-                    <!--        <div>-->
-                    <!--        <table style="text-align:right;" class="table table-borderless">-->
-                              
-                           </table>
-                           </div>
-                          </div>
-                          </div>
-                    
-                    
+                    <div id="right-elements" t-attf-class="#{'col-5' if report_type != 'html' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
+                        <div id="total" class="clearfix row">
+                            <div class="ms-auto">
+                                <table class="table table-sm table-borderless avoid-page-break-inside">
+                                </table>
+                            </div>
+                        </div>
+                    </div>
 
+                    <!-- ================== REORDERED BOTTOM SECTION (ONLY CHANGE HERE) ================== -->
+
+                    <!-- 1) Terms and Conditions FIRST -->
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <div class="col-12">
                             <p>
-                            <span t-field="o.term_and_cond"/>
+                                <span t-field="o.term_and_cond"/>
                             </p>
                         </div>
                     </div>
 
+                    <!-- 2) Bank Details SECOND -->
+                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+                        <div class="col-12">
+                            <p>
+                                <span t-field="o.bank_details"/>
+                            </p>
+                        </div>
+                    </div>
 
-                    <!--<div class="row" style="page-break-inside:avoid;">-->
-                    <!--    <div class="col-6"/>-->
-                    <!--    <div class="col-3">-->
-                    <!--        BALANCE DUE-->
-                    <!--    </div>-->
-                    <!--    <div class="col-3">-->
-                    <!--        <span t-field="o.amount_residual"/>-->
-                    <!--    </div>-->
-                    <!--</div>-->
-
-                    <div class="row" style="page-break-inside:avoid;">
+                    <!-- 3) QR Code THIRD + 4) Stamp/Signature far right bottom corner -->
+                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+                        <!-- QR on the left -->
                         <div name="ksa_qr" class="col-4">
                             <t t-if="o.display_ksa_qr">
-                                <img t-if="o.ks_qr_code" class="pt-5" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>
+                                <img t-if="o.ks_qr_code" class="pt-2" t-att-src="image_data_uri(o.ks_qr_code)" style="max-height: 200px;" alt="KSA QR"/>
                             </t>
                         </div>
-                        <div name="stamp" class="col-4">
-                            <img t-if="o.company_id.stamp and o.display_stamp" class="pt-5" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
-                        </div>
-                        <div name="signature" class="col-4">
-                            <img t-if="o.company_id.signature and o.display_signature" class="pt-5" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 200px;" alt="Stamp"/>
+
+                        <!-- Spacer -->
+                        <div class="col-4"></div>
+
+                        <!-- Stamp + Signature at extreme right -->
+                        <div class="col-4 text-end" style="padding-right: 0;">
+                            <div class="d-flex flex-column align-items-end" style="gap: 10px;">
+                                <img t-if="o.company_id.stamp and o.display_stamp" class="pt-2" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
+                                <img t-if="o.company_id.signature and o.display_signature" class="pt-2" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 200px;" alt="Signature"/>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
-                        <div class="col-12">
-                            <p>
-                            <span t-field="o.bank_details"/>
-                            </p>
-                        </div>
-                    </div>
+                    <!-- ================== /REORDERED BOTTOM SECTION ================== -->
 
                 </t>
             </t>
         </t>
-                         </template>
+    </template>
 
 </odoo>

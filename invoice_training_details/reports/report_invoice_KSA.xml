@@ -62,8 +62,6 @@
                                 <!-- ================== /ADDED ================== -->
 
                                 <!--<div t-field="o.partner_id" t-options="{&quot;widget&quot;: &quot;contact&quot;, &quot;fields&quot;: [&quot;address&quot;, &quot;name&quot;], &quot;no_marker&quot;: True}"/>-->
-                                 
-                               
                             </div>
                         </div>
                         <div class="col-4">
@@ -85,7 +83,6 @@
                                         <td class="p-0">Due Date</td>
                                         <td class="p-0"><span t-field="o.invoice_date_due"/></td>
                                     </tr>
-                                   
                                 </table>
                             </div>
                         </div>
@@ -109,9 +106,9 @@
                                     <td class="text-end"><span t-field="line.quantity"/></td>
                                     <td class="text-end"><span t-field="line.price_unit"/></td>
                                     <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_ids])"/>
-                                            <td name="td_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
-                                                <span t-out="taxes" id="line_tax_ids">Tax</span>
-                                            </td>
+                                    <td name="td_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }} {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
+                                        <span t-out="taxes" id="line_tax_ids">Tax</span>
+                                    </td>
                                     <td class="text-end"><span t-field="line.price_subtotal"/></td>
                                     <td class="text-end"><span t-field="line.price_total"/></td>
                                 </tr>
@@ -140,8 +137,6 @@
                                 <th name="th_training_date" style="text-align: center; vertical-align: middle;"><span>Training Price</span></th>
 
                                 <th t-if="o.display_total" name="th_training_date" style="max-width:80px;text-align: center; vertical-align: middle;"> <span>Total Price</span></th>
-                                <!--<th t-if="o.display_downpayment" name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>-->
-                                <!--<th t-if="o.display_due_amount" name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>-->
                             </tr>
                         </thead>
                         <tbody>
@@ -200,18 +195,22 @@
                                                         </tr>
                                                     </t>
                                                 </t>
+
+                                            <!-- ================== CURRENCY (ONLY CHANGE HERE) ================== -->
+                                            <t t-set="fixed_rate" t-value="3.75"/>
                                              <tr class="border-black o_total">
                                                 <td style="background-color:#fff;"><strong>Currency Rate</strong></td>
                                                 <td style="background-color:#fff;" class="text-end">
-<span t-out="o.currency_id.rate" t-options='{"widget": "float", "precision": 2}'>31.05</span>
+                                                    <span t-out="fixed_rate" t-options='{"widget": "float", "precision": 2}'>3.75</span>
                                                 </td>
                                             </tr>
                                             <tr class="border-black o_total">
                                                 <td style="background-color:#fff;"><strong>Total Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
                                                 <td style="background-color:#fff;" class="text-end">
-                                                    <span t-field="o.currency_total">31.05</span>
+                                                    <span t-out="o.amount_total * fixed_rate" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'>0.00</span>
                                                 </td>
                                             </tr>
+                                            <!-- ================== /CURRENCY (ONLY CHANGE HERE) ================== -->
                                            
                                             
                                         </table>

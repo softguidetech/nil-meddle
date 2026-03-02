@@ -206,6 +206,8 @@
                                                t-value="invoice_currency._get_conversion_rate(invoice_currency, company_currency, o.company_id, rate_date) if invoice_currency and company_currency else 1.0"/>
                                             <t t-set="tax_amount_company"
    t-value="(o.amount_tax or 0.0) * company_per_unit"/>
+                                            <t t-set="untaxed_amount_company"
+   t-value="(o.amount_untaxed or 0.0) * company_per_unit"/>
 
                                             <tr class="border-black o_total">
                                                 <td style="background-color:#fff;"><strong><span t-esc="company_currency.name"/> per Unit</strong></td>
@@ -213,6 +215,12 @@
                                                     <span t-out="company_per_unit" t-options='{"widget": "float", "precision": 6}'>0.000000</span>
                                                 </td>
                                             </tr>
+                                            <tr class="border-black o_total">
+    <td style="background-color:#fff;"><strong>Untaxed Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
+    <td style="background-color:#fff;" class="text-end">
+        <span t-out="untaxed_amount_company" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'>0.00</span>
+    </td>
+</tr>
                                             
                                             <tr class="border-black o_total">
     <td style="background-color:#fff;"><strong>Tax Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>

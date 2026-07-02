@@ -8,10 +8,18 @@
 
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
 
-                    <!-- جعل صفحة التقرير مرجعاً لموقع الختم والتوقيع -->
                     <style>
-                        .page {
-                            position: relative !important;
+                        table[name="training_line_table"] th,
+                        table[name="training_line_table"] td {
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                        }
+
+                        table[name="training_line_table"] th span,
+                        table[name="training_line_table"] td span,
+                        table[name="training_line_table"] td div {
+                            text-align: center !important;
+                            vertical-align: middle !important;
                         }
                     </style>
 
@@ -163,31 +171,56 @@
                         t-if="o.display_training_table"
                         class="table table-sm o_main_table table-bordered text-center"
                         name="training_line_table"
+                        style="
+                            width:100%;
+                            text-align:center;
+                            vertical-align:middle;
+                        "
                     >
 
                         <thead>
                             <tr>
 
-                                <th style="font-size:18px; text-align:center; vertical-align:middle;">
+                                <th style="
+                                    font-size:18px;
+                                    text-align:center;
+                                    vertical-align:middle;
+                                ">
                                     Item
                                 </th>
 
-                                <th style="font-size:18px; text-align:center; vertical-align:middle;">
+                                <th style="
+                                    font-size:18px;
+                                    text-align:center;
+                                    vertical-align:middle;
+                                ">
                                     Training Name
                                 </th>
 
                                 <th
                                     t-if="o.display_instructor"
-                                    style="font-size:18px; text-align:center; vertical-align:middle;"
+                                    style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    "
                                 >
                                     Instructor Name
                                 </th>
 
-                                <th style="font-size:18px; text-align:center; vertical-align:middle;">
+                                <th style="
+                                    font-size:18px;
+                                    text-align:center;
+                                    vertical-align:middle;
+                                ">
                                     # Of Students
                                 </th>
 
-                                <th style="font-size:18px; text-align:center; vertical-align:middle;">
+                                <th style="
+                                    font-size:18px;
+                                    text-align:center;
+                                    vertical-align:middle;
+                                ">
                                     <span t-if="o.display_location">
                                         Location
                                     </span>
@@ -197,21 +230,37 @@
                                     </span>
                                 </th>
 
-                                <th style="font-size:18px; text-align:center; vertical-align:middle;">
+                                <th style="
+                                    font-size:18px;
+                                    text-align:center;
+                                    vertical-align:middle;
+                                ">
                                     Duration
                                 </th>
 
-                                <th style="font-size:18px; text-align:center; vertical-align:middle;">
+                                <th style="
+                                    font-size:18px;
+                                    text-align:center;
+                                    vertical-align:middle;
+                                ">
                                     Training Dates
                                 </th>
 
-                                <th style="font-size:18px; text-align:center; vertical-align:middle;">
+                                <th style="
+                                    font-size:18px;
+                                    text-align:center;
+                                    vertical-align:middle;
+                                ">
                                     Training Price
                                 </th>
 
                                 <th
                                     t-if="o.display_total"
-                                    style="font-size:18px; text-align:center; vertical-align:middle;"
+                                    style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    "
                                 >
                                     Total Price
                                 </th>
@@ -235,26 +284,46 @@
 
                                 <tr>
 
-                                    <td style="font-size:18px;">
+                                    <td style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    ">
                                         <span t-esc="item"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    ">
                                         <span t-field="training.training_id"/>
                                     </td>
 
                                     <td
                                         t-if="o.display_instructor"
-                                        style="font-size:20px;"
+                                        style="
+                                            font-size:20px;
+                                            text-align:center;
+                                            vertical-align:middle;
+                                        "
                                     >
                                         <span t-field="training.instructor_id.name"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    ">
                                         <span t-field="training.no_of_student"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    ">
 
                                         <span
                                             t-if="o.display_location"
@@ -274,11 +343,19 @@
 
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    ">
                                         <span t-field="training.duration"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    ">
 
                                         <span t-field="training.training_date_start"/>
 
@@ -288,8 +365,12 @@
 
                                     </td>
 
-                                    <!-- السعر بعملة الكوتيشن CLC -->
-                                    <td style="font-size:18px;">
+                                    <!-- السعر بعملة الكوتيشن -->
+                                    <td style="
+                                        font-size:18px;
+                                        text-align:center;
+                                        vertical-align:middle;
+                                    ">
 
                                         <span
                                             t-out="training.price"
@@ -303,11 +384,14 @@
 
                                     <t t-if="item == 1">
 
-                                        <!-- المجموع بعملة الكوتيشن CLC -->
                                         <td
                                             t-if="o.display_total"
                                             t-att-rowspan="total_rows"
-                                            style="font-size:18px;"
+                                            style="
+                                                font-size:18px;
+                                                text-align:center;
+                                                vertical-align:middle;
+                                            "
                                         >
 
                                             <span
@@ -405,7 +489,10 @@
 
                                         <tr class="border-grey o_subtotal">
 
-                                            <td style="background-color:#fff; font-size:20px;">
+                                            <td style="
+                                                background-color:#fff;
+                                                font-size:20px;
+                                            ">
 
                                                 <strong t-out="subtotal['name']">
                                                     Untaxed Amount
@@ -413,7 +500,11 @@
 
                                             </td>
 
-                                            <td style="background-color:#fff; text-align:right; font-size:20px;">
+                                            <td style="
+                                                background-color:#fff;
+                                                text-align:right;
+                                                font-size:20px;
+                                            ">
 
                                                 <span
                                                     t-att-class="oe_subtotal_footer_separator"
@@ -433,7 +524,6 @@
                                             t-value="subtotal['name']"
                                         />
 
-                                        <!-- الضرائب بعملة الكوتيشن CLC -->
                                         <t
                                             t-foreach="tax_totals.get('groups_by_subtotal', {}).get(subtotal['name'], [])"
                                             t-as="tax_group"
@@ -441,13 +531,20 @@
 
                                             <tr class="border-grey">
 
-                                                <td style="background-color:#fff; font-size:20px;">
+                                                <td style="
+                                                    background-color:#fff;
+                                                    font-size:20px;
+                                                ">
 
                                                     <span t-out="tax_group.get('tax_group_name')"/>
 
                                                 </td>
 
-                                                <td style="background-color:#fff; text-align:right; font-size:20px;">
+                                                <td style="
+                                                    background-color:#fff;
+                                                    text-align:right;
+                                                    font-size:20px;
+                                                ">
 
                                                     <span
                                                         t-out="tax_group.get('tax_group_amount', 0.0)"
@@ -472,11 +569,18 @@
                                     class="border-grey"
                                 >
 
-                                    <td style="background-color:#fff; font-size:20px;">
+                                    <td style="
+                                        background-color:#fff;
+                                        font-size:20px;
+                                    ">
                                         Rounding
                                     </td>
 
-                                    <td style="background-color:#fff; text-align:right; font-size:20px;">
+                                    <td style="
+                                        background-color:#fff;
+                                        text-align:right;
+                                        font-size:20px;
+                                    ">
 
                                         <span
                                             t-out="tax_totals.get('rounding_amount', 0.0)"
@@ -492,7 +596,10 @@
 
                                 <tr class="border-grey o_total">
 
-                                    <td style="background-color:#fff; font-size:20px;">
+                                    <td style="
+                                        background-color:#fff;
+                                        font-size:20px;
+                                    ">
 
                                         <strong>
                                             Quotation Amount
@@ -500,7 +607,11 @@
 
                                     </td>
 
-                                    <td style="background-color:#fff; text-align:right; font-size:15px;">
+                                    <td style="
+                                        background-color:#fff;
+                                        text-align:right;
+                                        font-size:15px;
+                                    ">
 
                                         <span
                                             t-out="o.amount_total"
@@ -524,7 +635,6 @@
                     </div>
 
                     <!-- الشروط -->
-                    <!-- النص محصور بالجهة اليسرى كي لا يتعارض مع الختم -->
                     <div
                         class="row pt-3 pb-2"
                         style="
@@ -536,13 +646,11 @@
 
                         <div class="col-12">
 
-                            <p
-                                style="
-                                    font-size:28px;
-                                    margin-bottom:0;
-                                    page-break-inside:auto;
-                                "
-                            >
+                            <p style="
+                                font-size:28px;
+                                margin-bottom:0;
+                                page-break-inside:auto;
+                            ">
 
                                 <span
                                     t-field="o.term_and_cond"
@@ -555,83 +663,86 @@
 
                     </div>
 
-                    <!-- الختم والتوقيع في الزاوية السفلية اليمنى -->
-                    <!-- لا يحجزان مساحة ولا يدفعان المحتوى إلى صفحة جديدة -->
+                    <!--
+                        الختم والتوقيع:
+                        position absolute لا يحجز مساحة.
+                        استخدام top أكثر استقراراً مع wkhtmltopdf من bottom.
+                    -->
                     <div
                         style="
                             position:absolute;
+                            top:700px;
                             right:0;
-                            bottom:10px;
-                            width:230px;
-                            height:300px;
+                            width:240px;
+                            height:320px;
                             margin:0;
                             padding:0;
                             text-align:right;
-                            z-index:10;
+                            z-index:9999;
                             overflow:visible;
                         "
                     >
-
-                        <!-- التوقيع -->
-                        <div
-                            name="signature"
-                            style="
-                                position:absolute;
-                                right:0;
-                                bottom:145px;
-                                width:230px;
-                                height:145px;
-                                margin:0;
-                                padding:0;
-                                text-align:right;
-                            "
-                        >
-
-                            <img
-                                t-if="o.company_id.signature and o.display_signature"
-                                t-att-src="image_data_uri(o.company_id.signature)"
-                                style="
-                                    display:block;
-                                    max-width:230px;
-                                    max-height:145px;
-                                    width:auto;
-                                    height:auto;
-                                    margin-left:auto;
-                                    margin-right:0;
-                                "
-                                alt="Signature"
-                            />
-
-                        </div>
 
                         <!-- الختم -->
                         <div
                             name="stamp"
                             style="
-                                position:absolute;
-                                right:0;
-                                bottom:0;
-                                width:230px;
-                                height:145px;
+                                display:block;
+                                width:240px;
+                                height:155px;
                                 margin:0;
                                 padding:0;
                                 text-align:right;
+                                overflow:visible;
                             "
                         >
 
                             <img
                                 t-if="o.company_id.stamp and o.display_stamp"
                                 t-att-src="image_data_uri(o.company_id.stamp)"
+                                alt="Stamp"
                                 style="
-                                    display:block;
-                                    max-width:230px;
-                                    max-height:145px;
+                                    display:inline-block;
+                                    max-width:240px;
+                                    max-height:155px;
                                     width:auto;
                                     height:auto;
-                                    margin-left:auto;
-                                    margin-right:0;
+                                    margin:0;
+                                    padding:0;
+                                    border:0;
                                 "
-                                alt="Stamp"
+                            />
+
+                        </div>
+
+                        <!-- التوقيع -->
+                        <div
+                            name="signature"
+                            style="
+                                display:block;
+                                width:240px;
+                                height:155px;
+                                margin:0;
+                                padding:0;
+                                text-align:right;
+                                overflow:visible;
+                            "
+                        >
+
+                            <img
+                                t-if="o.company_id.signature and o.display_signature"
+                                t-att-src="image_data_uri(o.company_id.signature)"
+                                alt="Signature"
+                                style="
+                                    display:inline-block;
+                                    max-width:240px;
+                                    max-height:155px;
+                                    width:auto;
+                                    height:auto;
+                                    margin:0;
+                                    padding:0;
+                                    border:0;
+                                "
                             />
 
                         </div>

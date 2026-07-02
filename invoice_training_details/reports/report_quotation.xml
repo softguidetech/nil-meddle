@@ -8,6 +8,13 @@
 
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
 
+                    <!-- جعل صفحة التقرير مرجعاً لموقع الختم والتوقيع -->
+                    <style>
+                        .page {
+                            position: relative !important;
+                        }
+                    </style>
+
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
 
@@ -331,7 +338,12 @@
                     <!-- Course Content -->
                     <div
                         class="row pt-3 pb-2"
-                        style="page-break-inside:avoid; display:flex; justify-content:space-between; align-items:flex-start;"
+                        style="
+                            page-break-inside:avoid;
+                            display:flex;
+                            justify-content:space-between;
+                            align-items:flex-start;
+                        "
                     >
 
                         <div
@@ -344,7 +356,12 @@
 
                             <table
                                 class="table table-sm"
-                                style="background-color:#fff; color:white; width:auto; border:none;"
+                                style="
+                                    background-color:#fff;
+                                    color:white;
+                                    width:auto;
+                                    border:none;
+                                "
                             >
                                 <tbody>
 
@@ -356,12 +373,22 @@
                         <!-- الحسابات والمجموع -->
                         <div
                             class="col-auto"
-                            style="min-width:300px; flex:0 0 auto; margin-left:auto; text-align:left; position:absolute; right:15px;"
+                            style="
+                                min-width:300px;
+                                flex:0 0 auto;
+                                margin-left:auto;
+                                text-align:left;
+                                position:absolute;
+                                right:15px;
+                            "
                         >
 
                             <table
                                 class="table table-sm table-border"
-                                style="background-color:#fff; width:300px;"
+                                style="
+                                    background-color:#fff;
+                                    width:300px;
+                                "
                             >
 
                                 <t
@@ -509,11 +536,13 @@
 
                         <div class="col-12">
 
-                            <p style="
-                                font-size:28px;
-                                margin-bottom:0;
-                                page-break-inside:auto;
-                            ">
+                            <p
+                                style="
+                                    font-size:28px;
+                                    margin-bottom:0;
+                                    page-break-inside:auto;
+                                "
+                            >
 
                                 <span
                                     t-field="o.term_and_cond"
@@ -526,58 +555,35 @@
 
                     </div>
 
-                    <!-- الختم والتوقيع ثابتان في الزاوية السفلية اليمنى -->
+                    <!-- الختم والتوقيع في الزاوية السفلية اليمنى -->
+                    <!-- لا يحجزان مساحة ولا يدفعان المحتوى إلى صفحة جديدة -->
                     <div
                         style="
-                            position:fixed;
+                            position:absolute;
                             right:0;
-                            bottom:0;
+                            bottom:10px;
                             width:230px;
-                            height:340px;
-                            text-align:right;
-                            z-index:10;
+                            height:300px;
                             margin:0;
                             padding:0;
-                            page-break-inside:avoid;
+                            text-align:right;
+                            z-index:10;
+                            overflow:visible;
                         "
                     >
 
-                        <div
-                            name="stamp"
-                            style="
-                                width:230px;
-                                height:170px;
-                                text-align:right;
-                                margin:0;
-                                padding:0;
-                            "
-                        >
-
-                            <img
-                                t-if="o.company_id.stamp and o.display_stamp"
-                                t-att-src="image_data_uri(o.company_id.stamp)"
-                                style="
-                                    display:block;
-                                    max-height:170px;
-                                    max-width:230px;
-                                    width:auto;
-                                    height:auto;
-                                    margin-left:auto;
-                                    object-fit:contain;
-                                "
-                                alt="Stamp"
-                            />
-
-                        </div>
-
+                        <!-- التوقيع -->
                         <div
                             name="signature"
                             style="
+                                position:absolute;
+                                right:0;
+                                bottom:145px;
                                 width:230px;
-                                height:165px;
-                                text-align:right;
+                                height:145px;
                                 margin:0;
                                 padding:0;
+                                text-align:right;
                             "
                         >
 
@@ -586,14 +592,46 @@
                                 t-att-src="image_data_uri(o.company_id.signature)"
                                 style="
                                     display:block;
-                                    max-height:165px;
                                     max-width:230px;
+                                    max-height:145px;
                                     width:auto;
                                     height:auto;
                                     margin-left:auto;
-                                    object-fit:contain;
+                                    margin-right:0;
                                 "
                                 alt="Signature"
+                            />
+
+                        </div>
+
+                        <!-- الختم -->
+                        <div
+                            name="stamp"
+                            style="
+                                position:absolute;
+                                right:0;
+                                bottom:0;
+                                width:230px;
+                                height:145px;
+                                margin:0;
+                                padding:0;
+                                text-align:right;
+                            "
+                        >
+
+                            <img
+                                t-if="o.company_id.stamp and o.display_stamp"
+                                t-att-src="image_data_uri(o.company_id.stamp)"
+                                style="
+                                    display:block;
+                                    max-width:230px;
+                                    max-height:145px;
+                                    width:auto;
+                                    height:auto;
+                                    margin-left:auto;
+                                    margin-right:0;
+                                "
+                                alt="Stamp"
                             />
 
                         </div>

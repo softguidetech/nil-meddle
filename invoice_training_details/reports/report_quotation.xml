@@ -365,7 +365,7 @@
 
                                     </td>
 
-                                    <!-- السعر بعملة الكوتيشن -->
+                                    <!-- السعر بعملة الكوتيشن CLC -->
                                     <td style="
                                         font-size:18px;
                                         text-align:center;
@@ -384,6 +384,7 @@
 
                                     <t t-if="item == 1">
 
+                                        <!-- المجموع بعملة الكوتيشن CLC -->
                                         <td
                                             t-if="o.display_total"
                                             t-att-rowspan="total_rows"
@@ -524,6 +525,7 @@
                                             t-value="subtotal['name']"
                                         />
 
+                                        <!-- الضرائب بعملة الكوتيشن CLC -->
                                         <t
                                             t-foreach="tax_totals.get('groups_by_subtotal', {}).get(subtotal['name'], [])"
                                             t-as="tax_group"
@@ -635,6 +637,7 @@
                     </div>
 
                     <!-- الشروط -->
+                    <!-- مساحة يمين النص مخصصة للختم والتوقيع -->
                     <div
                         class="row pt-3 pb-2"
                         style="
@@ -663,18 +666,15 @@
 
                     </div>
 
-                    <!--
-                        الختم والتوقيع:
-                        position absolute لا يحجز مساحة.
-                        استخدام top أكثر استقراراً مع wkhtmltopdf من bottom.
-                    -->
+                    <!-- الختم والتوقيع في الزاوية السفلية اليمنى -->
+                    <!-- لا يحجزان مساحة ولا ينشئان صفحة ثانية -->
                     <div
                         style="
                             position:absolute;
-                            top:700px;
+                            top:900px;
                             right:0;
-                            width:240px;
-                            height:320px;
+                            width:230px;
+                            height:185px;
                             margin:0;
                             padding:0;
                             text-align:right;
@@ -684,68 +684,46 @@
                     >
 
                         <!-- الختم -->
-                        <div
-                            name="stamp"
+                        <img
+                            t-if="o.company_id.stamp and o.display_stamp"
+                            t-att-src="image_data_uri(o.company_id.stamp)"
+                            alt="Stamp"
                             style="
+                                position:absolute;
+                                top:0;
+                                right:0;
                                 display:block;
-                                width:240px;
-                                height:155px;
+                                max-width:210px;
+                                max-height:165px;
+                                width:auto;
+                                height:auto;
                                 margin:0;
                                 padding:0;
-                                text-align:right;
-                                overflow:visible;
+                                border:0;
+                                z-index:1;
                             "
-                        >
-
-                            <img
-                                t-if="o.company_id.stamp and o.display_stamp"
-                                t-att-src="image_data_uri(o.company_id.stamp)"
-                                alt="Stamp"
-                                style="
-                                    display:inline-block;
-                                    max-width:240px;
-                                    max-height:155px;
-                                    width:auto;
-                                    height:auto;
-                                    margin:0;
-                                    padding:0;
-                                    border:0;
-                                "
-                            />
-
-                        </div>
+                        />
 
                         <!-- التوقيع -->
-                        <div
-                            name="signature"
+                        <img
+                            t-if="o.company_id.signature and o.display_signature"
+                            t-att-src="image_data_uri(o.company_id.signature)"
+                            alt="Signature"
                             style="
+                                position:absolute;
+                                right:0;
+                                bottom:0;
                                 display:block;
-                                width:240px;
-                                height:155px;
+                                max-width:155px;
+                                max-height:95px;
+                                width:auto;
+                                height:auto;
                                 margin:0;
                                 padding:0;
-                                text-align:right;
-                                overflow:visible;
+                                border:0;
+                                z-index:2;
                             "
-                        >
-
-                            <img
-                                t-if="o.company_id.signature and o.display_signature"
-                                t-att-src="image_data_uri(o.company_id.signature)"
-                                alt="Signature"
-                                style="
-                                    display:inline-block;
-                                    max-width:240px;
-                                    max-height:155px;
-                                    width:auto;
-                                    height:auto;
-                                    margin:0;
-                                    padding:0;
-                                    border:0;
-                                "
-                            />
-
-                        </div>
+                        />
 
                     </div>
 

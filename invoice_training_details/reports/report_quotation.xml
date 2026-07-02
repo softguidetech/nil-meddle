@@ -73,11 +73,7 @@
                     <!--    </tbody>-->
                     <!--</table>-->
 
-                    <div class="row pt-3 pb-2">
-                        <div class="col-12">
-                            Training Courses Details: <span t-field="o.training_name"/>
-                        </div>
-                    </div>
+                
 
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>

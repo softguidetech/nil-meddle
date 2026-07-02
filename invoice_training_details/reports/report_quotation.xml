@@ -11,6 +11,21 @@
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
 
+                    <!-- توسيط جميع عناصر جدول التدريب أفقياً وعامودياً -->
+                    <style>
+                        table[name="training_line_table"] th,
+                        table[name="training_line_table"] td {
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                        }
+
+                        table[name="training_line_table"] th span,
+                        table[name="training_line_table"] td span {
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                        }
+                    </style>
+
                     <!-- العنوان الرئيسي -->
                     <div class="row">
                         <div class="col-18">
@@ -156,6 +171,7 @@
                         t-if="o.display_training_table"
                         class="table table-sm o_main_table table-bordered text-center"
                         name="training_line_table"
+                        style="text-align:center; vertical-align:middle;"
                     >
 
                         <thead>
@@ -228,26 +244,26 @@
 
                                 <tr>
 
-                                    <td style="font-size:18px;">
+                                    <td style="font-size:18px; text-align:center; vertical-align:middle;">
                                         <span t-esc="item"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="font-size:18px; text-align:center; vertical-align:middle;">
                                         <span t-field="training.training_id"/>
                                     </td>
 
                                     <td
                                         t-if="o.display_instructor"
-                                        style="font-size:20px;"
+                                        style="font-size:20px; text-align:center; vertical-align:middle;"
                                     >
                                         <span t-field="training.instructor_id.name"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="font-size:18px; text-align:center; vertical-align:middle;">
                                         <span t-field="training.no_of_student"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="font-size:18px; text-align:center; vertical-align:middle;">
 
                                         <span
                                             t-if="o.display_location"
@@ -267,11 +283,11 @@
 
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="font-size:18px; text-align:center; vertical-align:middle;">
                                         <span t-field="training.duration"/>
                                     </td>
 
-                                    <td style="font-size:18px;">
+                                    <td style="font-size:18px; text-align:center; vertical-align:middle;">
 
                                         <span t-field="training.training_date_start"/>
 
@@ -282,7 +298,7 @@
                                     </td>
 
                                     <!-- السعر بعملة الكوتيشن CLC -->
-                                    <td style="font-size:18px;">
+                                    <td style="font-size:18px; text-align:center; vertical-align:middle;">
 
                                         <span
                                             t-out="training.price"
@@ -300,7 +316,7 @@
                                         <td
                                             t-if="o.display_total"
                                             t-att-rowspan="total_rows"
-                                            style="font-size:18px;"
+                                            style="font-size:18px; text-align:center; vertical-align:middle;"
                                         >
 
                                             <span
@@ -526,12 +542,12 @@
 
                     </div>
 
-                    <!-- الختم والتوقيع ثابتان بأسفل يمين الصفحة الأولى -->
+                    <!-- الختم والتوقيع في أقصى أسفل يمين الصفحة -->
                     <div
                         style="
                             position:absolute;
                             right:0;
-                            top:720px;
+                            bottom:5px;
                             width:230px;
                             height:340px;
                             text-align:right;

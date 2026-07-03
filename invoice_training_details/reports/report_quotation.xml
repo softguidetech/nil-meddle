@@ -641,95 +641,107 @@
 
                     </div>
 
-                    <!-- الشروط -->
-                    <!-- مساحة يمين النص مخصصة للختم والتوقيع -->
+                    <!-- الشروط والختم والتوقيع -->
+                    <!-- الختم والتوقيع داخل نفس حاوية الشروط ولا يحجزان مساحة إضافية -->
                     <div
-                        class="row pt-3 pb-2"
                         style="
+                            position:relative;
                             page-break-inside:auto;
-                            padding-right:250px;
-                            min-height:0;
-                            margin-bottom:0;
+                            margin:0;
+                            padding:0;
                         "
                     >
 
-                        <div class="col-12">
-
-                            <p style="
-                                font-size:28px;
-                                margin-bottom:0;
+                        <!-- الشروط -->
+                        <div
+                            class="row pt-3 pb-2"
+                            style="
                                 page-break-inside:auto;
-                            ">
+                                padding-right:250px;
+                                min-height:0;
+                                margin-bottom:0;
+                            "
+                        >
 
-                                <span
-                                    t-field="o.term_and_cond"
-                                    style="font-size:22px;"
-                                />
+                            <div class="col-12">
 
-                            </p>
+                                <p style="
+                                    font-size:28px;
+                                    margin-bottom:0;
+                                    page-break-inside:auto;
+                                ">
+
+                                    <span
+                                        t-field="o.term_and_cond"
+                                        style="font-size:22px;"
+                                    />
+
+                                </p>
+
+                            </div>
 
                         </div>
 
-                    </div>
-
-                    <!-- الختم والتوقيع في الزاوية السفلية اليمنى -->
-                    <!-- لا يحجزان مساحة ولا ينشئان صفحة ثانية -->
-                    <div
-                        style="
-                            position:fixed;
-                            right:0;
-                            bottom:15px;
-                            width:230px;
-                            height:185px;
-                            margin:0;
-                            padding:0;
-                            text-align:right;
-                            z-index:9999;
-                            overflow:visible;
-                        "
-                    >
-
-                        <!-- الختم -->
-                        <img
-                            t-if="o.company_id.stamp and o.display_stamp"
-                            t-att-src="image_data_uri(o.company_id.stamp)"
-                            alt="Stamp"
-                            style="
-                                position:absolute;
-                                top:0;
-                                right:0;
-                                display:block;
-                                max-width:210px;
-                                max-height:165px;
-                                width:auto;
-                                height:auto;
-                                margin:0;
-                                padding:0;
-                                border:0;
-                                z-index:1;
-                            "
-                        />
-
-                        <!-- التوقيع -->
-                        <img
-                            t-if="o.company_id.signature and o.display_signature"
-                            t-att-src="image_data_uri(o.company_id.signature)"
-                            alt="Signature"
+                        <!-- الختم والتوقيع في أسفل يمين حاوية الشروط -->
+                        <!-- لا يدخلان في تدفق الصفحة ولا ينشئان صفحة ثانية -->
+                        <div
                             style="
                                 position:absolute;
                                 right:0;
                                 bottom:0;
-                                display:block;
-                                max-width:155px;
-                                max-height:95px;
-                                width:auto;
-                                height:auto;
+                                width:230px;
+                                height:185px;
                                 margin:0;
                                 padding:0;
-                                border:0;
-                                z-index:2;
+                                text-align:right;
+                                z-index:9999;
+                                overflow:visible;
                             "
-                        />
+                        >
+
+                            <!-- الختم -->
+                            <img
+                                t-if="o.company_id.stamp and o.display_stamp"
+                                t-att-src="image_data_uri(o.company_id.stamp)"
+                                alt="Stamp"
+                                style="
+                                    position:absolute;
+                                    top:0;
+                                    right:0;
+                                    display:block;
+                                    max-width:210px;
+                                    max-height:165px;
+                                    width:auto;
+                                    height:auto;
+                                    margin:0;
+                                    padding:0;
+                                    border:0;
+                                    z-index:1;
+                                "
+                            />
+
+                            <!-- التوقيع -->
+                            <img
+                                t-if="o.company_id.signature and o.display_signature"
+                                t-att-src="image_data_uri(o.company_id.signature)"
+                                alt="Signature"
+                                style="
+                                    position:absolute;
+                                    right:0;
+                                    bottom:0;
+                                    display:block;
+                                    max-width:155px;
+                                    max-height:95px;
+                                    width:auto;
+                                    height:auto;
+                                    margin:0;
+                                    padding:0;
+                                    border:0;
+                                    z-index:2;
+                                "
+                            />
+
+                        </div>
 
                     </div>
 

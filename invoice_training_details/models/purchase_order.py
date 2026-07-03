@@ -20,7 +20,6 @@ class SaleOrder(models.Model):
     descriptions = fields.Char(string='Description')
     # ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
     training_id = fields.Many2one('product.template',string='Training Name')
-    train_language = fields.Char(string='Training Language')
     location = fields.Selection([('Cisco U','Cisco U'),('ILT','ILT'),('VILT','VILT')])
     where_location = fields.Char(string='Where?')
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
@@ -124,7 +123,6 @@ class SaleOrder(models.Model):
             
             'instructor_id': self.instructor_id.id,
             'training_id': self.training_id.id,
-            # 'train_language': self.train_language,
             # 'location': self.location,
             # 'payment_method': self.payment_method,
             'clcs_qty': self.clcs_qty,

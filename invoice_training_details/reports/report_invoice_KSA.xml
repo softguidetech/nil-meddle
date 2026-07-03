@@ -128,7 +128,6 @@
                                 <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Training Name</span></th>
                                 <th t-if="o.display_description" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Description</span></th>
                                 <th t-if="o.display_instructor" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Instructor Name</span></th>
-                                <th name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Language</span></th>
                                 <th name="th_of_students" style="text-align: center; vertical-align: middle;"><span># Of Students</span></th>
                                 <th t-if="o.display_location" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Location</span></th>
                                 <th t-if="o.display_where" name="th_training_name" style="text-align: center; vertical-align: middle;"><span>Where?</span></th>
@@ -148,7 +147,6 @@
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.training_id"/></td>
                                     <td t-if="o.display_description" style="text-align: center; vertical-align: middle;"><span t-field="training.descriptions"/></td>
                                     <td t-if="o.display_instructor" style="text-align: center; vertical-align: middle;"><span t-field="training.instructor_id.name"/></td>
-                                    <td style="text-align: center; vertical-align: middle;"><span t-field="training.train_language"/></td>
                                     <td style="text-align: center; vertical-align: middle;"><span t-field="training.no_of_student"/></td>
                                     <td t-if="o.display_location" style="text-align: center; vertical-align: middle;"><span t-field="training.location"/></td>
                                     <td t-if="o.display_where" style="text-align: center; vertical-align: middle;"><span t-field="training.where_location2"/></td>

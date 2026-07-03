@@ -76,7 +76,6 @@
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="wor_hour_number"/>
-                            <field name="train_language"/>
                             <field name="duration"/>
                             <field name="training_date_start"/>
                             <field name="hourly_rate"/>

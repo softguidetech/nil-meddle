@@ -23,7 +23,6 @@
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="instructor_id"/>
-                            <field name="train_language"/>
                             <field name="location"/>
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
                             <field name="where_location2"/>
@@ -90,7 +89,6 @@
                             <field name="hyperlink"/>
                             
                             <field name="wor_hour_number"/>
-                            <field name="train_language"/>
                             <!--<field name="location"/>-->
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
                             <!--<field name="payment_method"/>-->

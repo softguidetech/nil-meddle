@@ -21,6 +21,70 @@
                             text-align: center !important;
                             vertical-align: middle !important;
                         }
+
+                        .terms-content {
+                            width: 100%;
+                            font-size: 14px;
+                            line-height: 1.35;
+                            color: #000;
+                            text-align: left;
+                            word-wrap: break-word;
+                            overflow-wrap: break-word;
+                        }
+
+                        .terms-content p {
+                            margin-top: 0;
+                            margin-bottom: 6px;
+                            padding: 0;
+                            line-height: 1.35;
+                        }
+
+                        .terms-content div {
+                            line-height: 1.35;
+                        }
+
+                        .terms-content ol,
+                        .terms-content ul {
+                            margin-top: 0;
+                            margin-bottom: 6px;
+                            padding-left: 22px;
+                        }
+
+                        .terms-content li {
+                            margin-top: 0;
+                            margin-bottom: 4px;
+                            padding-left: 2px;
+                            line-height: 1.35;
+                        }
+
+                        .terms-content h1,
+                        .terms-content h2,
+                        .terms-content h3,
+                        .terms-content h4,
+                        .terms-content h5,
+                        .terms-content h6 {
+                            margin-top: 8px;
+                            margin-bottom: 5px;
+                            page-break-after: avoid;
+                        }
+
+                        .terms-content table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin-top: 5px;
+                            margin-bottom: 8px;
+                        }
+
+                        .terms-content table th,
+                        .terms-content table td {
+                            padding: 4px;
+                            vertical-align: top;
+                        }
+
+                        .terms-content img {
+                            max-width: 100%;
+                            height: auto;
+                        }
                     </style>
 
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
@@ -642,7 +706,6 @@
                     </div>
 
                     <!-- الشروط والختم والتوقيع -->
-                    <!-- الختم والتوقيع داخل نفس حاوية الشروط ولا يحجزان مساحة إضافية -->
                     <div
                         style="
                             position:relative;
@@ -654,43 +717,34 @@
 
                         <!-- الشروط -->
                         <div
-                            class="row pt-3 pb-2"
+                            class="row pt-2 pb-1"
                             style="
                                 page-break-inside:auto;
-                                padding-right:250px;
-                                min-height:0;
-                                margin-bottom:0;
+                                padding-right:240px;
+                                margin:0;
                             "
                         >
 
-                            <div class="col-12">
+                            <div class="col-12" style="padding:0;">
 
-                                <p style="
-                                    font-size:28px;
-                                    margin-bottom:0;
-                                    page-break-inside:auto;
-                                ">
-
-                                    <span
-                                        t-field="o.term_and_cond"
-                                        style="font-size:22px;"
-                                    />
-
-                                </p>
+                                <div
+                                    t-if="o.term_and_cond"
+                                    t-field="o.term_and_cond"
+                                    class="terms-content"
+                                />
 
                             </div>
 
                         </div>
 
-                        <!-- الختم والتوقيع في أسفل يمين حاوية الشروط -->
-                        <!-- لا يدخلان في تدفق الصفحة ولا ينشئان صفحة ثانية -->
+                        <!-- الختم والتوقيع -->
                         <div
                             style="
                                 position:absolute;
                                 right:0;
                                 bottom:0;
-                                width:230px;
-                                height:185px;
+                                width:225px;
+                                height:180px;
                                 margin:0;
                                 padding:0;
                                 text-align:right;

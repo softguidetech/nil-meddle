@@ -120,6 +120,12 @@
                                     style="font-size:20px;"
                                 />
 
+                                <div
+                                    t-if="o.partner_id.is_company == False and o.partner_id.email"
+                                    t-field="o.partner_id.email"
+                                    style="font-size:20px;"
+                                />
+
                             </div>
                         </div>
 
@@ -525,7 +531,6 @@
                                             t-value="subtotal['name']"
                                         />
 
-                                        <!-- الضرائب بعملة الكوتيشن CLC -->
                                         <t
                                             t-foreach="tax_totals.get('groups_by_subtotal', {}).get(subtotal['name'], [])"
                                             t-as="tax_group"

@@ -509,19 +509,73 @@
                             <br/>
                             <br/>
 
-                            <table
-                                class="table table-sm"
-                                style="
-                                    background-color:#fff;
-                                    color:white;
-                                    width:auto;
-                                    border:none;
-                                "
-                            >
-                                <tbody>
+                           <table
+    class="table table-sm"
+    style="
+        background-color:#fff;
+        color:#000;
+        width:auto;
+        border:none;
+    "
+>
+    <tbody>
 
-                                </tbody>
-                            </table>
+        <tr>
+            <td style="
+                border:none;
+                padding:0 0 10px 0;
+                text-align:left;
+                color:#000;
+            ">
+                <strong style="font-size:20px;">
+                    Course Content
+                </strong>
+            </td>
+        </tr>
+
+        <t t-foreach="o.training_course_ids" t-as="training">
+
+            <tr>
+                <td style="
+                    border:none;
+                    padding:4px 0 8px 0;
+                    text-align:left;
+                    color:#000;
+                ">
+
+                    <div style="
+                        font-size:18px;
+                        font-weight:bold;
+                        color:#000;
+                    ">
+                        <span t-field="training.training_id"/>
+                    </div>
+
+                    <div
+                        t-if="training.hyperlink"
+                        style="
+                            font-size:16px;
+                            margin-top:3px;
+                        "
+                    >
+                        <a
+                            t-att-href="training.hyperlink"
+                            style="
+                                color:#0563C1;
+                                text-decoration:underline;
+                            "
+                        >
+                            <span t-esc="training.hyperlink"/>
+                        </a>
+                    </div>
+
+                </td>
+            </tr>
+
+        </t>
+
+    </tbody>
+</table>
 
                         </div>
 

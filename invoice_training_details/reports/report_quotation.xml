@@ -509,8 +509,13 @@
                             <br/>
                             <br/>
 
-                         <div
-    t-if="o.training_course_ids"
+                         <t
+    t-set="hyperlink_trainings"
+    t-value="o.training_course_ids.filtered(lambda training: training.hyperlink)"
+/>
+
+<div
+    t-if="hyperlink_trainings"
     style="
         text-align:left;
         color:#000;
@@ -529,10 +534,9 @@
         Course Content
     </div>
 
-    <t t-foreach="o.training_course_ids" t-as="training">
+    <t t-foreach="hyperlink_trainings" t-as="training">
 
         <div
-            t-if="training.hyperlink"
             style="
                 font-size:18px;
                 margin-bottom:6px;
@@ -549,18 +553,6 @@
             >
                 <span t-field="training.training_id"/>
             </a>
-        </div>
-
-        <div
-            t-if="not training.hyperlink"
-            style="
-                font-size:18px;
-                margin-bottom:6px;
-                color:#000;
-                font-weight:bold;
-            "
-        >
-            <span t-field="training.training_id"/>
         </div>
 
     </t>

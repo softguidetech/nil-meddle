@@ -147,133 +147,13 @@
                             <br/><br/>
                         </div>
                     </div>
-                    <!-- Terms and Conditions -->
-                    <div class="terms-section" style="
-                        width:100%;
-                        margin-top:24px;
-                        margin-bottom:18px;
-                        page-break-inside:auto;
-                    ">
-                        <div style="
-                            font-size:24px;
-                            font-weight:700;
-                            color:#0DCAF0;
-                            margin-bottom:12px;
-                            padding-bottom:7px;
-                            border-bottom:2px solid #0DCAF0;
-                        ">
-                            Terms and Conditions
-                        </div>
 
-                        <style>
-                            .terms-content {
-                                width: 100%;
-                                font-size: 18px;
-                                line-height: 1.6;
-                                color: #222;
-                                text-align: left;
-                            }
-
-                            .terms-content p {
-                                margin: 0 0 10px 0;
-                                line-height: 1.6;
-                            }
-
-                            .terms-content h1,
-                            .terms-content h2,
-                            .terms-content h3,
-                            .terms-content h4 {
-                                color: #0DCAF0;
-                                font-weight: 700;
-                                margin: 16px 0 8px 0;
-                                page-break-after: avoid;
-                            }
-
-                            .terms-content h1 { font-size: 24px; }
-                            .terms-content h2 { font-size: 22px; }
-                            .terms-content h3 { font-size: 20px; }
-                            .terms-content h4 { font-size: 18px; }
-
-                            .terms-content ul,
-                            .terms-content ol {
-                                margin: 8px 0 12px 24px;
-                                padding-left: 16px;
-                            }
-
-                            .terms-content li {
-                                margin-bottom: 5px;
-                                line-height: 1.5;
-                            }
-
-                            .terms-content table {
-                                width: 100% !important;
-                                border-collapse: collapse !important;
-                                table-layout: fixed;
-                                margin: 14px 0 18px 0;
-                                font-size: 16px;
-                                page-break-inside: auto;
-                            }
-
-                            .terms-content thead {
-                                display: table-header-group;
-                            }
-
-                            .terms-content tr {
-                                page-break-inside: avoid;
-                                page-break-after: auto;
-                            }
-
-                            .terms-content th {
-                                background-color: #0DCAF0 !important;
-                                color: #ffffff !important;
-                                font-weight: 700;
-                                text-align: center;
-                                vertical-align: middle;
-                                border: 1px solid #8aa6ad !important;
-                                padding: 9px 7px !important;
-                                word-wrap: break-word;
-                            }
-
-                            .terms-content td {
-                                background-color: #ffffff;
-                                color: #222222;
-                                text-align: left;
-                                vertical-align: top;
-                                border: 1px solid #b8c4c8 !important;
-                                padding: 8px 7px !important;
-                                line-height: 1.45;
-                                word-wrap: break-word;
-                                white-space: normal;
-                            }
-
-                            .terms-content tbody tr:nth-child(even) td {
-                                background-color: #f4f8f9;
-                            }
-
-                            .terms-content strong,
-                            .terms-content b {
-                                font-weight: 700;
-                            }
-
-                            .terms-content a {
-                                color: #087f9c;
-                                text-decoration: underline;
-                            }
-
-                            .terms-content blockquote {
-                                margin: 12px 0;
-                                padding: 10px 14px;
-                                border-left: 4px solid #0DCAF0;
-                                background-color: #f4f8f9;
-                            }
-                        </style>
-
-                        <div class="terms-content">
-                            <div t-field="o.term_and_cond"/>
-                        </div>
-                    </div>
-
-
+                   <!-- الشروط -->
+<div class="row pt-3 pb-2" style="page-break-inside:avoid;">
+    <div class="col-8">
+        <p style="font-size:28px;"><span t-field="o.term_and_cond" style="font-size:22px;"/></p>
+    </div>
+</div>
 
                     <!-- الختم والتوقيع -->
                     <div class="row" style="page-break-inside:avoid; position: relative; min-height: 170px;">

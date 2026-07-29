@@ -23,16 +23,17 @@
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="instructor_id"/>
-                            <field name="location"/>
+                            <field name="location" column_invisible="'Cisco U' in (parent.training_name or '')"/>
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
-                            <field name="where_location2"/>
+                            <field name="where_location2" column_invisible="'Cisco U' in (parent.training_name or '')"/>
                             <field name="payment_method"/>
                             
                             <!--<field name="name"/>-->
-                            <field name="no_of_student"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
+                            <field name="no_of_student" column_invisible="'Cisco U' in (parent.training_name or '')"/>
+                            <field name="no_of_student" string="#of Subscriptions" column_invisible="'Cisco U' not in (parent.training_name or '')"/>
+                            <field name="duration" column_invisible="'Cisco U' in (parent.training_name or '')"/>
+                            <field name="training_date_start" column_invisible="'Cisco U' in (parent.training_name or '')"/>
+                            <field name="training_date_end" column_invisible="'Cisco U' in (parent.training_name or '')"/>
                             <field name="price"/>
                         </tree>
                     </field>
@@ -46,7 +47,7 @@
                         <!--</group>-->
                         <group>
                             <field name= "bank_details"/>
-                            <field name= "term_and_cond" widget="html"/>
+                            <field name= "term_and_cond"/>
                         </group>
                     </group>
                     <group>
@@ -132,7 +133,7 @@
                         </group>
                         <group>
                             <field name= "bank_details"/>
-                            <field name= "term_and_cond" widget="html"/>
+                            <field name= "term_and_cond"/>
                         </group>
                         
                        

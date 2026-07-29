@@ -23,17 +23,17 @@
                             <field name="cost_clc"/>
                             <field name="hyperlink"/>
                             <field name="instructor_id"/>
-                            <field name="location" attrs="{'column_invisible': [('parent.training_name', 'ilike', 'Cisco U All Access')]}"/>
+                            <field name="location" attrs="{'column_invisible': [('parent.training_name', '=', 'Cisco U All Access')]}"/>
                             <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
-                            <field name="where_location2" attrs="{'column_invisible': [('parent.training_name', 'ilike', 'Cisco U All Access')]}"/>
+                            <field name="where_location2" attrs="{'column_invisible': [('parent.training_name', '=', 'Cisco U All Access')]}"/>
                             <field name="payment_method"/>
                             
                             <!--<field name="name"/>-->
-                            <field name="no_of_student" attrs="{'column_invisible': [('parent.training_name', 'ilike', 'Cisco U All Access')]}"/>
-                            <field name="no_of_student" string="#of Subscriptions" attrs="{'column_invisible': [('parent.training_name', 'not ilike', 'Cisco U All Access')]}"/>
-                            <field name="duration" attrs="{'column_invisible': [('parent.training_name', 'ilike', 'Cisco U All Access')]}"/>
-                            <field name="training_date_start" attrs="{'column_invisible': [('parent.training_name', 'ilike', 'Cisco U All Access')]}"/>
-                            <field name="training_date_end" attrs="{'column_invisible': [('parent.training_name', 'ilike', 'Cisco U All Access')]}"/>
+                            <field name="no_of_student" attrs="{'column_invisible': [('parent.training_name', '=', 'Cisco U All Access')]}"/>
+                            <field name="no_of_student" string="#of Subscriptions" attrs="{'column_invisible': [('parent.training_name', '!=', 'Cisco U All Access')]}"/>
+                            <field name="duration" attrs="{'column_invisible': [('parent.training_name', '=', 'Cisco U All Access')]}"/>
+                            <field name="training_date_start" attrs="{'column_invisible': [('parent.training_name', '=', 'Cisco U All Access')]}"/>
+                            <field name="training_date_end" attrs="{'column_invisible': [('parent.training_name', '=', 'Cisco U All Access')]}"/>
                             <field name="price"/>
                         </tree>
                     </field>

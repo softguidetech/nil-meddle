@@ -269,7 +269,7 @@
                         </style>
 
                         <div class="terms-content">
-                            <t t-field="o.term_and_cond"/>
+                            <div t-field="o.term_and_cond"/>
                         </div>
                     </div>
 

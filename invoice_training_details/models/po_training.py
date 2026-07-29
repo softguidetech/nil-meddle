@@ -145,6 +145,12 @@ class PurchaseOrder(models.Model):
     )
     term_and_cond = fields.Html(
         string='Term and conditions',
+        sanitize=False,
+        sanitize_tags=False,
+        sanitize_attributes=False,
+        sanitize_style=False,
+        strip_style=False,
+        strip_classes=False,
         default='1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding taxes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>'
     )
     

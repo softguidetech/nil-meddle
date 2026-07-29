@@ -71,7 +71,10 @@
                         <thead>
                             <tr>
                                 <th style="font-size:18px; text-align:center; vertical-align:middle;">Item</th>
-<th style="font-size:18px; text-align:center; vertical-align:middle;">Training Name</th>
+<th style="font-size:18px; text-align:center; vertical-align:middle;">
+    <span t-if="is_cisco_u_all_access">Subscription Name</span>
+    <span t-if="not is_cisco_u_all_access">Training Name</span>
+</th>
 <th t-if="o.display_instructor" style="font-size:18px; text-align:center; vertical-align:middle;">Instructor Name</th>
 <th style="font-size:18px; text-align:center; vertical-align:middle;">
     <span t-if="is_cisco_u_all_access"># Of Subscriptions</span>

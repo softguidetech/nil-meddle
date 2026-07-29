@@ -149,9 +149,10 @@
                     </div>
 
                    <!-- الشروط -->
-<div class="row pt-3 pb-2" style="page-break-inside:avoid;">
-    <div class="col-8">
-        <p style="font-size:28px;"><span t-field="o.term_and_cond" style="font-size:22px;"/></p>
+<div class="row pt-3 pb-2">
+    <div class="col-12">
+        <div t-field="o.term_and_cond"
+             style="width:100%; font-size:22px;"/>
     </div>
 </div>
 

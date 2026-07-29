@@ -83,7 +83,7 @@
 </th>
 <th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Duration</th>
 <th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Training Dates</th>
-<th style="font-size:18px; text-align:center; vertical-align:middle;">Training Price</th>
+<th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Training Price</th>
 <th t-if="o.display_total" style="font-size:18px; text-align:center; vertical-align:middle;">Total Price</th>
 
                             </tr>
@@ -104,7 +104,7 @@
                                     </td>
                                     <td t-if="not is_cisco_u_all_access" style="font-size:18px;"><span t-field="training.duration"/></td>
                                     <td t-if="not is_cisco_u_all_access" style="font-size:18px;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
-                                    <td style="font-size:18px;"><span t-field="training.price"/></td>
+                                    <td t-if="not is_cisco_u_all_access" style="font-size:18px;"><span t-field="training.price"/></td>
                                     <t t-if="item == 1">
                                         <td t-if="o.display_total" t-att-rowspan="total_rows" style="font-size:18px;"><span t-field="o.total_training_price"/></td>
                                     </t>

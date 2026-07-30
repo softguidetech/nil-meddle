@@ -108,26 +108,20 @@ class SaleOrder(models.Model):
         '''
     )
 
-    _BASE_TERMS_AND_CONDITIONS = (
-        '1. PO Reference #: PCD-006-2024 </br> '
-        '2. PO Amendment PCD-006-2024 </br> '
-        '3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>'
-        '4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.'
-        '5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> '
-        '6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>'
-    )
-
     _CASH_TERMS_HEADER = (
         '<div class="o_order_terms_header">'
-        '<strong>Instructor from:</strong><br/>'
+        '<strong>Instructor From:</strong><br/>'
+        '<strong>End Customer:</strong><br/>'
+        '<strong>Candidate Details:</strong><br/>'
         '</div>'
     )
 
     _CLC_TERMS_HEADER = (
         '<div class="o_order_terms_header">'
-        '<strong>CLC Order</strong><br/>'
-        '<strong>Instructor from:</strong><br/>'
-        '<strong>CLCs Utilized:</strong><br/>'
+        '<strong>Instructor From:</strong><br/>'
+        '<strong>End Customer:</strong><br/>'
+        '<strong>Candidate Details:</strong><br/>'
+        '<strong>#of CLCs Utilized:</strong><br/>'
         '</div>'
     )
 

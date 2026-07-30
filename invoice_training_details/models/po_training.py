@@ -1,26 +1,22 @@
 # -*- coding: utf-8 -*-
 
-import re
-
-from markupsafe import escape
 from odoo import api, models, fields
 
 
 class PurchaseOrder(models.Model):
     _inherit = "purchase.order"
 
-    _DEFAULT_TERMS = (
-        '1. PO Reference #: PCD-006-2024 </br> '
-        '2. PO Amendment PCD-006-2024 </br> '
-        '3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>'
-        '4. The invoice amount does not include VAT or Withholding taxes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.'
-        '5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> '
-        '6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>'
+    is_training_order = fields.Boolean(
+        string='Is Training Order'
     )
 
-    is_training_order = fields.Boolean(string='Is Training Order')
-    training_name = fields.Char(string='Training Name')
-    service_name = fields.Char(string='Service Name')
+    training_name = fields.Char(
+        string='Training Name'
+    )
+
+    service_name = fields.Char(
+        string='Service Name'
+    )
 
     total_training_price = fields.Monetary(
         string='Total Training Price',
@@ -51,14 +47,18 @@ class PurchaseOrder(models.Model):
         string="Instructor"
     )
 
-    descriptions = fields.Char(string='Description')
+    descriptions = fields.Char(
+        string='Description'
+    )
 
     training_id = fields.Many2one(
         'product.template',
         string='Training Name'
     )
 
-    train_language = fields.Char(string='Training Language')
+    train_language = fields.Char(
+        string='Training Language'
+    )
 
     location = fields.Selection([
         ('Cisco U', 'Cisco U'),
@@ -66,7 +66,9 @@ class PurchaseOrder(models.Model):
         ('VILT', 'VILT')
     ], string='Location')
 
-    where_location = fields.Char(string='Where?')
+    where_location = fields.Char(
+        string='Where?'
+    )
 
     payment_method = fields.Selection([
         ('cash', 'Cash'),
@@ -98,9 +100,17 @@ class PurchaseOrder(models.Model):
         compute='_compute_total'
     )
 
-    visa = fields.Boolean(string="Visa")
-    start_date = fields.Date(string="From Date")
-    end_date = fields.Date(string="To Date")
+    visa = fields.Boolean(
+        string="Visa"
+    )
+
+    start_date = fields.Date(
+        string="From Date"
+    )
+
+    end_date = fields.Date(
+        string="To Date"
+    )
 
     book_details_id = fields.Many2many(
         'ir.attachment',
@@ -112,8 +122,13 @@ class PurchaseOrder(models.Model):
         copy=False
     )
 
-    training_vendor = fields.Char(string="Training Vendor")
-    training_type = fields.Char(string="Training Type")
+    training_vendor = fields.Char(
+        string="Training Vendor"
+    )
+
+    training_type = fields.Char(
+        string="Training Type"
+    )
 
     display_training_table = fields.Boolean(
         string='Display Training Table in PDF'
@@ -159,9 +174,17 @@ class PurchaseOrder(models.Model):
         string="Display Description"
     )
 
-    clcs_qty = fields.Float(string='CLCs Qty')
-    po_reference = fields.Char(string='PO#')
-    tr_expiry_date = fields.Date(string='Expiry Date')
+    clcs_qty = fields.Float(
+        string='CLCs Qty'
+    )
+
+    po_reference = fields.Char(
+        string='PO#'
+    )
+
+    tr_expiry_date = fields.Date(
+        string='Expiry Date'
+    )
 
     bank_details = fields.Html(
         string='Bank Details',
@@ -178,88 +201,20 @@ class PurchaseOrder(models.Model):
 
     term_and_cond = fields.Html(
         string='Term and conditions',
-        default=lambda self: self._default_term_and_cond()
-    )
-
-    @api.model
-    def _default_term_and_cond(self):
-        return self._compose_term_and_cond(
-            payment_method='cash',
-            training_vendor='',
-            clcs_qty=0,
-            existing_terms=self._DEFAULT_TERMS
+        default=(
+            '<strong>CLC Order</strong></br>'
+            '<strong>Instructor from:</strong></br>'
+            '<strong>CLCs Utilized:</strong></br></br>'
+            '1. PO Reference #: PCD-006-2024 </br> '
+            '2. PO Amendment PCD-006-2024 </br> '
+            '3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>'
+            '4. The invoice amount does not include VAT or Withholding taxes - '
+            'it must be paid by Taqnia Cyber if any, without any charging or '
+            'deduction from the invoice amount. '
+            '5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> '
+            '6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>'
         )
-
-    @api.model
-    def _remove_fixed_terms(self, terms):
-        if not terms:
-            return ''
-
-        pattern = (
-            r'<p\b[^>]*class=["\'][^"\']*'
-            r'o_fixed_order_terms'
-            r'[^"\']*["\'][^>]*>.*?</p>'
-        )
-
-        return re.sub(
-            pattern,
-            '',
-            str(terms),
-            flags=re.IGNORECASE | re.DOTALL
-        ).strip()
-
-    @api.model
-    def _compose_term_and_cond(
-        self,
-        payment_method,
-        training_vendor,
-        clcs_qty,
-        existing_terms
-    ):
-        vendor_value = escape(training_vendor or '')
-
-        if clcs_qty:
-            clcs_value = format(clcs_qty, 'g')
-        else:
-            clcs_value = ''
-
-        if payment_method == 'clc':
-            fixed_terms = (
-                '<p class="o_fixed_order_terms">'
-                '<strong>CLC Order</strong><br/>'
-                '<strong>Instructor from:</strong> '
-                f'{vendor_value}<br/>'
-                '<strong>CLCs Utilized:</strong> '
-                f'{clcs_value}'
-                '</p>'
-            )
-        else:
-            fixed_terms = (
-                '<p class="o_fixed_order_terms">'
-                '<strong>Instructor from:</strong> '
-                f'{vendor_value}'
-                '</p>'
-            )
-
-        return fixed_terms + (existing_terms or '')
-
-    @api.onchange(
-        'payment_method',
-        'training_vendor',
-        'clcs_qty'
     )
-    def _onchange_fixed_terms_and_conditions(self):
-        for rec in self:
-            existing_terms = rec._remove_fixed_terms(
-                rec.term_and_cond or ''
-            )
-
-            rec.term_and_cond = rec._compose_term_and_cond(
-                payment_method=rec.payment_method or 'cash',
-                training_vendor=rec.training_vendor,
-                clcs_qty=rec.clcs_qty,
-                existing_terms=existing_terms
-            )
 
     @api.depends('amount_total', 'currency_id')
     def _compute_cur_tot(self):
@@ -313,6 +268,7 @@ class PurchaseOrder(models.Model):
 
     def action_sync_training_lines(self):
         self.ensure_one()
+
         order_lines = []
 
         for course in self.training_course_ids:
@@ -327,12 +283,15 @@ class PurchaseOrder(models.Model):
             }))
 
         self.order_line = False
-        self.write({'order_line': order_lines})
+        self.write({
+            'order_line': order_lines
+        })
 
         return True
 
     def action_sync_service_lines(self):
         self.ensure_one()
+
         order_lines = []
 
         for service in self.pro_service_ids:
@@ -347,6 +306,8 @@ class PurchaseOrder(models.Model):
             }))
 
         self.order_line = False
-        self.write({'order_line': order_lines})
+        self.write({
+            'order_line': order_lines
+        })
 
         return True

@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 
+import re
+
 from odoo import api, models, fields
 
 
@@ -106,7 +108,58 @@ class SaleOrder(models.Model):
         '''
     )
 
-    term_and_cond = fields.Html(string='Term and conditions',default=' 1. PO Reference #: PCD-006-2024 </br> 2. PO Amendment PCD-006-2024 </br> 3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> 6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>')
+    _BASE_TERMS_AND_CONDITIONS = (
+        '1. PO Reference #: PCD-006-2024 </br> '
+        '2. PO Amendment PCD-006-2024 </br> '
+        '3. End customer name: Saudi Authority for Data and Artificial Intelligence, Saudi Arabia. </br>'
+        '4. The invoice amount does not include VAT or Withholding tajes - it must be paid by Taqnia Cyber if any, without any charging or deduction from the invoice amount.'
+        '5. Taqnia Cyber will pay the taxes to KSA authorities directly.</br> '
+        '6. Taqnia Cyber must bear Money transfers or bank charges on payment.</br>'
+    )
+
+    _CASH_TERMS_HEADER = (
+        '<div class="o_order_terms_header">'
+        '<strong>Instructor from:</strong><br/>'
+        '</div>'
+    )
+
+    _CLC_TERMS_HEADER = (
+        '<div class="o_order_terms_header">'
+        '<strong>CLC Order</strong><br/>'
+        '<strong>Instructor from:</strong><br/>'
+        '<strong>CLCs Utilized:</strong><br/>'
+        '</div>'
+    )
+
+    term_and_cond = fields.Html(
+        string='Term and conditions',
+        default=lambda self: self._default_term_and_cond()
+    )
+
+    @api.model
+    def _default_term_and_cond(self):
+        return self._CASH_TERMS_HEADER + self._BASE_TERMS_AND_CONDITIONS
+
+    @api.model
+    def _remove_order_terms_header(self, value):
+        return re.sub(
+            r'<div[^>]*class=["\'][^"\']*o_order_terms_header[^"\']*["\'][^>]*>.*?</div>',
+            '',
+            value or '',
+            flags=re.IGNORECASE | re.DOTALL
+        ).strip()
+
+    @api.onchange('payment_method')
+    def _onchange_payment_method_terms(self):
+        for rec in self:
+            existing_terms = rec._remove_order_terms_header(rec.term_and_cond)
+
+            if rec.payment_method == 'clc':
+                header = rec._CLC_TERMS_HEADER
+            else:
+                header = rec._CASH_TERMS_HEADER
+
+            rec.term_and_cond = header + existing_terms
     
     @api.depends('pro_service_ids.price')
     def _compute_service_price(self):

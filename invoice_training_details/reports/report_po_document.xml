@@ -8,12 +8,12 @@
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
-                    <t t-set="is_cash_order" t-value="'cash' in o.training_course_ids.mapped('payment_method')"/>
+                    <t t-set="is_clc_order" t-value="'clc' in [(method or '').lower() for method in o.training_course_ids.mapped('payment_method')]"/>
 
                     <div class="row">
                         <div class="col-18">
-                            <span t-if="is_cash_order" style="font-size:30px; font-weight:bold; color:#0DCAF0;">Work Order</span>
-                            <span t-if="not is_cash_order" style="font-size:30px; font-weight:bold; color:#0DCAF0;">Purchase Order</span>
+                            <span t-if="is_clc_order" style="font-size:30px; font-weight:bold; color:#0DCAF0;">Work Order</span>
+                            <span t-if="not is_clc_order" style="font-size:30px; font-weight:bold; color:#0DCAF0;">Purchase Order</span>
                         </div>
                     </div>
 
@@ -48,12 +48,12 @@
                                 <table class="table table-borderless">
     <tr>
         <td style="font-size:20px; vertical-align: middle;">
-            <span t-if="is_cash_order">Work Order</span>
-            <span t-if="not is_cash_order">Purchase Order</span>
+            <span t-if="is_clc_order">Work Order</span>
+            <span t-if="not is_clc_order">Purchase Order</span>
         </td>
         <td style="font-size:20px; vertical-align: middle;">
-            <span t-if="is_cash_order" t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else 'WO-' + o.name"/>
-            <span t-if="not is_cash_order" t-field="o.name"/>
+            <span t-if="is_clc_order" t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else 'WO-' + o.name"/>
+            <span t-if="not is_clc_order" t-field="o.name"/>
         </td>
     </tr>
     <tr>
@@ -91,8 +91,8 @@
 <th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Duration</th>
 <th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Training Dates</th>
 <th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">
-    <span t-if="is_cash_order">Rate Card</span>
-    <span t-if="not is_cash_order">Training Price</span>
+    <span t-if="is_clc_order">Rate Card</span>
+    <span t-if="not is_clc_order">Training Price</span>
 </th>
 <th t-if="o.display_total" style="font-size:18px; text-align:center; vertical-align:middle;">Total Price</th>
 

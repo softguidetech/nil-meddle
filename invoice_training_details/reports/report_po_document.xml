@@ -70,6 +70,19 @@
                         </div>
                     </div>
 
+                    <style>
+                        table[name="training_line_table"] th {
+                            background-color: #D9F4FA !important;
+                            color: #075E68 !important;
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                            border-color: #9DDDE7 !important;
+                        }
+                        table[name="training_line_table"] td {
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                        }
+                    </style>
                     <t t-set="is_cisco_u_all_access" t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>
@@ -150,7 +163,10 @@
                                     </t>
                                 </t>
                                 <tr class="border-grey o_total">
-                                    <td style="background-color:#fff; font-size:20px;"><strong>Invoice Amount</strong></td>
+                                    <td style="background-color:#fff; font-size:20px;">
+                                        <strong t-if="is_clc_order">NIL ME Invoice Amount</strong>
+                                        <strong t-if="not is_clc_order">Partner Invoice Amount</strong>
+                                    </td>
                                     <td style="background-color:#fff; text-align: right; font-size:15px;">
                                         <span t-out="o.amount_total" t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                                     </td>
@@ -162,8 +178,24 @@
 
 <div class="row pt-3 pb-2">
     <div class="col-12">
-        <div t-field="o.term_and_cond"
-             style="width:100%; font-size:22px;"/>
+        <div t-if="is_clc_order" style="width:100%; font-size:22px; line-height:1.7;">
+            <div><strong>CLC Order</strong></div>
+            <div>
+                <strong>Instructor from:</strong>
+                <span t-field="o.training_vendor"/>
+            </div>
+            <div>
+                <strong>CLCs Utilized:</strong>
+                <span t-field="o.clcs_qty"/>
+            </div>
+        </div>
+        <div t-if="not is_clc_order" style="width:100%; font-size:22px; line-height:1.7;">
+            <div>
+                <strong>Instructor from:</strong>
+                <span t-field="o.training_vendor"/>
+            </div>
+            <div t-field="o.term_and_cond"/>
+        </div>
     </div>
 </div>
 

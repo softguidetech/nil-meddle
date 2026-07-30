@@ -188,15 +188,14 @@
                 <strong>CLCs Utilized:</strong>
                 <span t-field="o.clcs_qty"/>
             </div>
-            <div t-field="o.term_and_cond"/>
         </div>
         <div t-if="not is_clc_order" style="width:100%; font-size:22px; line-height:1.7;">
             <div>
                 <strong>Instructor from:</strong>
                 <span t-field="o.training_vendor"/>
             </div>
-            <div t-field="o.term_and_cond"/>
         </div>
+        <div t-field="o.term_and_cond" style="width:100%; font-size:22px;"/>
     </div>
 </div>
 

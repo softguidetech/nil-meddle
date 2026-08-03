@@ -132,7 +132,7 @@ class SaleOrder(models.Model):
 
     @api.model
     def _default_term_and_cond(self):
-        return self._CASH_TERMS_HEADER + self._BASE_TERMS_AND_CONDITIONS
+        return self._CASH_TERMS_HEADER
 
     @api.model
     def _remove_order_terms_header(self, value):

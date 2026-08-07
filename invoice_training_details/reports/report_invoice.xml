@@ -26,17 +26,34 @@
                 <div t-if="o.partner_id.is_company" t-field="o.partner_id.name"/>
                 <strong t-if="not o.partner_id.is_company">Company Name:</strong>
                 <div t-if="not o.partner_id.is_company" t-field="o.partner_id.parent_id.name"/>
+
                 <strong>Address:</strong>
                 <div>
                   <span t-field="o.partner_id.street"/> <span t-field="o.partner_id.street2"/>
                   <span t-if="o.partner_id.city">, <span t-field="o.partner_id.city"/></span>
                   <span t-if="o.partner_id.country_id.name">, <span t-field="o.partner_id.country_id.name"/></span>
                 </div>
-                <strong t-if="o.partner_id.vat or o.partner_id.parent_id.vat">Tax Number:</strong>
-                <div>
-                  <span t-if="o.partner_id.vat" t-field="o.partner_id.vat"/>
-                  <span t-if="o.partner_id.parent_id.vat" t-field="o.partner_id.parent_id.vat"/>
+
+                <div t-if="o.partner_id.is_company and o.partner_id.vat">
+                  <strong>TAX#:</strong>
+                  <span t-field="o.partner_id.vat"/>
                 </div>
+
+                <div t-if="not o.partner_id.is_company and o.partner_id.parent_id.vat">
+                  <strong>TAX#:</strong>
+                  <span t-field="o.partner_id.parent_id.vat"/>
+                </div>
+
+                <div t-if="o.partner_id.is_company and o.partner_id.l10n_sa_additional_identification_number">
+                  <strong>Commercial Registration:</strong>
+                  <span t-field="o.partner_id.l10n_sa_additional_identification_number"/>
+                </div>
+
+                <div t-if="not o.partner_id.is_company and o.partner_id.parent_id.l10n_sa_additional_identification_number">
+                  <strong>Commercial Registration:</strong>
+                  <span t-field="o.partner_id.parent_id.l10n_sa_additional_identification_number"/>
+                </div>
+
                 <strong t-if="not o.partner_id.is_company">Attention:</strong><br/>
                 <div t-if="not o.partner_id.is_company" t-field="o.partner_id.name"/>
               </div>
@@ -214,6 +231,7 @@
               <img t-if="o.company_id.stamp and o.display_stamp" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height:150px;" alt="Stamp"/>
             </div>
           </div>
+
         </t>
       </t>
     </t>

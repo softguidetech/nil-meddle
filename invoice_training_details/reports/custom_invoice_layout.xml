@@ -13,7 +13,13 @@
 
                     <div class="col-9">
 
-                        <strong id="company_name" class="h5 fw-bold">
+                        <strong id="company_name"
+                                style="
+                                    font-family:'DejaVu Sans', Arial, sans-serif;
+                                    font-size:18px;
+                                    font-weight:600;
+                                    letter-spacing:0.2px;
+                                ">
                             <t t-esc="company.name"/>
                         </strong>
 

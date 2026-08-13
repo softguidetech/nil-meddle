@@ -2,48 +2,104 @@
 <odoo>
 
     <template id="custom_invoice_report_layout" inherit_id="web.external_layout_standard" primary="True">
+
         <div t-attf-class="header o_company_#{company.id}_layout" position="replace">
-<t t-set="company" t-value="o.company_id if o else request.env.company"/>
+
+            <t t-set="company" t-value="o.company_id if o else request.env.company"/>
+
             <div class="header o_company_#{company.id}_layout">
+
                 <div class="row mb-2">
+
                     <div class="col-9">
+
                         <strong id="company_name" class="h5 fw-bold">
-                            <t t-esc="company.name" />
+                            <t t-esc="company.name"/>
                         </strong>
-                        <div t-field="company.street" class="pt-1"/>
-                        <div t-field="company.street2" class="pt-1"/>
-                        <div class="pt-1">
-                            <span t-field="company.city"/>
-                            <t t-if="company.country_id.name">
-                                , <span t-field="company.country_id.name"/>
-                            </t>
+
+                        <!-- Company Address -->
+                        <div style="margin-top:4px;">
+
+                            <!-- Street + Street 2 -->
+                            <div t-if="company.street or company.street2">
+
+                                <span t-if="company.street"
+                                      t-field="company.street"/>
+
+                                <t t-if="company.street and company.street2">, </t>
+
+                                <span t-if="company.street2"
+                                      t-field="company.street2"/>
+
+                            </div>
+
+                            <!-- City + State + ZIP + Country -->
+                            <div t-if="company.city or company.state_id or company.zip or company.country_id">
+
+                                <span t-if="company.city"
+                                      t-field="company.city"/>
+
+                                <t t-if="company.city and company.state_id">, </t>
+
+                                <span t-if="company.state_id"
+                                      t-field="company.state_id.name"/>
+
+                                <t t-if="company.zip">
+                                    <t t-if="company.city or company.state_id"> </t>
+                                    <span t-field="company.zip"/>
+                                </t>
+
+                                <t t-if="company.country_id">
+                                    <t t-if="company.city or company.state_id or company.zip">, </t>
+                                    <span t-field="company.country_id.name"/>
+                                </t>
+
+                            </div>
+
                         </div>
-                        <div t-field="company.state_id.name" class="pt-1"/>
+
                         <div t-field="company.phone" class="pt-1"/>
+
                         <div t-field="company.email" class="pt-1"/>
+
                         <div class="pt-1">
                             <strong>Tax Number:</strong>
                             <t t-esc="company.vat"/>
                         </div>
+
                         <t t-if="company.country_id.name == 'Saudi Arabia'">
+
                             <div class="pt-1">
                                 <strong>CRN:</strong>
                                 <t t-esc="company.l10n_sa_additional_identification_number"/>
                             </div>
+
                         </t>
+
                     </div>
+
                     <div class="col-3 text-end">
-                        <img t-if="company.logo" class="pt-2" t-att-src="image_data_uri(company.logo)" style="max-height: 150px;" alt="Logo"/>
+
+                        <img t-if="company.logo"
+                             class="pt-2"
+                             t-att-src="image_data_uri(company.logo)"
+                             style="max-height:150px;"
+                             alt="Logo"/>
+
                     </div>
+
                 </div>
+
             </div>
+
         </div>
 
         <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
             <div class="text-center">
-                <strong>Ruba</strong>
+                <strong> </strong>
             </div>
         </div>
+
     </template>
 
 </odoo>

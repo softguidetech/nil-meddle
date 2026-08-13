@@ -212,30 +212,79 @@
                     </div>
 
 
-                    <!--<table class="table table-sm o_main_table table-borderless" name="order_lines">-->
-                    <!--    <thead class="bg-light text-info">-->
-                    <!--        <tr>-->
-                    <!--            <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>-->
-                    <!--            <th name="th_quantity" class="text-end"><span>QTY</span></th>-->
-                    <!--            <th name="th_rate" class="text-end"><span>RATE</span></th>-->
-                    <!--            <th name="th_amount" class="text-end"><span>AMOUNT</span></th>-->
-                    <!--        </tr>-->
-                    <!--    </thead>-->
-                    <!--    <tbody>-->
-                    <!--        <t t-foreach="o.order_lines" t-as="line">-->
-                    <!--            <tr>-->
-                    <!--                <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>-->
-                    <!--                <td class="text-end"><span t-field="line.quantity"/></td>-->
-                    <!--                <td class="text-end"><span t-field="line.price_unit"/></td>-->
-                    <!--                <td class="text-end"><span t-field="line.quantity"/></td>-->
-                    <!--            </tr>-->
-                    <!--        </t>-->
-                    <!--    </tbody>-->
-                    <!--</table>-->
+                    <!-- Sales Order Lines: shown when Training Table is disabled -->
+                    <table t-if="not o.display_training_table"
+                           class="table table-sm o_main_table table-borderless"
+                           name="order_lines">
+
+                        <thead class="bg-light text-info">
+                            <tr>
+                                <th name="th_description" class="text-start">
+                                    <span>DESCRIPTION</span>
+                                </th>
+                                <th name="th_quantity" class="text-end">
+                                    <span>QTY</span>
+                                </th>
+                                <th name="th_rate" class="text-end">
+                                    <span>RATE</span>
+                                </th>
+                                <th name="th_taxes" class="text-end">
+                                    <span>Taxes</span>
+                                </th>
+                                <th name="th_amount" class="text-end">
+                                    <span>Taxable Amount</span>
+                                </th>
+                                <th name="th_total_tax_inc" class="text-end">
+                                    <span>Total Tax.inc</span>
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <t t-foreach="o.order_line" t-as="line">
+
+                                <tr t-if="not line.display_type">
+                                    <td class="text-start" style="max-width:50px;">
+                                        <span t-field="line.name"/>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span t-field="line.product_uom_qty"/>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span t-field="line.price_unit"/>
+                                    </td>
+
+                                    <t t-set="taxes"
+                                       t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.tax_id])"/>
+
+                                    <td name="td_taxes" class="text-end">
+                                        <span t-out="taxes">Tax</span>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span t-field="line.price_subtotal"/>
+                                    </td>
+
+                                    <td class="text-end">
+                                        <span t-field="line.price_total"/>
+                                    </td>
+                                </tr>
+
+                            </t>
+                        </tbody>
+
+                    </table>
 
 
                     <!-- TWO-LINE SPACE BEFORE TRAINING TABLE -->
                     <div style="height:30px;"></div>
+
+
+                    <!-- Sale Order product lines used by the Training Table -->
+                    <t t-set="sale_product_lines"
+                       t-value="o.order_line.filtered(lambda line: not line.display_type)"/>
 
 
                     <!-- Training Table -->
@@ -255,7 +304,7 @@
 
                                 <th name="th_training_name"
                                     style="text-align:center; vertical-align:middle;">
-                                    <span>Training Name</span>
+                                    <span>Scope of Work</span>
                                 </th>
 
 
@@ -335,7 +384,8 @@
 
 
                                     <td style="text-align:left; vertical-align:middle;">
-                                        <span t-field="training.training_id"/>
+                                        <span t-if="training_index &lt; len(sale_product_lines)"
+                                              t-out="sale_product_lines[training_index].product_id.name"/>
                                     </td>
 
 

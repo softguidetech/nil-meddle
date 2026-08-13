@@ -14,14 +14,14 @@
                     <div class="col-9">
 
                         <strong id="company_name"
-                                style="
-                                    font-family:'DejaVu Sans', Arial, sans-serif;
-                                    font-size:18px;
-                                    font-weight:600;
-                                    letter-spacing:0.2px;
-                                ">
-                            <t t-esc="company.name"/>
-                        </strong>
+        style="
+            font-family:Calibri, Arial, sans-serif;
+            font-size:18px;
+            font-weight:600;
+            letter-spacing:0.2px;
+        ">
+    <t t-esc="company.name"/>
+</strong>
 
                         <!-- Company Address -->
                         <div style="margin-top:4px;">

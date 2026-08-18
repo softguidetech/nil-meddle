@@ -1,95 +1,137 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
+    <template id="custom_invoice_report_layout"
+              inherit_id="web.external_layout_standard"
+              primary="True">
 
-    <template id="custom_invoice_report_layout" inherit_id="web.external_layout_standard" primary="True">
-
+        <!-- HEADER -->
         <div t-attf-class="header o_company_#{company.id}_layout" position="replace">
 
             <t t-set="company" t-value="o.company_id if o else request.env.company"/>
 
-            <div class="header o_company_#{company.id}_layout">
+            <div t-attf-class="header o_company_#{company.id}_layout"
+                 style="padding:0; margin:0;">
 
-                <div class="row mb-2">
+                <div class="row"
+                     style="
+                        margin:0;
+                        padding:0;
+                        width:100%;
+                        align-items:flex-start;
+                     ">
 
-                    <div class="col-9">
+                    <!-- COMPANY INFORMATION -->
+                    <div class="col-9"
+                         style="
+                            padding:0;
+                            margin:0;
+                            line-height:1.35;
+                         ">
 
-                        <strong id="company_name"
-        style="
-            font-family:Calibri, Arial, sans-serif;
-            font-size:18px;
-            font-weight:600;
-            letter-spacing:0.2px;
-        ">
-    <t t-esc="company.name"/>
-</strong>
+                        <!-- Company Name -->
+                        <div style="
+                            margin:0 0 6px 0;
+                            padding:0;
+                            max-width:540px;
+                            font-size:16px;
+                            font-weight:600;
+                            line-height:1.25;
+                            letter-spacing:0;
+                            white-space:normal;
+                            word-break:normal;
+                        ">
+                            <t t-esc="company.name"/>
+                        </div>
 
-                        <!-- Company Address -->
-                        <div style="margin-top:4px;">
-
-                            <!-- Street + Street 2 -->
-                            <div t-if="company.street or company.street2">
-
-                                <span t-if="company.street"
-                                      t-field="company.street"/>
-
+                        <!-- Address -->
+                        <div style="
+                            margin:0 0 2px 0;
+                            padding:0;
+                            font-size:12px;
+                            font-weight:400;
+                            line-height:1.35;
+                        ">
+                            <t t-if="company.street or company.street2">
+                                <span t-if="company.street" t-field="company.street"/>
                                 <t t-if="company.street and company.street2">, </t>
+                                <span t-if="company.street2" t-field="company.street2"/>
+                            </t>
+                        </div>
 
-                                <span t-if="company.street2"
-                                      t-field="company.street2"/>
+                        <div t-if="company.city or company.state_id or company.zip or company.country_id"
+                             style="
+                                margin:0 0 3px 0;
+                                padding:0;
+                                font-size:12px;
+                                font-weight:400;
+                                line-height:1.35;
+                             ">
 
-                            </div>
+                            <span t-if="company.city" t-field="company.city"/>
 
-                            <!-- City + State + ZIP + Country -->
-                            <div t-if="company.city or company.state_id or company.zip or company.country_id">
+                            <t t-if="company.state_id">
+                                <t t-if="company.city">, </t>
+                                <span t-field="company.state_id.name"/>
+                            </t>
 
-                                <span t-if="company.city"
-                                      t-field="company.city"/>
+                            <t t-if="company.zip">
+                                <t t-if="company.city or company.state_id"> </t>
+                                <span t-field="company.zip"/>
+                            </t>
 
-                                <t t-if="company.city and company.state_id">, </t>
-
-                                <span t-if="company.state_id"
-                                      t-field="company.state_id.name"/>
-
-                                <t t-if="company.zip">
-                                    <t t-if="company.city or company.state_id"> </t>
-                                    <span t-field="company.zip"/>
-                                </t>
-
-                                <t t-if="company.country_id">
-                                    <t t-if="company.city or company.state_id or company.zip">, </t>
-                                    <span t-field="company.country_id.name"/>
-                                </t>
-
-                            </div>
+                            <t t-if="company.country_id">
+                                <t t-if="company.city or company.state_id or company.zip">, </t>
+                                <span t-field="company.country_id.name"/>
+                            </t>
 
                         </div>
 
-                        <div t-field="company.phone" class="pt-1"/>
-
-                        <div t-field="company.email" class="pt-1"/>
-
-                        <div class="pt-1">
-                            <strong>Tax Number:</strong>
-                            <t t-esc="company.vat"/>
+                        <!-- Contact -->
+                        <div t-if="company.phone"
+                             style="margin:0 0 2px 0; font-size:12px; line-height:1.35;">
+                            <span t-field="company.phone"/>
                         </div>
 
-                        <t t-if="company.country_id.name == 'Saudi Arabia'">
+                        <div t-if="company.email"
+                             style="margin:0 0 2px 0; font-size:12px; line-height:1.35;">
+                            <span t-field="company.email"/>
+                        </div>
 
-                            <div class="pt-1">
-                                <strong>CRN:</strong>
-                                <t t-esc="company.l10n_sa_additional_identification_number"/>
-                            </div>
+                        <!-- Tax Number -->
+                        <div t-if="company.vat"
+                             style="margin:0 0 2px 0; font-size:12px; line-height:1.35;">
+                            <strong style="font-weight:600;">Tax Number:</strong>
+                            <span t-esc="company.vat"/>
+                        </div>
 
-                        </t>
+                        <!-- Saudi CRN -->
+                        <div t-if="company.country_id and company.country_id.name == 'Saudi Arabia' and company.l10n_sa_additional_identification_number"
+                             style="margin:0; font-size:12px; line-height:1.35;">
+                            <strong style="font-weight:600;">CRN:</strong>
+                            <span t-esc="company.l10n_sa_additional_identification_number"/>
+                        </div>
 
                     </div>
 
-                    <div class="col-3 text-end">
+                    <!-- LOGO -->
+                    <div class="col-3"
+                         style="
+                            padding:0;
+                            margin:0;
+                            text-align:right;
+                         ">
 
                         <img t-if="company.logo"
-                             class="pt-2"
                              t-att-src="image_data_uri(company.logo)"
-                             style="max-height:150px;"
+                             style="
+                                max-height:105px;
+                                max-width:180px;
+                                width:auto;
+                                height:auto;
+                                object-fit:contain;
+                                margin:0;
+                                padding:0;
+                             "
                              alt="Logo"/>
 
                     </div>
@@ -100,6 +142,7 @@
 
         </div>
 
+        <!-- FOOTER -->
         <div t-attf-class="footer o_standard_footer o_company_#{company.id}_layout">
             <div class="text-center">
                 <strong> </strong>
@@ -107,5 +150,4 @@
         </div>
 
     </template>
-
 </odoo>

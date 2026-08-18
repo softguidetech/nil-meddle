@@ -136,74 +136,44 @@
                         </div>
 
 
-                        <!-- PI Details -->
+                        <!-- Document Details -->
                         <div class="col-4">
 
-                            <div>
+                            <div style="
+                                margin-left:auto;
+                                width:220px;
+                                line-height:1.2;
+                            ">
 
-                                <table class="table table-borderless">
+                                <div style="
+                                    margin:0 0 3px 0;
+                                    padding:0;
+                                    white-space:nowrap;
+                                ">
+                                    <span>Quot#: </span>
+                                    <span t-if="o.name"
+                                          t-esc="
+                                            o.name
+                                            if o.name.startswith('PI')
+                                            else 'PI' + (
+                                                o.name[2:]
+                                                if o.name.startswith('SO')
+                                                else o.name[1:]
+                                                if o.name.startswith('S')
+                                                else o.name
+                                            )
+                                          "/>
+                                </div>
 
-                                    <tr class="p-0">
-
-                                        <td class="p-0"
-                                            style="vertical-align:middle;">
-                                            Quot#
-                                        </td>
-
-                                        <td class="p-0"
-                                            style="vertical-align:middle;">
-
-                                            <span t-if="o.name"
-                                                  t-esc="
-                                                    o.name
-                                                    if o.name.startswith('PI')
-                                                    else 'PI' + (
-                                                        o.name[2:]
-                                                        if o.name.startswith('SO')
-                                                        else o.name[1:]
-                                                        if o.name.startswith('S')
-                                                        else o.name
-                                                    )
-                                                  "/>
-
-                                        </td>
-
-                                    </tr>
-
-
-                                    <tr class="p-0">
-
-                                        <td class="p-0"
-                                            style="vertical-align:middle;">
-                                            DATE
-                                        </td>
-
-                                        <td class="p-0"
-                                            style="vertical-align:middle;">
-
-                                            <span t-field="o.date_order"
-                                                  t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
-
-                                        </td>
-
-                                    </tr>
-
-
-                                    <tr class="p-0">
-
-                                        <td class="p-0"
-                                            style="vertical-align:middle;">
-                                            DUE DATE
-                                        </td>
-
-                                        <td class="p-0"
-                                            style="vertical-align:middle;">
-                                            <span t-field="o.validity_date"/>
-                                        </td>
-
-                                    </tr>
-
-                                </table>
+                                <div style="
+                                    margin:0;
+                                    padding:0;
+                                    white-space:nowrap;
+                                ">
+                                    <span>DATE: </span>
+                                    <span t-field="o.date_order"
+                                          t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                                </div>
 
                             </div>
 

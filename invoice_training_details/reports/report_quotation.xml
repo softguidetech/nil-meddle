@@ -154,8 +154,8 @@
                                     <span t-if="o.name"
                                           t-esc="
                                             o.name
-                                            if o.name.startswith('PI')
-                                            else 'PI' + (
+                                            if o.name.startswith('Q')
+                                            else 'Q' + (
                                                 o.name[2:]
                                                 if o.name.startswith('SO')
                                                 else o.name[1:]

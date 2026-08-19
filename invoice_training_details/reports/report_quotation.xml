@@ -305,7 +305,17 @@
 
 
                                     <td style="text-align:left; vertical-align:middle;">
-                                        <span t-field="training.training_id"/>
+                                        <div>
+                                            <span t-field="training.training_id"/>
+                                        </div>
+
+                                        <div t-if="training.hyperlink" style="margin-top:3px;">
+                                            <a t-att-href="training.hyperlink"
+                                               target="_blank"
+                                               style="text-decoration:underline;">
+                                                Click for Course Content
+                                            </a>
+                                        </div>
                                     </td>
 
 
@@ -376,29 +386,6 @@
                         </tbody>
 
                     </table>
-
-
-                    <!-- Course Content: show only trainings that have a hyperlink -->
-                    <t t-set="course_content_lines"
-                       t-value="o.training_course_ids.filtered('hyperlink')"/>
-
-                    <div t-if="course_content_lines"
-                         style="margin-top:10px; margin-bottom:10px; page-break-inside:avoid;">
-
-                        <div style="margin:0 0 4px 0;">
-                            <strong>Course Content</strong>
-                        </div>
-
-                        <t t-foreach="course_content_lines" t-as="content_training">
-                            <div style="margin:0 0 3px 0;">
-                                <a t-att-href="content_training.hyperlink"
-                                   style="text-decoration:underline;">
-                                    <span t-field="content_training.training_id"/>
-                                </a>
-                            </div>
-                        </t>
-
-                    </div>
 
 
                     <div class="row pt-3 pb-2"

@@ -305,17 +305,8 @@
 
 
                                     <td style="text-align:left; vertical-align:middle;">
-                                        <div>
-                                            <span t-field="training.training_id"/>
-                                        </div>
-
-                                        <div t-if="training.hyperlink" style="margin-top:3px;">
-                                            <a t-att-href="training.hyperlink"
-                                               target="_blank"
-                                               style="text-decoration:underline;">
-                                                Click for Course Content
-                                            </a>
-                                        </div>
+                                        <span t-field="training.training_id"/>
+                                        <t t-if="training.hyperlink"><span> - </span><a t-att-href="training.hyperlink" target="_blank" style="text-decoration:underline;">Click for Course Content</a></t>
                                     </td>
 
 

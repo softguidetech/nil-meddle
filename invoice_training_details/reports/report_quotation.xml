@@ -378,30 +378,6 @@
                     </table>
 
 
-                    <!-- Course Content: show only trainings whose product has a hyperlink -->
-                    <t t-set="linked_trainings"
-                       t-value="o.training_course_ids.filtered(lambda training: training.training_id and 'hyperlink' in training.training_id._fields and training.training_id.hyperlink)"/>
-
-                    <div t-if="linked_trainings"
-                         style="margin-top:12px; margin-bottom:8px; page-break-inside:avoid;">
-
-                        <div style="margin-bottom:4px;">
-                            <strong>Course Content</strong>
-                        </div>
-
-                        <t t-foreach="linked_trainings" t-as="linked_training">
-                            <div style="margin:0 0 3px 0;">
-                                <a t-att-href="linked_training.training_id.hyperlink"
-                                   target="_blank"
-                                   style="text-decoration:underline;">
-                                    <span t-field="linked_training.training_id"/>
-                                </a>
-                            </div>
-                        </t>
-
-                    </div>
-
-
                     <div class="row pt-3 pb-2"
                          style="
                             page-break-inside:avoid;

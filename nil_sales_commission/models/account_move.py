@@ -1,6 +1,6 @@
 from datetime import date
 
-from odoo import api, models
+from odoo import api, fields, models
 
 
 COMMISSION_CUTOFF_DATE = date(2026, 5, 31)
@@ -9,19 +9,18 @@ COMMISSION_CUTOFF_DATE = date(2026, 5, 31)
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
+    exclude_from_commission = fields.Boolean(
+        string='Exclude from Commission',
+        default=False,
+        copy=False,
+    )
+
     def _nil_get_commission_sale_orders(self):
         """
         Find every Sale Order related to the invoice.
 
-        Primary link:
-            invoice line -> sale line -> sale order
-
-        Fallback:
-            invoice_origin -> sale.order.name
-
-        The fallback is important for older/custom invoices where the
-        invoice was created from a quotation/order but the sale_line_ids
-        relation is missing.
+        1) Standard invoice line -> sale line -> sale order link.
+        2) Fallback through invoice_origin for older/custom invoices.
         """
         self.ensure_one()
 
@@ -32,9 +31,6 @@ class AccountMove(models.Model):
         origin = (self.invoice_origin or '').strip()
 
         if origin:
-            # Typical Odoo invoice_origin values are:
-            # S00001
-            # S00001, S00002
             origin_names = [
                 value.strip()
                 for value in origin.split(',')
@@ -46,8 +42,6 @@ class AccountMove(models.Model):
                     ('name', 'in', origin_names),
                 ])
 
-            # Extra fallback for custom origin formatting.
-            # Search only when the exact-name lookup did not find anything.
             if not orders:
                 orders |= SaleOrder.search([
                     ('name', '=', origin),
@@ -56,12 +50,6 @@ class AccountMove(models.Model):
         return orders
 
     def _nil_get_commission_lead(self):
-        """
-        Return the CRM Lead linked to the invoice through its Sale Order.
-
-        If a commission row already exists and already knows its Lead,
-        preserve that link as a fallback.
-        """
         self.ensure_one()
 
         leads = self._nil_get_commission_sale_orders().mapped(
@@ -78,18 +66,22 @@ class AccountMove(models.Model):
             ('lead_id', '!=', False),
         ], limit=1)
 
-        return existing_commission.lead_id if existing_commission else self.env['crm.lead']
+        if existing_commission:
+            return existing_commission.lead_id
+
+        return self.env['crm.lead']
 
     def _nil_get_commission_salesperson(self):
         """
         Salesperson priority:
+        1) CURRENT salesperson on linked CRM Lead.
+        2) Invoice Salesperson.
+        3) Sale Order Salesperson.
 
-        1. CURRENT salesperson on the linked CRM Lead.
-        2. Invoice Salesperson.
-        3. Sale Order Salesperson.
-
-        This keeps the invoice itself fixed while allowing Lead salesperson
-        changes to update pending commission rows.
+        IMPORTANT:
+        A salesperson is NOT required for the invoice to appear in
+        Commission Ledger. This method only provides the best available
+        default value.
         """
         self.ensure_one()
 
@@ -108,107 +100,67 @@ class AccountMove(models.Model):
 
         return self.env['res.users']
 
-    def _nil_is_allowed_commission_salesperson(self):
-        self.ensure_one()
-
-        salesperson = self._nil_get_commission_salesperson()
-
-        if not salesperson:
-            return False
-
-        return self.env[
-            'nil.sales.commission'
-        ]._nil_is_allowed_salesperson(
-            salesperson
-        )
-
-    def _nil_is_commission_eligible(self):
-        """
-        Eligible invoices:
-
-        - Customer Invoice only
-        - Draft OR Posted (only Cancelled invoices are excluded)
-        - Invoice Date from 01-Jun-2026 onward
-        - Positive untaxed amount
-        - Salesperson is one of the approved commission users
-        """
-        self.ensure_one()
-
-        return bool(
-            self.move_type == 'out_invoice'
-            and self.state != 'cancel'
-            and self.invoice_date
-            and self.invoice_date > COMMISSION_CUTOFF_DATE
-            and self.amount_untaxed > 0
-            and self._nil_get_commission_salesperson()
-            and self._nil_is_allowed_commission_salesperson()
-        )
-
     def _nil_sync_sales_commission(self):
         """
-        Create/update one commission row per eligible customer invoice.
+        Ensure every customer invoice dated after 31-May-2026 appears in
+        Commission Ledger, regardless of:
+        - salesperson
+        - invoice state
+        - invoice amount
+        - CRM link
 
-        Fixed from Invoice:
-        - Invoice reference
+        User-controlled exclusion is respected.
+
+        Invoice-linked fixed fields:
+        - Invoice
         - Invoice Date
-        - Invoice Value excluding tax
+        - Invoice Value Excl. Tax
         - Currency
 
-        Dynamic from current Lead:
+        Lead-driven defaults:
+        - Lead
         - Salesperson
         - Customer
-        - Commission %
-        - Commission Amount
 
-        Rates:
-        - Ruba Khattam = 1.5%
-        - Loudy Abdo = 5%
-        - Baraa Abo Saleh = 2%
+        Existing Paid rows are never changed.
+        Existing Excluded rows remain excluded.
         """
-        Commission = self.env[
-            'nil.sales.commission'
-        ].sudo()
+        Commission = self.env['nil.sales.commission'].sudo()
 
         for invoice in self:
-
             if invoice.move_type != 'out_invoice':
+                continue
+
+            if not invoice.invoice_date:
+                continue
+
+            if invoice.invoice_date <= COMMISSION_CUTOFF_DATE:
                 continue
 
             commission = Commission.search([
                 ('invoice_id', '=', invoice.id),
             ], limit=1)
 
-            if not invoice._nil_is_commission_eligible():
-
+            if invoice.exclude_from_commission:
                 if commission and commission.state != 'paid':
-                    commission.unlink()
-
+                    commission.with_context(
+                        nil_auto_sync=True
+                    ).write({
+                        'state': 'excluded',
+                    })
                 continue
 
-            salesperson = (
-                invoice._nil_get_commission_salesperson()
-            )
-
+            salesperson = invoice._nil_get_commission_salesperson()
             lead = invoice._nil_get_commission_lead()
-
-            invoice_value = float(
-                invoice.amount_untaxed or 0.0
-            )
-
-            commission_rate = (
-                Commission._nil_get_commission_rate(
-                    salesperson
-                )
-            )
 
             values = {
                 'invoice_id': invoice.id,
-                'lead_id': (
-                    lead.id
-                    if lead
+                'lead_id': lead.id if lead else False,
+                'salesperson_id': (
+                    salesperson.id
+                    if salesperson
                     else False
                 ),
-                'salesperson_id': salesperson.id,
                 'customer_id': (
                     lead.partner_id.id
                     if lead and lead.partner_id
@@ -218,73 +170,69 @@ class AccountMove(models.Model):
                 ),
                 'company_id': invoice.company_id.id,
                 'currency_id': invoice.currency_id.id,
-                'training_value': invoice_value,
-                'commission_rate': commission_rate,
-                'commission_amount': (
-                    invoice_value
-                    * (commission_rate / 100.0)
+                'training_value': float(
+                    invoice.amount_untaxed or 0.0
                 ),
                 'commission_date': invoice.invoice_date,
             }
 
             if commission:
-
                 if commission.state == 'paid':
                     continue
 
-                if commission.state == 'cancelled':
-                    values['state'] = 'pending'
+                # Do not silently undo a deliberate exclusion.
+                if commission.state == 'excluded':
+                    continue
 
-                commission.write(values)
+                # Only refresh the default rate when the user has never
+                # manually overridden it.
+                if not commission.manual_rate:
+                    values['commission_rate'] = (
+                        Commission._nil_get_default_commission_rate(
+                            salesperson
+                        )
+                    )
+
+                commission.with_context(
+                    nil_auto_sync=True
+                ).write(values)
 
             else:
+                values.update({
+                    'commission_rate':
+                        Commission._nil_get_default_commission_rate(
+                            salesperson
+                        ),
+                    'state': 'draft',
+                    'manual_rate': False,
+                })
 
-                values['state'] = 'pending'
-
-                Commission.create(values)
+                Commission.with_context(
+                    nil_auto_sync=True
+                ).create(values)
 
         return True
 
     @api.model
     def _nil_backfill_sales_commissions(self):
         """
-        Re-scan ALL non-cancelled customer invoices from 01-Jun-2026 onward.
+        Backfill ALL customer invoices from 01-Jun-2026 onward.
 
-        This is deliberately invoice-first. It does not require a commission
-        row to already exist.
+        No salesperson filter.
+        No Posted-only filter.
+        No positive-amount filter.
 
-        For each invoice, the code tries:
-        1. Sale-line link to Sale Order
-        2. invoice_origin to Sale Order
-        3. Lead salesperson
-        4. Invoice salesperson
-        5. Sale Order salesperson
+        The user decides which rows to approve or exclude.
         """
-        Commission = self.env[
-            'nil.sales.commission'
-        ].sudo()
-
+        Commission = self.env['nil.sales.commission'].sudo()
         Commission._nil_prepare_invoice_commission_migration()
 
         invoices = self.sudo().search([
             ('move_type', '=', 'out_invoice'),
-            ('state', '!=', 'cancel'),
             ('invoice_date', '>', COMMISSION_CUTOFF_DATE),
-            ('amount_untaxed', '>', 0),
         ])
 
         invoices._nil_sync_sales_commission()
-
-        # Clean unpaid commissions that no longer qualify after the full scan.
-        non_paid_commissions = Commission.search([
-            ('state', '!=', 'paid'),
-            ('invoice_id', '!=', False),
-        ])
-
-        for commission in non_paid_commissions:
-            if not commission.invoice_id._nil_is_commission_eligible():
-                commission.unlink()
-
         return True
 
     def action_post(self):
@@ -305,7 +253,6 @@ class AccountMove(models.Model):
         }
 
         if tracked_fields.intersection(vals):
-
             self.filtered(
                 lambda move:
                     move.move_type == 'out_invoice'

@@ -8,13 +8,13 @@
             <tree string="Commission Ledger"
                   decoration-success="state == 'paid'"
                   decoration-muted="state == 'cancelled'">
-                <field name="commission_date"/>
-                <field name="name"/>
+                <field name="commission_date" string="Invoice Date"/>
+                <field name="invoice_id"/>
                 <field name="salesperson_id"/>
-                <field name="lead_id"/>
+                <field name="lead_id" optional="show"/>
                 <field name="customer_id"/>
                 <field name="currency_id" column_invisible="1"/>
-                <field name="training_value" sum="Total Training Value"/>
+                <field name="training_value" sum="Total Invoice Value"/>
                 <field name="commission_rate"/>
                 <field name="commission_amount" sum="Total Commission"/>
                 <field name="state" widget="badge"
@@ -63,10 +63,11 @@
 
                     <group>
                         <group string="Commission">
+                            <field name="invoice_id" readonly="state == 'paid'"/>
                             <field name="lead_id" readonly="state == 'paid'"/>
                             <field name="salesperson_id" readonly="state == 'paid'"/>
                             <field name="customer_id" readonly="state == 'paid'"/>
-                            <field name="commission_date" readonly="state == 'paid'"/>
+                            <field name="commission_date" string="Invoice Date" readonly="state == 'paid'"/>
                         </group>
 
                         <group string="Amounts">
@@ -104,6 +105,7 @@
         <field name="arch" type="xml">
             <search string="Commission Ledger">
                 <field name="name"/>
+                <field name="invoice_id"/>
                 <field name="salesperson_id"/>
                 <field name="lead_id"/>
                 <field name="customer_id"/>

@@ -361,10 +361,12 @@ class SalesCommission(models.Model):
                 and protected_fields.intersection(
                     vals
                 )
+                and not self.env.context.get(
+                    'nil_skip_paid_lock'
+                )
             ):
                 raise UserError(_(
-                    'A paid commission is locked because it already has '
-                    'an accounting entry.'
+                    'Use Reset to Draft before editing a paid commission.'
                 ))
 
         result = True
@@ -422,28 +424,74 @@ class SalesCommission(models.Model):
 
         return result
 
+    def _nil_reverse_paid_entry(self):
+        """
+        Reverse the posted commission journal entry so a Paid commission can
+        safely return to Draft or be deleted.
+
+        We keep the accounting audit trail:
+        - Original posted commission journal entry remains.
+        - Odoo creates/posts a reversal entry dated today.
+        - The commission record is then unlocked.
+        """
+        for rec in self:
+            if rec.state != 'paid' or not rec.move_id:
+                continue
+
+            move = rec.move_id.sudo()
+
+            # If the linked move was already deleted/reset elsewhere, just
+            # clear the commission's payment link.
+            if not move.exists():
+                rec.with_context(nil_skip_paid_lock=True).write({
+                    'move_id': False,
+                    'payment_date': False,
+                })
+                continue
+
+            if move.state == 'posted':
+                reversal_date = fields.Date.context_today(rec)
+
+                reversal_moves = move._reverse_moves(
+                    default_values_list=[{
+                        'date': reversal_date,
+                        'ref': _(
+                            'Reversal of %(commission)s',
+                            commission=rec.name,
+                        ),
+                    }],
+                    cancel=False,
+                )
+
+                if reversal_moves.filtered(
+                    lambda reversal:
+                        reversal.state != 'posted'
+                ):
+                    reversal_moves.action_post()
+
+            rec.with_context(
+                nil_skip_paid_lock=True
+            ).write({
+                'move_id': False,
+                'payment_date': False,
+            })
+
+        return True
+
     def unlink(self):
         """
-        FULL delete freedom for every NON-PAID entry.
+        User can delete ANY commission row.
 
-        Manual row:
-            delete normally.
-
-        Automatic Ruba row:
-            deleting it also marks the invoice as Excluded so the next
-            backfill does not recreate it immediately.
-
-        Paid rows stay protected because they already have a posted journal
-        entry.
+        If the row is Paid, reverse its posted accounting entry first so the
+        books remain balanced and the audit trail is preserved.
         """
-        if any(
-            rec.state == 'paid'
-            for rec in self
-        ):
-            raise UserError(_(
-                'Paid commissions cannot be deleted while their journal '
-                'entry is posted.'
-            ))
+        paid_records = self.filtered(
+            lambda rec:
+                rec.state == 'paid'
+        )
+
+        if paid_records:
+            paid_records._nil_reverse_paid_entry()
 
         auto_rows = self.filtered(
             lambda rec:
@@ -589,16 +637,17 @@ class SalesCommission(models.Model):
 
     def action_reset_draft(self):
         """
-        Works for BOTH automatic and manually created non-paid entries.
+        Reset ANY non-deleted commission to Draft.
 
-        If the row was excluded, Reset to Draft makes it visible again
-        in the normal Commission Ledger.
+        For Paid rows:
+        - reverse the posted accounting entry first
+        - clear payment link/date
+        - return the commission to Draft
+        - allow full editing/deletion again
         """
         for rec in self:
             if rec.state == 'paid':
-                raise UserError(_(
-                    'A paid commission cannot be reset to Draft.'
-                ))
+                rec._nil_reverse_paid_entry()
 
             if rec.is_auto_ruba and rec.invoice_id:
                 rec.invoice_id.sudo().write({
@@ -606,8 +655,12 @@ class SalesCommission(models.Model):
                         False,
                 })
 
-            rec.write({
+            rec.with_context(
+                nil_skip_paid_lock=True
+            ).write({
                 'state': 'draft',
+                'payment_date': False,
+                'move_id': False,
             })
 
         return self.env['ir.actions.actions']._for_xml_id(

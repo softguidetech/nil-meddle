@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="view_sales_commission_tree" model="ir.ui.view">
+        <field name="name">nil.sales.commission.tree</field>
+        <field name="model">nil.sales.commission</field>
+        <field name="arch" type="xml">
+            <tree string="Commission Ledger"
+                  decoration-success="state == 'paid'"
+                  decoration-muted="state == 'cancelled'">
+                <field name="commission_date"/>
+                <field name="name"/>
+                <field name="salesperson_id"/>
+                <field name="lead_id"/>
+                <field name="customer_id"/>
+                <field name="currency_id" column_invisible="1"/>
+                <field name="training_value" sum="Total Training Value"/>
+                <field name="commission_rate"/>
+                <field name="commission_amount" sum="Total Commission"/>
+                <field name="state" widget="badge"
+                       decoration-warning="state == 'pending'"
+                       decoration-success="state == 'paid'"
+                       decoration-muted="state == 'cancelled'"/>
+                <field name="payment_date" optional="show"/>
+                <field name="move_id" optional="show"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="view_sales_commission_form" model="ir.ui.view">
+        <field name="name">nil.sales.commission.form</field>
+        <field name="model">nil.sales.commission</field>
+        <field name="arch" type="xml">
+            <form string="Sales Commission">
+                <header>
+                    <button name="action_mark_paid"
+                            type="object"
+                            string="Mark Paid"
+                            class="oe_highlight"
+                            invisible="state != 'pending'"/>
+                    <button name="action_cancel"
+                            type="object"
+                            string="Cancel"
+                            invisible="state != 'pending'"/>
+                    <button name="action_reset_pending"
+                            type="object"
+                            string="Reset to Pending"
+                            invisible="state != 'cancelled'"/>
+                    <button name="action_open_move"
+                            type="object"
+                            string="Journal Entry"
+                            invisible="not move_id"/>
+                    <field name="state" widget="statusbar" statusbar_visible="pending,paid,cancelled"/>
+                </header>
+
+                <sheet>
+                    <div class="oe_title">
+                        <label for="name"/>
+                        <h1>
+                            <field name="name" readonly="1"/>
+                        </h1>
+                    </div>
+
+                    <group>
+                        <group string="Commission">
+                            <field name="lead_id" readonly="state == 'paid'"/>
+                            <field name="salesperson_id" readonly="state == 'paid'"/>
+                            <field name="customer_id" readonly="state == 'paid'"/>
+                            <field name="commission_date" readonly="state == 'paid'"/>
+                        </group>
+
+                        <group string="Amounts">
+                            <field name="currency_id" readonly="state == 'paid'"/>
+                            <field name="training_value" readonly="state == 'paid'"/>
+                            <field name="commission_rate"/>
+                            <field name="commission_amount" readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Payment / Accounting" invisible="state == 'cancelled'">
+                        <group>
+                            <field name="company_id" readonly="state == 'paid'"/>
+                            <field name="payment_journal_id" readonly="state == 'paid'"/>
+                            <field name="expense_account_id" readonly="state == 'paid'"/>
+                            <field name="payment_account_id" readonly="state == 'paid'"/>
+                        </group>
+                        <group>
+                            <field name="payment_date"/>
+                            <field name="move_id"/>
+                        </group>
+                    </group>
+
+                    <group>
+                        <field name="notes" placeholder="Optional notes..."/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_sales_commission_search" model="ir.ui.view">
+        <field name="name">nil.sales.commission.search</field>
+        <field name="model">nil.sales.commission</field>
+        <field name="arch" type="xml">
+            <search string="Commission Ledger">
+                <field name="name"/>
+                <field name="salesperson_id"/>
+                <field name="lead_id"/>
+                <field name="customer_id"/>
+
+                <separator/>
+
+                <filter name="pending" string="Pending" domain="[('state', '=', 'pending')]"/>
+                <filter name="paid" string="Paid" domain="[('state', '=', 'paid')]"/>
+                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+
+                <separator/>
+
+                <filter name="group_salesperson"
+                        string="Salesperson"
+                        context="{'group_by': 'salesperson_id'}"/>
+                <filter name="group_customer"
+                        string="Customer"
+                        context="{'group_by': 'customer_id'}"/>
+                <filter name="group_state"
+                        string="Status"
+                        context="{'group_by': 'state'}"/>
+                <filter name="group_month"
+                        string="Month"
+                        context="{'group_by': 'commission_date:month'}"/>
+            </search>
+        </field>
+    </record>
+
+    <record id="view_sales_commission_pivot" model="ir.ui.view">
+        <field name="name">nil.sales.commission.pivot</field>
+        <field name="model">nil.sales.commission</field>
+        <field name="arch" type="xml">
+            <pivot string="Commission Analysis">
+                <field name="salesperson_id" type="row"/>
+                <field name="commission_date" interval="month" type="col"/>
+                <field name="commission_amount" type="measure"/>
+                <field name="training_value" type="measure"/>
+            </pivot>
+        </field>
+    </record>
+
+    <record id="action_sales_commission" model="ir.actions.act_window">
+        <field name="name">Commission Ledger</field>
+        <field name="res_model">nil.sales.commission</field>
+        <field name="view_mode">tree,form,pivot</field>
+        <field name="search_view_id" ref="view_sales_commission_search"/>
+    </record>
+
+    <record id="action_sales_commission_analysis" model="ir.actions.act_window">
+        <field name="name">Commission Analysis</field>
+        <field name="res_model">nil.sales.commission</field>
+        <field name="view_mode">pivot,tree,form</field>
+        <field name="search_view_id" ref="view_sales_commission_search"/>
+    </record>
+
+    <menuitem id="menu_nil_commission_root"
+              name="Commissions"
+              parent="crm.crm_menu_root"
+              sequence="18"
+              groups="nil_sales_commission.group_nil_commission_manager"/>
+
+    <menuitem id="menu_nil_commission_ledger"
+              name="Commission Ledger"
+              parent="menu_nil_commission_root"
+              action="action_sales_commission"
+              sequence="1"
+              groups="nil_sales_commission.group_nil_commission_manager"/>
+
+    <menuitem id="menu_nil_commission_analysis"
+              name="Analysis"
+              parent="menu_nil_commission_root"
+              action="action_sales_commission_analysis"
+              sequence="2"
+              groups="nil_sales_commission.group_nil_commission_manager"/>
+
+</odoo>

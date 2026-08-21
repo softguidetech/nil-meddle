@@ -6,6 +6,14 @@ from odoo import api, models
 COMMISSION_CUTOFF_DATE = date(2026, 5, 31)
 COMMISSION_RATE = 5.0
 
+# Commission is created ONLY for these salespeople.
+# Matching is case-insensitive and ignores extra spaces.
+ALLOWED_COMMISSION_SALESPERSONS = {
+    'ruba khattam',
+    'loudy abdo',
+    'baraa',
+}
+
 
 class AccountMove(models.Model):
     _inherit = 'account.move'
@@ -35,6 +43,22 @@ class AccountMove(models.Model):
 
         return self.env['res.users']
 
+    def _nil_is_allowed_commission_salesperson(self):
+        """
+        Commission is allowed ONLY for:
+        - Ruba Khattam
+        - Loudy Al Abdo
+        - Baraa Abo Saleh
+        """
+        self.ensure_one()
+
+        salesperson = self._nil_get_commission_salesperson()
+        if not salesperson:
+            return False
+
+        salesperson_name = (salesperson.name or '').strip().lower()
+        return salesperson_name in ALLOWED_COMMISSION_SALESPERSONS
+
     def _nil_is_commission_eligible(self):
         self.ensure_one()
 
@@ -45,18 +69,22 @@ class AccountMove(models.Model):
             and self.invoice_date > COMMISSION_CUTOFF_DATE
             and self.amount_untaxed > 0
             and self._nil_get_commission_salesperson()
+            and self._nil_is_allowed_commission_salesperson()
         )
 
     def _nil_sync_sales_commission(self):
         """
-        Create/update one commission row per posted customer invoice.
+        Create/update one commission row per eligible posted customer invoice.
 
         Eligibility:
         - Customer Invoice only (out_invoice)
         - Posted
         - Invoice Date strictly after 31-May-2026
         - Positive untaxed invoice value
-        - Salesperson available
+        - Salesperson must be one of:
+            Ruba Khattam
+            Loudy Abdo
+            Baraa
 
         Commission:
         - 5% of invoice amount excluding VAT/tax
@@ -73,8 +101,11 @@ class AccountMove(models.Model):
             ], limit=1)
 
             if not invoice._nil_is_commission_eligible():
-                if commission and commission.state == 'pending':
-                    commission.write({'state': 'cancelled'})
+                # Remove non-paid commission rows that are no longer eligible.
+                # Paid rows are preserved because they may already have posted
+                # accounting entries and must remain as historical records.
+                if commission and commission.state != 'paid':
+                    commission.unlink()
                 continue
 
             salesperson = invoice._nil_get_commission_salesperson()
@@ -111,11 +142,28 @@ class AccountMove(models.Model):
     @api.model
     def _nil_backfill_sales_commissions(self):
         """
-        Backfill ALL existing posted customer invoices dated after 31-May-2026.
-        This is called automatically when the module data is installed/upgraded.
+        Backfill existing posted customer invoices dated after 31-May-2026,
+        but ONLY for the three approved salespeople.
+
+        Also removes any non-paid commission rows belonging to other
+        salespeople so the commission ledger stays clean.
         """
         Commission = self.env['nil.sales.commission'].sudo()
         Commission._nil_prepare_invoice_commission_migration()
+
+        # Clean up previously generated non-paid commissions for people
+        # outside the approved list.
+        non_paid_commissions = Commission.search([
+            ('state', '!=', 'paid'),
+        ])
+
+        disallowed_commissions = non_paid_commissions.filtered(
+            lambda rec: (rec.salesperson_id.name or '').strip().lower()
+            not in ALLOWED_COMMISSION_SALESPERSONS
+        )
+
+        if disallowed_commissions:
+            disallowed_commissions.unlink()
 
         invoices = self.sudo().search([
             ('move_type', '=', 'out_invoice'),
@@ -123,6 +171,7 @@ class AccountMove(models.Model):
             ('invoice_date', '>', COMMISSION_CUTOFF_DATE),
             ('amount_untaxed', '>', 0),
         ])
+
         invoices._nil_sync_sales_commission()
         return True
 
@@ -143,16 +192,22 @@ class AccountMove(models.Model):
         }
 
         if tracked_fields.intersection(vals):
-            self.filtered(lambda move: move.move_type == 'out_invoice')._nil_sync_sales_commission()
+            self.filtered(
+                lambda move: move.move_type == 'out_invoice'
+            )._nil_sync_sales_commission()
 
         return result
 
     def button_draft(self):
         result = super().button_draft()
-        self.filtered(lambda move: move.move_type == 'out_invoice')._nil_sync_sales_commission()
+        self.filtered(
+            lambda move: move.move_type == 'out_invoice'
+        )._nil_sync_sales_commission()
         return result
 
     def button_cancel(self):
         result = super().button_cancel()
-        self.filtered(lambda move: move.move_type == 'out_invoice')._nil_sync_sales_commission()
+        self.filtered(
+            lambda move: move.move_type == 'out_invoice'
+        )._nil_sync_sales_commission()
         return result

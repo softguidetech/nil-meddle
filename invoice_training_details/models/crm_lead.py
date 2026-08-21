@@ -1,540 +1,239 @@
-from odoo import models, fields, api
+# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+from odoo import fields, models, api
 
-class CostDetails(models.Model):
-    _name = 'cost.details'
-    _description = 'Cost Details'
-
-    cos_lead_id = fields.Many2one(
-        'crm.lead',
-        string="Lead",
-        ondelete='cascade'
+class Lead(models.Model):
+    _inherit = 'crm.lead'
+    # Override the currency_id field to set a default value of USD
+    currency_id = fields.Many2one(
+        'res.currency', 
+        string='Currency', 
+        default=lambda self: self.env.ref('base.USD')  # Automatically set to USD
     )
-
-    name = fields.Char(string="Cost Name")
-    description = fields.Text(string="Description")
-    price = fields.Float(string="Price")
-
-    # Partner Share
-    # Manual in all cases EXCEPT:
-    # CLC + EnterOne = automatic 20% after deducting direct costs
-    training_vendor = fields.Float(string="Partner Share")
-
-    # Logistics
-    total_price_all = fields.Float(
-        string="Logistics Cost",
-        compute='_compute_total'
-    )
-
-    # Total Costs
-    margin1 = fields.Float(
-        string="Total Costs",
-        compute='_compute_margin1'
-    )
-
-    # Kits & Labs
-    clc_cost = fields.Float(string="Kits & Labs")
-
-    rate_card = fields.Float(string="Partner Rate")
-
-    # Instructor Cost
+    training_name = fields.Many2one('res.partner',string='End Customer')
+    venue = fields.Float(string='Venue')
+    service_name = fields.Char(string='Service Name')
+    total_training_price = fields.Float(string='Total Training Price', compute="_compute_training_price", store=True)
+    @api.depends('training_course_ids.price')
+    def _compute_training_price(self):
+        for rec in self:
+            if rec.training_course_ids:
+                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
+            else:
+                rec.total_training_price = 0
+    total_service_price = fields.Float(string='Total Service Price', compute="_compute_service_price", store=True)
+    half_advance_payment_before = fields.Float(string='Advance payment amount 50% (paid)')
+    half_payment_after = fields.Float(string='50% Amount after Training Delivery (Not Yet Paid)')
+    training_course_ids = fields.One2many('training.course', 'lead_id', string='Training Courses')
+    pro_service_ids = fields.One2many('pro.service','pro_lead_id',string='Professional Services')
+    end_customer = fields.Char(string='End Client')
+    cisco_am = fields.Char(string='Cisco Account Manager')
+    cost_details_ids = fields.One2many('cost.details', 'cos_lead_id', string="Costs Details")
+    ticket_ids = fields.One2many('ticket.ticket','ticket_lead_id',string='Tickets')
+    hotel_ids = fields.One2many('hotel.hotel','hotel_lead_id',string='Hotels')
+    total_price_all = fields.Float(string="Total Logistics",compute='_compute_total')
+    visa = fields.Boolean(string="Visa")
+    start_date = fields.Date(string="From Date")
+    to_date = fields.Date(string="To Date")
+    book_details_id = fields.Many2many('ir.attachment', 'doc_attach_rel4', 'doc_id', 'attach_id5',
+                                         string="Booking Details",
+                                         help='You can attach the copy of your document', copy=False)
+    details = fields.Html(string="Details")
+    cost = fields.Float(string="Cost")
     ins_time = fields.Float(string="Instructor")
-
-    # NIL ME Share
-    nilme_share = fields.Float(
-        string="NIL ME Share $",
-        compute='_compute_nilme_share'
-    )
-
-    # Learning Partner
-    learning_partner = fields.Selection([
-        ('Koenig', 'Koenig'),
-        ('Mira', 'Mira'),
-        ('EnterOne', 'EnterOne'),
-        ('NIL LTD', 'NIL LTD'),
-        ('NIL SA', 'NIL SA')
-    ], string='Learning Partner')
-
-    # Cost
-    cost = fields.Float(
-        string="Cost",
-        compute='_compute_total'
-    )
-
-    # Margin %
-    margin = fields.Float(
-        string="Margin (%)",
-        compute='_compute_margin'
-    )
-
-    # Sales Commission
-    # Always 5% of TOTAL TRAINING PRICE
-    sales_commission = fields.Float(
-        string="Sales Commission (5%)",
-        compute='_compute_sales_commission'
-    )
-
-    # Payment Method
-    # Taken automatically from the Training lines
-    payment_method = fields.Selection([
-        ('cash', 'Cash'),
-        ('clc', 'CLC'),
-    ], string="Payment Method", compute='_compute_payment_method')
+    margin1 = fields.Float(string="Total Costs", compute='_compute_margin1')
+    nilme_share = fields.Float(string="NIL ME Share $", compute='_compute_nilme_share')
 
 
-    # =========================================================
-    # PAYMENT METHOD
-    # =========================================================
+    # Add extra fields
+    instructor_id = fields.Many2one('hr.employee',string="Instructor")
+    descriptions = fields.Char(string='Description')
+    
 
-    @api.depends(
-        'cos_lead_id.training_course_ids.payment_method'
-    )
-    def _compute_payment_method(self):
+    ordering_partner_id = fields.Many2one('res.partner',string='Ordering Partner')
+    training_id = fields.Many2one('product.template',string='Training Name')
+    location = fields.Selection([('Online','Online'),('On site','On site')])
+    payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    clcs_qty = fields.Float(string='CLCs Qty')
+    learnig_partner = fields.Selection([('Koenig','Koenig'),('Mira','Mira'),('EnterOne','EnterOne'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
+    con_per = fields.Char(string='Contact Person')
 
-        for rec in self:
+    # Extra information tab
+    clcs_qty = fields.Float(string='Customer CLCs Qty')
+    so_no = fields.Char(string='SO#')
+    tr_expiry_date = fields.Date(string='Expiry Date')
+    poref = fields.Char(string='PO Ref:')
+    invref = fields.Char(string='Invoice Ref:')
 
-            if not rec.cos_lead_id:
-                rec.payment_method = 'cash'
-                continue
+    # Logistics tab
+    instructor_logistics = fields.Char(string='Instructor Logistics')
+    uber = fields.Float(string='Uber')
+    ctrng = fields.Float(string='Catering')  # Now it's manually editable
 
-            methods = rec.cos_lead_id.training_course_ids.mapped(
-                'payment_method'
-            )
+    def action_create_cost_line(self):
+        """ Automatically create a new cost line when called """
+        for lead in self:
+            self.env['cost.details'].create({
+                'cos_lead_id': lead.id,
+                'name': 'New Cost Line',
+                'currency_id': lead.env.company.currency_id.id,
+                'training_vendor': 0.0,
+                'total_price_all': 0.0,
+                'clc_cost': 0.0,
+                'rate_card': 0.0,
+                'nilme_share': 0.0,
+                'learning_partner': lead.learnig_partner,  # Include the learning_partner field
+                'price': 0.0,  # Set a default value for the mandatory price field
+            })
 
-            # If all training lines are CLC,
-            # consider this Cost Detail as CLC.
-            #
-            # Otherwise keep Partner Share manual.
-            if methods and all(
-                method == 'clc'
-                for method in methods
-            ):
-                rec.payment_method = 'clc'
-
-            else:
-                rec.payment_method = 'cash'
-
-
-    # =========================================================
-    # HELPERS
-    # =========================================================
-
-    def _get_direct_costs(self):
-        """
-        Direct Costs =
-            Logistics
-            + Kits & Labs
-            + Instructor
-        """
-
-        self.ensure_one()
-
-        return (
-            (self.total_price_all or 0.0)
-            + (self.clc_cost or 0.0)
-            + (self.ins_time or 0.0)
-        )
-
-
-    def _is_enterone_clc(self):
-        """
-        EnterOne automatic calculation applies ONLY when:
-
-        Payment Method = CLC
-        AND
-        Learning Partner = EnterOne
-        """
-
-        self.ensure_one()
-
-        return (
-            self.payment_method == 'clc'
-            and self.learning_partner == 'EnterOne'
-        )
-
-
-    def _get_effective_partner_share(self):
-        """
-        CLC + EnterOne:
-
-            Partner Share =
-            20% × (
-                Total Training Price
-                - Logistics
-                - Kits & Labs
-                - Instructor
-            )
-
-        All other cases:
-
-            Partner Share is entered manually.
-        """
-
-        self.ensure_one()
-
-        # CLC + ENTERONE
-        if self._is_enterone_clc():
-
-            total_training_price = (
-                self.cos_lead_id.total_training_price or 0.0
-            )
-
-            direct_costs = self._get_direct_costs()
-
-            amount_after_costs = (
-                total_training_price
-                - direct_costs
-            )
-
-            if amount_after_costs > 0:
-
-                return (
-                    amount_after_costs
-                    * 0.20
-                )
-
-            return 0.0
-
-        # CASH OR OTHER PARTNERS
-        return self.training_vendor or 0.0
-
-
-    # =========================================================
-    # LOGISTICS COST
-    # =========================================================
-
-    @api.depends(
-        'cos_lead_id.ticket_ids.price',
-        'cos_lead_id.hotel_ids.price',
-        'cos_lead_id.cost_details_ids.price',
-        'cos_lead_id.instructor_logistics',
-        'cos_lead_id.venue',
-        'cos_lead_id.ctrng',
-        'cos_lead_id.uber',
-        'ins_time'
-    )
+    @api.depends('ticket_ids.price', 'hotel_ids.price', 'cost_details_ids.price', 'instructor_logistics', 'venue', 'ctrng', 'uber')
     def _compute_total(self):
-
         for rec in self:
+            ticket_total = sum(ticket.price for ticket in rec.ticket_ids) if rec.ticket_ids else 0
+            hotel_total = sum(hotel.price for hotel in rec.hotel_ids) if rec.hotel_ids else 0
+            cost_details_total = sum(cost.price for cost in rec.cost_details_ids) if rec.cost_details_ids else 0
+            instructor_logistics = float(rec.instructor_logistics) if rec.instructor_logistics else 0
+            venue = rec.venue if rec.venue else 0
+            uber = rec.uber if rec.uber else 0
+            ctrng = rec.ctrng if rec.ctrng else 0
 
-            lead = rec.cos_lead_id
+            rec.total_price_all = ticket_total + hotel_total + cost_details_total + instructor_logistics + venue + uber + ctrng
 
-            if not lead:
-
-                rec.total_price_all = 0.0
-                rec.cost = 0.0
-
-                continue
-
-            ticket_total = sum(
-                lead.ticket_ids.mapped('price')
-            )
-
-            hotel_total = sum(
-                lead.hotel_ids.mapped('price')
-            )
-
-            cost_details_total = sum(
-                lead.cost_details_ids.mapped('price')
-            )
-
-            instructor_logistics = float(
-                lead.instructor_logistics or 0.0
-            )
-
-            venue = float(
-                lead.venue or 0.0
-            )
-
-            catering = float(
-                lead.ctrng or 0.0
-            )
-
-            uber = float(
-                lead.uber or 0.0
-            )
-
-            total = (
-                ticket_total
-                + hotel_total
-                + cost_details_total
-                + instructor_logistics
-                + venue
-                + catering
-                + uber
-            )
-
-            rec.total_price_all = total
-            rec.cost = total
-
-
-    # =========================================================
-    # ENTERONE PARTNER SHARE
-    # =========================================================
-
-    @api.onchange(
-        'learning_partner',
-        'payment_method',
-        'total_price_all',
-        'clc_cost',
-        'ins_time',
-        'cos_lead_id.total_training_price'
-    )
-    def _onchange_enterone_partner_share(self):
-
+    @api.depends('pro_service_ids.price')
+    def _compute_service_price(self):
         for rec in self:
-
-            # Automatic ONLY for CLC + EnterOne
-            if (
-                rec.payment_method == 'clc'
-                and rec.learning_partner == 'EnterOne'
-            ):
-
-                total_training_price = (
-                    rec.cos_lead_id.total_training_price
-                    or 0.0
-                )
-
-                direct_costs = (
-                    (rec.total_price_all or 0.0)
-                    + (rec.clc_cost or 0.0)
-                    + (rec.ins_time or 0.0)
-                )
-
-                amount_after_costs = (
-                    total_training_price
-                    - direct_costs
-                )
-
-                if amount_after_costs > 0:
-
-                    rec.training_vendor = (
-                        amount_after_costs
-                        * 0.20
-                    )
-
-                else:
-
-                    rec.training_vendor = 0.0
-
-
-    # =========================================================
-    # TOTAL COSTS
-    # =========================================================
-
-    @api.depends(
-        'training_vendor',
-        'total_price_all',
-        'clc_cost',
-        'ins_time',
-        'learning_partner',
-        'payment_method',
-        'cos_lead_id.total_training_price'
-    )
-    def _compute_margin1(self):
-
-        for record in self:
-
-            direct_costs = (
-                (record.total_price_all or 0.0)
-                + (record.clc_cost or 0.0)
-                + (record.ins_time or 0.0)
-            )
-
-            partner_share = (
-                record._get_effective_partner_share()
-            )
-
-            record.margin1 = (
-                direct_costs
-                + partner_share
-            )
-
-
-    # =========================================================
-    # NIL ME SHARE
-    # =========================================================
-
-    @api.depends(
-        'margin1',
-        'training_vendor',
-        'total_price_all',
-        'clc_cost',
-        'ins_time',
-        'learning_partner',
-        'payment_method',
-        'cos_lead_id.total_training_price'
-    )
-    def _compute_nilme_share(self):
-
-        for record in self:
-
-            total_training_price = (
-                record.cos_lead_id.total_training_price
-                or 0.0
-            )
-
-            # -------------------------------------------------
-            # CLC + ENTERONE
-            # -------------------------------------------------
-
-            if (
-                record.payment_method == 'clc'
-                and record.learning_partner == 'EnterOne'
-            ):
-
-                direct_costs = (
-                    (record.total_price_all or 0.0)
-                    + (record.clc_cost or 0.0)
-                    + (record.ins_time or 0.0)
-                )
-
-                amount_after_costs = (
-                    total_training_price
-                    - direct_costs
-                )
-
-                if amount_after_costs > 0:
-
-                    # EnterOne = 20%
-                    # NIL ME = 80%
-                    record.nilme_share = (
-                        amount_after_costs
-                        * 0.80
-                    )
-
-                else:
-
-                    # Show actual loss
-                    record.nilme_share = (
-                        amount_after_costs
-                    )
-
-            # -------------------------------------------------
-            # CASH OR OTHER PARTNERS
-            # -------------------------------------------------
-
+            if rec.pro_service_ids:
+                rec.total_service_price = sum(rec.pro_service_ids.mapped('price'))
             else:
+                rec.total_service_price = 0
 
-                record.nilme_share = (
-                    total_training_price
-                    - (record.margin1 or 0.0)
-                )
-
-
-    # =========================================================
-    # MARGIN %
-    # =========================================================
-
-    @api.depends(
-        'nilme_share',
-        'cos_lead_id.total_training_price'
-    )
-    def _compute_margin(self):
-
-        for record in self:
-
-            total_training_price = (
-                record.cos_lead_id.total_training_price
-                or 0.0
-            )
-
-            if total_training_price:
-
-                record.margin = (
-                    (record.nilme_share or 0.0)
-                    / total_training_price
-                )
-
+    @api.depends('training_course_ids.price')
+    def _compute_training_price(self):
+        for rec in self:
+            if rec.training_course_ids:
+                rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
             else:
-
-                record.margin = 0.0
-
-
-    # =========================================================
-    # SALES COMMISSION
-    # =========================================================
-
-    @api.depends(
-        'cos_lead_id.total_training_price'
-    )
-    def _compute_sales_commission(self):
-        """
-        Sales Commission =
-        5% of the FULL Training Value
-
-        It does NOT depend on:
-            - Partner Share
-            - Logistics
-            - Kits & Labs
-            - Instructor
-            - NIL ME Share
-            - Profit Margin
-        """
-
-        for record in self:
-
-            total_training_price = (
-                record.cos_lead_id.total_training_price
-                or 0.0
-            )
-
-            record.sales_commission = (
-                total_training_price
-                * 0.05
-            )
-
-
-    # =========================================================
-    # QUOTATION CONTEXT
-    # =========================================================
+                rec.total_training_price = 0
 
     def _prepare_opportunity_quotation_context(self):
+        quotation_context = super()._prepare_opportunity_quotation_context()
+        quotation_context.update({
+            'default_training_name': self.training_name,
+            'default_training_course_ids': [(6, 0, self.training_course_ids.ids)],
+            'default_pro_service_ids': [(6, 0, self.pro_service_ids.ids)],
+            'default_cos_details_ids': [(6, 0, self.cost_details_ids.ids)],
+            'default_clcs_qty': self.clcs_qty,
+            'default_so_no': self.so_no,
+            'default_tr_expiry_date': self.tr_expiry_date,
+            'default_instructor_logistics': self.instructor_logistics,
+            'default_ctrng': self.ctrng,
+            'default_descriptions': self.descriptions,
+            'default_ordering_partner': self.ordering_partner_id.id,
+            'default_instructor_id': self.instructor_id.id,
+            'default_training_id': self.training_id.id,
+            'default_location': self.location,
+            'default_learnig_partner': self.learnig_partner,
+            'default_uber': self.uber,
+            'default_payment_method': self.payment_method,
+            'default_clcs_qty': self.clcs_qty,
+            'default_cost_details_ids': [(6, 0, self.cost_details_ids.ids)],  # Pass related Cost Details
+            'default_poref': self.poref,
+            'default_invref': self.invref,
+            'default_uber' : self.uber,
+            'default_ins_time': self.ins_time,
+            # Add ticket and hotel details
+            'default_ticket_ids': [(6, 0, self.ticket_ids.ids)],
+            'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
+        })
+        return quotation_context
 
-        return {
+class HotelHotel(models.Model):
+    _name = 'hotel.hotel'
+    _description='Hotels'
+    
+    hotel_lead_id = fields.Many2one('crm.lead',string="Lead")
+    hotel_order_id = fields.Many2one('sale.order',string="Order")
+    hotel_id = fields.Many2one('hotel.description',string="Hotel")
+    date_from = fields.Date(string="Date From")
+    date_to = fields.Date(string="Date To")
+    nights = fields.Char(string="Nights",compute='_compute_nights')
+    location = fields.Char(string="Location")
+    pax = fields.Char(string="PAX")
+    des = fields.Char(string="Description")
+    room_type = fields.Char(string="Room Type")
+    currency_id = fields.Many2one('res.currency',string="Currency",required=True)
+    price_without_tax = fields.Monetary(string="Price",required=True)
+    tax = fields.Monetary(string="Taxes",required=True)
+    price = fields.Monetary(string="Price with Tax",compute='_compute_total')
+    
+    def _compute_total(self):
+        for rec in self:
+            rec.price = rec.price_without_tax + rec.tax
+            
+    def _compute_nights(self):
+        duration = 0
+        for rec in self:
+            duration = rec.date_to - rec.date_from
+            days= str(duration).replace(', 0:00:00','Nights')
+            rec.nights = days
+class TicketTicket(models.Model):
+    _name = 'ticket.ticket'
+    _description='Tickets'   
+    
+    ticket_lead_id = fields.Many2one('crm.lead',string="Lead")
+    ticket_order_id = fields.Many2one('sale.order',string="Order")
+    airline_id = fields.Many2one('airline.airline',string="Airlines")
+    origin_id = fields.Many2one('loca.loca',string="Origin")
+    destination_id = fields.Many2one('loca.loca',string="Destination")
+    date = fields.Date(string="Date")
+    duration = fields.Char(string="Duration")
+    time_from = fields.Float(string="Availabe Time From")
+    time_to = fields.Float(string="Availabe Time To")
+    stop = fields.Char(string="Stop")
+    class_type_id = fields.Many2one('flight.class.type',string="Class Type")
+    currency_id = fields.Many2one('res.currency',string="Currency",required=True)
+    price = fields.Monetary(string="Price with Taxes",required=True)
+    
+class AirlineAirline(models.Model):
+    _name = 'airline.airline'
+    _description= 'Airlines'
+    
+    name = fields.Char(string="Airline",required=True)
+    
+class LocaLoca(models.Model):
+    _name = 'loca.loca'
+    _description= 'Locations'
+    
+    name = fields.Char(string="Location",required=True)
 
-            'default_cos_lead_id':
-                self.cos_lead_id.id,
+class FlightClassType(models.Model):
+    _name = 'flight.class.type'
+    _description= 'Classes'
+    
+    name = fields.Char(string="Class Type",required=True)
+    
+    
+class HotelDescription(models.Model):
+    _name = 'hotel.description'
+    _description= 'Hotel Description'
+    
+    name = fields.Char(string="Hotel",required=True)
+    
+class ProductProduct(models.Model):
+    _inherit = 'product.product'
 
-            'default_name':
-                self.name,
+    
+    cost_clc = fields.Char(string="CLCs Cost")
+    hyperlink = fields.Char(string="Hyper Link")
+    
+    
+class ProductProduct(models.Model):
+    _inherit = 'product.template'
 
-            'default_description':
-                self.description,
-
-            'default_price':
-                self.price,
-
-            'default_training_vendor':
-                self.training_vendor,
-
-            'default_total_price_all':
-                self.total_price_all,
-
-            'default_margin1':
-                self.margin1,
-
-            'default_clc_cost':
-                self.clc_cost,
-
-            'default_rate_card':
-                self.rate_card,
-
-            'default_ins_time':
-                self.ins_time,
-
-            'default_nilme_share':
-                self.nilme_share,
-
-            'default_learning_partner':
-                self.learning_partner,
-
-            'default_cost':
-                self.cost,
-
-            'default_margin':
-                self.margin,
-
-            'default_sales_commission':
-                self.sales_commission,
-        }
+    
+    cost_clc = fields.Char(string="CLCs Cost")
+    hyperlink = fields.Char(string="Hyper Link")
+    
+    
+    

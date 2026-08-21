@@ -16,31 +16,44 @@ class CostDetails(models.Model):
     price = fields.Float(string="Price")
 
     # Partner Share
-    # Manual except when:
-    # Payment Method = CLC AND Learning Partner = EnterOne
+    # Manual in all cases except:
+    # CLC + EnterOne = 20% automatically after deducting direct costs
     training_vendor = fields.Float(string="Partner Share")
 
+    # Logistics Cost
     total_price_all = fields.Float(
         string="Logistics Cost",
         compute='_compute_total'
     )
 
+    # Total Costs
     margin1 = fields.Float(
         string="Total Costs",
         compute='_compute_margin1'
     )
 
-    clc_cost = fields.Float(string="Kits & Labs")
+    # Kits & Labs
+    clc_cost = fields.Float(
+        string="Kits & Labs"
+    )
 
-    rate_card = fields.Float(string="Partner Rate")
+    # Partner Rate
+    rate_card = fields.Float(
+        string="Partner Rate"
+    )
 
-    ins_time = fields.Float(string="Instructor")
+    # Instructor Cost
+    ins_time = fields.Float(
+        string="Instructor"
+    )
 
+    # NIL ME Share
     nilme_share = fields.Float(
         string="NIL ME Share $",
         compute='_compute_nilme_share'
     )
 
+    # Learning Partner
     learning_partner = fields.Selection([
         ('Koenig', 'Koenig'),
         ('Mira', 'Mira'),
@@ -49,35 +62,42 @@ class CostDetails(models.Model):
         ('NIL SA', 'NIL SA')
     ], string='Learning Partner')
 
+    # Cost
     cost = fields.Float(
         string="Cost",
         compute='_compute_total'
     )
 
+    # Margin %
     margin = fields.Float(
         string="Margin (%)",
         compute='_compute_margin'
     )
 
+    # Sales Commission
+    # 5% of FULL Training Value
     sales_commission = fields.Float(
         string="Sales Commission (5%)",
         compute='_compute_sales_commission'
     )
 
-    # Used to determine whether Partner Share should be automatic
+    # Payment Method
+    # Automatically taken from the Training lines
     payment_method = fields.Selection([
         ('cash', 'Cash'),
         ('clc', 'CLC'),
     ], string="Payment Method", compute='_compute_payment_method')
 
-    # ---------------------------------------------------------
-    # Payment Method
-    # ---------------------------------------------------------
+
+    # =========================================================
+    # PAYMENT METHOD
+    # =========================================================
 
     @api.depends(
         'cos_lead_id.training_course_ids.payment_method'
     )
     def _compute_payment_method(self):
+
         for rec in self:
 
             if not rec.cos_lead_id:
@@ -88,16 +108,23 @@ class CostDetails(models.Model):
                 'payment_method'
             )
 
-            # If all training lines are CLC, treat cost line as CLC.
-            # Otherwise keep it manual.
-            if methods and all(method == 'clc' for method in methods):
+            # If all Training lines are CLC,
+            # Cost Details will be considered CLC.
+            #
+            # Otherwise it stays manual as Cash.
+            if methods and all(
+                method == 'clc'
+                for method in methods
+            ):
                 rec.payment_method = 'clc'
+
             else:
                 rec.payment_method = 'cash'
 
-    # ---------------------------------------------------------
-    # Helpers
-    # ---------------------------------------------------------
+
+    # =========================================================
+    # HELPERS
+    # =========================================================
 
     def _get_direct_costs(self):
         """
@@ -106,6 +133,7 @@ class CostDetails(models.Model):
             + Kits & Labs
             + Instructor
         """
+
         self.ensure_one()
 
         return (
@@ -114,13 +142,16 @@ class CostDetails(models.Model):
             + (self.ins_time or 0.0)
         )
 
+
     def _is_enterone_clc(self):
         """
         Automatic EnterOne calculation applies ONLY when:
+
         Payment Method = CLC
         AND
         Learning Partner = EnterOne
         """
+
         self.ensure_one()
 
         return (
@@ -128,39 +159,68 @@ class CostDetails(models.Model):
             and self.learning_partner == 'EnterOne'
         )
 
+
     def _get_effective_partner_share(self):
         """
         CLC + EnterOne:
+
             Partner Share =
-            20% × (Training Price - Direct Costs)
+            20% × (
+                Total Training Price
+                - Logistics
+                - Kits & Labs
+                - Instructor
+            )
 
         All other cases:
-            Partner Share is entered manually.
+
+            Partner Share is manually entered.
         """
+
         self.ensure_one()
+
+        # -----------------------------------------------------
+        # CLC + ENTERONE
+        # -----------------------------------------------------
 
         if self._is_enterone_clc():
 
             total_training_price = (
-                self.cos_lead_id.total_training_price or 0.0
+                self.cos_lead_id.total_training_price
+                or 0.0
             )
 
-            direct_costs = self._get_direct_costs()
+            direct_costs = (
+                self._get_direct_costs()
+            )
 
             amount_after_costs = (
-                total_training_price - direct_costs
+                total_training_price
+                - direct_costs
             )
 
             if amount_after_costs > 0:
-                return amount_after_costs * 0.20
+
+                return (
+                    amount_after_costs
+                    * 0.20
+                )
 
             return 0.0
 
-        return self.training_vendor or 0.0
+        # -----------------------------------------------------
+        # CASH OR OTHER PARTNERS
+        # -----------------------------------------------------
 
-    # ---------------------------------------------------------
-    # Logistics Cost
-    # ---------------------------------------------------------
+        return (
+            self.training_vendor
+            or 0.0
+        )
+
+
+    # =========================================================
+    # LOGISTICS COST
+    # =========================================================
 
     @api.depends(
         'cos_lead_id.ticket_ids.price',
@@ -179,36 +239,49 @@ class CostDetails(models.Model):
             lead = rec.cos_lead_id
 
             if not lead:
+
                 rec.total_price_all = 0.0
                 rec.cost = 0.0
+
                 continue
 
+            # Tickets
             ticket_total = sum(
                 lead.ticket_ids.mapped('price')
             )
 
+            # Hotels
             hotel_total = sum(
                 lead.hotel_ids.mapped('price')
             )
 
+            # Additional Cost Details
             cost_details_total = sum(
                 lead.cost_details_ids.mapped('price')
             )
 
+            # Instructor Logistics
             instructor_logistics = float(
-                lead.instructor_logistics or 0.0
+                lead.instructor_logistics
+                or 0.0
             )
 
+            # Venue
             venue = float(
-                lead.venue or 0.0
+                lead.venue
+                or 0.0
             )
 
+            # Catering
             catering = float(
-                lead.ctrng or 0.0
+                lead.ctrng
+                or 0.0
             )
 
+            # Uber
             uber = float(
-                lead.uber or 0.0
+                lead.uber
+                or 0.0
             )
 
             total = (
@@ -224,9 +297,10 @@ class CostDetails(models.Model):
             rec.total_price_all = total
             rec.cost = total
 
-    # ---------------------------------------------------------
-    # EnterOne CLC Partner Share
-    # ---------------------------------------------------------
+
+    # =========================================================
+    # ENTERONE PARTNER SHARE
+    # =========================================================
 
     @api.onchange(
         'learning_partner',
@@ -240,14 +314,16 @@ class CostDetails(models.Model):
 
         for rec in self:
 
-            # Automatic calculation ONLY for CLC + EnterOne
+            # Automatic ONLY when:
+            # CLC + EnterOne
             if (
                 rec.payment_method == 'clc'
                 and rec.learning_partner == 'EnterOne'
             ):
 
                 total_training_price = (
-                    rec.cos_lead_id.total_training_price or 0.0
+                    rec.cos_lead_id.total_training_price
+                    or 0.0
                 )
 
                 direct_costs = (
@@ -257,22 +333,25 @@ class CostDetails(models.Model):
                 )
 
                 amount_after_costs = (
-                    total_training_price - direct_costs
+                    total_training_price
+                    - direct_costs
                 )
 
                 if amount_after_costs > 0:
 
                     rec.training_vendor = (
-                        amount_after_costs * 0.20
+                        amount_after_costs
+                        * 0.20
                     )
 
                 else:
 
                     rec.training_vendor = 0.0
 
-    # ---------------------------------------------------------
-    # Total Costs
-    # ---------------------------------------------------------
+
+    # =========================================================
+    # TOTAL COSTS
+    # =========================================================
 
     @api.depends(
         'training_vendor',
@@ -298,12 +377,14 @@ class CostDetails(models.Model):
             )
 
             record.margin1 = (
-                direct_costs + partner_share
+                direct_costs
+                + partner_share
             )
 
-    # ---------------------------------------------------------
-    # NIL ME Share
-    # ---------------------------------------------------------
+
+    # =========================================================
+    # NIL ME SHARE
+    # =========================================================
 
     @api.depends(
         'margin1',
@@ -320,10 +401,14 @@ class CostDetails(models.Model):
         for record in self:
 
             total_training_price = (
-                record.cos_lead_id.total_training_price or 0.0
+                record.cos_lead_id.total_training_price
+                or 0.0
             )
 
+            # -------------------------------------------------
             # CLC + ENTERONE
+            # -------------------------------------------------
+
             if (
                 record.payment_method == 'clc'
                 and record.learning_partner == 'EnterOne'
@@ -336,21 +421,30 @@ class CostDetails(models.Model):
                 )
 
                 amount_after_costs = (
-                    total_training_price - direct_costs
+                    total_training_price
+                    - direct_costs
                 )
 
                 if amount_after_costs > 0:
 
-                    # NIL ME gets remaining 80%
+                    # EnterOne = 20%
+                    # NIL ME = 80%
                     record.nilme_share = (
-                        amount_after_costs * 0.80
+                        amount_after_costs
+                        * 0.80
                     )
 
                 else:
 
-                    record.nilme_share = amount_after_costs
+                    # Show actual loss
+                    record.nilme_share = (
+                        amount_after_costs
+                    )
 
-            # CASH or any other partner
+            # -------------------------------------------------
+            # CASH OR OTHER PARTNERS
+            # -------------------------------------------------
+
             else:
 
                 record.nilme_share = (
@@ -358,9 +452,10 @@ class CostDetails(models.Model):
                     - (record.margin1 or 0.0)
                 )
 
-    # ---------------------------------------------------------
-    # Margin %
-    # ---------------------------------------------------------
+
+    # =========================================================
+    # MARGIN %
+    # =========================================================
 
     @api.depends(
         'nilme_share',
@@ -371,7 +466,8 @@ class CostDetails(models.Model):
         for record in self:
 
             total_training_price = (
-                record.cos_lead_id.total_training_price or 0.0
+                record.cos_lead_id.total_training_price
+                or 0.0
             )
 
             if total_training_price:
@@ -385,49 +481,82 @@ class CostDetails(models.Model):
 
                 record.margin = 0.0
 
-    # ---------------------------------------------------------
-    # Sales Commission 5%
-    # ---------------------------------------------------------
 
-    @api.depends('nilme_share')
+    # =========================================================
+    # SALES COMMISSION
+    # =========================================================
+
+    @api.depends(
+        'cos_lead_id.total_training_price'
+    )
     def _compute_sales_commission(self):
+        """
+        Sales Commission =
+        5% of FULL Total Training Price
+        """
 
         for record in self:
 
-            net_profit = (
-                record.nilme_share or 0.0
+            total_training_price = (
+                record.cos_lead_id.total_training_price
+                or 0.0
             )
 
-            if net_profit > 0:
+            record.sales_commission = (
+                total_training_price
+                * 0.05
+            )
 
-                record.sales_commission = (
-                    net_profit * 0.05
-                )
 
-            else:
-
-                record.sales_commission = 0.0
-
-    # ---------------------------------------------------------
-    # Quotation Context
-    # ---------------------------------------------------------
+    # =========================================================
+    # QUOTATION CONTEXT
+    # =========================================================
 
     def _prepare_opportunity_quotation_context(self):
 
         return {
-            'default_cos_lead_id': self.cos_lead_id.id,
-            'default_name': self.name,
-            'default_description': self.description,
-            'default_price': self.price,
-            'default_training_vendor': self.training_vendor,
-            'default_total_price_all': self.total_price_all,
-            'default_margin1': self.margin1,
-            'default_clc_cost': self.clc_cost,
-            'default_rate_card': self.rate_card,
-            'default_ins_time': self.ins_time,
-            'default_nilme_share': self.nilme_share,
-            'default_learning_partner': self.learning_partner,
-            'default_cost': self.cost,
-            'default_margin': self.margin,
-            'default_sales_commission': self.sales_commission,
+            'default_cos_lead_id':
+                self.cos_lead_id.id,
+
+            'default_name':
+                self.name,
+
+            'default_description':
+                self.description,
+
+            'default_price':
+                self.price,
+
+            'default_training_vendor':
+                self.training_vendor,
+
+            'default_total_price_all':
+                self.total_price_all,
+
+            'default_margin1':
+                self.margin1,
+
+            'default_clc_cost':
+                self.clc_cost,
+
+            'default_rate_card':
+                self.rate_card,
+
+            'default_ins_time':
+                self.ins_time,
+
+            'default_nilme_share':
+                self.nilme_share,
+
+            'default_learning_partner':
+                self.learning_partner,
+
+            'default_cost':
+                self.cost,
+
+            'default_margin':
+                self.margin,
+
+            'default_sales_commission':
+                self.sales_commission,
         }

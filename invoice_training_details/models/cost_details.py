@@ -17,8 +17,8 @@ class CostDetails(models.Model):
 
     # Partner Share
     # Manual in all cases except:
-    # CLC + EnterOne = 20% automatically after deducting
-    # Instructor + Hotel + Airfare ONLY
+    # CLC + EnterOne = 20% automatically after deducting:
+    # Instructor + Hotel + Airfare
     training_vendor = fields.Float(
         string="Partner Share"
     )
@@ -33,11 +33,6 @@ class CostDetails(models.Model):
     margin1 = fields.Float(
         string="Total Costs",
         compute='_compute_margin1'
-    )
-
-    # Kits & Labs
-    clc_cost = fields.Float(
-        string="Kits & Labs"
     )
 
     # Partner Rate
@@ -84,13 +79,8 @@ class CostDetails(models.Model):
         compute='_compute_sales_commission'
     )
 
-    # ---------------------------------------------------------
-    # Helper ONLY
-    #
-    # We are NOT creating another Payment Method field.
-    # This simply checks the Payment Method already selected
-    # inside the Training lines.
-    # ---------------------------------------------------------
+    # Helper only
+    # Reads Payment Method from Training lines
     is_clc = fields.Boolean(
         string="Is CLC",
         compute='_compute_is_clc'
@@ -132,9 +122,6 @@ class CostDetails(models.Model):
     # =========================================================
 
     def _get_ticket_total(self):
-        """
-        Total Airfare
-        """
 
         self.ensure_one()
 
@@ -147,9 +134,6 @@ class CostDetails(models.Model):
 
 
     def _get_hotel_total(self):
-        """
-        Total Hotel Cost
-        """
 
         self.ensure_one()
 
@@ -162,9 +146,6 @@ class CostDetails(models.Model):
 
 
     def _get_uber_cost(self):
-        """
-        Uber is a NIL ME-only cost for CLC.
-        """
 
         self.ensure_one()
 
@@ -178,19 +159,14 @@ class CostDetails(models.Model):
 
     def _get_clc_shared_costs(self):
         """
-        For CLC ONLY:
+        CLC costs deducted BEFORE partner split:
 
-        Costs deducted BEFORE splitting between
-        NIL ME and the Partner:
+        Instructor
+        + Hotel
+        + Airfare
 
-            1. Instructor
-            2. Hotel
-            3. Airfare
-
-        Uber is NOT included here.
-
-        Uber will be deducted from NIL ME Share
-        AFTER the Partner split.
+        Uber is NOT included.
+        Uber is deducted ONLY from NIL ME Share afterwards.
         """
 
         self.ensure_one()
@@ -216,30 +192,20 @@ class CostDetails(models.Model):
 
     def _get_cash_direct_costs(self):
         """
-        CASH keeps the previous calculation:
-
-        Logistics Cost
-        + Kits & Labs
-        + Instructor
+        Cash Costs =
+            Logistics
+            + Instructor
         """
 
         self.ensure_one()
 
         return (
             (self.total_price_all or 0.0)
-            + (self.clc_cost or 0.0)
             + (self.ins_time or 0.0)
         )
 
 
     def _is_enterone_clc(self):
-        """
-        True ONLY when:
-
-        Training = CLC
-        AND
-        Learning Partner = EnterOne
-        """
 
         self.ensure_one()
 
@@ -253,30 +219,24 @@ class CostDetails(models.Model):
         """
         CLC + EnterOne:
 
-        Step 1:
-            Shared Amount =
-                Total Training Price
-                - Instructor
-                - Hotel
-                - Airfare
+        Amount to Split =
+            Total Training Price
+            - Instructor
+            - Hotel
+            - Airfare
 
-        Step 2:
-            EnterOne Share =
-                20% of Shared Amount
+        EnterOne Share =
+            20% of Amount to Split
 
-        IMPORTANT:
-            Uber is NOT deducted before the 80/20 split.
+        Uber is NOT included before the split.
 
         All other cases:
-            Partner Share is manually entered.
+            Partner Share is manual.
         """
 
         self.ensure_one()
 
-        # -----------------------------------------------------
-        # CLC + ENTERONE
-        # -----------------------------------------------------
-
+        # CLC + EnterOne
         if self._is_enterone_clc():
 
             total_training_price = (
@@ -296,19 +256,14 @@ class CostDetails(models.Model):
             if amount_to_split > 0:
 
                 return (
-                    amount_to_split
-                    * 0.20
+                    amount_to_split * 0.20
                 )
 
             return 0.0
 
-        # -----------------------------------------------------
-        # CASH OR OTHER PARTNERS
-        # -----------------------------------------------------
-
+        # Cash or other partners
         return (
-            self.training_vendor
-            or 0.0
+            self.training_vendor or 0.0
         )
 
 
@@ -339,43 +294,32 @@ class CostDetails(models.Model):
 
                 continue
 
-            # Airfare
             ticket_total = sum(
                 lead.ticket_ids.mapped('price')
             )
 
-            # Hotel
             hotel_total = sum(
                 lead.hotel_ids.mapped('price')
             )
 
-            # Other Cost Details
             cost_details_total = sum(
                 lead.cost_details_ids.mapped('price')
             )
 
-            # Instructor Logistics
             instructor_logistics = float(
-                lead.instructor_logistics
-                or 0.0
+                lead.instructor_logistics or 0.0
             )
 
-            # Venue
             venue = float(
-                lead.venue
-                or 0.0
+                lead.venue or 0.0
             )
 
-            # Catering
             catering = float(
-                lead.ctrng
-                or 0.0
+                lead.ctrng or 0.0
             )
 
-            # Uber
             uber = float(
-                lead.uber
-                or 0.0
+                lead.uber or 0.0
             )
 
             total = (
@@ -406,8 +350,6 @@ class CostDetails(models.Model):
 
         for rec in self:
 
-            # Automatic ONLY:
-            # CLC + EnterOne
             if rec._is_enterone_clc():
 
                 total_training_price = (
@@ -415,8 +357,6 @@ class CostDetails(models.Model):
                     or 0.0
                 )
 
-                # ONLY:
-                # Instructor + Hotel + Airfare
                 shared_costs = (
                     rec._get_clc_shared_costs()
                 )
@@ -429,8 +369,7 @@ class CostDetails(models.Model):
                 if amount_to_split > 0:
 
                     rec.training_vendor = (
-                        amount_to_split
-                        * 0.20
+                        amount_to_split * 0.20
                     )
 
                 else:
@@ -445,7 +384,6 @@ class CostDetails(models.Model):
     @api.depends(
         'training_vendor',
         'total_price_all',
-        'clc_cost',
         'ins_time',
         'learning_partner',
         'is_clc',
@@ -462,35 +400,24 @@ class CostDetails(models.Model):
                 record._get_effective_partner_share()
             )
 
-            # -------------------------------------------------
             # CLC
-            # -------------------------------------------------
-
             if record.is_clc:
 
-                # Shared costs:
-                # Instructor + Hotel + Airfare
                 shared_costs = (
                     record._get_clc_shared_costs()
                 )
 
-                # NIL ME-only cost
                 uber = (
                     record._get_uber_cost()
                 )
 
-                # Total deal costs still include Uber,
-                # but Uber is NOT part of the partner split.
                 record.margin1 = (
                     shared_costs
                     + partner_share
                     + uber
                 )
 
-            # -------------------------------------------------
-            # CASH
-            # -------------------------------------------------
-
+            # Cash
             else:
 
                 direct_costs = (
@@ -511,7 +438,6 @@ class CostDetails(models.Model):
         'margin1',
         'training_vendor',
         'total_price_all',
-        'clc_cost',
         'ins_time',
         'learning_partner',
         'is_clc',
@@ -535,13 +461,10 @@ class CostDetails(models.Model):
 
             if record.is_clc:
 
-                # ONLY these are deducted before partner split:
-                # Instructor + Hotel + Airfare
                 shared_costs = (
                     record._get_clc_shared_costs()
                 )
 
-                # Uber belongs ONLY to NIL ME
                 uber = (
                     record._get_uber_cost()
                 )
@@ -551,16 +474,11 @@ class CostDetails(models.Model):
                     - shared_costs
                 )
 
-                # ---------------------------------------------
-                # CLC + ENTERONE
-                # ---------------------------------------------
-
+                # CLC + EnterOne
                 if record.learning_partner == 'EnterOne':
 
                     if amount_to_split > 0:
 
-                        # NIL ME receives 80%
-                        # THEN Uber is deducted from NIL ME
                         record.nilme_share = (
                             (amount_to_split * 0.80)
                             - uber
@@ -573,14 +491,9 @@ class CostDetails(models.Model):
                             - uber
                         )
 
-                # ---------------------------------------------
-                # CLC + OTHER PARTNERS
-                # ---------------------------------------------
-
+                # CLC + Other Partner
                 else:
 
-                    # Partner Share stays manual
-                    # Uber is still deducted ONLY from NIL ME
                     record.nilme_share = (
                         amount_to_split
                         - (record.training_vendor or 0.0)
@@ -636,10 +549,6 @@ class CostDetails(models.Model):
         'cos_lead_id.total_training_price'
     )
     def _compute_sales_commission(self):
-        """
-        Sales Commission =
-        5% of FULL Total Training Price
-        """
 
         for record in self:
 
@@ -649,8 +558,7 @@ class CostDetails(models.Model):
             )
 
             record.sales_commission = (
-                total_training_price
-                * 0.05
+                total_training_price * 0.05
             )
 
 
@@ -682,9 +590,6 @@ class CostDetails(models.Model):
 
             'default_margin1':
                 self.margin1,
-
-            'default_clc_cost':
-                self.clc_cost,
 
             'default_rate_card':
                 self.rate_card,

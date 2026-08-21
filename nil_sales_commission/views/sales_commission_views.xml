@@ -7,9 +7,12 @@
         <field name="arch" type="xml">
             <tree string="Commission Ledger"
                   decoration-success="state == 'paid'"
-                  decoration-muted="state == 'cancelled'">
+                  decoration-warning="state == 'draft'"
+                  decoration-muted="state == 'excluded'">
+
                 <field name="commission_date" string="Invoice Date"/>
                 <field name="invoice_id"/>
+                <field name="invoice_state" optional="show"/>
                 <field name="salesperson_id"/>
                 <field name="lead_id" optional="show"/>
                 <field name="customer_id"/>
@@ -17,12 +20,17 @@
                 <field name="training_value" sum="Total Invoice Value"/>
                 <field name="commission_rate"/>
                 <field name="commission_amount" sum="Total Commission"/>
-                <field name="state" widget="badge"
-                       decoration-warning="state == 'pending'"
+
+                <field name="state"
+                       widget="badge"
+                       decoration-warning="state == 'draft'"
+                       decoration-info="state == 'pending'"
                        decoration-success="state == 'paid'"
-                       decoration-muted="state == 'cancelled'"/>
+                       decoration-muted="state == 'excluded'"/>
+
                 <field name="payment_date" optional="show"/>
                 <field name="move_id" optional="show"/>
+
             </tree>
         </field>
     </record>
@@ -31,29 +39,46 @@
         <field name="name">nil.sales.commission.form</field>
         <field name="model">nil.sales.commission</field>
         <field name="arch" type="xml">
+
             <form string="Sales Commission">
+
                 <header>
+
+                    <button name="action_approve"
+                            type="object"
+                            string="Approve"
+                            class="oe_highlight"
+                            invisible="state != 'draft'"/>
+
+                    <button name="action_exclude"
+                            type="object"
+                            string="Exclude"
+                            invisible="state in ('paid', 'excluded')"/>
+
+                    <button name="action_reset_draft"
+                            type="object"
+                            string="Reset to Draft"
+                            invisible="state not in ('pending', 'excluded', 'cancelled')"/>
+
                     <button name="action_mark_paid"
                             type="object"
                             string="Mark Paid"
                             class="oe_highlight"
                             invisible="state != 'pending'"/>
-                    <button name="action_cancel"
-                            type="object"
-                            string="Cancel"
-                            invisible="state != 'pending'"/>
-                    <button name="action_reset_pending"
-                            type="object"
-                            string="Reset to Pending"
-                            invisible="state != 'cancelled'"/>
+
                     <button name="action_open_move"
                             type="object"
                             string="Journal Entry"
                             invisible="not move_id"/>
-                    <field name="state" widget="statusbar" statusbar_visible="pending,paid,cancelled"/>
+
+                    <field name="state"
+                           widget="statusbar"
+                           statusbar_visible="draft,pending,paid,excluded"/>
+
                 </header>
 
                 <sheet>
+
                     <div class="oe_title">
                         <label for="name"/>
                         <h1>
@@ -62,40 +87,87 @@
                     </div>
 
                     <group>
-                        <group string="Commission">
-                            <field name="invoice_id" readonly="state == 'paid'"/>
-                            <field name="lead_id" readonly="state == 'paid'"/>
-                            <field name="salesperson_id" readonly="state == 'paid'"/>
-                            <field name="customer_id" readonly="state == 'paid'"/>
-                            <field name="commission_date" string="Invoice Date" readonly="state == 'paid'"/>
+
+                        <group string="Invoice / Deal">
+
+                            <field name="invoice_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="invoice_state"
+                                   readonly="1"/>
+
+                            <field name="lead_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="salesperson_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="customer_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="commission_date"
+                                   string="Invoice Date"
+                                   readonly="invoice_id or state == 'paid'"/>
+
                         </group>
 
-                        <group string="Amounts">
-                            <field name="currency_id" readonly="state == 'paid'"/>
-                            <field name="training_value" readonly="state == 'paid'"/>
-                            <field name="commission_rate"/>
-                            <field name="commission_amount" readonly="1"/>
+                        <group string="Commission">
+
+                            <field name="currency_id"
+                                   readonly="invoice_id or state == 'paid'"/>
+
+                            <field name="training_value"
+                                   readonly="invoice_id or state == 'paid'"/>
+
+                            <field name="commission_rate"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="commission_amount"
+                                   readonly="1"/>
+
+                            <field name="manual_rate"
+                                   invisible="1"/>
+
                         </group>
+
                     </group>
 
-                    <group string="Payment / Accounting" invisible="state == 'cancelled'">
+                    <group string="Payment / Accounting"
+                           invisible="state in ('draft', 'excluded', 'cancelled')">
+
                         <group>
-                            <field name="company_id" readonly="state == 'paid'"/>
-                            <field name="payment_journal_id" readonly="state == 'paid'"/>
-                            <field name="expense_account_id" readonly="state == 'paid'"/>
-                            <field name="payment_account_id" readonly="state == 'paid'"/>
+                            <field name="company_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="payment_journal_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="expense_account_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="payment_account_id"
+                                   readonly="state == 'paid'"/>
                         </group>
+
                         <group>
-                            <field name="payment_date"/>
-                            <field name="move_id"/>
+                            <field name="payment_date"
+                                   readonly="1"/>
+
+                            <field name="move_id"
+                                   readonly="1"/>
                         </group>
+
                     </group>
 
                     <group>
-                        <field name="notes" placeholder="Optional notes..."/>
+                        <field name="notes"
+                               placeholder="Optional notes..."/>
                     </group>
+
                 </sheet>
+
             </form>
+
         </field>
     </record>
 
@@ -103,7 +175,9 @@
         <field name="name">nil.sales.commission.search</field>
         <field name="model">nil.sales.commission</field>
         <field name="arch" type="xml">
+
             <search string="Commission Ledger">
+
                 <field name="name"/>
                 <field name="invoice_id"/>
                 <field name="salesperson_id"/>
@@ -112,25 +186,46 @@
 
                 <separator/>
 
-                <filter name="pending" string="Pending" domain="[('state', '=', 'pending')]"/>
-                <filter name="paid" string="Paid" domain="[('state', '=', 'paid')]"/>
-                <filter name="cancelled" string="Cancelled" domain="[('state', '=', 'cancelled')]"/>
+                <filter name="draft"
+                        string="Draft"
+                        domain="[('state', '=', 'draft')]"/>
+
+                <filter name="approved"
+                        string="Approved"
+                        domain="[('state', '=', 'pending')]"/>
+
+                <filter name="paid"
+                        string="Paid"
+                        domain="[('state', '=', 'paid')]"/>
+
+                <filter name="excluded"
+                        string="Excluded"
+                        domain="[('state', '=', 'excluded')]"/>
 
                 <separator/>
 
                 <filter name="group_salesperson"
                         string="Salesperson"
                         context="{'group_by': 'salesperson_id'}"/>
+
                 <filter name="group_customer"
                         string="Customer"
                         context="{'group_by': 'customer_id'}"/>
+
                 <filter name="group_state"
                         string="Status"
                         context="{'group_by': 'state'}"/>
+
+                <filter name="group_invoice_state"
+                        string="Invoice Status"
+                        context="{'group_by': 'invoice_state'}"/>
+
                 <filter name="group_month"
                         string="Month"
                         context="{'group_by': 'commission_date:month'}"/>
+
             </search>
+
         </field>
     </record>
 
@@ -138,12 +233,14 @@
         <field name="name">nil.sales.commission.pivot</field>
         <field name="model">nil.sales.commission</field>
         <field name="arch" type="xml">
+
             <pivot string="Commission Analysis">
                 <field name="salesperson_id" type="row"/>
                 <field name="commission_date" interval="month" type="col"/>
                 <field name="commission_amount" type="measure"/>
                 <field name="training_value" type="measure"/>
             </pivot>
+
         </field>
     </record>
 
@@ -152,6 +249,7 @@
         <field name="res_model">nil.sales.commission</field>
         <field name="view_mode">tree,form,pivot</field>
         <field name="search_view_id" ref="view_sales_commission_search"/>
+        <field name="context">{'search_default_draft': 1}</field>
     </record>
 
     <record id="action_sales_commission_analysis" model="ir.actions.act_window">

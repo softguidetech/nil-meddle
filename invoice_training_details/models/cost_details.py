@@ -16,31 +16,26 @@ class CostDetails(models.Model):
     price = fields.Float(string="Price")
 
     # Partner Share
-    # Manual for all partners except EnterOne.
-    # For EnterOne it will be calculated automatically.
+    # Manual except when:
+    # Payment Method = CLC AND Learning Partner = EnterOne
     training_vendor = fields.Float(string="Partner Share")
 
-    # Logistics
     total_price_all = fields.Float(
         string="Logistics Cost",
         compute='_compute_total'
     )
 
-    # Total Costs
     margin1 = fields.Float(
         string="Total Costs",
         compute='_compute_margin1'
     )
 
-    # Kits & Labs
     clc_cost = fields.Float(string="Kits & Labs")
 
     rate_card = fields.Float(string="Partner Rate")
 
-    # Instructor Cost
     ins_time = fields.Float(string="Instructor")
 
-    # NIL ME Net Share / Profit
     nilme_share = fields.Float(
         string="NIL ME Share $",
         compute='_compute_nilme_share'
@@ -64,11 +59,41 @@ class CostDetails(models.Model):
         compute='_compute_margin'
     )
 
-    # NEW: Sales Commission
     sales_commission = fields.Float(
         string="Sales Commission (5%)",
         compute='_compute_sales_commission'
     )
+
+    # Used to determine whether Partner Share should be automatic
+    payment_method = fields.Selection([
+        ('cash', 'Cash'),
+        ('clc', 'CLC'),
+    ], string="Payment Method", compute='_compute_payment_method')
+
+    # ---------------------------------------------------------
+    # Payment Method
+    # ---------------------------------------------------------
+
+    @api.depends(
+        'cos_lead_id.training_course_ids.payment_method'
+    )
+    def _compute_payment_method(self):
+        for rec in self:
+
+            if not rec.cos_lead_id:
+                rec.payment_method = 'cash'
+                continue
+
+            methods = rec.cos_lead_id.training_course_ids.mapped(
+                'payment_method'
+            )
+
+            # If all training lines are CLC, treat cost line as CLC.
+            # Otherwise keep it manual.
+            if methods and all(method == 'clc' for method in methods):
+                rec.payment_method = 'clc'
+            else:
+                rec.payment_method = 'cash'
 
     # ---------------------------------------------------------
     # Helpers
@@ -76,8 +101,6 @@ class CostDetails(models.Model):
 
     def _get_direct_costs(self):
         """
-        Costs deducted BEFORE EnterOne / NIL ME split.
-
         Direct Costs =
             Logistics
             + Kits & Labs
@@ -91,18 +114,32 @@ class CostDetails(models.Model):
             + (self.ins_time or 0.0)
         )
 
-    def _get_effective_partner_share(self):
+    def _is_enterone_clc(self):
         """
-        For EnterOne:
-            Partner Share = 20% of:
-            Sale - Logistics - Kits - Instructor
-
-        For all other partners:
-            Use manually entered Partner Share.
+        Automatic EnterOne calculation applies ONLY when:
+        Payment Method = CLC
+        AND
+        Learning Partner = EnterOne
         """
         self.ensure_one()
 
-        if self.learning_partner == 'EnterOne':
+        return (
+            self.payment_method == 'clc'
+            and self.learning_partner == 'EnterOne'
+        )
+
+    def _get_effective_partner_share(self):
+        """
+        CLC + EnterOne:
+            Partner Share =
+            20% × (Training Price - Direct Costs)
+
+        All other cases:
+            Partner Share is entered manually.
+        """
+        self.ensure_one()
+
+        if self._is_enterone_clc():
 
             total_training_price = (
                 self.cos_lead_id.total_training_price or 0.0
@@ -110,13 +147,12 @@ class CostDetails(models.Model):
 
             direct_costs = self._get_direct_costs()
 
-            net_before_partner_split = (
+            amount_after_costs = (
                 total_training_price - direct_costs
             )
 
-            # EnterOne receives 20% only when there is profit
-            if net_before_partner_split > 0:
-                return net_before_partner_split * 0.20
+            if amount_after_costs > 0:
+                return amount_after_costs * 0.20
 
             return 0.0
 
@@ -189,11 +225,12 @@ class CostDetails(models.Model):
             rec.cost = total
 
     # ---------------------------------------------------------
-    # Auto-calculate EnterOne Partner Share
+    # EnterOne CLC Partner Share
     # ---------------------------------------------------------
 
     @api.onchange(
         'learning_partner',
+        'payment_method',
         'total_price_all',
         'clc_cost',
         'ins_time',
@@ -203,7 +240,11 @@ class CostDetails(models.Model):
 
         for rec in self:
 
-            if rec.learning_partner == 'EnterOne':
+            # Automatic calculation ONLY for CLC + EnterOne
+            if (
+                rec.payment_method == 'clc'
+                and rec.learning_partner == 'EnterOne'
+            ):
 
                 total_training_price = (
                     rec.cos_lead_id.total_training_price or 0.0
@@ -215,15 +256,18 @@ class CostDetails(models.Model):
                     + (rec.ins_time or 0.0)
                 )
 
-                net_before_partner_split = (
+                amount_after_costs = (
                     total_training_price - direct_costs
                 )
 
-                if net_before_partner_split > 0:
+                if amount_after_costs > 0:
+
                     rec.training_vendor = (
-                        net_before_partner_split * 0.20
+                        amount_after_costs * 0.20
                     )
+
                 else:
+
                     rec.training_vendor = 0.0
 
     # ---------------------------------------------------------
@@ -236,6 +280,7 @@ class CostDetails(models.Model):
         'clc_cost',
         'ins_time',
         'learning_partner',
+        'payment_method',
         'cos_lead_id.total_training_price'
     )
     def _compute_margin1(self):
@@ -267,6 +312,7 @@ class CostDetails(models.Model):
         'clc_cost',
         'ins_time',
         'learning_partner',
+        'payment_method',
         'cos_lead_id.total_training_price'
     )
     def _compute_nilme_share(self):
@@ -277,8 +323,11 @@ class CostDetails(models.Model):
                 record.cos_lead_id.total_training_price or 0.0
             )
 
-            # ENTERONE
-            if record.learning_partner == 'EnterOne':
+            # CLC + ENTERONE
+            if (
+                record.payment_method == 'clc'
+                and record.learning_partner == 'EnterOne'
+            ):
 
                 direct_costs = (
                     (record.total_price_all or 0.0)
@@ -286,26 +335,22 @@ class CostDetails(models.Model):
                     + (record.ins_time or 0.0)
                 )
 
-                net_before_partner_split = (
+                amount_after_costs = (
                     total_training_price - direct_costs
                 )
 
-                if net_before_partner_split > 0:
+                if amount_after_costs > 0:
 
-                    # NIL ME receives exactly 80%
+                    # NIL ME gets remaining 80%
                     record.nilme_share = (
-                        net_before_partner_split * 0.80
+                        amount_after_costs * 0.80
                     )
 
                 else:
 
-                    # If the deal makes a loss,
-                    # show the actual loss.
-                    record.nilme_share = (
-                        net_before_partner_split
-                    )
+                    record.nilme_share = amount_after_costs
 
-            # ALL OTHER PARTNERS
+            # CASH or any other partner
             else:
 
                 record.nilme_share = (
@@ -337,6 +382,7 @@ class CostDetails(models.Model):
                 )
 
             else:
+
                 record.margin = 0.0
 
     # ---------------------------------------------------------
@@ -352,12 +398,14 @@ class CostDetails(models.Model):
                 record.nilme_share or 0.0
             )
 
-            # Commission only when there is profit
             if net_profit > 0:
+
                 record.sales_commission = (
                     net_profit * 0.05
                 )
+
             else:
+
                 record.sales_commission = 0.0
 
     # ---------------------------------------------------------
@@ -371,7 +419,6 @@ class CostDetails(models.Model):
             'default_name': self.name,
             'default_description': self.description,
             'default_price': self.price,
-
             'default_training_vendor': self.training_vendor,
             'default_total_price_all': self.total_price_all,
             'default_margin1': self.margin1,

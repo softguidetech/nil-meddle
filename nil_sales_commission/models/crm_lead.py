@@ -8,19 +8,23 @@ class CrmLead(models.Model):
         'nil.sales.commission',
         'lead_id',
         string='Sales Commissions',
+        groups='nil_sales_commission.group_nil_commission_manager',
     )
 
     commission_count = fields.Integer(
         string='Commission Count',
         compute='_compute_commission_count',
+        compute_sudo=True,
+        groups='nil_sales_commission.group_nil_commission_manager',
     )
 
-    @api.depends('commission_ids')
     def _compute_commission_count(self):
+        Commission = self.env['nil.sales.commission'].sudo()
+
         for lead in self:
-            lead.commission_count = len(
-                lead.commission_ids
-            )
+            lead.commission_count = Commission.search_count([
+                ('lead_id', '=', lead.id),
+            ])
 
     @api.model_create_multi
     def create(self, vals_list):

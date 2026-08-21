@@ -16,11 +16,19 @@ class SalesCommission(models.Model):
         default=lambda self: _('New'),
     )
 
+    invoice_id = fields.Many2one(
+        'account.move',
+        string='Invoice',
+        copy=False,
+        index=True,
+        ondelete='restrict',
+        domain="[('move_type', '=', 'out_invoice')]",
+    )
+
     lead_id = fields.Many2one(
         'crm.lead',
         string='Lead / Opportunity',
-        required=True,
-        ondelete='restrict',
+        ondelete='set null',
         index=True,
     )
 
@@ -53,7 +61,7 @@ class SalesCommission(models.Model):
     )
 
     training_value = fields.Monetary(
-        string='Training Value',
+        string='Invoice Value (Excl. Tax)',
         currency_field='currency_id',
         required=True,
     )
@@ -129,18 +137,53 @@ class SalesCommission(models.Model):
 
     _sql_constraints = [
         (
-            'lead_commission_unique',
-            'unique(lead_id)',
-            'A commission record already exists for this lead/opportunity.',
+            'invoice_commission_unique',
+            'unique(invoice_id)',
+            'A commission record already exists for this invoice.',
         ),
     ]
+
+    @api.model
+    def _nil_prepare_invoice_commission_migration(self):
+        """
+        Remove the old one-commission-per-lead database constraint and clear
+        unpaid legacy rows that were created by the former CRM-stage logic.
+        Paid historical rows are preserved.
+        """
+        self.env.cr.execute(
+            'ALTER TABLE nil_sales_commission '
+            'DROP CONSTRAINT IF EXISTS nil_sales_commission_lead_commission_unique'
+        )
+        self.env.cr.execute(
+            'ALTER TABLE nil_sales_commission '
+            'DROP CONSTRAINT IF EXISTS lead_commission_unique'
+        )
+
+        legacy = self.sudo().search([
+            ('invoice_id', '=', False),
+            ('state', '!=', 'paid'),
+        ])
+        if legacy:
+            legacy.unlink()
+
+        return True
 
     @api.model_create_multi
     def create(self, vals_list):
         sequence = self.env['ir.sequence']
+
         for vals in vals_list:
             if vals.get('name', _('New')) == _('New'):
                 vals['name'] = sequence.next_by_code('sales.commission') or _('New')
+
+            invoice_id = vals.get('invoice_id')
+            if invoice_id:
+                invoice = self.env['account.move'].browse(invoice_id)
+                vals.setdefault('customer_id', invoice.partner_id.id if invoice.partner_id else False)
+                vals.setdefault('company_id', invoice.company_id.id)
+                vals.setdefault('currency_id', invoice.currency_id.id)
+                vals.setdefault('commission_date', invoice.invoice_date)
+                vals.setdefault('training_value', invoice.amount_untaxed or 0.0)
 
             training_value = vals.get('training_value', 0.0) or 0.0
             vals['commission_rate'] = 5.0
@@ -150,6 +193,7 @@ class SalesCommission(models.Model):
 
     def write(self, vals):
         protected_fields = {
+            'invoice_id',
             'lead_id',
             'salesperson_id',
             'customer_id',
@@ -179,39 +223,31 @@ class SalesCommission(models.Model):
             raise UserError(_('Paid commissions cannot be deleted.'))
         return super().unlink()
 
-    @api.onchange('lead_id')
-    def _onchange_lead_id(self):
+    @api.onchange('invoice_id')
+    def _onchange_invoice_id(self):
         for rec in self:
-            if not rec.lead_id:
+            if not rec.invoice_id:
                 continue
 
-            lead = rec.lead_id
-            rec.salesperson_id = lead.user_id
-            rec.customer_id = lead.partner_id
-            rec.company_id = lead.company_id or self.env.company
+            invoice = rec.invoice_id
+            lead = invoice._nil_get_commission_lead()
+            salesperson = invoice._nil_get_commission_salesperson()
 
-            lead_currency = getattr(lead, 'currency_id', False)
-            if not lead_currency:
-                lead_currency = getattr(lead, 'company_currency', False)
-            rec.currency_id = lead_currency or rec.company_id.currency_id
-
-            training_value = float(getattr(lead, 'total_training_price', 0.0) or 0.0)
-            rec.training_value = training_value
+            rec.lead_id = lead
+            rec.salesperson_id = salesperson
+            rec.customer_id = invoice.partner_id
+            rec.company_id = invoice.company_id
+            rec.currency_id = invoice.currency_id
+            rec.training_value = invoice.amount_untaxed or 0.0
             rec.commission_rate = 5.0
-            rec.commission_amount = training_value * 0.05
-            rec.commission_date = lead.date_closed or fields.Date.context_today(rec)
-
-    @api.onchange('payment_journal_id')
-    def _onchange_payment_journal_id(self):
-        for rec in self:
-            if rec.payment_journal_id and rec.payment_journal_id.default_account_id:
-                rec.payment_account_id = rec.payment_journal_id.default_account_id
+            rec.commission_amount = (invoice.amount_untaxed or 0.0) * 0.05
+            rec.commission_date = invoice.invoice_date or fields.Date.context_today(rec)
 
     @api.constrains('training_value', 'commission_amount')
     def _check_non_negative_amounts(self):
         for rec in self:
             if rec.training_value < 0 or rec.commission_amount < 0:
-                raise ValidationError(_('Training value and commission amount cannot be negative.'))
+                raise ValidationError(_('Invoice value and commission amount cannot be negative.'))
 
     def action_mark_paid(self):
         for rec in self:
@@ -242,10 +278,18 @@ class SalesCommission(models.Model):
                 payment_date,
             )
 
+            source_name = (
+                rec.invoice_id.name
+                if rec.invoice_id
+                else rec.lead_id.name
+                if rec.lead_id
+                else rec.name
+            )
+
             line_name = _(
-                'Sales Commission - %(salesperson)s - %(lead)s',
+                'Sales Commission - %(salesperson)s - %(source)s',
                 salesperson=rec.salesperson_id.name,
-                lead=rec.lead_id.name,
+                source=source_name,
             )
 
             partner = rec.salesperson_id.partner_id
@@ -319,7 +363,7 @@ class SalesCommission(models.Model):
             'type': 'ir.actions.act_window',
             'name': _('Journal Entry'),
             'res_model': 'account.move',
-            'view_mode': 'form',
             'res_id': self.move_id.id,
+            'view_mode': 'form',
             'target': 'current',
         }

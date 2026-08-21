@@ -18,89 +18,105 @@ class CrmLead(models.Model):
     @api.depends('commission_ids')
     def _compute_commission_count(self):
         for lead in self:
-            lead.commission_count = len(lead.commission_ids)
+            lead.commission_count = len(
+                lead.commission_ids
+            )
 
     @api.model_create_multi
     def create(self, vals_list):
+
         leads = super().create(vals_list)
+
         leads._nil_sync_invoice_commissions_from_lead()
+
         return leads
 
     def write(self, vals):
+
         result = super().write(vals)
 
-        # IMPORTANT:
-        # Every Lead edit refreshes its invoice-based commission rows.
-        #
-        # The invoice itself remains unchanged. The current CRM Lead is
-        # the source of truth for salesperson/customer assignment.
+        # Any Lead edit refreshes all related pending commission rows.
         self._nil_sync_invoice_commissions_from_lead()
 
         return result
 
     def _nil_get_related_commission_invoices(self):
         """
-        Return every invoice that belongs to these CRM Leads.
+        Find every invoice related to these CRM Leads.
 
-        We collect invoices in two ways:
-        1. Through Sale Orders linked to the CRM Lead.
-        2. Through existing commission rows already linked to the Lead.
-
-        This lets the sync both update existing rows and recreate a pending
-        row if the salesperson becomes eligible again.
+        Sources:
+        1. Sale Orders where opportunity_id = this Lead.
+        2. Standard Sale Order invoice_ids relation.
+        3. invoice_origin matching the Sale Order number.
+        4. Existing commission rows already linked to the Lead.
         """
         if not self:
             return self.env['account.move']
 
-        SaleOrder = self.env['sale.order'].sudo()
-        Commission = self.env['nil.sales.commission'].sudo()
+        SaleOrder = self.env[
+            'sale.order'
+        ].sudo()
+
+        AccountMove = self.env[
+            'account.move'
+        ].sudo()
+
+        Commission = self.env[
+            'nil.sales.commission'
+        ].sudo()
 
         sale_orders = SaleOrder.search([
             ('opportunity_id', 'in', self.ids),
         ])
 
-        invoices_from_orders = sale_orders.mapped('invoice_ids')
+        invoices = sale_orders.mapped(
+            'invoice_ids'
+        )
+
+        # Fallback for older/custom invoices that have invoice_origin
+        # but no invoice_line -> sale_line relation.
+        for order in sale_orders:
+
+            invoices |= AccountMove.search([
+                ('move_type', '=', 'out_invoice'),
+                ('invoice_origin', 'ilike', order.name),
+            ])
 
         existing_commissions = Commission.search([
             ('lead_id', 'in', self.ids),
             ('invoice_id', '!=', False),
         ])
 
-        invoices_from_commissions = existing_commissions.mapped('invoice_id')
-
-        return (
-            invoices_from_orders
-            | invoices_from_commissions
+        invoices |= existing_commissions.mapped(
+            'invoice_id'
         )
+
+        return invoices
 
     def _nil_sync_invoice_commissions_from_lead(self):
         """
-        Refresh commission rows from the CURRENT CRM Lead values.
+        Refresh commission rows using CURRENT Lead values.
 
-        What changes dynamically from the Lead:
-        - Salesperson
-        - Customer
-        - Commission rate
-        - Commission amount
+        Invoice stays fixed:
+        - invoice number
+        - invoice date
+        - invoice untaxed value
+        - currency
 
-        What stays fixed from the Invoice:
-        - Invoice reference
-        - Invoice date
-        - Invoice untaxed value
-        - Currency
+        Lead stays dynamic:
+        - salesperson
+        - customer
+        - commission rate
+        - commission amount
 
         Rates:
         - Ruba Khattam = 1.5%
         - Loudy Abdo = 5%
         - Baraa Abo Saleh = 2%
-
-        If the Lead salesperson is changed to someone outside the approved
-        list, an unpaid commission row is removed.
-
-        Paid commission rows are NOT modified because their accounting
-        journal entry is already posted.
         """
-        invoices = self._nil_get_related_commission_invoices()
+        invoices = (
+            self._nil_get_related_commission_invoices()
+        )
 
         if invoices:
             invoices._nil_sync_sales_commission()
@@ -108,9 +124,12 @@ class CrmLead(models.Model):
         return True
 
     def action_view_sales_commission(self):
+
         self.ensure_one()
 
-        action = self.env['ir.actions.actions']._for_xml_id(
+        action = self.env[
+            'ir.actions.actions'
+        ]._for_xml_id(
             'nil_sales_commission.action_sales_commission'
         )
 
@@ -119,17 +138,30 @@ class CrmLead(models.Model):
         ]
 
         action['context'] = {
-            'default_lead_id': self.id,
+            'default_lead_id':
+                self.id,
+
             'default_salesperson_id':
-                self.user_id.id if self.user_id else False,
+                self.user_id.id
+                if self.user_id
+                else False,
+
             'default_customer_id':
-                self.partner_id.id if self.partner_id else False,
+                self.partner_id.id
+                if self.partner_id
+                else False,
         }
 
         commissions = self.commission_ids
 
         if len(commissions) == 1:
-            action['views'] = [(False, 'form')]
-            action['res_id'] = commissions.id
+
+            action['views'] = [
+                (False, 'form')
+            ]
+
+            action['res_id'] = (
+                commissions.id
+            )
 
         return action

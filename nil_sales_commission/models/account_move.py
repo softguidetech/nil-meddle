@@ -17,15 +17,17 @@ class AccountMove(models.Model):
 
     def _nil_get_commission_sale_orders(self):
         """
-        Find every Sale Order related to the invoice.
+        Find Sale Orders related to the invoice.
 
-        1) Standard invoice line -> sale line -> sale order link.
-        2) Fallback through invoice_origin for older/custom invoices.
+        Primary:
+            Invoice Line -> Sale Line -> Sale Order
+
+        Fallback:
+            Invoice Origin -> Sale Order Number
         """
         self.ensure_one()
 
         SaleOrder = self.env['sale.order'].sudo()
-
         orders = self.invoice_line_ids.sale_line_ids.order_id
 
         origin = (self.invoice_origin or '').strip()
@@ -50,6 +52,10 @@ class AccountMove(models.Model):
         return orders
 
     def _nil_get_commission_lead(self):
+        """
+        Best-effort link from invoice to CRM Lead.
+        The Lead link never controls whether an invoice appears.
+        """
         self.ensure_one()
 
         leads = self._nil_get_commission_sale_orders().mapped(
@@ -71,61 +77,28 @@ class AccountMove(models.Model):
 
         return self.env['crm.lead']
 
-    def _nil_get_commission_salesperson(self):
-        """
-        Salesperson priority:
-        1) CURRENT salesperson on linked CRM Lead.
-        2) Invoice Salesperson.
-        3) Sale Order Salesperson.
-
-        IMPORTANT:
-        A salesperson is NOT required for the invoice to appear in
-        Commission Ledger. This method only provides the best available
-        default value.
-        """
-        self.ensure_one()
-
-        lead = self._nil_get_commission_lead()
-
-        if lead and lead.user_id:
-            return lead.user_id
-
-        if self.invoice_user_id:
-            return self.invoice_user_id
-
-        sale_orders = self._nil_get_commission_sale_orders()
-
-        if sale_orders and sale_orders[0].user_id:
-            return sale_orders[0].user_id
-
-        return self.env['res.users']
-
     def _nil_sync_sales_commission(self):
         """
-        Ensure every customer invoice dated after 31-May-2026 appears in
-        Commission Ledger, regardless of:
-        - salesperson
-        - invoice state
-        - invoice amount
-        - CRM link
+        Every Customer Invoice dated from 01-Jun-2026 onward gets
+        one automatic Ruba Khattam commission row at 1.5%.
 
-        User-controlled exclusion is respected.
+        IMPORTANT:
+        Commission basis = CRM Lead Total Training Price.
+        Invoice amount is NOT used for commission calculation.
 
-        Invoice-linked fixed fields:
-        - Invoice
-        - Invoice Date
-        - Invoice Value Excl. Tax
-        - Currency
+        There is NO salesperson eligibility filter.
 
-        Lead-driven defaults:
-        - Lead
-        - Salesperson
-        - Customer
+        Additional/manual commission rows are fully preserved and can be
+        edited/deleted/reset by the user.
 
-        Existing Paid rows are never changed.
-        Existing Excluded rows remain excluded.
+        If an invoice is deliberately excluded, its automatic Ruba row
+        stays Excluded and is not recreated as Draft until Reset to Draft.
         """
-        Commission = self.env['nil.sales.commission'].sudo()
+        Commission = self.env[
+            'nil.sales.commission'
+        ].sudo()
+
+        ruba_user = Commission._nil_get_ruba_user()
 
         for invoice in self:
             if invoice.move_type != 'out_invoice':
@@ -137,30 +110,21 @@ class AccountMove(models.Model):
             if invoice.invoice_date <= COMMISSION_CUTOFF_DATE:
                 continue
 
-            commission = Commission.search([
-                ('invoice_id', '=', invoice.id),
-            ], limit=1)
-
-            if invoice.exclude_from_commission:
-                if commission and commission.state != 'paid':
-                    commission.with_context(
-                        nil_auto_sync=True
-                    ).write({
-                        'state': 'excluded',
-                    })
-                continue
-
-            salesperson = invoice._nil_get_commission_salesperson()
             lead = invoice._nil_get_commission_lead()
 
-            values = {
+            # Commission basis is the TOTAL TRAINING VALUE from the CRM Lead,
+            # NOT the invoice amount.
+            #
+            # The invoice is only the trigger/reference that makes the row appear.
+            # If no Lead is linked, keep the row visible with Training Value = 0
+            # so Ruba can fill/correct it manually if needed.
+            training_value = float(
+                lead.total_training_price or 0.0
+            ) if lead else 0.0
+
+            common_values = {
                 'invoice_id': invoice.id,
                 'lead_id': lead.id if lead else False,
-                'salesperson_id': (
-                    salesperson.id
-                    if salesperson
-                    else False
-                ),
                 'customer_id': (
                     lead.partner_id.id
                     if lead and lead.partner_id
@@ -169,62 +133,135 @@ class AccountMove(models.Model):
                     else False
                 ),
                 'company_id': invoice.company_id.id,
-                'currency_id': invoice.currency_id.id,
-                'training_value': float(
-                    invoice.amount_untaxed or 0.0
+                'currency_id': (
+                    lead.currency_id.id
+                    if lead and lead.currency_id
+                    else invoice.currency_id.id
                 ),
+                'training_value': training_value,
                 'commission_date': invoice.invoice_date,
             }
 
-            if commission:
-                if commission.state == 'paid':
-                    continue
+            auto_ruba = Commission.search([
+                ('invoice_id', '=', invoice.id),
+                ('is_auto_ruba', '=', True),
+            ], limit=1)
 
-                # Do not silently undo a deliberate exclusion.
-                if commission.state == 'excluded':
-                    continue
+            # Adopt an existing non-paid Ruba row if this invoice came from
+            # an older module version and no auto flag existed yet.
+            if not auto_ruba and ruba_user:
+                old_ruba = Commission.search([
+                    ('invoice_id', '=', invoice.id),
+                    ('salesperson_id', '=', ruba_user.id),
+                    ('state', '!=', 'paid'),
+                    ('is_auto_ruba', '=', False),
+                ], limit=1)
 
-                # Only refresh the default rate when the user has never
-                # manually overridden it.
-                if not commission.manual_rate:
-                    values['commission_rate'] = (
-                        Commission._nil_get_default_commission_rate(
-                            salesperson
-                        )
-                    )
+                if old_ruba:
+                    old_ruba.with_context(
+                        nil_auto_sync=True
+                    ).write({
+                        'is_auto_ruba': True,
+                    })
+                    auto_ruba = old_ruba
 
-                commission.with_context(
-                    nil_auto_sync=True
-                ).write(values)
+            if invoice.exclude_from_commission:
+                if auto_ruba and auto_ruba.state != 'paid':
+                    auto_ruba.with_context(
+                        nil_auto_sync=True
+                    ).write({
+                        **common_values,
+                        'state': 'excluded',
+                    })
+                elif not auto_ruba:
+                    values = dict(common_values)
+                    values.update({
+                        'salesperson_id': (
+                            ruba_user.id
+                            if ruba_user
+                            else False
+                        ),
+                        'commission_rate': 1.5,
+                        'commission_amount': (
+                            training_value * 0.015
+                        ),
+                        'state': 'excluded',
+                        'is_auto_ruba': True,
+                    })
+
+                    Commission.with_context(
+                        nil_auto_sync=True
+                    ).create(values)
+
+                continue
+
+            if auto_ruba:
+                if auto_ruba.state != 'paid':
+                    auto_ruba.with_context(
+                        nil_auto_sync=True
+                    ).write({
+                        **common_values,
+                        'salesperson_id': (
+                            ruba_user.id
+                            if ruba_user
+                            else auto_ruba.salesperson_id.id
+                        ),
+                        'commission_rate': 1.5,
+                    })
 
             else:
+                values = dict(common_values)
                 values.update({
-                    'commission_rate':
-                        Commission._nil_get_default_commission_rate(
-                            salesperson
-                        ),
+                    'salesperson_id': (
+                        ruba_user.id
+                        if ruba_user
+                        else False
+                    ),
+                    'commission_rate': 1.5,
+                    'commission_amount': (
+                        training_value * 0.015
+                    ),
                     'state': 'draft',
-                    'manual_rate': False,
+                    'is_auto_ruba': True,
                 })
 
                 Commission.with_context(
                     nil_auto_sync=True
                 ).create(values)
 
+            # Keep MANUAL invoice-linked rows synchronized with invoice/lead
+            # details, but NEVER overwrite their Commission For, rate or state.
+            manual_rows = Commission.search([
+                ('invoice_id', '=', invoice.id),
+                ('is_auto_ruba', '=', False),
+                ('state', '!=', 'paid'),
+            ])
+
+            if manual_rows:
+                manual_rows.with_context(
+                    nil_auto_sync=True
+                ).write(common_values)
+
         return True
 
     @api.model
     def _nil_backfill_sales_commissions(self):
         """
-        Backfill ALL customer invoices from 01-Jun-2026 onward.
+        Re-scan ALL Customer Invoices from 01-Jun-2026 onward.
 
         No salesperson filter.
         No Posted-only filter.
         No positive-amount filter.
 
-        The user decides which rows to approve or exclude.
+        Result:
+        - Every invoice appears through an automatic Ruba 1.5% row.
+        - Manual rows are preserved.
+        - Excluded invoices remain excluded.
         """
-        Commission = self.env['nil.sales.commission'].sudo()
+        Commission = self.env[
+            'nil.sales.commission'
+        ].sudo()
+
         Commission._nil_prepare_invoice_commission_migration()
 
         invoices = self.sudo().search([

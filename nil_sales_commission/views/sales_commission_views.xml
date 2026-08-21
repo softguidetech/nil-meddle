@@ -6,20 +6,39 @@
         <field name="model">nil.sales.commission</field>
         <field name="arch" type="xml">
             <tree string="Commission Ledger"
+                  create="1"
+                  edit="1"
+                  delete="1"
                   decoration-success="state == 'paid'"
                   decoration-warning="state == 'draft'"
                   decoration-muted="state == 'excluded'">
 
-                <field name="commission_date" string="Invoice Date"/>
+                <field name="commission_date"
+                       string="Invoice Date"/>
+
                 <field name="invoice_id"/>
-                <field name="invoice_state" optional="show"/>
-                <field name="salesperson_id"/>
-                <field name="lead_id" optional="show"/>
+
+                <field name="invoice_state"
+                       optional="show"/>
+
+                <field name="salesperson_id"
+                       string="Commission For"/>
+
+                <field name="lead_id"
+                       optional="show"/>
+
                 <field name="customer_id"/>
-                <field name="currency_id" column_invisible="1"/>
-                <field name="training_value" sum="Total Invoice Value"/>
+
+                <field name="currency_id"
+                       column_invisible="1"/>
+
+                <field name="training_value"
+                       sum="Total Training Value"/>
+
                 <field name="commission_rate"/>
-                <field name="commission_amount" sum="Total Commission"/>
+
+                <field name="commission_amount"
+                       sum="Total Commission"/>
 
                 <field name="state"
                        widget="badge"
@@ -28,8 +47,14 @@
                        decoration-success="state == 'paid'"
                        decoration-muted="state == 'excluded'"/>
 
-                <field name="payment_date" optional="show"/>
-                <field name="move_id" optional="show"/>
+                <field name="is_auto_ruba"
+                       optional="hide"/>
+
+                <field name="payment_date"
+                       optional="show"/>
+
+                <field name="move_id"
+                       optional="show"/>
 
             </tree>
         </field>
@@ -40,7 +65,10 @@
         <field name="model">nil.sales.commission</field>
         <field name="arch" type="xml">
 
-            <form string="Sales Commission">
+            <form string="Sales Commission"
+                  create="1"
+                  edit="1"
+                  delete="1">
 
                 <header>
 
@@ -82,13 +110,14 @@
                     <div class="oe_title">
                         <label for="name"/>
                         <h1>
-                            <field name="name" readonly="1"/>
+                            <field name="name"
+                                   readonly="1"/>
                         </h1>
                     </div>
 
                     <group>
 
-                        <group string="Invoice / Deal">
+                        <group string="Invoice / Deal Reference">
 
                             <field name="invoice_id"
                                    readonly="state == 'paid'"/>
@@ -99,34 +128,35 @@
                             <field name="lead_id"
                                    readonly="state == 'paid'"/>
 
-                            <field name="salesperson_id"
-                                   readonly="state == 'paid'"/>
-
                             <field name="customer_id"
                                    readonly="state == 'paid'"/>
 
                             <field name="commission_date"
                                    string="Invoice Date"
-                                   readonly="invoice_id or state == 'paid'"/>
+                                   readonly="state == 'paid'"/>
 
                         </group>
 
                         <group string="Commission">
 
-                            <field name="currency_id"
-                                   readonly="invoice_id or state == 'paid'"/>
+                            <field name="is_auto_ruba"
+                                   invisible="1"/>
 
-                            <field name="training_value"
-                                   readonly="invoice_id or state == 'paid'"/>
+                            <field name="salesperson_id"
+                                   string="Commission For"
+                                   readonly="state == 'paid' or is_auto_ruba"/>
 
                             <field name="commission_rate"
+                                   readonly="state == 'paid' or is_auto_ruba"/>
+
+                            <field name="currency_id"
+                                   readonly="state == 'paid'"/>
+
+                            <field name="training_value"
                                    readonly="state == 'paid'"/>
 
                             <field name="commission_amount"
                                    readonly="1"/>
-
-                            <field name="manual_rate"
-                                   invisible="1"/>
 
                         </group>
 
@@ -136,6 +166,7 @@
                            invisible="state in ('draft', 'excluded', 'cancelled')">
 
                         <group>
+
                             <field name="company_id"
                                    readonly="state == 'paid'"/>
 
@@ -147,14 +178,17 @@
 
                             <field name="payment_account_id"
                                    readonly="state == 'paid'"/>
+
                         </group>
 
                         <group>
+
                             <field name="payment_date"
                                    readonly="1"/>
 
                             <field name="move_id"
                                    readonly="1"/>
+
                         </group>
 
                     </group>
@@ -202,10 +236,14 @@
                         string="Excluded"
                         domain="[('state', '=', 'excluded')]"/>
 
+                <filter name="ruba_auto"
+                        string="Ruba 1.5%"
+                        domain="[('is_auto_ruba', '=', True)]"/>
+
                 <separator/>
 
                 <filter name="group_salesperson"
-                        string="Salesperson"
+                        string="Commission For"
                         context="{'group_by': 'salesperson_id'}"/>
 
                 <filter name="group_customer"
@@ -235,10 +273,15 @@
         <field name="arch" type="xml">
 
             <pivot string="Commission Analysis">
-                <field name="salesperson_id" type="row"/>
-                <field name="commission_date" interval="month" type="col"/>
-                <field name="commission_amount" type="measure"/>
-                <field name="training_value" type="measure"/>
+                <field name="salesperson_id"
+                       type="row"/>
+                <field name="commission_date"
+                       interval="month"
+                       type="col"/>
+                <field name="commission_amount"
+                       type="measure"/>
+                <field name="training_value"
+                       type="measure"/>
             </pivot>
 
         </field>
@@ -248,15 +291,28 @@
         <field name="name">Commission Ledger</field>
         <field name="res_model">nil.sales.commission</field>
         <field name="view_mode">tree,form,pivot</field>
-        <field name="search_view_id" ref="view_sales_commission_search"/>
-        <field name="context">{'search_default_draft': 1}</field>
+        <field name="search_view_id"
+               ref="view_sales_commission_search"/>
+        <!-- Excluded rows disappear from the normal working ledger. -->
+        <field name="domain">[('state', '!=', 'excluded')]</field>
+    </record>
+
+    <record id="action_sales_commission_excluded" model="ir.actions.act_window">
+        <field name="name">Excluded Invoices</field>
+        <field name="res_model">nil.sales.commission</field>
+        <field name="view_mode">tree,form</field>
+        <field name="search_view_id"
+               ref="view_sales_commission_search"/>
+        <!-- Dedicated place to recover excluded rows. -->
+        <field name="domain">[('state', '=', 'excluded')]</field>
     </record>
 
     <record id="action_sales_commission_analysis" model="ir.actions.act_window">
         <field name="name">Commission Analysis</field>
         <field name="res_model">nil.sales.commission</field>
         <field name="view_mode">pivot,tree,form</field>
-        <field name="search_view_id" ref="view_sales_commission_search"/>
+        <field name="search_view_id"
+               ref="view_sales_commission_search"/>
     </record>
 
     <menuitem id="menu_nil_commission_root"
@@ -272,11 +328,18 @@
               sequence="1"
               groups="nil_sales_commission.group_nil_commission_manager"/>
 
+    <menuitem id="menu_nil_commission_excluded"
+              name="Excluded Invoices"
+              parent="menu_nil_commission_root"
+              action="action_sales_commission_excluded"
+              sequence="2"
+              groups="nil_sales_commission.group_nil_commission_manager"/>
+
     <menuitem id="menu_nil_commission_analysis"
               name="Analysis"
               parent="menu_nil_commission_root"
               action="action_sales_commission_analysis"
-              sequence="2"
+              sequence="3"
               groups="nil_sales_commission.group_nil_commission_manager"/>
 
 </odoo>

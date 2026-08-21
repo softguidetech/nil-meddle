@@ -20,12 +20,21 @@ class CrmLead(models.Model):
         for lead in self:
             lead.commission_count = len(lead.commission_ids)
 
+    @api.model_create_multi
+    def create(self, vals_list):
+        leads = super().create(vals_list)
+
+        # In case a Lead is created directly in Invoiced stage
+        leads._sync_sales_commission()
+
+        return leads
+
     def write(self, vals):
         result = super().write(vals)
 
-        # Keep a still-pending commission synchronized with the lead,
-        # but ONLY when the lead already has a posted customer invoice.
+        # Recheck commission when any of these values change
         tracked_fields = {
+            'stage_id',
             'user_id',
             'partner_id',
             'total_training_price',
@@ -36,110 +45,207 @@ class CrmLead(models.Model):
 
         return result
 
-    def _get_posted_customer_invoices(self):
-        """Return posted customer invoices linked to this CRM lead via Sales Orders."""
+    def _is_invoiced_stage(self):
+        """
+        Returns True ONLY when the CRM Lead stage
+        is named exactly "Invoiced".
+        """
+
         self.ensure_one()
 
-        sale_orders = self.env['sale.order'].search([
-            ('opportunity_id', '=', self.id),
-        ])
+        if not self.stage_id:
+            return False
 
-        return sale_orders.mapped('invoice_ids').filtered(
-            lambda move: move.move_type == 'out_invoice' and move.state == 'posted'
-        )
+        stage_name = (
+            self.stage_id.name or ''
+        ).strip().lower()
+
+        return stage_name == 'invoiced'
 
     def _sync_sales_commission(self):
         """
-        Create/update ONE commission record per CRM lead only after the lead
-        has at least one POSTED customer invoice.
+        COMMISSION RULES
 
-        - Before invoicing: no commission record is created.
-        - Once invoiced: create Pending commission = 5% of total_training_price.
-        - If the posted invoice is reset/cancelled and no posted invoice remains:
-          cancel the Pending commission.
-        - Paid commissions are historical snapshots and are never auto-changed.
+        1. Commission is created ONLY when:
+               Lead Stage = Invoiced
+
+        2. Commission =
+               Total Training Price × 5%
+
+        3. Salesperson =
+               Lead Salesperson (user_id)
+
+        4. New commission status =
+               Pending
+
+        5. Only ONE commission record is allowed
+           per Lead.
+
+        6. If Lead remains Invoiced and:
+               - Salesperson changes
+               - Customer changes
+               - Training Value changes
+
+           the Pending commission is updated.
+
+        7. Paid commissions are NEVER automatically changed.
+
+        8. Moving the Lead away from Invoiced
+           does NOT delete an existing commission.
         """
+
         Commission = self.env['nil.sales.commission']
 
         for lead in self:
+
+            # =====================================================
+            # ONLY INVOICED LEADS
+            # =====================================================
+
+            if not lead._is_invoiced_stage():
+                continue
+
+            # =====================================================
+            # SALESPERSON IS REQUIRED
+            # =====================================================
+
+            if not lead.user_id:
+                continue
+
+            # =====================================================
+            # CHECK EXISTING COMMISSION
+            # =====================================================
+
             commission = Commission.search([
                 ('lead_id', '=', lead.id),
             ], limit=1)
 
-            posted_invoices = lead._get_posted_customer_invoices()
-
-            # Not invoiced anymore: cancel only an unpaid/pending record.
-            if not posted_invoices:
-                if commission and commission.state == 'pending':
-                    commission.write({'state': 'cancelled'})
-                continue
-
-            # No salesperson = nothing to assign yet.
-            if not lead.user_id:
-                continue
+            # =====================================================
+            # TRAINING VALUE
+            # =====================================================
 
             training_value = float(
-                getattr(lead, 'total_training_price', 0.0) or 0.0
+                lead.total_training_price or 0.0
             )
 
-            lead_currency = getattr(lead, 'currency_id', False)
-            if not lead_currency:
-                lead_currency = getattr(lead, 'company_currency', False)
+            # =====================================================
+            # COMPANY
+            # =====================================================
 
-            company = lead.company_id or self.env.company
-            currency = lead_currency or company.currency_id
+            company = (
+                lead.company_id
+                or self.env.company
+            )
 
-            invoice_dates = [
-                move.invoice_date or move.date
-                for move in posted_invoices
-                if (move.invoice_date or move.date)
-            ]
-            commission_date = min(invoice_dates) if invoice_dates else fields.Date.context_today(lead)
+            # =====================================================
+            # CURRENCY
+            # =====================================================
+
+            currency = (
+                lead.currency_id
+                if lead.currency_id
+                else company.currency_id
+            )
+
+            # =====================================================
+            # COMMISSION VALUES
+            # =====================================================
 
             values = {
                 'salesperson_id': lead.user_id.id,
-                'customer_id': lead.partner_id.id if lead.partner_id else False,
+
+                'customer_id':
+                    lead.partner_id.id
+                    if lead.partner_id
+                    else False,
+
                 'company_id': company.id,
+
                 'currency_id': currency.id,
+
                 'training_value': training_value,
+
                 'commission_rate': 5.0,
-                'commission_amount': training_value * 0.05,
-                'commission_date': commission_date,
+
+                'commission_amount':
+                    training_value * 0.05,
+
+                'commission_date':
+                    fields.Date.context_today(lead),
             }
 
+            # =====================================================
+            # EXISTING COMMISSION
+            # =====================================================
+
             if commission:
+
+                # Paid commission is historical.
+                # Never modify it automatically.
                 if commission.state == 'paid':
                     continue
 
+                # If previously cancelled and Lead
+                # becomes Invoiced again, reactivate it.
                 if commission.state == 'cancelled':
                     values['state'] = 'pending'
 
                 commission.write(values)
+
+            # =====================================================
+            # NEW COMMISSION
+            # =====================================================
+
             else:
+
                 values.update({
                     'lead_id': lead.id,
                     'state': 'pending',
                 })
+
                 Commission.create(values)
 
         return True
 
     def action_view_sales_commission(self):
+        """
+        Opens the commission related to this Lead.
+        """
+
         self.ensure_one()
 
-        action = self.env['ir.actions.actions']._for_xml_id(
+        action = self.env[
+            'ir.actions.actions'
+        ]._for_xml_id(
             'nil_sales_commission.action_sales_commission'
         )
-        action['domain'] = [('lead_id', '=', self.id)]
+
+        action['domain'] = [
+            ('lead_id', '=', self.id)
+        ]
+
         action['context'] = {
             'default_lead_id': self.id,
-            'default_salesperson_id': self.user_id.id,
-            'default_customer_id': self.partner_id.id if self.partner_id else False,
+
+            'default_salesperson_id':
+                self.user_id.id
+                if self.user_id
+                else False,
+
+            'default_customer_id':
+                self.partner_id.id
+                if self.partner_id
+                else False,
         }
 
         commission = self.commission_ids[:1]
+
         if len(self.commission_ids) == 1:
-            action['views'] = [(False, 'form')]
+
+            action['views'] = [
+                (False, 'form')
+            ]
+
             action['res_id'] = commission.id
 
         return action

@@ -2,11 +2,8 @@ from odoo import Command, api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 
-DEFAULT_COMMISSION_RATES = {
-    'ruba khattam': 1.5,
-    'loudy abdo': 5.0,
-    'baraa abo saleh': 2.0,
-}
+RUBA_COMMISSION_RATE = 1.5
+RUBA_NAME = 'ruba khattam'
 
 
 class SalesCommission(models.Model):
@@ -46,11 +43,9 @@ class SalesCommission(models.Model):
         index=True,
     )
 
-    # Not required anymore.
-    # Every invoice must appear even when Salesperson is empty.
     salesperson_id = fields.Many2one(
         'res.users',
-        string='Salesperson',
+        string='Commission For',
         index=True,
     )
 
@@ -76,7 +71,7 @@ class SalesCommission(models.Model):
     )
 
     training_value = fields.Monetary(
-        string='Invoice Value (Excl. Tax)',
+        string='Training Value',
         currency_field='currency_id',
         required=True,
         default=0.0,
@@ -93,14 +88,6 @@ class SalesCommission(models.Model):
         currency_field='currency_id',
         required=True,
         default=0.0,
-    )
-
-    # Once the user manually edits the rate, Lead/invoice sync must not
-    # overwrite that manual decision.
-    manual_rate = fields.Boolean(
-        string='Manual Commission Rate',
-        default=False,
-        copy=False,
     )
 
     commission_date = fields.Date(
@@ -121,6 +108,15 @@ class SalesCommission(models.Model):
         string='Status',
         required=True,
         default='draft',
+        index=True,
+    )
+
+    # Marks the one automatic Ruba 1.5% row generated for each invoice.
+    # Manual rows are False and remain fully editable.
+    is_auto_ruba = fields.Boolean(
+        string='Automatic Ruba Commission',
+        default=False,
+        copy=False,
         index=True,
     )
 
@@ -163,78 +159,73 @@ class SalesCommission(models.Model):
         string='Notes'
     )
 
-    _sql_constraints = [
-        (
-            'invoice_commission_unique',
-            'unique(invoice_id)',
-            'A commission record already exists for this invoice.',
-        ),
-    ]
+    # Intentionally NO unique(invoice_id) SQL constraint.
+    # One invoice may have:
+    # - the automatic Ruba 1.5% row
+    # - one or more additional manual commission rows
+    _sql_constraints = []
 
     @api.model
-    def _nil_normalize_salesperson_name(self, name):
+    def _nil_normalize_name(self, name):
         return ' '.join(
             (name or '').split()
         ).casefold()
 
     @api.model
-    def _nil_get_default_commission_rate(self, salesperson):
+    def _nil_get_ruba_user(self):
         """
-        Default only.
+        Return Ruba Khattam's Odoo user.
 
-        Ruba Khattam      = 1.5%
-        Loudy Abdo        = 5%
-        Baraa Abo Saleh   = 2%
-        Anyone else       = 0%
-
-        IMPORTANT:
-        These names NO LONGER control whether an invoice appears.
-        Every invoice appears. The rate is editable in Draft/Approved.
+        In this database Ruba is the main Administrator user.
+        We first match by name, then safely fall back to base.user_admin.
         """
-        if not salesperson:
-            return 0.0
-
-        normalized_name = (
-            self._nil_normalize_salesperson_name(
-                salesperson.name
-            )
+        Users = self.env[
+            'res.users'
+        ].sudo().with_context(
+            active_test=False
         )
 
-        return DEFAULT_COMMISSION_RATES.get(
-            normalized_name,
-            0.0,
+        candidates = Users.search([
+            ('name', 'ilike', 'Ruba Khattam'),
+        ])
+
+        for user in candidates:
+            if self._nil_normalize_name(
+                user.name
+            ) == RUBA_NAME:
+                return user
+
+        admin = self.env.ref(
+            'base.user_admin',
+            raise_if_not_found=False,
         )
 
-    # Backward-compatible helper in case older code still calls it.
-    @api.model
-    def _nil_get_commission_rate(self, salesperson):
-        return self._nil_get_default_commission_rate(
-            salesperson
-        )
+        if admin:
+            return admin
+
+        return Users.browse()
 
     @api.model
     def _nil_prepare_invoice_commission_migration(self):
         """
-        IMPORTANT:
-        Do NOT delete manual commission entries.
+        Preserve ALL manual entries.
 
-        The old code deleted every unpaid commission where invoice_id was
-        empty. That is exactly why manually entered rows could disappear
-        during module upgrade/backfill.
-
-        This migration only removes obsolete SQL constraints.
+        Also remove the old one-row-per-invoice constraint so one invoice can
+        have Ruba's automatic row plus additional manual commission rows.
         """
-        self.env.cr.execute(
-            'ALTER TABLE nil_sales_commission '
-            'DROP CONSTRAINT IF EXISTS '
-            'nil_sales_commission_lead_commission_unique'
-        )
+        constraint_names = [
+            'nil_sales_commission_lead_commission_unique',
+            'lead_commission_unique',
+            'nil_sales_commission_invoice_commission_unique',
+            'invoice_commission_unique',
+        ]
 
-        self.env.cr.execute(
-            'ALTER TABLE nil_sales_commission '
-            'DROP CONSTRAINT IF EXISTS '
-            'lead_commission_unique'
-        )
+        for constraint_name in constraint_names:
+            self.env.cr.execute(
+                'ALTER TABLE nil_sales_commission '
+                'DROP CONSTRAINT IF EXISTS %s'
+                % constraint_name
+            )
 
         return True
 
@@ -286,7 +277,9 @@ class SalesCommission(models.Model):
 
                 vals.setdefault(
                     'currency_id',
-                    invoice.currency_id.id,
+                    lead.currency_id.id
+                    if lead and lead.currency_id
+                    else invoice.currency_id.id,
                 )
 
                 vals.setdefault(
@@ -294,44 +287,49 @@ class SalesCommission(models.Model):
                     invoice.invoice_date,
                 )
 
+                # Commission basis is the training value on the CRM Lead,
+                # not the invoice untaxed amount.
                 vals.setdefault(
                     'training_value',
-                    invoice.amount_untaxed or 0.0,
+                    lead.total_training_price
+                    if lead
+                    else 0.0,
                 )
 
-                if not vals.get('salesperson_id'):
-                    salesperson = (
-                        invoice._nil_get_commission_salesperson()
-                    )
+            # Automatic Ruba rows always use Ruba + 1.5%.
+            if vals.get('is_auto_ruba'):
+                ruba_user = self._nil_get_ruba_user()
 
-                    vals['salesperson_id'] = (
-                        salesperson.id
-                        if salesperson
-                        else False
-                    )
-
-            salesperson = (
-                self.env['res.users'].browse(
-                    vals.get('salesperson_id')
+                vals['salesperson_id'] = (
+                    ruba_user.id
+                    if ruba_user
+                    else vals.get('salesperson_id')
                 )
-                if vals.get('salesperson_id')
-                else self.env['res.users']
-            )
 
-            if 'commission_rate' not in vals:
                 vals['commission_rate'] = (
-                    self._nil_get_default_commission_rate(
-                        salesperson
-                    )
+                    RUBA_COMMISSION_RATE
+                )
+
+            else:
+                # Manual entries stay manual.
+                vals.setdefault(
+                    'commission_rate',
+                    0.0,
                 )
 
             training_value = float(
-                vals.get('training_value', 0.0)
+                vals.get(
+                    'training_value',
+                    0.0,
+                )
                 or 0.0
             )
 
             commission_rate = float(
-                vals.get('commission_rate', 0.0)
+                vals.get(
+                    'commission_rate',
+                    0.0,
+                )
                 or 0.0
             )
 
@@ -339,15 +337,6 @@ class SalesCommission(models.Model):
                 training_value
                 * (commission_rate / 100.0)
             )
-
-            if not self.env.context.get(
-                'nil_auto_sync'
-            ):
-                if 'commission_rate' in vals:
-                    vals.setdefault(
-                        'manual_rate',
-                        True,
-                    )
 
         return super().create(vals_list)
 
@@ -363,6 +352,7 @@ class SalesCommission(models.Model):
             'commission_rate',
             'commission_amount',
             'commission_date',
+            'is_auto_ruba',
         }
 
         for rec in self:
@@ -373,9 +363,8 @@ class SalesCommission(models.Model):
                 )
             ):
                 raise UserError(_(
-                    'A paid commission is locked. '
-                    'Reverse/correct its journal entry '
-                    'before changing the commission values.'
+                    'A paid commission is locked because it already has '
+                    'an accounting entry.'
                 ))
 
         result = True
@@ -387,36 +376,18 @@ class SalesCommission(models.Model):
                 'nil_auto_sync'
             )
 
-            if (
-                'commission_rate' in rec_vals
-                and not auto_sync
-            ):
-                rec_vals['manual_rate'] = True
+            # Automatic Ruba row is always Ruba 1.5%.
+            if rec.is_auto_ruba and auto_sync:
+                ruba_user = rec._nil_get_ruba_user()
 
-            # If the salesperson is manually changed and the user has not
-            # manually fixed a rate, use the default rate for the new person.
-            if (
-                'salesperson_id' in rec_vals
-                and 'commission_rate' not in rec_vals
-                and not rec.manual_rate
-                and not auto_sync
-            ):
-                salesperson = (
-                    self.env['res.users'].browse(
-                        rec_vals.get(
-                            'salesperson_id'
-                        )
-                    )
-                    if rec_vals.get(
-                        'salesperson_id'
-                    )
-                    else self.env['res.users']
+                rec_vals['salesperson_id'] = (
+                    ruba_user.id
+                    if ruba_user
+                    else rec.salesperson_id.id
                 )
 
                 rec_vals['commission_rate'] = (
-                    self._nil_get_default_commission_rate(
-                        salesperson
-                    )
+                    RUBA_COMMISSION_RATE
                 )
 
             training_value = float(
@@ -452,23 +423,43 @@ class SalesCommission(models.Model):
         return result
 
     def unlink(self):
+        """
+        FULL delete freedom for every NON-PAID entry.
+
+        Manual row:
+            delete normally.
+
+        Automatic Ruba row:
+            deleting it also marks the invoice as Excluded so the next
+            backfill does not recreate it immediately.
+
+        Paid rows stay protected because they already have a posted journal
+        entry.
+        """
         if any(
             rec.state == 'paid'
             for rec in self
         ):
             raise UserError(_(
-                'Paid commissions cannot be deleted.'
+                'Paid commissions cannot be deleted while their journal '
+                'entry is posted.'
             ))
 
-        # Manual rows and invoice rows can be deleted.
-        # If an invoice row is deleted, a future full Backfill/Upgrade may
-        # recreate it. Use "Exclude" when you want a permanent, reversible
-        # exclusion.
+        auto_rows = self.filtered(
+            lambda rec:
+                rec.is_auto_ruba
+                and rec.invoice_id
+        )
+
+        for rec in auto_rows:
+            rec.invoice_id.sudo().write({
+                'exclude_from_commission': True,
+            })
+
         return super().unlink()
 
     @api.onchange(
         'invoice_id',
-        'salesperson_id',
         'commission_rate',
         'training_value',
     )
@@ -480,27 +471,29 @@ class SalesCommission(models.Model):
                     invoice._nil_get_commission_lead()
                 )
 
-                if not rec.lead_id:
-                    rec.lead_id = lead
+                rec.lead_id = lead
 
-                if not rec.customer_id:
-                    rec.customer_id = (
-                        lead.partner_id
-                        if lead and lead.partner_id
-                        else invoice.partner_id
-                    )
+                rec.customer_id = (
+                    lead.partner_id
+                    if lead and lead.partner_id
+                    else invoice.partner_id
+                )
 
                 rec.company_id = (
                     invoice.company_id
                 )
 
                 rec.currency_id = (
-                    invoice.currency_id
+                    lead.currency_id
+                    if lead and lead.currency_id
+                    else invoice.currency_id
                 )
 
+                # Commission is calculated on CRM Lead Total Training Price.
                 rec.training_value = (
-                    invoice.amount_untaxed
-                    or 0.0
+                    lead.total_training_price
+                    if lead
+                    else rec.training_value
                 )
 
                 rec.commission_date = (
@@ -510,10 +503,15 @@ class SalesCommission(models.Model):
                     )
                 )
 
-                if not rec.salesperson_id:
-                    rec.salesperson_id = (
-                        invoice._nil_get_commission_salesperson()
-                    )
+            if rec.is_auto_ruba:
+                ruba_user = (
+                    rec._nil_get_ruba_user()
+                )
+
+                rec.salesperson_id = ruba_user
+                rec.commission_rate = (
+                    RUBA_COMMISSION_RATE
+                )
 
             rec.commission_amount = (
                 (rec.training_value or 0.0)
@@ -525,9 +523,8 @@ class SalesCommission(models.Model):
 
     @api.constrains(
         'commission_rate',
-        'commission_amount',
     )
-    def _check_commission_values(self):
+    def _check_commission_rate(self):
         for rec in self:
             if rec.commission_rate < 0:
                 raise ValidationError(_(
@@ -546,7 +543,7 @@ class SalesCommission(models.Model):
 
             if not rec.salesperson_id:
                 raise UserError(_(
-                    'Please select a Salesperson before approval.'
+                    'Please select who receives this commission.'
                 ))
 
             if rec.commission_rate <= 0:
@@ -554,14 +551,10 @@ class SalesCommission(models.Model):
                     'Commission percentage must be greater than zero.'
                 ))
 
-            if rec.commission_amount <= 0:
-                raise UserError(_(
-                    'Commission amount must be greater than zero.'
-                ))
-
             if rec.invoice_id:
                 rec.invoice_id.sudo().write({
-                    'exclude_from_commission': False,
+                    'exclude_from_commission':
+                        False,
                 })
 
             rec.write({
@@ -577,40 +570,60 @@ class SalesCommission(models.Model):
                     'A paid commission cannot be excluded.'
                 ))
 
-            if rec.invoice_id:
+            if rec.is_auto_ruba and rec.invoice_id:
                 rec.invoice_id.sudo().write({
-                    'exclude_from_commission': True,
+                    'exclude_from_commission':
+                        True,
                 })
 
             rec.write({
                 'state': 'excluded',
             })
 
-        return True
+        # Immediately return to the normal ledger.
+        # The normal ledger hides Excluded rows, so the invoice disappears
+        # from the user's working list as soon as it is excluded.
+        return self.env['ir.actions.actions']._for_xml_id(
+            'nil_sales_commission.action_sales_commission'
+        )
 
     def action_reset_draft(self):
+        """
+        Works for BOTH automatic and manually created non-paid entries.
+
+        If the row was excluded, Reset to Draft makes it visible again
+        in the normal Commission Ledger.
+        """
         for rec in self:
             if rec.state == 'paid':
                 raise UserError(_(
                     'A paid commission cannot be reset to Draft.'
                 ))
 
-            if rec.invoice_id:
+            if rec.is_auto_ruba and rec.invoice_id:
                 rec.invoice_id.sudo().write({
-                    'exclude_from_commission': False,
+                    'exclude_from_commission':
+                        False,
                 })
 
             rec.write({
                 'state': 'draft',
             })
 
-        return True
+        return self.env['ir.actions.actions']._for_xml_id(
+            'nil_sales_commission.action_sales_commission'
+        )
 
     def action_mark_paid(self):
         for rec in self:
             if rec.state != 'pending':
                 raise UserError(_(
                     'Only Approved commissions can be marked as paid.'
+                ))
+
+            if not rec.salesperson_id:
+                raise UserError(_(
+                    'Please select who receives this commission.'
                 ))
 
             if rec.commission_amount <= 0:
@@ -638,9 +651,7 @@ class SalesCommission(models.Model):
             )
 
             company = rec.company_id
-            company_currency = (
-                company.currency_id
-            )
+            company_currency = company.currency_id
             currency = rec.currency_id
 
             company_amount = currency._convert(
@@ -660,28 +671,18 @@ class SalesCommission(models.Model):
 
             line_name = _(
                 'Sales Commission - %(salesperson)s - %(source)s',
-                salesperson=(
-                    rec.salesperson_id.name
-                    if rec.salesperson_id
-                    else 'N/A'
-                ),
+                salesperson=rec.salesperson_id.name,
                 source=source_name,
             )
 
-            partner = (
-                rec.salesperson_id.partner_id
-                if rec.salesperson_id
-                else self.env['res.partner']
-            )
+            partner = rec.salesperson_id.partner_id
 
             debit_line = {
                 'name': line_name,
                 'account_id':
                     rec.expense_account_id.id,
                 'partner_id':
-                    partner.id
-                    if partner
-                    else False,
+                    partner.id,
                 'debit': company_amount,
                 'credit': 0.0,
             }
@@ -691,9 +692,7 @@ class SalesCommission(models.Model):
                 'account_id':
                     rec.payment_account_id.id,
                 'partner_id':
-                    partner.id
-                    if partner
-                    else False,
+                    partner.id,
                 'debit': 0.0,
                 'credit': company_amount,
             }
@@ -744,7 +743,7 @@ class SalesCommission(models.Model):
 
         return True
 
-    # Keep old methods working if old buttons/actions still exist somewhere.
+    # Compatibility with buttons/actions from older module versions.
     def action_cancel(self):
         return self.action_exclude()
 

@@ -90,9 +90,12 @@
 
                         <tree editable="bottom">
 
-                            <!-- Hidden field used for readonly condition -->
+                            <!--
+                                Needed only for the readonly condition.
+                                Hidden from the table.
+                            -->
                             <field name="payment_method"
-                                   invisible="1"/>
+                                   column_invisible="1"/>
 
 
                             <!-- Learning Partner -->
@@ -102,20 +105,16 @@
 
 
                             <!--
-                                Editable:
-                                - Cash + Any Partner
-                                - CLC + Any Partner except EnterOne
+                                Partner Share:
 
-                                Readonly:
-                                - CLC + EnterOne
+                                Cash + any partner = Editable
+                                CLC + other partner = Editable
+                                CLC + EnterOne = Readonly / Automatic
                             -->
                             <field name="training_vendor"
                                    string="Partner Share"
                                    width="120"
-                                   attrs="{'readonly': [
-                                       ('learning_partner', '=', 'EnterOne'),
-                                       ('payment_method', '=', 'clc')
-                                   ]}"
+                                   readonly="learning_partner == 'EnterOne' and payment_method == 'clc'"
                                    force_save="1"/>
 
 
@@ -145,14 +144,14 @@
                                    readonly="1"/>
 
 
-                            <!-- NIL ME Net Profit -->
+                            <!-- NIL ME Share -->
                             <field name="nilme_share"
                                    string="NIL ME Share $"
                                    width="130"
                                    readonly="1"/>
 
 
-                            <!-- Profit Margin -->
+                            <!-- Margin -->
                             <field name="margin"
                                    string="Margin (%)"
                                    widget="percentage"

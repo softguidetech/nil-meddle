@@ -153,6 +153,11 @@ class SalesCommission(models.Model):
     ]
 
     @api.model
+    def _nil_normalize_salesperson_name(self, name):
+        """Normalize case and repeated/extra spaces in salesperson names."""
+        return ' '.join((name or '').split()).casefold()
+
+    @api.model
     def _nil_get_commission_rate(self, salesperson):
         """
         Return the commission rate for an approved salesperson.
@@ -166,8 +171,16 @@ class SalesCommission(models.Model):
         if not salesperson:
             return 0.0
 
-        salesperson_name = (salesperson.name or '').strip().lower()
-        return COMMISSION_RATES.get(salesperson_name, 0.0)
+        salesperson_name = self._nil_normalize_salesperson_name(
+            salesperson.name
+        )
+
+        normalized_rates = {
+            self._nil_normalize_salesperson_name(name): rate
+            for name, rate in COMMISSION_RATES.items()
+        }
+
+        return normalized_rates.get(salesperson_name, 0.0)
 
     @api.model
     def _nil_is_allowed_salesperson(self, salesperson):

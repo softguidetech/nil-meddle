@@ -2,6 +2,15 @@ from odoo import Command, api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 
+# Commission rates are driven by the CURRENT salesperson on the CRM Lead.
+# Matching is case-insensitive and ignores surrounding spaces.
+COMMISSION_RATES = {
+    'ruba khattam': 1.5,
+    'loudy abdo': 5.0,
+    'baraa abo saleh': 2.0,
+}
+
+
 class SalesCommission(models.Model):
     _name = 'nil.sales.commission'
     _description = 'Sales Commission'
@@ -68,7 +77,7 @@ class SalesCommission(models.Model):
 
     commission_rate = fields.Float(
         string='Commission %',
-        default=5.0,
+        default=0.0,
         required=True,
         readonly=True,
     )
@@ -144,6 +153,27 @@ class SalesCommission(models.Model):
     ]
 
     @api.model
+    def _nil_get_commission_rate(self, salesperson):
+        """
+        Return the commission rate for an approved salesperson.
+
+        Ruba Khattam      = 1.5%
+        Loudy Abdo        = 5%
+        Baraa Abo Saleh   = 2%
+
+        Anyone else       = 0%
+        """
+        if not salesperson:
+            return 0.0
+
+        salesperson_name = (salesperson.name or '').strip().lower()
+        return COMMISSION_RATES.get(salesperson_name, 0.0)
+
+    @api.model
+    def _nil_is_allowed_salesperson(self, salesperson):
+        return self._nil_get_commission_rate(salesperson) > 0.0
+
+    @api.model
     def _nil_prepare_invoice_commission_migration(self):
         """
         Remove the old one-commission-per-lead database constraint and clear
@@ -179,15 +209,39 @@ class SalesCommission(models.Model):
             invoice_id = vals.get('invoice_id')
             if invoice_id:
                 invoice = self.env['account.move'].browse(invoice_id)
-                vals.setdefault('customer_id', invoice.partner_id.id if invoice.partner_id else False)
+                lead = invoice._nil_get_commission_lead()
+
+                vals.setdefault('lead_id', lead.id if lead else False)
+                vals.setdefault(
+                    'customer_id',
+                    lead.partner_id.id
+                    if lead and lead.partner_id
+                    else invoice.partner_id.id
+                    if invoice.partner_id
+                    else False,
+                )
                 vals.setdefault('company_id', invoice.company_id.id)
                 vals.setdefault('currency_id', invoice.currency_id.id)
                 vals.setdefault('commission_date', invoice.invoice_date)
                 vals.setdefault('training_value', invoice.amount_untaxed or 0.0)
 
-            training_value = vals.get('training_value', 0.0) or 0.0
-            vals['commission_rate'] = 5.0
-            vals['commission_amount'] = training_value * 0.05
+                if not vals.get('salesperson_id'):
+                    salesperson = invoice._nil_get_commission_salesperson()
+                    vals['salesperson_id'] = salesperson.id if salesperson else False
+
+            salesperson = (
+                self.env['res.users'].browse(vals.get('salesperson_id'))
+                if vals.get('salesperson_id')
+                else self.env['res.users']
+            )
+
+            training_value = float(vals.get('training_value', 0.0) or 0.0)
+            commission_rate = self._nil_get_commission_rate(salesperson)
+
+            vals['commission_rate'] = commission_rate
+            vals['commission_amount'] = (
+                training_value * (commission_rate / 100.0)
+            )
 
         return super().create(vals_list)
 
@@ -211,43 +265,82 @@ class SalesCommission(models.Model):
                     'A paid commission is locked. Reverse/correct its journal entry before changing the commission values.'
                 ))
 
-        if 'training_value' in vals:
-            vals = dict(vals)
-            vals['commission_rate'] = 5.0
-            vals['commission_amount'] = (vals.get('training_value') or 0.0) * 0.05
+        result = True
 
-        return super().write(vals)
+        # Recalculate rate and amount per record because the rate depends
+        # on the salesperson assigned to that specific commission row.
+        for rec in self:
+            rec_vals = dict(vals)
+
+            salesperson = (
+                self.env['res.users'].browse(rec_vals['salesperson_id'])
+                if rec_vals.get('salesperson_id')
+                else rec.salesperson_id
+            )
+
+            training_value = float(
+                rec_vals.get('training_value', rec.training_value) or 0.0
+            )
+
+            if (
+                'salesperson_id' in rec_vals
+                or 'training_value' in rec_vals
+            ):
+                commission_rate = self._nil_get_commission_rate(salesperson)
+                rec_vals['commission_rate'] = commission_rate
+                rec_vals['commission_amount'] = (
+                    training_value * (commission_rate / 100.0)
+                )
+
+            result = super(SalesCommission, rec).write(rec_vals)
+
+        return result
 
     def unlink(self):
         if any(rec.state == 'paid' for rec in self):
             raise UserError(_('Paid commissions cannot be deleted.'))
         return super().unlink()
 
-    @api.onchange('invoice_id')
+    @api.onchange('invoice_id', 'salesperson_id')
     def _onchange_invoice_id(self):
         for rec in self:
-            if not rec.invoice_id:
-                continue
+            if rec.invoice_id:
+                invoice = rec.invoice_id
+                lead = invoice._nil_get_commission_lead()
+                salesperson = (
+                    lead.user_id
+                    if lead
+                    else invoice._nil_get_commission_salesperson()
+                )
 
-            invoice = rec.invoice_id
-            lead = invoice._nil_get_commission_lead()
-            salesperson = invoice._nil_get_commission_salesperson()
+                rec.lead_id = lead
+                rec.salesperson_id = salesperson
+                rec.customer_id = (
+                    lead.partner_id
+                    if lead and lead.partner_id
+                    else invoice.partner_id
+                )
+                rec.company_id = invoice.company_id
+                rec.currency_id = invoice.currency_id
+                rec.training_value = invoice.amount_untaxed or 0.0
+                rec.commission_date = (
+                    invoice.invoice_date
+                    or fields.Date.context_today(rec)
+                )
 
-            rec.lead_id = lead
-            rec.salesperson_id = salesperson
-            rec.customer_id = invoice.partner_id
-            rec.company_id = invoice.company_id
-            rec.currency_id = invoice.currency_id
-            rec.training_value = invoice.amount_untaxed or 0.0
-            rec.commission_rate = 5.0
-            rec.commission_amount = (invoice.amount_untaxed or 0.0) * 0.05
-            rec.commission_date = invoice.invoice_date or fields.Date.context_today(rec)
+            rate = rec._nil_get_commission_rate(rec.salesperson_id)
+            rec.commission_rate = rate
+            rec.commission_amount = (
+                (rec.training_value or 0.0) * (rate / 100.0)
+            )
 
     @api.constrains('training_value', 'commission_amount')
     def _check_non_negative_amounts(self):
         for rec in self:
             if rec.training_value < 0 or rec.commission_amount < 0:
-                raise ValidationError(_('Invoice value and commission amount cannot be negative.'))
+                raise ValidationError(
+                    _('Invoice value and commission amount cannot be negative.')
+                )
 
     def action_mark_paid(self):
         for rec in self:
@@ -344,14 +437,18 @@ class SalesCommission(models.Model):
     def action_cancel(self):
         for rec in self:
             if rec.state == 'paid':
-                raise UserError(_('A paid commission cannot be cancelled from here.'))
+                raise UserError(
+                    _('A paid commission cannot be cancelled from here.')
+                )
             rec.state = 'cancelled'
         return True
 
     def action_reset_pending(self):
         for rec in self:
             if rec.state != 'cancelled':
-                raise UserError(_('Only cancelled commissions can be reset to pending.'))
+                raise UserError(
+                    _('Only cancelled commissions can be reset to pending.')
+                )
             rec.state = 'pending'
         return True
 
@@ -359,6 +456,7 @@ class SalesCommission(models.Model):
         self.ensure_one()
         if not self.move_id:
             raise UserError(_('No journal entry is linked to this commission.'))
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('Journal Entry'),

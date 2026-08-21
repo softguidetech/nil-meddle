@@ -9,18 +9,14 @@
 
         <field name="arch" type="xml">
 
-            <!-- Instructor -->
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
             </xpath>
 
-            <!-- Ordering Partner -->
             <xpath expr="//field[@name='partner_id']" position="after">
                 <field name="ordering_partner_id"/>
             </xpath>
 
-
-            <!-- Pages -->
             <xpath expr="//page[@name='internal_notes']" position="before">
 
                 <!-- ===================================================== -->
@@ -81,10 +77,12 @@
                 <page id="clcs" name="Costs Details">
 
                     <group>
+
                         <button name="action_create_cost_line"
                                 type="object"
                                 string="Add Cost Line"
                                 class="oe_highlight"/>
+
                     </group>
 
 
@@ -92,46 +90,62 @@
 
                         <tree editable="bottom">
 
-                            <!-- Partner -->
+                            <!-- Hidden field used for readonly condition -->
+                            <field name="payment_method"
+                                   invisible="1"/>
+
+
+                            <!-- Learning Partner -->
                             <field name="learning_partner"
                                    string="Learning Partner"
                                    width="140"/>
 
+
                             <!--
-                                Manual for normal partners.
-                                Automatically calculated for EnterOne,
-                                therefore readonly when EnterOne is selected.
+                                Editable:
+                                - Cash + Any Partner
+                                - CLC + Any Partner except EnterOne
+
+                                Readonly:
+                                - CLC + EnterOne
                             -->
                             <field name="training_vendor"
                                    string="Partner Share"
                                    width="120"
-                                   attrs="{'readonly': [('learning_partner', '=', 'EnterOne')]}"
+                                   attrs="{'readonly': [
+                                       ('learning_partner', '=', 'EnterOne'),
+                                       ('payment_method', '=', 'clc')
+                                   ]}"
                                    force_save="1"/>
 
 
-                            <!-- Direct Costs -->
+                            <!-- Logistics -->
                             <field name="total_price_all"
                                    string="Logistics Cost"
                                    width="120"
                                    readonly="1"/>
 
+
+                            <!-- Kits & Labs -->
                             <field name="clc_cost"
                                    string="Kits &amp; Labs"
                                    width="110"/>
 
+
+                            <!-- Instructor -->
                             <field name="ins_time"
                                    string="Instructor"
                                    width="110"/>
 
 
-                            <!-- Total Cost -->
+                            <!-- Total Costs -->
                             <field name="margin1"
                                    string="Total Costs"
                                    width="120"
                                    readonly="1"/>
 
 
-                            <!-- NIL ME Profit -->
+                            <!-- NIL ME Net Profit -->
                             <field name="nilme_share"
                                    string="NIL ME Share $"
                                    width="130"

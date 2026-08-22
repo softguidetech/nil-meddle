@@ -190,6 +190,30 @@ class SalesCommission(models.Model):
         compute_sudo=True,
     )
 
+    profit_learning_partner = fields.Char(
+        string='Learning Partner',
+        compute='_compute_profit_margin_summary',
+        compute_sudo=True,
+    )
+
+    profit_total_costs = fields.Float(
+        string='Total Costs',
+        compute='_compute_profit_margin_summary',
+        compute_sudo=True,
+    )
+
+    profit_nilme_share = fields.Float(
+        string='NIL ME Share $',
+        compute='_compute_profit_margin_summary',
+        compute_sudo=True,
+    )
+
+    profit_margin_pct = fields.Float(
+        string='Margin (%)',
+        compute='_compute_profit_margin_summary',
+        compute_sudo=True,
+    )
+
     @api.depends(
         'lead_id',
         'lead_id.cost_details_ids',
@@ -204,6 +228,49 @@ class SalesCommission(models.Model):
                 rec.lead_id.cost_details_ids.sudo()
                 if rec.lead_id
                 else self.env['cost.details']
+            )
+
+    @api.depends(
+        'lead_id',
+        'lead_id.total_training_price',
+        'lead_id.cost_details_ids',
+        'lead_id.cost_details_ids.nilme_share',
+        'lead_id.cost_details_ids.margin1',
+        'lead_id.cost_details_ids.learning_partner',
+    )
+    def _compute_profit_margin_summary(self):
+        for rec in self:
+            cost_lines = (
+                rec.lead_id.cost_details_ids.sudo()
+                if rec.lead_id
+                else self.env['cost.details']
+            )
+
+            partner_labels = []
+            for line in cost_lines:
+                if line.learning_partner:
+                    label = dict(
+                        line._fields['learning_partner'].selection
+                    ).get(
+                        line.learning_partner,
+                        line.learning_partner,
+                    )
+                    if label not in partner_labels:
+                        partner_labels.append(label)
+
+            total_costs = sum(cost_lines.mapped('margin1'))
+            nilme_share = sum(cost_lines.mapped('nilme_share'))
+            total_training_price = float(
+                rec.lead_id.total_training_price or 0.0
+            ) if rec.lead_id else 0.0
+
+            rec.profit_learning_partner = ', '.join(partner_labels)
+            rec.profit_total_costs = total_costs
+            rec.profit_nilme_share = nilme_share
+            rec.profit_margin_pct = (
+                (nilme_share / total_training_price) * 100.0
+                if total_training_price
+                else 0.0
             )
 
     _sql_constraints = [

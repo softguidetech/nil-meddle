@@ -183,6 +183,29 @@ class SalesCommission(models.Model):
         string='Notes'
     )
 
+    cost_detail_ids = fields.Many2many(
+        'cost.details',
+        string='Cost Details Margin',
+        compute='_compute_cost_detail_ids',
+        compute_sudo=True,
+    )
+
+    @api.depends(
+        'lead_id',
+        'lead_id.cost_details_ids',
+        'lead_id.cost_details_ids.nilme_share',
+        'lead_id.cost_details_ids.margin',
+        'lead_id.cost_details_ids.margin1',
+        'lead_id.cost_details_ids.learning_partner',
+    )
+    def _compute_cost_detail_ids(self):
+        for rec in self:
+            rec.cost_detail_ids = (
+                rec.lead_id.cost_details_ids.sudo()
+                if rec.lead_id
+                else self.env['cost.details']
+            )
+
     _sql_constraints = [
         (
             'auto_invoice_commission_unique',

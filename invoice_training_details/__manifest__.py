@@ -1,17 +1,15 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Invoice Training Details",
-    "version": "17.0.1.4",
+    "version": "17.0.1.5",
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
 
-    # Author Information
     "author": "SoftGuide Tech",
     "website": "https://www.softguidetech.com",
     "license": "LGPL-3",
 
-    # Dependencies
     "depends": [
         "account",
         "crm",
@@ -20,22 +18,19 @@
         "product"
     ],
 
-    # Data Files
     "data": [
         "data/report_paperformat.xml",
         "security/ir.model.access.csv",
         "views/account_move_views.xml",
 
-        # Load LCP before the main CRM inherited view.
-        # This keeps the stored LCP view synchronized before
-        # Odoo revalidates crm_lead_views.xml.
+        # LCP must load before crm_lead_views.xml so any older
+        # stored LCP view is replaced before CRM revalidation.
         "views/lcp_details_views.xml",
         "views/crm_lead_views.xml",
 
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
 
-        # Reports
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",
         "reports/report_quotation.xml",
@@ -51,7 +46,6 @@
         ],
     },
 
-    # Installation Settings
     "installable": True,
     "application": False,
     "auto_install": False,

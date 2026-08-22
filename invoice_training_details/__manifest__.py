@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Invoice Training Details",
-    "version": "17.0.1.5",
+    "version": "17.0.1.7",
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
@@ -23,8 +23,7 @@
         "security/ir.model.access.csv",
         "views/account_move_views.xml",
 
-        # LCP must load before crm_lead_views.xml so any older
-        # stored LCP view is replaced before CRM revalidation.
+        # IMPORTANT: LCP before CRM main inherited view.
         "views/lcp_details_views.xml",
         "views/crm_lead_views.xml",
 

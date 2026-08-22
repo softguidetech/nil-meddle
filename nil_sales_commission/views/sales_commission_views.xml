@@ -173,33 +173,71 @@
                     </group>
 
                     <group string="Profit Margin"
-                           col="1"
                            invisible="not lead_id">
+                        <div class="row mt16 mb16">
+                            <div class="col-3">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="text-muted mb-1">Learning Partner</div>
+                                    <h3 class="m-0">
+                                        <field name="profit_learning_partner" nolabel="1" readonly="1"/>
+                                    </h3>
+                                </div>
+                            </div>
 
-                        <field name="cost_detail_ids"
-                               nolabel="1"
-                               readonly="1">
+                            <div class="col-3">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="text-muted mb-1">Total Costs</div>
+                                    <h3 class="m-0">
+                                        <field name="profit_total_costs" nolabel="1" readonly="1"/>
+                                    </h3>
+                                </div>
+                            </div>
 
-                            <tree create="0"
-                                  edit="0"
-                                  delete="0">
+                            <div class="col-3">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="text-muted mb-1">NIL ME Share $</div>
+                                    <h3 class="m-0">
+                                        <field name="profit_nilme_share" nolabel="1" readonly="1"/>
+                                    </h3>
+                                </div>
+                            </div>
 
-                                <field name="learning_partner"
-                                       string="Learning Partner"/>
+                            <div class="col-3">
+                                <div class="border rounded p-3 bg-light">
+                                    <div class="text-muted mb-1">Margin (%)</div>
+                                    <h3 class="m-0">
+                                        <field name="profit_margin_pct" nolabel="1" readonly="1" widget="percentage"/>
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
 
-                                <field name="margin1"
-                                       string="Total Costs"/>
+                        <group string="Cost Details Lines" col="1">
+                            <field name="cost_detail_ids"
+                                   nolabel="1"
+                                   readonly="1">
 
-                                <field name="nilme_share"
-                                       string="NIL ME Share $"/>
+                                <tree create="0"
+                                      edit="0"
+                                      delete="0">
 
-                                <field name="margin"
-                                       string="Margin (%)"
-                                       widget="percentage"/>
+                                    <field name="learning_partner"
+                                           string="Learning Partner"/>
 
-                            </tree>
+                                    <field name="margin1"
+                                           string="Total Costs"/>
 
-                        </field>
+                                    <field name="nilme_share"
+                                           string="NIL ME Share $"/>
+
+                                    <field name="margin"
+                                           string="Margin (%)"
+                                           widget="percentage"/>
+
+                                </tree>
+
+                            </field>
+                        </group>
 
                     </group>
 

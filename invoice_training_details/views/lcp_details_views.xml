@@ -1,6 +1,95 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
+    <!-- ========================================================= -->
+    <!-- TRAINING COURSE LCP EDIT FORM -->
+    <!-- Opens as a clean modal when a training pricing card is clicked -->
+    <!-- ========================================================= -->
+
+    <record id="view_training_course_lcp_form" model="ir.ui.view">
+        <field name="name">training.course.lcp.form</field>
+        <field name="model">training.course</field>
+
+        <field name="arch" type="xml">
+            <form string="Training Pricing">
+
+                <sheet>
+
+                    <group string="Course">
+                        <group>
+                            <field name="training_id"/>
+                            <field name="descriptions"/>
+                            <field name="location"/>
+                            <field name="where_location2"
+                                   string="Country / City"/>
+                        </group>
+
+                        <group>
+                            <field name="training_date_start"/>
+                            <field name="training_date_end"/>
+                            <field name="duration"/>
+                            <field name="lcp_days"
+                                   readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="Pricing">
+                        <group>
+                            <field name="no_of_student"
+                                   string="Seats"/>
+
+                            <field name="payment_method"/>
+
+                            <field name="clcs_qty"
+                                   string="CLCs / Seat"
+                                   invisible="payment_method != 'clc'"/>
+
+                            <field name="lcp_total_clcs_with_vat"
+                                   string="Total CLCs + VAT"
+                                   readonly="1"
+                                   invisible="payment_method != 'clc'"/>
+                        </group>
+
+                        <group>
+                            <field name="lcp_currency_id"
+                                   invisible="1"/>
+
+                            <field name="lcp_rate_card"/>
+
+                            <field name="lcp_total_rate_card"
+                                   readonly="1"/>
+
+                            <field name="lcp_instructor_rate_day"/>
+
+                            <field name="lcp_total_instructor_cost"
+                                   readonly="1"/>
+                        </group>
+                    </group>
+
+                    <group string="On-site Estimate"
+                           invisible="location != 'On site'">
+                        <group>
+                            <field name="lcp_per_diem_total"
+                                   readonly="1"/>
+                        </group>
+
+                        <group>
+                            <field name="lcp_uber_total"
+                                   readonly="1"/>
+                        </group>
+                    </group>
+
+                </sheet>
+
+            </form>
+        </field>
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- CRM LEAD: LCP DETAILS TAB -->
+    <!-- ========================================================= -->
+
     <record id="crm_lead_view_form_lcp_details" model="ir.ui.view">
         <field name="name">crm.lead.form.lcp.details</field>
         <field name="model">crm.lead</field>
@@ -8,197 +97,499 @@
 
         <field name="arch" type="xml">
 
-            <xpath expr="//page[@name='internal_notes']" position="before">
+            <xpath expr="//page[@name='internal_notes']"
+                   position="before">
 
-                <page name="lcp_details" string="LCP Details">
-
-                    <!-- ================================================= -->
-                    <!-- DEAL / PRICING SETUP -->
-                    <!-- ================================================= -->
-
-                    <group string="Pricing Setup" col="4">
-
-                        <field name="training_name"
-                               string="Customer"/>
-
-                        <field name="ordering_partner_id"
-                               string="Partner"/>
-
-                        <field name="so_no"
-                               string="SO#"/>
-
-                        <field name="total_training_price"
-                               string="Training Value"
-                               readonly="1"/>
-
-                        <field name="lcp_vat_rate"
-                               string="VAT %"/>
-
-                        <field name="lcp_instructor_source"/>
-
-                        <field name="lcp_uber_day_rate"/>
-
-                        <field name="lcp_per_diem_rate"/>
-
-                    </group>
+                <page name="lcp_details"
+                      string="LCP Details">
 
                     <!-- ================================================= -->
-                    <!-- TRAINING PRICING -->
+                    <!-- 1. PRICING SETUP -->
                     <!-- ================================================= -->
 
-                    <separator string="Training Pricing"/>
+                    <separator string="1. Pricing Setup"/>
 
-                    <field name="training_course_ids"
-                           nolabel="1">
+                    <group col="3">
 
-                        <tree editable="bottom">
+                        <group>
+                            <field name="ordering_partner_id"
+                                   string="Ordering Partner"/>
 
-                            <field name="training_id"
-                                   string="Class"/>
+                            <field name="learnig_partner"
+                                   string="Learning Partner"/>
 
-                            <field name="descriptions"
-                                   string="Description"
-                                   optional="hide"/>
-
-                            <field name="location"/>
-
-                            <field name="where_location2"
-                                   string="Country / City"
-                                   optional="show"/>
-
-                            <field name="lcp_days"
-                                   string="Days"
-                                   readonly="1"/>
-
-                            <field name="no_of_student"
-                                   string="Seats"/>
-
-                            <field name="payment_method"
-                                   string="Payment"/>
-
-                            <field name="clcs_qty"
-                                   string="CLCs / Seat"/>
-
-                            <field name="lcp_clcs_with_vat"
-                                   string="CLCs + VAT"
-                                   readonly="1"
-                                   optional="hide"/>
-
-                            <field name="lcp_total_clcs_with_vat"
-                                   string="Total CLCs + VAT"
-                                   readonly="1"/>
-
-                            <field name="lcp_rate_card"
-                                   string="Rate Card / Seat"/>
-
-                            <field name="lcp_total_rate_card"
-                                   string="Total Rate Card"
-                                   readonly="1"/>
-
-                            <field name="lcp_instructor_rate_day"
-                                   string="Instructor / Day"
-                                   optional="show"/>
-
-                            <field name="lcp_total_instructor_cost"
-                                   string="Instructor Cost"
-                                   readonly="1"
-                                   optional="show"/>
-
-                            <field name="lcp_per_diem_total"
-                                   string="Per Diem"
-                                   readonly="1"
-                                   optional="hide"/>
-
-                            <field name="lcp_uber_total"
-                                   string="Uber"
-                                   readonly="1"
-                                   optional="hide"/>
-
-                        </tree>
-
-                    </field>
-
-                    <!-- ================================================= -->
-                    <!-- SUMMARY -->
-                    <!-- ================================================= -->
-
-                    <separator string="LCP Summary"/>
-
-                    <group col="4">
-
-                        <group string="Training Totals">
-
-                            <field name="lcp_total_days"
-                                   readonly="1"/>
-
-                            <field name="lcp_total_clcs_with_vat"
-                                   readonly="1"/>
-
-                            <field name="lcp_total_rate_card"
-                                   readonly="1"/>
-
-                            <field name="lcp_total_instructor_cost"
-                                   readonly="1"/>
-
-                            <field name="lcp_total_per_diem"
-                                   readonly="1"/>
-
-                            <field name="lcp_total_uber_estimate"
-                                   readonly="1"/>
-
+                            <field name="so_no"
+                                   string="SO#"/>
                         </group>
 
-                        <group string="Existing Logistics">
+                        <group>
+                            <field name="currency_id"
+                                   invisible="1"/>
 
-                            <field name="lcp_ticket_total"
+                            <field name="total_training_price"
+                                   string="Training Value"
+                                   widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
                                    readonly="1"/>
 
-                            <field name="lcp_hotel_total"
-                                   readonly="1"/>
+                            <field name="lcp_vat_rate"/>
 
-                            <field name="venue"
-                                   string="Venue"/>
+                            <field name="lcp_instructor_source"/>
+
+                            <field name="instructor_id"
+                                   string="Instructor"/>
+                        </group>
+
+                        <group>
+                            <field name="lcp_uber_day_rate"/>
+
+                            <field name="lcp_per_diem_rate"/>
+
+                            <field name="venue"/>
 
                             <field name="ctrng"
                                    string="Catering"/>
-
-                            <field name="uber"
-                                   string="Current Uber"/>
-
-                        </group>
-
-                        <group string="Cost Details Result">
-
-                            <field name="lcp_learning_partner"
-                                   readonly="1"/>
-
-                            <field name="lcp_partner_share"
-                                   readonly="1"/>
-
-                            <field name="lcp_total_costs"
-                                   readonly="1"/>
-
-                            <field name="lcp_nilme_profit"
-                                   readonly="1"/>
-
-                            <field name="lcp_profit_margin"
-                                   widget="percentage"
-                                   readonly="1"/>
-
-                            <field name="lcp_sales_commission"
-                                   readonly="1"/>
-
                         </group>
 
                     </group>
 
-                    <div class="alert alert-warning"
+
+                    <!-- ================================================= -->
+                    <!-- 2. TRAINING PRICING -->
+                    <!-- No horizontal table: each course is a full-width card -->
+                    <!-- ================================================= -->
+
+                    <separator string="2. Training Pricing"/>
+
+                    <field name="training_course_ids"
+                           mode="kanban"
+                           nolabel="1"
+                           context="{
+                               'form_view_ref':
+                               'invoice_training_details.view_training_course_lcp_form'
+                           }">
+
+                        <kanban create="1"
+                                quick_create="false"
+                                records_draggable="false">
+
+                            <field name="training_id"/>
+                            <field name="descriptions"/>
+                            <field name="location"/>
+                            <field name="where_location2"/>
+                            <field name="training_date_start"/>
+                            <field name="training_date_end"/>
+                            <field name="lcp_days"/>
+                            <field name="no_of_student"/>
+                            <field name="payment_method"/>
+                            <field name="clcs_qty"/>
+                            <field name="lcp_total_clcs_with_vat"/>
+                            <field name="lcp_currency_id"/>
+                            <field name="lcp_rate_card"/>
+                            <field name="lcp_total_rate_card"/>
+                            <field name="lcp_instructor_rate_day"/>
+                            <field name="lcp_total_instructor_cost"/>
+                            <field name="lcp_per_diem_total"/>
+
+                            <templates>
+
+                                <t t-name="kanban-box">
+
+                                    <div class="oe_kanban_global_click o_kanban_record"
+                                         style="width:100%; max-width:100%; flex-basis:100%;">
+
+                                        <!-- Course Header -->
+                                        <div class="d-flex justify-content-between align-items-start mb-3">
+
+                                            <div>
+                                                <div class="fw-bold fs-4">
+                                                    <field name="training_id"/>
+                                                </div>
+
+                                                <div class="text-muted mt-1">
+                                                    <field name="descriptions"/>
+                                                </div>
+
+                                                <div class="text-muted mt-2">
+                                                    <field name="where_location2"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="text-end">
+                                                <span class="badge rounded-pill text-bg-light me-1">
+                                                    <field name="location"/>
+                                                </span>
+
+                                                <span class="badge rounded-pill text-bg-light">
+                                                    <field name="payment_method"/>
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- Basic Course Info -->
+                                        <div class="d-flex flex-wrap gap-2 mb-3">
+
+                                            <div class="border rounded p-2 bg-light"
+                                                 style="min-width:120px;">
+                                                <div class="text-muted small">
+                                                    Days
+                                                </div>
+                                                <div class="fw-bold fs-5">
+                                                    <field name="lcp_days"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="border rounded p-2 bg-light"
+                                                 style="min-width:120px;">
+                                                <div class="text-muted small">
+                                                    Seats
+                                                </div>
+                                                <div class="fw-bold fs-5">
+                                                    <field name="no_of_student"/>
+                                                </div>
+                                            </div>
+
+                                            <t t-if="record.payment_method.raw_value == 'clc'">
+
+                                                <div class="border rounded p-2 bg-light"
+                                                     style="min-width:135px;">
+                                                    <div class="text-muted small">
+                                                        CLCs / Seat
+                                                    </div>
+                                                    <div class="fw-bold fs-5">
+                                                        <field name="clcs_qty"/>
+                                                    </div>
+                                                </div>
+
+                                                <div class="border rounded p-2"
+                                                     style="min-width:155px; background:#f4f0ff;">
+                                                    <div class="text-muted small">
+                                                        Total CLCs + VAT
+                                                    </div>
+                                                    <div class="fw-bold fs-5">
+                                                        <field name="lcp_total_clcs_with_vat"/>
+                                                    </div>
+                                                    <div class="text-muted small">
+                                                        Rounded Up
+                                                    </div>
+                                                </div>
+
+                                            </t>
+
+                                            <div class="border rounded p-2 bg-light"
+                                                 style="min-width:145px;">
+                                                <div class="text-muted small">
+                                                    Rate Card / Seat
+                                                </div>
+                                                <div class="fw-bold fs-5">
+                                                    <field name="lcp_rate_card"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="border rounded p-2 bg-light"
+                                                 style="min-width:145px;">
+                                                <div class="text-muted small">
+                                                    Total Rate Card
+                                                </div>
+                                                <div class="fw-bold fs-5">
+                                                    <field name="lcp_total_rate_card"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="border rounded p-2 bg-light"
+                                                 style="min-width:145px;">
+                                                <div class="text-muted small">
+                                                    Instructor / Day
+                                                </div>
+                                                <div class="fw-bold fs-5">
+                                                    <field name="lcp_instructor_rate_day"/>
+                                                </div>
+                                            </div>
+
+                                            <div class="border rounded p-2 bg-light"
+                                                 style="min-width:145px;">
+                                                <div class="text-muted small">
+                                                    Instructor Cost
+                                                </div>
+                                                <div class="fw-bold fs-5">
+                                                    <field name="lcp_total_instructor_cost"/>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- On-site only -->
+                                        <t t-if="record.location.raw_value == 'On site'">
+
+                                            <div class="d-flex flex-wrap gap-3 text-muted small">
+
+                                                <span>
+                                                    Per Diem:
+                                                    <strong>
+                                                        <field name="lcp_per_diem_total"/>
+                                                    </strong>
+                                                </span>
+
+                                            </div>
+
+                                        </t>
+
+                                    </div>
+
+                                </t>
+
+                            </templates>
+
+                        </kanban>
+
+                    </field>
+
+
+                    <!-- ================================================= -->
+                    <!-- 3. LCP SUMMARY -->
+                    <!-- ================================================= -->
+
+                    <separator string="3. LCP Summary"/>
+
+                    <div class="row g-3 mt-1 mb-3">
+
+                        <!-- Training Totals -->
+                        <div class="col-12 col-lg-4">
+
+                            <div class="border rounded p-3 h-100">
+
+                                <div class="fw-bold fs-5 mb-3">
+                                    A. Training Totals
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Training Days</span>
+                                    <strong>
+                                        <field name="lcp_total_days"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Seats</span>
+                                    <strong>
+                                        <field name="lcp_total_seats"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total CLCs + VAT</span>
+                                    <strong>
+                                        <field name="lcp_total_clcs_with_vat"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Rate Card</span>
+                                    <strong>
+                                        <field name="lcp_total_rate_card"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Instructor Cost</span>
+                                    <strong>
+                                        <field name="lcp_total_instructor_cost"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Per Diem</span>
+                                    <strong>
+                                        <field name="lcp_total_per_diem"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span>Uber Logistics (Days + 2)</span>
+                                    <strong>
+                                        <field name="lcp_total_uber_estimate"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Existing Logistics -->
+                        <div class="col-12 col-lg-4">
+
+                            <div class="border rounded p-3 h-100">
+
+                                <div class="fw-bold fs-5 mb-3">
+                                    B. Existing Logistics
+                                </div>
+
+                                <div class="text-muted small mb-3">
+                                    Pulled directly from the existing CRM Lead.
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Tickets</span>
+                                    <strong>
+                                        <field name="lcp_ticket_total"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Hotels</span>
+                                    <strong>
+                                        <field name="lcp_hotel_total"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Venue</span>
+                                    <strong>
+                                        <field name="venue"
+                                               nolabel="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Catering</span>
+                                    <strong>
+                                        <field name="ctrng"
+                                               nolabel="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span>Uber (Auto-updated)</span>
+                                    <strong>
+                                        <field name="uber"
+                                               nolabel="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- Cost Details Result -->
+                        <div class="col-12 col-lg-4">
+
+                            <div class="border rounded p-3 h-100">
+
+                                <div class="fw-bold fs-5 mb-3">
+                                    C. Cost Details Result
+                                </div>
+
+                                <div class="text-muted small mb-3">
+                                    Current result from the existing Cost Details engine.
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Learning Partner</span>
+                                    <strong>
+                                        <field name="lcp_cost_learning_partner"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Partner Share</span>
+                                    <strong>
+                                        <field name="lcp_partner_share"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span>Total Costs</span>
+                                    <strong>
+                                        <field name="lcp_total_costs"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <hr/>
+
+                                <div class="d-flex justify-content-between mb-2">
+                                    <span class="fw-bold">
+                                        NIL ME Profit
+                                    </span>
+                                    <strong class="fs-5">
+                                        <field name="lcp_nilme_profit"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="d-flex justify-content-between">
+                                    <span class="fw-bold">
+                                        Profit Margin
+                                    </span>
+                                    <strong class="fs-5">
+                                        <field name="lcp_profit_margin"
+                                               nolabel="1"
+                                               readonly="1"
+                                               widget="percentage"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Warning only when the current Cost Details setup has
+                         more than one line, because current lead-wide costs
+                         would otherwise be duplicated if summed. -->
+                    <div class="alert alert-warning mt-2"
                          role="alert"
                          invisible="lcp_cost_detail_count &lt;= 1">
 
-                        This lead has more than one Cost Details row.
-                        The LCP summary uses the first Cost Details row to
-                        avoid duplicating lead-level costs.
+                        This Lead has more than one Cost Details line.
+                        LCP mirrors the first Cost Details result so the
+                        existing lead-level logistics are not duplicated.
 
                     </div>
 

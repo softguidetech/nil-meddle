@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <record id="crm_lead_view_form_lcp_details" model="ir.ui.view">
+        <field name="name">crm.lead.form.lcp.details</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='internal_notes']" position="before">
+
+                <page name="lcp_details" string="LCP Details">
+
+                    <!-- ================================================= -->
+                    <!-- DEAL / PRICING SETUP -->
+                    <!-- ================================================= -->
+
+                    <group string="Pricing Setup" col="4">
+
+                        <field name="training_name"
+                               string="Customer"/>
+
+                        <field name="ordering_partner_id"
+                               string="Partner"/>
+
+                        <field name="so_no"
+                               string="SO#"/>
+
+                        <field name="total_training_price"
+                               string="Training Value"
+                               readonly="1"/>
+
+                        <field name="lcp_vat_rate"
+                               string="VAT %"/>
+
+                        <field name="lcp_instructor_source"/>
+
+                        <field name="lcp_uber_day_rate"/>
+
+                        <field name="lcp_per_diem_rate"/>
+
+                    </group>
+
+                    <!-- ================================================= -->
+                    <!-- TRAINING PRICING -->
+                    <!-- ================================================= -->
+
+                    <separator string="Training Pricing"/>
+
+                    <field name="training_course_ids"
+                           nolabel="1">
+
+                        <tree editable="bottom">
+
+                            <field name="training_id"
+                                   string="Class"/>
+
+                            <field name="descriptions"
+                                   string="Description"
+                                   optional="hide"/>
+
+                            <field name="location"/>
+
+                            <field name="where_location2"
+                                   string="Country / City"
+                                   optional="show"/>
+
+                            <field name="lcp_days"
+                                   string="Days"
+                                   readonly="1"/>
+
+                            <field name="no_of_student"
+                                   string="Seats"/>
+
+                            <field name="payment_method"
+                                   string="Payment"/>
+
+                            <field name="clcs_qty"
+                                   string="CLCs / Seat"/>
+
+                            <field name="lcp_clcs_with_vat"
+                                   string="CLCs + VAT"
+                                   readonly="1"
+                                   optional="hide"/>
+
+                            <field name="lcp_total_clcs_with_vat"
+                                   string="Total CLCs + VAT"
+                                   readonly="1"/>
+
+                            <field name="lcp_rate_card"
+                                   string="Rate Card / Seat"/>
+
+                            <field name="lcp_total_rate_card"
+                                   string="Total Rate Card"
+                                   readonly="1"/>
+
+                            <field name="lcp_instructor_rate_day"
+                                   string="Instructor / Day"
+                                   optional="show"/>
+
+                            <field name="lcp_total_instructor_cost"
+                                   string="Instructor Cost"
+                                   readonly="1"
+                                   optional="show"/>
+
+                            <field name="lcp_per_diem_total"
+                                   string="Per Diem"
+                                   readonly="1"
+                                   optional="hide"/>
+
+                            <field name="lcp_uber_total"
+                                   string="Uber"
+                                   readonly="1"
+                                   optional="hide"/>
+
+                        </tree>
+
+                    </field>
+
+                    <!-- ================================================= -->
+                    <!-- SUMMARY -->
+                    <!-- ================================================= -->
+
+                    <separator string="LCP Summary"/>
+
+                    <group col="4">
+
+                        <group string="Training Totals">
+
+                            <field name="lcp_total_days"
+                                   readonly="1"/>
+
+                            <field name="lcp_total_clcs_with_vat"
+                                   readonly="1"/>
+
+                            <field name="lcp_total_rate_card"
+                                   readonly="1"/>
+
+                            <field name="lcp_total_instructor_cost"
+                                   readonly="1"/>
+
+                            <field name="lcp_total_per_diem"
+                                   readonly="1"/>
+
+                            <field name="lcp_total_uber_estimate"
+                                   readonly="1"/>
+
+                        </group>
+
+                        <group string="Existing Logistics">
+
+                            <field name="lcp_ticket_total"
+                                   readonly="1"/>
+
+                            <field name="lcp_hotel_total"
+                                   readonly="1"/>
+
+                            <field name="venue"
+                                   string="Venue"/>
+
+                            <field name="ctrng"
+                                   string="Catering"/>
+
+                            <field name="uber"
+                                   string="Current Uber"/>
+
+                        </group>
+
+                        <group string="Cost Details Result">
+
+                            <field name="lcp_learning_partner"
+                                   readonly="1"/>
+
+                            <field name="lcp_partner_share"
+                                   readonly="1"/>
+
+                            <field name="lcp_total_costs"
+                                   readonly="1"/>
+
+                            <field name="lcp_nilme_profit"
+                                   readonly="1"/>
+
+                            <field name="lcp_profit_margin"
+                                   widget="percentage"
+                                   readonly="1"/>
+
+                            <field name="lcp_sales_commission"
+                                   readonly="1"/>
+
+                        </group>
+
+                    </group>
+
+                    <div class="alert alert-warning"
+                         role="alert"
+                         invisible="lcp_cost_detail_count &lt;= 1">
+
+                        This lead has more than one Cost Details row.
+                        The LCP summary uses the first Cost Details row to
+                        avoid duplicating lead-level costs.
+
+                    </div>
+
+                    <field name="lcp_cost_detail_count"
+                           invisible="1"/>
+
+                </page>
+
+            </xpath>
+
+        </field>
+
+    </record>
+
+</odoo>

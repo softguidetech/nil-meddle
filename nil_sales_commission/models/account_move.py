@@ -16,21 +16,43 @@ class AccountMove(models.Model):
     )
 
     def _nil_get_commission_sale_orders(self):
-        """
-        Find Sale Orders related to the invoice.
-
-        Primary:
-            Invoice Line -> Sale Line -> Sale Order
-
-        Fallback:
-            Invoice Origin -> Sale Order Number
-        """
         self.ensure_one()
 
-        SaleOrder = self.env['sale.order'].sudo()
-        orders = self.invoice_line_ids.sale_line_ids.order_id
+        invoice = self.sudo()
+        invoice_company = invoice.company_id.sudo()
 
-        origin = (self.invoice_origin or '').strip()
+        # IMPORTANT:
+        # Search only inside the SAME company as the invoice.
+        # This prevents an invoice from NIL ME UAE from accidentally finding
+        # an S00xxx Sale Order with the same number in NIL ME Saudi, and vice
+        # versa.
+        SaleOrder = (
+            self.env['sale.order']
+            .sudo()
+            .with_context(
+                allowed_company_ids=[invoice_company.id],
+            )
+        )
+
+        sale_lines = invoice.invoice_line_ids.sudo().mapped(
+            'sale_line_ids'
+        ).sudo()
+
+        order_ids = sale_lines.mapped(
+            'order_id'
+        ).filtered(
+            lambda order:
+                order.company_id.id == invoice_company.id
+        ).ids
+
+        orders = SaleOrder.browse(
+            order_ids
+        ).sudo()
+
+        origin = (
+            invoice.invoice_origin
+            or ''
+        ).strip()
 
         if origin:
             origin_names = [
@@ -41,26 +63,28 @@ class AccountMove(models.Model):
 
             if origin_names:
                 orders |= SaleOrder.search([
+                    ('company_id', '=', invoice_company.id),
                     ('name', 'in', origin_names),
                 ])
 
             if not orders:
                 orders |= SaleOrder.search([
+                    ('company_id', '=', invoice_company.id),
                     ('name', '=', origin),
                 ])
 
-        return orders
+        return orders.sudo()
 
     def _nil_get_commission_lead(self):
         """
-        Best-effort link from invoice to CRM Lead.
-        The Lead link never controls whether an invoice appears.
+        Best-effort invoice -> Sale Order -> CRM Lead relation.
+        The Lead relation never controls whether the invoice appears.
         """
         self.ensure_one()
 
-        leads = self._nil_get_commission_sale_orders().mapped(
+        leads = self._nil_get_commission_sale_orders().sudo().mapped(
             'opportunity_id'
-        )
+        ).sudo()
 
         if leads:
             return leads[:1]
@@ -77,30 +101,65 @@ class AccountMove(models.Model):
 
         return self.env['crm.lead']
 
+    def _nil_get_deal_salesperson(self):
+        """
+        Salesperson used ONLY to determine the fixed Loudy/Baraa commission.
+
+        Priority:
+        1. Current salesperson on CRM Lead
+        2. Invoice Salesperson
+        3. Sale Order Salesperson
+        """
+        self.ensure_one()
+
+        invoice = self.sudo()
+        lead = invoice._nil_get_commission_lead().sudo()
+
+        if lead and lead.user_id:
+            return lead.user_id.sudo()
+
+        if invoice.invoice_user_id:
+            return invoice.invoice_user_id.sudo()
+
+        orders = invoice._nil_get_commission_sale_orders().sudo()
+
+        if orders and orders[0].user_id:
+            return orders[0].user_id.sudo()
+
+        return self.env['res.users']
+
     def _nil_sync_sales_commission(self):
         """
-        Every Customer Invoice dated from 01-Jun-2026 onward gets
-        one automatic Ruba Khattam commission row at 1.5%.
+        FINAL COMMISSION LOGIC
 
-        IMPORTANT:
-        Commission basis = CRM Lead Total Training Price.
-        Invoice amount is NOT used for commission calculation.
-
-        There is NO salesperson eligibility filter.
-
-        Additional/manual commission rows are fully preserved and can be
-        edited/deleted/reset by the user.
-
-        If an invoice is deliberately excluded, its automatic Ruba row
-        stays Excluded and is not recreated as Draft until Reset to Draft.
+        Every Customer Invoice dated from 01-Jun-2026 onward:
+        1. Ruba Khattam ALWAYS gets 1.5%.
+        2. If deal salesperson is Loudy Abdo, Loudy gets 5%.
+        3. If deal salesperson is Baraa Abo Saleh, Baraa gets 2%.
+        4. No salesperson filter controls whether the invoice appears.
+        5. Commission basis = CRM Lead Total Training Price, NOT invoice value.
+        6. Manual commission rows are preserved.
+        7. Automatic rows are unique per invoice/type, so repeated backfills
+           do not create duplicates.
         """
-        Commission = self.env[
-            'nil.sales.commission'
-        ].sudo()
+        all_company_ids = self.env[
+            'res.company'
+        ].sudo().search([]).ids
+
+        Commission = (
+            self.env['nil.sales.commission']
+            .sudo()
+            .with_context(
+                allowed_company_ids=all_company_ids,
+            )
+        )
 
         ruba_user = Commission._nil_get_ruba_user()
 
-        for invoice in self:
+        for invoice_record in self:
+            # All internal commission lookups are cross-company-safe.
+            invoice = invoice_record.sudo()
+
             if invoice.move_type != 'out_invoice':
                 continue
 
@@ -111,13 +170,8 @@ class AccountMove(models.Model):
                 continue
 
             lead = invoice._nil_get_commission_lead()
+            deal_salesperson = invoice._nil_get_deal_salesperson()
 
-            # Commission basis is the TOTAL TRAINING VALUE from the CRM Lead,
-            # NOT the invoice amount.
-            #
-            # The invoice is only the trigger/reference that makes the row appear.
-            # If no Lead is linked, keep the row visible with Training Value = 0
-            # so Ruba can fill/correct it manually if needed.
             training_value = float(
                 lead.total_training_price or 0.0
             ) if lead else 0.0
@@ -142,76 +196,36 @@ class AccountMove(models.Model):
                 'commission_date': invoice.invoice_date,
             }
 
+            # -------------------------------------------------------------
+            # 1) RUBA: ONE automatic 1.5% row per invoice
+            # -------------------------------------------------------------
             auto_ruba = Commission.search([
                 ('invoice_id', '=', invoice.id),
-                ('is_auto_ruba', '=', True),
+                ('auto_key', '=', 'ruba'),
             ], limit=1)
 
-            # Adopt an existing non-paid Ruba row if this invoice came from
-            # an older module version and no auto flag existed yet.
             if not auto_ruba and ruba_user:
+                # Adopt an older Ruba 1.5% row instead of creating a duplicate.
                 old_ruba = Commission.search([
                     ('invoice_id', '=', invoice.id),
+                    ('auto_key', '=', False),
                     ('salesperson_id', '=', ruba_user.id),
-                    ('state', '!=', 'paid'),
-                    ('is_auto_ruba', '=', False),
-                ], limit=1)
+                    ('commission_rate', '=', 1.5),
+                ], order='id asc', limit=1)
 
                 if old_ruba:
                     old_ruba.with_context(
-                        nil_auto_sync=True
+                        nil_auto_sync=True,
+                        nil_skip_paid_lock=True,
                     ).write({
+                        'auto_key': 'ruba',
                         'is_auto_ruba': True,
                     })
                     auto_ruba = old_ruba
 
-            if invoice.exclude_from_commission:
-                if auto_ruba and auto_ruba.state != 'paid':
-                    auto_ruba.with_context(
-                        nil_auto_sync=True
-                    ).write({
-                        **common_values,
-                        'state': 'excluded',
-                    })
-                elif not auto_ruba:
-                    values = dict(common_values)
-                    values.update({
-                        'salesperson_id': (
-                            ruba_user.id
-                            if ruba_user
-                            else False
-                        ),
-                        'commission_rate': 1.5,
-                        'commission_amount': (
-                            training_value * 0.015
-                        ),
-                        'state': 'excluded',
-                        'is_auto_ruba': True,
-                    })
-
-                    Commission.with_context(
-                        nil_auto_sync=True
-                    ).create(values)
-
-                continue
-
-            if auto_ruba:
-                if auto_ruba.state != 'paid':
-                    auto_ruba.with_context(
-                        nil_auto_sync=True
-                    ).write({
-                        **common_values,
-                        'salesperson_id': (
-                            ruba_user.id
-                            if ruba_user
-                            else auto_ruba.salesperson_id.id
-                        ),
-                        'commission_rate': 1.5,
-                    })
-
-            else:
-                values = dict(common_values)
-                values.update({
+            if not auto_ruba:
+                ruba_values = dict(common_values)
+                ruba_values.update({
                     'salesperson_id': (
                         ruba_user.id
                         if ruba_user
@@ -221,19 +235,162 @@ class AccountMove(models.Model):
                     'commission_amount': (
                         training_value * 0.015
                     ),
-                    'state': 'draft',
+                    'state': (
+                        'excluded'
+                        if invoice.exclude_from_commission
+                        else 'draft'
+                    ),
+                    'excluded_by_invoice':
+                        bool(invoice.exclude_from_commission),
+                    'auto_key': 'ruba',
                     'is_auto_ruba': True,
                 })
 
-                Commission.with_context(
+                auto_ruba = Commission.with_context(
                     nil_auto_sync=True
-                ).create(values)
+                ).create(ruba_values)
 
-            # Keep MANUAL invoice-linked rows synchronized with invoice/lead
-            # details, but NEVER overwrite their Commission For, rate or state.
+            elif auto_ruba.state != 'paid':
+                ruba_values = dict(common_values)
+                ruba_values.update({
+                    'salesperson_id': (
+                        ruba_user.id
+                        if ruba_user
+                        else auto_ruba.salesperson_id.id
+                    ),
+                    'commission_rate': 1.5,
+                    'is_auto_ruba': True,
+                    'auto_key': 'ruba',
+                })
+
+                if invoice.exclude_from_commission:
+                    ruba_values.update({
+                        'state': 'excluded',
+                        'excluded_by_invoice': True,
+                    })
+                elif auto_ruba.excluded_by_invoice:
+                    ruba_values.update({
+                        'state': 'draft',
+                        'excluded_by_invoice': False,
+                    })
+
+                auto_ruba.with_context(
+                    nil_auto_sync=True
+                ).write(ruba_values)
+
+            # -------------------------------------------------------------
+            # 2) LOUDY / BARAA: ONE fixed salesperson row per invoice
+            # -------------------------------------------------------------
+            fixed_rate = (
+                Commission._nil_get_fixed_salesperson_rate(
+                    deal_salesperson
+                )
+            )
+
+            auto_sales = Commission.search([
+                ('invoice_id', '=', invoice.id),
+                ('auto_key', '=', 'salesperson'),
+            ], limit=1)
+
+            if fixed_rate > 0.0 and deal_salesperson:
+                if not auto_sales:
+                    # Adopt an older exact matching row rather than duplicate it.
+                    old_sales = Commission.search([
+                        ('invoice_id', '=', invoice.id),
+                        ('auto_key', '=', False),
+                        ('is_auto_ruba', '=', False),
+                        ('salesperson_id', '=', deal_salesperson.id),
+                        ('commission_rate', '=', fixed_rate),
+                    ], order='id asc', limit=1)
+
+                    if old_sales:
+                        old_sales.with_context(
+                            nil_auto_sync=True,
+                            nil_skip_paid_lock=True,
+                        ).write({
+                            'auto_key': 'salesperson',
+                        })
+                        auto_sales = old_sales
+
+                if not auto_sales:
+                    sales_values = dict(common_values)
+                    sales_values.update({
+                        'salesperson_id':
+                            deal_salesperson.id,
+                        'commission_rate':
+                            fixed_rate,
+                        'commission_amount': (
+                            training_value
+                            * (fixed_rate / 100.0)
+                        ),
+                        'state': (
+                            'excluded'
+                            if invoice.exclude_from_commission
+                            else 'draft'
+                        ),
+                        'excluded_by_invoice':
+                            bool(invoice.exclude_from_commission),
+                        'auto_key': 'salesperson',
+                        'is_auto_ruba': False,
+                    })
+
+                    auto_sales = Commission.with_context(
+                        nil_auto_sync=True
+                    ).create(sales_values)
+
+                elif auto_sales.state != 'paid':
+                    salesperson_changed = (
+                        auto_sales.salesperson_id.id
+                        != deal_salesperson.id
+                    )
+
+                    sales_values = dict(common_values)
+                    sales_values.update({
+                        'salesperson_id':
+                            deal_salesperson.id,
+                        'commission_rate':
+                            fixed_rate,
+                        'auto_key':
+                            'salesperson',
+                    })
+
+                    if invoice.exclude_from_commission:
+                        sales_values.update({
+                            'state': 'excluded',
+                            'excluded_by_invoice': True,
+                        })
+                    elif auto_sales.excluded_by_invoice:
+                        sales_values.update({
+                            'state': 'draft',
+                            'excluded_by_invoice': False,
+                        })
+                    elif (
+                        salesperson_changed
+                        and auto_sales.state == 'excluded'
+                    ):
+                        # A different fixed salesperson is now responsible.
+                        sales_values['state'] = 'draft'
+
+                    auto_sales.with_context(
+                        nil_auto_sync=True
+                    ).write(sales_values)
+
+            else:
+                # Current deal salesperson is not Loudy/Baraa.
+                # Remove only NON-PAID automatic salesperson rows.
+                # Manual rows are never touched.
+                if auto_sales and auto_sales.state != 'paid':
+                    auto_sales.with_context(
+                        nil_sync_cleanup=True
+                    ).unlink()
+
+            # -------------------------------------------------------------
+            # 3) MANUAL rows: update reference/value only, never recipient,
+            #    rate, status or accounting decision.
+            # -------------------------------------------------------------
             manual_rows = Commission.search([
                 ('invoice_id', '=', invoice.id),
-                ('is_auto_ruba', '=', False),
+                ('auto_key', '=', False),
                 ('state', '!=', 'paid'),
             ])
 
@@ -247,24 +404,36 @@ class AccountMove(models.Model):
     @api.model
     def _nil_backfill_sales_commissions(self):
         """
-        Re-scan ALL Customer Invoices from 01-Jun-2026 onward.
+        Backfill ALL Customer Invoices from 01-Jun-2026 onward.
 
-        No salesperson filter.
-        No Posted-only filter.
-        No positive-amount filter.
-
-        Result:
-        - Every invoice appears through an automatic Ruba 1.5% row.
-        - Manual rows are preserved.
-        - Excluded invoices remain excluded.
+        This does not filter invoices by salesperson.
         """
-        Commission = self.env[
-            'nil.sales.commission'
-        ].sudo()
+        all_company_ids = self.env[
+            'res.company'
+        ].sudo().search([]).ids
+
+        Commission = (
+            self.env['nil.sales.commission']
+            .sudo()
+            .with_context(
+                allowed_company_ids=all_company_ids,
+            )
+        )
 
         Commission._nil_prepare_invoice_commission_migration()
 
-        invoices = self.sudo().search([
+        # Explicitly run the backfill across ALL companies/branches,
+        # including Saudi, regardless of which company is currently active
+        # in the Odoo company selector.
+        Move = (
+            self.env['account.move']
+            .sudo()
+            .with_context(
+                allowed_company_ids=all_company_ids,
+            )
+        )
+
+        invoices = Move.search([
             ('move_type', '=', 'out_invoice'),
             ('invoice_date', '>', COMMISSION_CUTOFF_DATE),
         ])
@@ -287,6 +456,7 @@ class AccountMove(models.Model):
             'partner_id',
             'currency_id',
             'invoice_origin',
+            'exclude_from_commission',
         }
 
         if tracked_fields.intersection(vals):

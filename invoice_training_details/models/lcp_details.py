@@ -10,7 +10,7 @@ class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
     # =========================================================
-    # LCP SETUP
+    # LCP SETUP INPUTS
     # =========================================================
 
     lcp_vat_rate = fields.Float(
@@ -41,7 +41,7 @@ class CrmLead(models.Model):
     )
 
     # =========================================================
-    # LCP TRAINING TOTALS
+    # TRAINING TOTALS
     # =========================================================
 
     lcp_total_days = fields.Integer(
@@ -66,19 +66,19 @@ class CrmLead(models.Model):
     )
 
     lcp_total_instructor_cost = fields.Monetary(
-        string='Total Instructor Cost',
+        string='Instructor Cost',
         currency_field='currency_id',
         compute='_compute_lcp_training_totals',
     )
 
     lcp_total_per_diem = fields.Monetary(
-        string='Total Per Diem',
+        string='Per Diem',
         currency_field='currency_id',
         compute='_compute_lcp_training_totals',
     )
 
     lcp_total_uber_estimate = fields.Monetary(
-        string='Uber Estimate',
+        string='Uber Logistics',
         currency_field='currency_id',
         compute='_compute_lcp_training_totals',
     )
@@ -100,7 +100,7 @@ class CrmLead(models.Model):
     )
 
     # =========================================================
-    # CURRENT COST DETAILS RESULT
+    # COST DETAILS RESULT
     # =========================================================
 
     lcp_cost_learning_partner = fields.Char(
@@ -137,37 +137,50 @@ class CrmLead(models.Model):
     )
 
     @api.depends(
-        'training_course_ids.lcp_days',
+        'training_course_ids.training_date_start',
+        'training_course_ids.training_date_end',
+        'training_course_ids.duration',
         'training_course_ids.no_of_student',
         'training_course_ids.payment_method',
         'training_course_ids.clcs_qty',
         'training_course_ids.location',
-        'training_course_ids.lcp_total_rate_card',
-        'training_course_ids.lcp_total_instructor_cost',
-        'training_course_ids.lcp_per_diem_total',
+        'training_course_ids.lcp_rate_card',
+        'training_course_ids.lcp_instructor_rate_day',
         'lcp_vat_rate',
+        'lcp_instructor_source',
+        'lcp_per_diem_rate',
         'lcp_uber_day_rate',
     )
     def _compute_lcp_training_totals(self):
         for lead in self:
             lines = lead.training_course_ids
 
-            lead.lcp_total_days = sum(
-                lines.mapped('lcp_days')
+            total_days = sum(
+                line._lcp_get_days()
+                for line in lines
             )
+
+            lead.lcp_total_days = total_days
 
             lead.lcp_total_seats = sum(
-                lines.mapped('no_of_student')
+                max(line.no_of_student or 0, 0)
+                for line in lines
             )
 
-            # TOTAL CLCs + VAT:
-            # VAT is applied to the GRAND TOTAL CLC quantity first,
-            # then the final result is rounded UP once.
+            # =====================================================
+            # TOTAL CLCs + VAT
+            #
+            # IMPORTANT:
+            # 1) Sum ALL CLC quantities first.
+            # 2) Apply VAT to the grand total.
+            # 3) Round UP once at the very end.
             #
             # Example:
-            # 36 CLC / Seat × 6 Seats = 216
-            # 216 × 1.15 = 248.4
-            # Rounded UP = 249
+            # 36 CLC/Seat x 6 Seats = 216
+            # 216 x 1.15 = 248.4
+            # Final ordered quantity = 249
+            # =====================================================
+
             base_total_clcs = sum(
                 (line.clcs_qty or 0.0)
                 * max(line.no_of_student or 0, 0)
@@ -180,33 +193,49 @@ class CrmLead(models.Model):
                 + ((lead.lcp_vat_rate or 0.0) / 100.0)
             )
 
-            grand_total_clcs_with_vat = (
+            total_clcs_with_vat = (
                 base_total_clcs
                 * vat_multiplier
             )
 
             lead.lcp_total_clcs_with_vat = (
-                int(math.ceil(grand_total_clcs_with_vat))
-                if grand_total_clcs_with_vat > 0
+                int(math.ceil(total_clcs_with_vat))
+                if total_clcs_with_vat > 0
                 else 0
             )
 
             lead.lcp_total_rate_card = sum(
-                lines.mapped('lcp_total_rate_card')
+                (line.lcp_rate_card or 0.0)
+                * max(line.no_of_student or 0, 0)
+                for line in lines
             )
 
             lead.lcp_total_instructor_cost = sum(
-                lines.mapped('lcp_total_instructor_cost')
+                (line.lcp_instructor_rate_day or 0.0)
+                * line._lcp_get_days()
+                for line in lines
             )
 
             lead.lcp_total_per_diem = sum(
-                lines.mapped('lcp_per_diem_total')
+                (lead.lcp_per_diem_rate or 0.0)
+                * line._lcp_get_days()
+                for line in lines
+                if (
+                    line.location == 'On site'
+                    and lead.lcp_instructor_source == 'nil_me'
+                )
             )
 
-            # Uber is a deal-level logistics estimate:
-            # Uber / Day × (Total Training Days + 2)
+            # =====================================================
+            # UBER
             #
-            # The extra 2 days represent the travel days around the training.
+            # Uber / Day x (Total Training Days + 2)
+            # +2 = the two additional travel days requested.
+            #
+            # The result is also synchronized into the EXISTING
+            # CRM Logistics -> Uber field.
+            # =====================================================
+
             has_onsite_training = any(
                 line.location == 'On site'
                 for line in lines
@@ -214,16 +243,15 @@ class CrmLead(models.Model):
 
             lead.lcp_total_uber_estimate = (
                 (lead.lcp_uber_day_rate or 0.0)
-                * ((lead.lcp_total_days or 0) + 2)
-                if has_onsite_training
-                and lead.lcp_total_days
+                * (total_days + 2)
+                if has_onsite_training and total_days
                 else 0.0
             )
 
     def _get_lcp_uber_logistics_amount(self):
         self.ensure_one()
 
-        days = sum(
+        total_days = sum(
             line._lcp_get_days()
             for line in self.training_course_ids
         )
@@ -233,26 +261,19 @@ class CrmLead(models.Model):
             for line in self.training_course_ids
         )
 
-        if (
-            not has_onsite_training
-            or not days
-        ):
+        if not has_onsite_training or not total_days:
             return 0.0
 
         return (
             (self.lcp_uber_day_rate or 0.0)
-            * (days + 2)
+            * (total_days + 2)
         )
 
     def _sync_lcp_uber_to_logistics(self):
-        """
-        Keep the existing CRM Logistics -> Uber field synchronized
-        with the LCP Uber / Day estimate.
-
-        Uber = Uber / Day × (Total Training Days + 2)
-        """
         for lead in self:
-            amount = lead._get_lcp_uber_logistics_amount()
+            amount = (
+                lead._get_lcp_uber_logistics_amount()
+            )
 
             if (lead.uber or 0.0) != amount:
                 lead.with_context(
@@ -278,9 +299,7 @@ class CrmLead(models.Model):
     @api.model_create_multi
     def create(self, vals_list):
         leads = super().create(vals_list)
-
         leads._sync_lcp_uber_to_logistics()
-
         return leads
 
     def write(self, vals):
@@ -301,9 +320,12 @@ class CrmLead(models.Model):
         'hotel_ids.price',
         'cost_details_ids.learning_partner',
         'cost_details_ids.training_vendor',
+        'cost_details_ids.ins_time',
+        'cost_details_ids.is_clc',
         'cost_details_ids.margin1',
         'cost_details_ids.nilme_share',
         'cost_details_ids.margin',
+        'total_training_price',
     )
     def _compute_lcp_existing_costs(self):
         for lead in self:
@@ -319,11 +341,9 @@ class CrmLead(models.Model):
                 lead.cost_details_ids
             )
 
-            # The current cost.details model calculates lead-wide logistics
-            # inside each cost row. Summing multiple rows would therefore
-            # duplicate the same costs. For the LCP summary we safely mirror
-            # the first current Cost Details result and warn in the view if
-            # more than one row exists.
+            # Current Cost Details calculates lead-wide totals.
+            # Use the first row to mirror the existing engine and
+            # avoid duplicating the same lead-wide costs.
             cost_line = lead.cost_details_ids[:1]
 
             if cost_line:
@@ -331,8 +351,14 @@ class CrmLead(models.Model):
                     cost_line.learning_partner or ''
                 )
 
+                # IMPORTANT:
+                # Partner Share comes from the SAME Cost Details
+                # business logic, not a separate LCP formula.
+                #
+                # CLC + EnterOne therefore follows the current
+                # automatic Partner Share calculation.
                 lead.lcp_partner_share = (
-                    cost_line.training_vendor or 0.0
+                    cost_line._get_effective_partner_share()
                 )
 
                 lead.lcp_total_costs = (
@@ -380,8 +406,6 @@ class CrmLead(models.Model):
 class TrainingCourse(models.Model):
     _inherit = 'training.course'
 
-    # Currency is inherited from the CRM Lead so all LCP money stays in the
-    # same currency as the opportunity. Your CRM currently defaults it to USD.
     lcp_currency_id = fields.Many2one(
         'res.currency',
         string='LCP Currency',
@@ -390,7 +414,8 @@ class TrainingCourse(models.Model):
     )
 
     # =========================================================
-    # LCP INPUTS
+    # ONLY THE COSTING INPUTS MISSING FROM THE EXISTING
+    # TRAINING MODULE / COST DETAILS
     # =========================================================
 
     lcp_rate_card = fields.Monetary(
@@ -403,46 +428,9 @@ class TrainingCourse(models.Model):
         currency_field='lcp_currency_id',
     )
 
-    # =========================================================
-    # LCP CALCULATIONS
-    # =========================================================
-
     lcp_days = fields.Integer(
         string='Days',
-        compute='_compute_lcp_values',
-    )
-
-    lcp_total_clcs_with_vat = fields.Integer(
-        string='Total CLCs + VAT',
-        compute='_compute_lcp_values',
-        help=(
-            'For CLC courses: '
-            'ceil((CLCs / Seat × Seats) × (1 + VAT %)).'
-        ),
-    )
-
-    lcp_total_rate_card = fields.Monetary(
-        string='Total Rate Card',
-        currency_field='lcp_currency_id',
-        compute='_compute_lcp_values',
-    )
-
-    lcp_total_instructor_cost = fields.Monetary(
-        string='Instructor Cost',
-        currency_field='lcp_currency_id',
-        compute='_compute_lcp_values',
-    )
-
-    lcp_per_diem_total = fields.Monetary(
-        string='Per Diem',
-        currency_field='lcp_currency_id',
-        compute='_compute_lcp_values',
-    )
-
-    lcp_uber_total = fields.Monetary(
-        string='Uber',
-        currency_field='lcp_currency_id',
-        compute='_compute_lcp_values',
+        compute='_compute_lcp_days',
     )
 
     def _lcp_get_days(self):
@@ -461,8 +449,6 @@ class TrainingCourse(models.Model):
             )
 
         if self.duration:
-            # Keeps compatibility with the existing Char field:
-            # "5 days", "5", "5.0 days", etc.
             first_token = (
                 str(self.duration)
                 .strip()
@@ -483,117 +469,20 @@ class TrainingCourse(models.Model):
         'training_date_start',
         'training_date_end',
         'duration',
-        'no_of_student',
-        'clcs_qty',
-        'lcp_rate_card',
-        'lcp_instructor_rate_day',
-        'location',
-        'payment_method',
-        'lead_id.lcp_vat_rate',
-        'lead_id.lcp_instructor_source',
-        'lead_id.lcp_per_diem_rate',
-        'lead_id.lcp_uber_day_rate',
     )
-    def _compute_lcp_values(self):
+    def _compute_lcp_days(self):
         for line in self:
-            days = line._lcp_get_days()
-            seats = max(
-                line.no_of_student or 0,
-                0,
+            line.lcp_days = (
+                line._lcp_get_days()
             )
-
-            line.lcp_days = days
-
-            # -----------------------------------------------------
-            # CLC + VAT
-            # -----------------------------------------------------
-            # IMPORTANT:
-            # VAT is applied on the TOTAL CLC quantity, not per seat.
-            #
-            # Example:
-            # 36 CLC / Seat × 6 Seats = 216 CLC
-            # 216 × 1.15 = 248.4
-            # Rounded UP = 249 CLC
-            # -----------------------------------------------------
-            if line.payment_method == 'clc':
-                base_total_clcs = (
-                    (line.clcs_qty or 0.0)
-                    * seats
-                )
-
-                vat_multiplier = (
-                    1.0
-                    + (
-                        (
-                            line.lead_id.lcp_vat_rate
-                            or 0.0
-                        )
-                        / 100.0
-                    )
-                )
-
-                total_with_vat = (
-                    base_total_clcs
-                    * vat_multiplier
-                )
-
-                line.lcp_total_clcs_with_vat = (
-                    int(math.ceil(total_with_vat))
-                    if total_with_vat > 0
-                    else 0
-                )
-
-            else:
-                line.lcp_total_clcs_with_vat = 0
-
-            # -----------------------------------------------------
-            # RATE CARD
-            # -----------------------------------------------------
-            line.lcp_total_rate_card = (
-                (line.lcp_rate_card or 0.0)
-                * seats
-            )
-
-            # -----------------------------------------------------
-            # INSTRUCTOR
-            # -----------------------------------------------------
-            line.lcp_total_instructor_cost = (
-                (line.lcp_instructor_rate_day or 0.0)
-                * days
-            )
-
-            onsite = (
-                line.location == 'On site'
-            )
-
-            nil_me_instructor = (
-                line.lead_id.lcp_instructor_source
-                == 'nil_me'
-            )
-
-            # Per diem is an LCP estimate only for on-site delivery
-            # with a NIL ME instructor. It does not change the current
-            # cost.details engine at this stage.
-            line.lcp_per_diem_total = (
-                (
-                    line.lead_id.lcp_per_diem_rate
-                    or 0.0
-                )
-                * days
-                if onsite and nil_me_instructor
-                else 0.0
-            )
-
-            # Uber is calculated once at Lead / deal level as:
-            # Uber / Day × (Total Training Days + 2)
-            # and synchronized to the existing CRM Logistics -> Uber field.
-            line.lcp_uber_total = 0.0
 
     @api.model_create_multi
     def create(self, vals_list):
         lines = super().create(vals_list)
 
-        lines.mapped('lead_id')._sync_lcp_uber_to_logistics()
+        lines.mapped(
+            'lead_id'
+        )._sync_lcp_uber_to_logistics()
 
         return lines
 

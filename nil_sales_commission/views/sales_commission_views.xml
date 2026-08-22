@@ -47,8 +47,12 @@
                        decoration-success="state == 'paid'"
                        decoration-muted="state == 'excluded'"/>
 
+                <field name="auto_key"
+                       string="Type"
+                       optional="show"/>
+
                 <field name="is_auto_ruba"
-                       optional="hide"/>
+                       column_invisible="1"/>
 
                 <field name="payment_date"
                        optional="show"/>
@@ -139,15 +143,21 @@
 
                         <group string="Commission">
 
+                            <field name="auto_key"
+                                   invisible="1"/>
+
                             <field name="is_auto_ruba"
+                                   invisible="1"/>
+
+                            <field name="excluded_by_invoice"
                                    invisible="1"/>
 
                             <field name="salesperson_id"
                                    string="Commission For"
-                                   readonly="state == 'paid' or is_auto_ruba"/>
+                                   readonly="state == 'paid' or auto_key in ('ruba', 'salesperson')"/>
 
                             <field name="commission_rate"
-                                   readonly="state == 'paid' or is_auto_ruba"/>
+                                   readonly="state == 'paid' or auto_key in ('ruba', 'salesperson')"/>
 
                             <field name="currency_id"
                                    readonly="state == 'paid'"/>
@@ -159,6 +169,37 @@
                                    readonly="1"/>
 
                         </group>
+
+                    </group>
+
+                    <group string="Profit Margin"
+                           col="1"
+                           invisible="not lead_id">
+
+                        <field name="cost_detail_ids"
+                               nolabel="1"
+                               readonly="1">
+
+                            <tree create="0"
+                                  edit="0"
+                                  delete="0">
+
+                                <field name="learning_partner"
+                                       string="Learning Partner"/>
+
+                                <field name="margin1"
+                                       string="Total Costs"/>
+
+                                <field name="nilme_share"
+                                       string="NIL ME Share $"/>
+
+                                <field name="margin"
+                                       string="Margin (%)"
+                                       widget="percentage"/>
+
+                            </tree>
+
+                        </field>
 
                     </group>
 
@@ -238,7 +279,11 @@
 
                 <filter name="ruba_auto"
                         string="Ruba 1.5%"
-                        domain="[('is_auto_ruba', '=', True)]"/>
+                        domain="[('auto_key', '=', 'ruba')]"/>
+
+                <filter name="fixed_sales"
+                        string="Loudy / Baraa Fixed"
+                        domain="[('auto_key', '=', 'salesperson')]"/>
 
                 <separator/>
 

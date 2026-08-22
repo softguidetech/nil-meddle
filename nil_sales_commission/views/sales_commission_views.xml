@@ -168,6 +168,13 @@
                             <field name="commission_amount"
                                    readonly="1"/>
 
+                            <field name="aed_currency_id"
+                                   invisible="1"/>
+
+                            <field name="commission_amount_aed"
+                                   string="Commission Amount AED (3.6725)"
+                                   readonly="1"/>
+
                         </group>
 
                     </group>

@@ -95,6 +95,34 @@ class SalesCommission(models.Model):
         default=0.0,
     )
 
+    aed_currency_id = fields.Many2one(
+        'res.currency',
+        string='AED Currency',
+        compute='_compute_commission_amount_aed',
+        compute_sudo=True,
+    )
+
+    commission_amount_aed = fields.Monetary(
+        string='Commission Amount AED',
+        currency_field='aed_currency_id',
+        compute='_compute_commission_amount_aed',
+        compute_sudo=True,
+    )
+
+    @api.depends('commission_amount')
+    def _compute_commission_amount_aed(self):
+        aed_currency = self.env.ref(
+            'base.AED',
+            raise_if_not_found=False,
+        )
+
+        for rec in self:
+            rec.aed_currency_id = aed_currency
+            rec.commission_amount_aed = (
+                (rec.commission_amount or 0.0)
+                * 3.6725
+            )
+
     commission_date = fields.Date(
         string='Commission Date',
         required=True,
@@ -1074,14 +1102,37 @@ class SalesCommission(models.Model):
 
             company = rec.company_id
             company_currency = company.currency_id
-            currency = rec.currency_id
 
-            company_amount = currency._convert(
-                rec.commission_amount,
-                company_currency,
-                company,
-                payment_date,
+            aed_currency = self.env.ref(
+                'base.AED',
+                raise_if_not_found=False,
             )
+
+            if not aed_currency:
+                raise UserError(_(
+                    'AED currency was not found in Odoo.'
+                ))
+
+            # Fixed business rate requested:
+            # USD commission x 3.6725 = AED commission.
+            aed_amount = (
+                (rec.commission_amount or 0.0)
+                * 3.6725
+            )
+
+            # Debit/Credit are always stored in company currency in Odoo.
+            # If company currency is AED, use the AED amount directly.
+            # Otherwise keep AED as the transaction currency and let Odoo
+            # carry the equivalent company-currency balance.
+            if company_currency == aed_currency:
+                company_amount = aed_amount
+            else:
+                company_amount = aed_currency._convert(
+                    aed_amount,
+                    company_currency,
+                    company,
+                    payment_date,
+                )
 
             source_name = (
                 rec.invoice_id.name
@@ -1121,19 +1172,19 @@ class SalesCommission(models.Model):
                 'credit': company_amount,
             }
 
-            if currency != company_currency:
+            if aed_currency != company_currency:
                 debit_line.update({
                     'currency_id':
-                        currency.id,
+                        aed_currency.id,
                     'amount_currency':
-                        rec.commission_amount,
+                        aed_amount,
                 })
 
                 credit_line.update({
                     'currency_id':
-                        currency.id,
+                        aed_currency.id,
                     'amount_currency':
-                        -rec.commission_amount,
+                        -aed_amount,
                 })
 
             move = self.env[

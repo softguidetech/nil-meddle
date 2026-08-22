@@ -212,33 +212,6 @@
                             </div>
                         </div>
 
-                        <group string="Cost Details Lines" col="1">
-                            <field name="cost_detail_ids"
-                                   nolabel="1"
-                                   readonly="1">
-
-                                <tree create="0"
-                                      edit="0"
-                                      delete="0">
-
-                                    <field name="learning_partner"
-                                           string="Learning Partner"/>
-
-                                    <field name="margin1"
-                                           string="Total Costs"/>
-
-                                    <field name="nilme_share"
-                                           string="NIL ME Share $"/>
-
-                                    <field name="margin"
-                                           string="Margin (%)"
-                                           widget="percentage"/>
-
-                                </tree>
-
-                            </field>
-                        </group>
-
                     </group>
 
                     <group string="Payment / Accounting"

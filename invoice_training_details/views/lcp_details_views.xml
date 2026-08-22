@@ -1,12 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="crm_lead_view_form_lcp_details" model="ir.ui.view">
-        <field name="name">crm.lead.form.lcp.details</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+    <!-- ========================================================= -->
+    <!-- EXISTING TRAINING LINE: LCP INPUT FORM -->
+    <!-- No course creation. Used only when clicking an existing card. -->
+    <!-- ========================================================= -->
 
-        <field name="arch" type="xml">
+    <record id="view_training_course_lcp_input_form"
+            model="ir.ui.view">
+
+        <field name="name">
+            training.course.lcp.input.form
+        </field>
+
+        <field name="model">
+            training.course
+        </field>
+
+        <field name="arch"
+               type="xml">
+
+            <form string="LCP Cost Inputs"
+                  create="false"
+                  delete="false">
+
+                <sheet>
+
+                    <group string="Training Reference">
+
+                        <group>
+                            <field name="training_id"
+                                   readonly="1"/>
+
+                            <field name="payment_method"
+                                   readonly="1"/>
+
+                            <field name="location"
+                                   readonly="1"/>
+                        </group>
+
+                        <group>
+                            <field name="lcp_days"
+                                   readonly="1"/>
+
+                            <field name="no_of_student"
+                                   string="Seats"
+                                   readonly="1"/>
+
+                            <field name="clcs_qty"
+                                   string="CLCs / Seat"
+                                   readonly="payment_method != 'clc'"/>
+                        </group>
+
+                    </group>
+
+                    <group string="Cost Inputs">
+
+                        <group>
+                            <field name="lcp_currency_id"
+                                   invisible="1"/>
+
+                            <field name="lcp_rate_card"/>
+                        </group>
+
+                        <group>
+                            <field name="lcp_instructor_rate_day"/>
+                        </group>
+
+                    </group>
+
+                </sheet>
+
+            </form>
+
+        </field>
+
+    </record>
+
+
+    <!-- ========================================================= -->
+    <!-- CRM LEAD: LCP DETAILS -->
+    <!-- ========================================================= -->
+
+    <record id="crm_lead_view_form_lcp_details"
+            model="ir.ui.view">
+
+        <field name="name">
+            crm.lead.form.lcp.details
+        </field>
+
+        <field name="model">
+            crm.lead
+        </field>
+
+        <field name="inherit_id"
+               ref="crm.crm_lead_view_form"/>
+
+        <field name="arch"
+               type="xml">
 
             <xpath expr="//page[@name='internal_notes']"
                    position="before">
@@ -14,9 +105,9 @@
                 <page name="lcp_details"
                       string="LCP Details">
 
-                    <!-- ================================================= -->
+                    <!-- ============================================= -->
                     <!-- 1. PRICING SETUP -->
-                    <!-- ================================================= -->
+                    <!-- ============================================= -->
 
                     <separator string="1. Pricing Setup"/>
 
@@ -65,21 +156,134 @@
                     </group>
 
 
-                    <!-- ================================================= -->
-                    <!-- 2. LCP SUMMARY -->
-                    <!-- ================================================= -->
+                    <!-- ============================================= -->
+                    <!-- 2. COURSE COST INPUTS -->
+                    <!-- Existing Training lines only. No Add/Delete. -->
+                    <!-- ============================================= -->
 
-                    <separator string="2. LCP Summary"/>
+                    <separator string="2. Course Cost Inputs"/>
+
+                    <field name="training_course_ids"
+                           mode="kanban"
+                           nolabel="1"
+                           class="o_lcp_input_cards"
+                           context="{
+                               'form_view_ref':
+                               'invoice_training_details.view_training_course_lcp_input_form'
+                           }">
+
+                        <kanban create="false"
+                                delete="false"
+                                quick_create="false"
+                                records_draggable="false">
+
+                            <field name="training_id"/>
+                            <field name="payment_method"/>
+                            <field name="location"/>
+                            <field name="lcp_days"/>
+                            <field name="no_of_student"/>
+                            <field name="clcs_qty"/>
+                            <field name="lcp_currency_id"/>
+                            <field name="lcp_rate_card"/>
+                            <field name="lcp_instructor_rate_day"/>
+
+                            <templates>
+
+                                <t t-name="kanban-box">
+
+                                    <div class="oe_kanban_global_click o_lcp_input_card">
+
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+
+                                            <div>
+                                                <div class="fw-bold fs-5">
+                                                    <field name="training_id"/>
+                                                </div>
+
+                                                <div class="text-muted small mt-1">
+                                                    Click to enter costing inputs
+                                                </div>
+                                            </div>
+
+                                            <div class="text-end">
+                                                <span class="badge rounded-pill text-bg-light me-1">
+                                                    <field name="payment_method"/>
+                                                </span>
+
+                                                <span class="badge rounded-pill text-bg-light">
+                                                    <field name="location"/>
+                                                </span>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="o_lcp_card_values">
+
+                                            <div class="o_lcp_value_box">
+                                                <span>Days</span>
+                                                <strong>
+                                                    <field name="lcp_days"/>
+                                                </strong>
+                                            </div>
+
+                                            <div class="o_lcp_value_box">
+                                                <span>Seats</span>
+                                                <strong>
+                                                    <field name="no_of_student"/>
+                                                </strong>
+                                            </div>
+
+                                            <t t-if="record.payment_method.raw_value == 'clc'">
+                                                <div class="o_lcp_value_box">
+                                                    <span>CLCs / Seat</span>
+                                                    <strong>
+                                                        <field name="clcs_qty"/>
+                                                    </strong>
+                                                </div>
+                                            </t>
+
+                                            <div class="o_lcp_value_box">
+                                                <span>Rate Card / Seat</span>
+                                                <strong>
+                                                    <field name="lcp_rate_card"/>
+                                                </strong>
+                                            </div>
+
+                                            <div class="o_lcp_value_box">
+                                                <span>Instructor / Day</span>
+                                                <strong>
+                                                    <field name="lcp_instructor_rate_day"/>
+                                                </strong>
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </t>
+
+                            </templates>
+
+                        </kanban>
+
+                    </field>
+
+
+                    <!-- ============================================= -->
+                    <!-- 3. LCP SUMMARY -->
+                    <!-- ============================================= -->
+
+                    <separator string="3. LCP Summary"/>
 
                     <div class="row g-3 mt-1 mb-3">
 
-                        <!-- Training Totals -->
+                        <!-- TRAINING TOTALS -->
                         <div class="col-12 col-lg-4">
 
                             <div class="border rounded p-3 h-100">
 
                                 <div class="fw-bold fs-5 mb-3">
-                                    A. Training Totals
+                                    Training Totals
                                 </div>
 
                                 <div class="d-flex justify-content-between mb-2">
@@ -143,7 +347,7 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between">
-                                    <span>Uber Logistics (Days + 2)</span>
+                                    <span>Uber Logistics</span>
                                     <strong>
                                         <field name="lcp_total_uber_estimate"
                                                nolabel="1"
@@ -157,17 +361,13 @@
                         </div>
 
 
-                        <!-- Existing Logistics -->
+                        <!-- LOGISTICS -->
                         <div class="col-12 col-lg-4">
 
                             <div class="border rounded p-3 h-100">
 
                                 <div class="fw-bold fs-5 mb-3">
-                                    B. Existing Logistics
-                                </div>
-
-                                <div class="text-muted small mb-3">
-                                    Pulled directly from the existing CRM Lead.
+                                    Logistics
                                 </div>
 
                                 <div class="d-flex justify-content-between mb-2">
@@ -209,10 +409,11 @@
                                 </div>
 
                                 <div class="d-flex justify-content-between">
-                                    <span>Uber (Auto-updated)</span>
+                                    <span>Uber</span>
                                     <strong>
                                         <field name="uber"
                                                nolabel="1"
+                                               readonly="1"
                                                class="oe_inline"/>
                                     </strong>
                                 </div>
@@ -222,17 +423,13 @@
                         </div>
 
 
-                        <!-- Cost Details Result -->
+                        <!-- PROFIT -->
                         <div class="col-12 col-lg-4">
 
                             <div class="border rounded p-3 h-100">
 
                                 <div class="fw-bold fs-5 mb-3">
-                                    C. Cost Details Result
-                                </div>
-
-                                <div class="text-muted small mb-3">
-                                    Current result from the existing Cost Details engine.
+                                    Profit Margin
                                 </div>
 
                                 <div class="d-flex justify-content-between mb-2">
@@ -271,6 +468,7 @@
                                     <span class="fw-bold">
                                         NIL ME Profit
                                     </span>
+
                                     <strong class="fs-5">
                                         <field name="lcp_nilme_profit"
                                                nolabel="1"
@@ -283,6 +481,7 @@
                                     <span class="fw-bold">
                                         Profit Margin
                                     </span>
+
                                     <strong class="fs-5">
                                         <field name="lcp_profit_margin"
                                                nolabel="1"
@@ -305,7 +504,7 @@
 
                         This Lead has more than one Cost Details line.
                         LCP mirrors the first Cost Details result so the
-                        existing lead-level logistics are not duplicated.
+                        existing lead-level costs are not duplicated.
 
                     </div>
 

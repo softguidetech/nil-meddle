@@ -1,22 +1,22 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Invoice Training Details",
-    "version": "17.0",
+    "version": "17.0.1.0",
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
-    
+
     # Author Information
     "author": "SoftGuide Tech",
     "website": "https://www.softguidetech.com",
     "license": "LGPL-3",
-    
+
     # Dependencies
     "depends": [
-        "account", 
-        "crm", 
+        "account",
+        "crm",
         "sale_management",
-        "hr", 
+        "hr",
         "product"
     ],
 
@@ -26,9 +26,11 @@
         "security/ir.model.access.csv",
         "views/account_move_views.xml",
         "views/crm_lead_views.xml",
+
+        # LCP Details
+        "views/lcp_details_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
-        'views/lcp_details_views.xml',
 
         # Reports
         "reports/custom_invoice_layout.xml",  # Custom layout for invoice

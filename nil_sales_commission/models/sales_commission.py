@@ -267,8 +267,10 @@ class SalesCommission(models.Model):
             rec.profit_learning_partner = ', '.join(partner_labels)
             rec.profit_total_costs = total_costs
             rec.profit_nilme_share = nilme_share
+            # Odoo's percentage widget expects a ratio.
+            # Example: 0.4768 is displayed as 47.68%.
             rec.profit_margin_pct = (
-                (nilme_share / total_training_price) * 100.0
+                (nilme_share / total_training_price)
                 if total_training_price
                 else 0.0
             )

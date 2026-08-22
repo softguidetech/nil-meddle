@@ -1,250 +1,452 @@
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
-<!--  Keep old child-form XML IDs safe for database upgrades.  -->
-<record id="view_training_course_lcp_form" model="ir.ui.view">
-<field name="name">training.course.lcp.form</field>
-<field name="model">training.course</field>
-<field name="arch" type="xml">
-<form string="Training Reference" create="false" delete="false">
-<sheet>
-<group>
-<field name="training_id" readonly="1"/>
-<field name="no_of_student" readonly="1"/>
-<field name="duration" readonly="1"/>
-</group>
-</sheet>
-</form>
-</field>
-</record>
-<record id="view_training_course_lcp_input_form" model="ir.ui.view">
-<field name="name">training.course.lcp.input.form</field>
-<field name="model">training.course</field>
-<field name="arch" type="xml">
-<form string="Training Reference" create="false" delete="false">
-<sheet>
-<group>
-<field name="training_id" readonly="1"/>
-<field name="no_of_student" readonly="1"/>
-<field name="duration" readonly="1"/>
-</group>
-</sheet>
-</form>
-</field>
-</record>
-<record id="crm_lead_view_form_lcp_details" model="ir.ui.view">
-<field name="name">crm.lead.form.lcp.details</field>
-<field name="model">crm.lead</field>
-<field name="inherit_id" ref="crm.crm_lead_view_form"/>
-<field name="arch" type="xml">
-<xpath expr="//page[@name='internal_notes']" position="before">
-<page name="lcp_details" string="LCP Details">
-<!--  =================================================  -->
-<!--  1. PRICING SETUP  -->
-<!--  Customer is NOT duplicated.  -->
-<!--  Learning Partner comes from Cost Details.  -->
-<!--  =================================================  -->
-<separator string="1. PRICING SETUP"/>
-<group col="4">
-<group>
-<field name="ordering_partner_id" string="Ordering Partner"/>
-<field name="lcp_cost_learning_partner" string="Learning Partner" readonly="1"/>
-<field name="so_no" string="SO#"/>
-</group>
-<group>
-<field name="currency_id" invisible="1"/>
-<field name="total_training_price" string="Training Value" widget="monetary" options="{'currency_field': 'currency_id'}" readonly="1"/>
-<field name="lcp_vat_rate" string="VAT %"/>
-<!--  ALWAYS MANUAL, ALWAYS VISIBLE  -->
-<field name="lcp_clcs_per_seat" string="CLCs / Seat"/>
-<field name="lcp_rate_card_per_seat" string="Rate Card / Seat"/>
-</group>
-<group>
-<field name="lcp_instructor_source" string="Instructor From"/>
-<field name="instructor_id" string="Instructor"/>
-<!--  NIL ME ONLY  -->
-<field name="lcp_instructor_md_rate" string="Instructor MD" invisible="lcp_instructor_source != 'nil_me'"/>
-<!--  VENDOR ONLY  -->
-<field name="lcp_vendor_instructor_day" string="Vendor Instructor / Day" invisible="lcp_instructor_source != 'vendor'"/>
-<field name="lcp_uber_day_rate" string="Uber / Day"/>
-</group>
-<group>
-<!--  NIL ME ONLY  -->
-<field name="lcp_per_diem_rate" string="Per Diem / Day" invisible="lcp_instructor_source != 'nil_me'"/>
-<!--  NIL ME ONLY: MANUAL DAYS  -->
-<field name="lcp_per_diem_days" string="Per Diem Days" invisible="lcp_instructor_source != 'nil_me'"/>
-<field name="venue" string="Venue"/>
-<field name="ctrng" string="Catering"/>
-</group>
-</group>
-<!--  =================================================  -->
-<!--  2. LCP SUMMARY  -->
-<!--  =================================================  -->
-<separator string="2. LCP SUMMARY"/>
-<div class="row g-3 mt-1 mb-3">
-<!--  A. TRAINING TOTALS  -->
-<div class="col-12 col-lg-4">
-<div class="o_lcp_summary_card">
-<div class="o_lcp_summary_title"> A. Training Totals </div>
-<div class="o_lcp_summary_line">
-<span>Total Training Days</span>
-<strong>
-<field name="lcp_total_days" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Total Seats</span>
-<strong>
-<field name="lcp_total_seats" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>CLCs / Seat</span>
-<strong>
-<field name="lcp_clcs_per_seat" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Total CLCs</span>
-<strong>
-<field name="lcp_total_clcs" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Total CLCs + VAT</span>
-<strong>
-<field name="lcp_total_clcs_with_vat" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Total Rate Card</span>
-<strong>
-<field name="lcp_total_rate_card" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<!--  NIL ME SUMMARY  -->
-<div class="o_lcp_summary_line" invisible="lcp_instructor_source != 'nil_me'">
-<span>Instructor MD</span>
-<strong>
-<field name="lcp_instructor_md_rate" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line" invisible="lcp_instructor_source != 'nil_me'">
-<span>Total Instructor MD</span>
-<strong>
-<field name="lcp_total_instructor_md" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line" invisible="lcp_instructor_source != 'nil_me'">
-<span>Per Diem Days</span>
-<strong>
-<field name="lcp_per_diem_days" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line" invisible="lcp_instructor_source != 'nil_me'">
-<span>Total Per Diem</span>
-<strong>
-<field name="lcp_total_per_diem" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<!--  VENDOR SUMMARY  -->
-<div class="o_lcp_summary_line" invisible="lcp_instructor_source != 'vendor'">
-<span>Vendor Instructor / Day</span>
-<strong>
-<field name="lcp_vendor_instructor_day" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line" invisible="lcp_instructor_source != 'vendor'">
-<span>Total Vendor Instructor</span>
-<strong>
-<field name="lcp_total_vendor_instructor" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Uber Logistics (Days + 2)</span>
-<strong>
-<field name="lcp_total_uber_estimate" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-</div>
-</div>
-<!--  B. EXISTING LOGISTICS  -->
-<div class="col-12 col-lg-4">
-<div class="o_lcp_summary_card">
-<div class="o_lcp_summary_title"> B. Existing Logistics </div>
-<div class="o_lcp_summary_note"> Pulled directly from the existing CRM Lead. </div>
-<div class="o_lcp_summary_line">
-<span>Tickets</span>
-<strong>
-<field name="lcp_ticket_total" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Hotels</span>
-<strong>
-<field name="lcp_hotel_total" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Venue</span>
-<strong>
-<field name="venue" nolabel="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Catering</span>
-<strong>
-<field name="ctrng" nolabel="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Uber (Auto-updated)</span>
-<strong>
-<field name="uber" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-</div>
-</div>
-<!--  C. COST DETAILS RESULT  -->
-<div class="col-12 col-lg-4">
-<div class="o_lcp_summary_card">
-<div class="o_lcp_summary_title"> C. Cost Details Result </div>
-<div class="o_lcp_summary_note"> Current result from the existing Cost Details engine. </div>
-<div class="o_lcp_summary_line">
-<span>Learning Partner</span>
-<strong>
-<field name="lcp_cost_learning_partner" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Partner Share</span>
-<strong>
-<field name="lcp_partner_share" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line">
-<span>Total Costs</span>
-<strong>
-<field name="lcp_total_costs" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_divider"/>
-<div class="o_lcp_summary_line o_lcp_summary_total">
-<span>NIL ME Profit</span>
-<strong>
-<field name="lcp_nilme_profit" nolabel="1" readonly="1" class="oe_inline"/>
-</strong>
-</div>
-<div class="o_lcp_summary_line o_lcp_summary_total">
-<span>Profit Margin</span>
-<strong>
-<field name="lcp_profit_margin" nolabel="1" readonly="1" widget="percentage" class="oe_inline"/>
-</strong>
-</div>
-</div>
-</div>
-</div>
-<field name="lcp_cost_detail_count" invisible="1"/>
-</page>
-</xpath>
-</field>
-</record>
+
+    <!-- Keep old child-form XML IDs safe for database upgrades. -->
+    <record id="view_training_course_lcp_form" model="ir.ui.view">
+        <field name="name">training.course.lcp.form</field>
+        <field name="model">training.course</field>
+        <field name="arch" type="xml">
+            <form string="Training Reference"
+                  create="false"
+                  delete="false">
+                <sheet>
+                    <group>
+                        <field name="training_id"
+                               readonly="1"/>
+                        <field name="no_of_student"
+                               readonly="1"/>
+                        <field name="duration"
+                               readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <record id="view_training_course_lcp_input_form"
+            model="ir.ui.view">
+        <field name="name">
+            training.course.lcp.input.form
+        </field>
+        <field name="model">training.course</field>
+        <field name="arch" type="xml">
+            <form string="Training Reference"
+                  create="false"
+                  delete="false">
+                <sheet>
+                    <group>
+                        <field name="training_id"
+                               readonly="1"/>
+                        <field name="no_of_student"
+                               readonly="1"/>
+                        <field name="duration"
+                               readonly="1"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+
+    <record id="crm_lead_view_form_lcp_details"
+            model="ir.ui.view">
+
+        <field name="name">
+            crm.lead.form.lcp.details
+        </field>
+
+        <field name="model">crm.lead</field>
+
+        <field name="inherit_id"
+               ref="crm.crm_lead_view_form"/>
+
+        <field name="arch" type="xml">
+
+            <xpath expr="//page[@name='internal_notes']"
+                   position="before">
+
+                <page name="lcp_details"
+                      string="LCP Details">
+
+                    <!-- ================================================= -->
+                    <!-- 1. PRICING SETUP -->
+                    <!-- ================================================= -->
+
+                    <separator string="1. PRICING SETUP"/>
+
+                    <group col="4">
+
+                        <group>
+                            <!-- Learning Partner comes from Cost Details -->
+                            <field name="lcp_cost_learning_partner"
+                                   string="Learning Partner"
+                                   readonly="1"/>
+
+                            <field name="so_no"
+                                   string="SO#"/>
+
+                            <!-- Source: Training -->
+                            <field name="lcp_payment_method"
+                                   string="Payment Method"
+                                   readonly="1"/>
+                        </group>
+
+                        <group>
+                            <field name="currency_id"
+                                   invisible="1"/>
+
+                            <field name="total_training_price"
+                                   string="Training Value"
+                                   widget="monetary"
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="1"/>
+
+                            <field name="lcp_vat_rate"
+                                   string="VAT %"/>
+
+                            <!-- CLC -->
+                            <field name="lcp_clcs_per_seat"
+                                   string="CLCs / Seat"
+                                   invisible="lcp_payment_method != 'clc'"/>
+
+                            <!-- CASH: same manual input, different label -->
+                            <field name="lcp_clcs_per_seat"
+                                   string="USD / Seat"
+                                   invisible="lcp_payment_method != 'cash'"/>
+
+                            <!-- CLC ONLY -->
+                            <field name="lcp_rate_card_per_seat"
+                                   string="Rate Card / Seat"
+                                   invisible="lcp_payment_method != 'clc'"/>
+                        </group>
+
+                        <group>
+                            <field name="lcp_instructor_source"
+                                   string="Instructor From"/>
+
+                            <field name="instructor_id"
+                                   string="Instructor"/>
+
+                            <!-- NIL ME ONLY -->
+                            <field name="lcp_instructor_md_rate"
+                                   string="Instructor Rate"
+                                   invisible="lcp_instructor_source != 'nil_me'"/>
+
+                            <!-- VENDOR ONLY -->
+                            <field name="lcp_vendor_instructor_day"
+                                   string="Vendor Instructor / Day"
+                                   invisible="lcp_instructor_source != 'vendor'"/>
+
+                            <field name="lcp_uber_day_rate"
+                                   string="Uber / Day"/>
+                        </group>
+
+                        <group>
+                            <!-- NIL ME ONLY -->
+                            <field name="lcp_per_diem_rate"
+                                   string="Per Diem / Day"
+                                   invisible="lcp_instructor_source != 'nil_me'"/>
+
+                            <!-- NIL ME ONLY: MANUAL DAYS -->
+                            <field name="lcp_per_diem_days"
+                                   string="Per Diem Days"
+                                   invisible="lcp_instructor_source != 'nil_me'"/>
+
+                            <field name="venue"
+                                   string="Venue"/>
+
+                            <field name="ctrng"
+                                   string="Catering"/>
+                        </group>
+
+                    </group>
+
+
+                    <!-- ================================================= -->
+                    <!-- 2. LCP SUMMARY -->
+                    <!-- ================================================= -->
+
+                    <separator string="2. LCP SUMMARY"/>
+
+                    <div class="row g-3 mt-1 mb-3">
+
+                        <!-- A. TRAINING TOTALS -->
+                        <div class="col-12 col-lg-4">
+
+                            <div class="o_lcp_summary_card">
+
+                                <div class="o_lcp_summary_title">
+                                    A. Training Totals
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Total Training Days</span>
+                                    <strong>
+                                        <field name="lcp_total_days"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Total Seats</span>
+                                    <strong>
+                                        <field name="lcp_total_seats"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <!-- TOTAL CLCs REMOVED BY REQUEST -->
+
+                                <!-- CLC ONLY -->
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_payment_method != 'clc'">
+                                    <span>Total CLCs + VAT</span>
+                                    <strong>
+                                        <field name="lcp_total_clcs_with_vat"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <!-- CLC ONLY -->
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_payment_method != 'clc'">
+                                    <span>Total Rate Card</span>
+                                    <strong>
+                                        <field name="lcp_total_rate_card"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <!-- NIL ME -->
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_instructor_source != 'nil_me'">
+                                    <span>Instructor Rate</span>
+                                    <strong>
+                                        <field name="lcp_instructor_md_rate"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_instructor_source != 'nil_me'">
+                                    <span>Total Instructor Cost</span>
+                                    <strong>
+                                        <field name="lcp_total_instructor_md"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_instructor_source != 'nil_me'">
+                                    <span>Per Diem Days</span>
+                                    <strong>
+                                        <field name="lcp_per_diem_days"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_instructor_source != 'nil_me'">
+                                    <span>Total Per Diem</span>
+                                    <strong>
+                                        <field name="lcp_total_per_diem"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <!-- VENDOR -->
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_instructor_source != 'vendor'">
+                                    <span>Vendor Instructor / Day</span>
+                                    <strong>
+                                        <field name="lcp_vendor_instructor_day"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_instructor_source != 'vendor'">
+                                    <span>Total Vendor Instructor</span>
+                                    <strong>
+                                        <field name="lcp_total_vendor_instructor"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Uber Logistics (Days + 2)</span>
+                                    <strong>
+                                        <field name="lcp_total_uber_estimate"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- B. EXISTING LOGISTICS -->
+                        <div class="col-12 col-lg-4">
+
+                            <div class="o_lcp_summary_card">
+
+                                <div class="o_lcp_summary_title">
+                                    B. Existing Logistics
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Tickets</span>
+                                    <strong>
+                                        <field name="lcp_ticket_total"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Hotels</span>
+                                    <strong>
+                                        <field name="lcp_hotel_total"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Venue</span>
+                                    <strong>
+                                        <field name="venue"
+                                               nolabel="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Catering</span>
+                                    <strong>
+                                        <field name="ctrng"
+                                               nolabel="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Uber (Auto-updated)</span>
+                                    <strong>
+                                        <field name="uber"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <!-- C. COST DETAILS RESULT -->
+                        <div class="col-12 col-lg-4">
+
+                            <div class="o_lcp_summary_card">
+
+                                <div class="o_lcp_summary_title">
+                                    C. Cost Details Result
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Learning Partner</span>
+                                    <strong>
+                                        <field name="lcp_cost_learning_partner"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Partner Share</span>
+                                    <strong>
+                                        <field name="lcp_partner_share"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line">
+                                    <span>Total Costs</span>
+                                    <strong>
+                                        <field name="lcp_total_costs"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_divider"/>
+
+                                <div class="o_lcp_summary_line o_lcp_summary_total">
+                                    <span>NIL ME Profit</span>
+                                    <strong>
+                                        <field name="lcp_nilme_profit"
+                                               nolabel="1"
+                                               readonly="1"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                                <div class="o_lcp_summary_line o_lcp_summary_total">
+                                    <span>Profit Margin</span>
+                                    <strong>
+                                        <field name="lcp_profit_margin"
+                                               nolabel="1"
+                                               readonly="1"
+                                               widget="percentage"
+                                               class="oe_inline"/>
+                                    </strong>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <field name="lcp_cost_detail_count"
+                           invisible="1"/>
+
+                </page>
+
+            </xpath>
+
+        </field>
+
+    </record>
+
 </odoo>

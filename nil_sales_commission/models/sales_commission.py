@@ -821,6 +821,77 @@ class SalesCommission(models.Model):
                     'Commission percentage must be greater than zero.'
                 ))
 
+            # ---------------------------------------------------------
+            # AUTO-FILL ACCOUNTING DEFAULTS ON APPROVAL
+            # ---------------------------------------------------------
+            # Payment Journal:
+            #     Incentive
+            #
+            # Commission Expense Account:
+            #     82109 Incentive - Operation
+            #
+            # Payment / Credit Account:
+            #     512022 Bank Emirates Islamic Bank
+            #     Checking Account/Current -AED
+            # ---------------------------------------------------------
+
+            Journal = self.env['account.journal'].sudo()
+            Account = self.env['account.account'].sudo()
+
+            payment_journal = Journal.search([
+                ('company_id', '=', rec.company_id.id),
+                ('name', '=', 'Incentive'),
+            ], limit=1)
+
+            if not payment_journal:
+                payment_journal = Journal.search([
+                    ('company_id', '=', rec.company_id.id),
+                    ('name', 'ilike', 'Incentive'),
+                ], limit=1)
+
+            expense_account = Account.search([
+                ('company_id', '=', rec.company_id.id),
+                ('code', '=', '82109'),
+            ], limit=1)
+
+            if not expense_account:
+                expense_account = Account.search([
+                    ('company_id', '=', rec.company_id.id),
+                    ('name', '=', 'Incentive - Operation'),
+                ], limit=1)
+
+            payment_account = Account.search([
+                ('company_id', '=', rec.company_id.id),
+                ('code', '=', '512022'),
+            ], limit=1)
+
+            if not payment_account:
+                payment_account = Account.search([
+                    ('company_id', '=', rec.company_id.id),
+                    ('name', 'ilike',
+                     'Bank Emirates Islamic Bank Checking Account/Current'),
+                ], limit=1)
+
+            if not payment_journal:
+                raise UserError(_(
+                    'Payment Journal "Incentive" was not found for company %(company)s.',
+                    company=rec.company_id.display_name,
+                ))
+
+            if not expense_account:
+                raise UserError(_(
+                    'Commission Expense Account 82109 Incentive - Operation '
+                    'was not found for company %(company)s.',
+                    company=rec.company_id.display_name,
+                ))
+
+            if not payment_account:
+                raise UserError(_(
+                    'Payment / Credit Account 512022 Bank Emirates Islamic Bank '
+                    'Checking Account/Current -AED was not found for company %(company)s.',
+                    company=rec.company_id.display_name,
+                ))
+
             if rec.invoice_id and rec.auto_key == 'ruba':
                 rec.invoice_id.sudo().write({
                     'exclude_from_commission':
@@ -829,6 +900,9 @@ class SalesCommission(models.Model):
 
             rec.write({
                 'state': 'pending',
+                'payment_journal_id': payment_journal.id,
+                'expense_account_id': expense_account.id,
+                'payment_account_id': payment_account.id,
             })
 
         return True

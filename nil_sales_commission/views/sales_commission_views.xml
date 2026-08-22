@@ -172,47 +172,63 @@
 
                     </group>
 
-                    <group string="Profit Margin"
-                           invisible="not lead_id">
-                        <div class="row mt16 mb16">
-                            <div class="col-3">
-                                <div class="border rounded p-3 bg-light">
-                                    <div class="text-muted mb-1">Learning Partner</div>
-                                    <h3 class="m-0">
-                                        <field name="profit_learning_partner" nolabel="1" readonly="1"/>
-                                    </h3>
-                                </div>
-                            </div>
+                    <separator string="Profit Margin"
+                               invisible="not lead_id"/>
 
-                            <div class="col-3">
-                                <div class="border rounded p-3 bg-light">
-                                    <div class="text-muted mb-1">Total Costs</div>
-                                    <h3 class="m-0">
-                                        <field name="profit_total_costs" nolabel="1" readonly="1"/>
-                                    </h3>
-                                </div>
-                            </div>
+                    <div class="d-flex flex-wrap gap-2 w-100 mt-2 mb-3"
+                         invisible="not lead_id"
+                         style="width: 100%;">
 
-                            <div class="col-3">
-                                <div class="border rounded p-3 bg-light">
-                                    <div class="text-muted mb-1">NIL ME Share $</div>
-                                    <h3 class="m-0">
-                                        <field name="profit_nilme_share" nolabel="1" readonly="1"/>
-                                    </h3>
-                                </div>
+                        <div class="border rounded p-2 bg-light"
+                             style="flex: 0 1 180px; min-width: 180px; max-width: 210px;">
+                            <div class="text-muted fw-bold mb-1">
+                                Learning Partner
                             </div>
-
-                            <div class="col-3">
-                                <div class="border rounded p-3 bg-light">
-                                    <div class="text-muted mb-1">Margin (%)</div>
-                                    <h3 class="m-0">
-                                        <field name="profit_margin_pct" nolabel="1" readonly="1" widget="percentage"/>
-                                    </h3>
-                                </div>
+                            <div class="fs-5 fw-bold">
+                                <field name="profit_learning_partner"
+                                       nolabel="1"
+                                       readonly="1"/>
                             </div>
                         </div>
 
-                    </group>
+                        <div class="border rounded p-2 bg-light"
+                             style="flex: 0 1 180px; min-width: 180px; max-width: 210px;">
+                            <div class="text-muted fw-bold mb-1">
+                                Total Costs
+                            </div>
+                            <div class="fs-5 fw-bold">
+                                <field name="profit_total_costs"
+                                       nolabel="1"
+                                       readonly="1"/>
+                            </div>
+                        </div>
+
+                        <div class="border rounded p-2 bg-light"
+                             style="flex: 0 1 180px; min-width: 180px; max-width: 210px;">
+                            <div class="text-muted fw-bold mb-1">
+                                NIL ME Share $
+                            </div>
+                            <div class="fs-5 fw-bold">
+                                <field name="profit_nilme_share"
+                                       nolabel="1"
+                                       readonly="1"/>
+                            </div>
+                        </div>
+
+                        <div class="border rounded p-2 bg-light"
+                             style="flex: 0 1 180px; min-width: 180px; max-width: 210px;">
+                            <div class="text-muted fw-bold mb-1">
+                                Margin (%)
+                            </div>
+                            <div class="fs-5 fw-bold">
+                                <field name="profit_margin_pct"
+                                       nolabel="1"
+                                       readonly="1"
+                                       widget="percentage"/>
+                            </div>
+                        </div>
+
+                    </div>
 
                     <group string="Payment / Accounting"
                            invisible="state in ('draft', 'excluded', 'cancelled')">

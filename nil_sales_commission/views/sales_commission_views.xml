@@ -40,6 +40,16 @@
                 <field name="commission_amount"
                        sum="Total Commission"/>
 
+                <field name="commission_paid_amount"
+                       string="Paid"
+                       readonly="1"
+                       sum="Total Paid"/>
+
+                <field name="commission_unpaid_amount"
+                       string="Unpaid"
+                       readonly="1"
+                       sum="Total Unpaid"/>
+
                 <field name="state"
                        widget="badge"
                        decoration-warning="state == 'draft'"
@@ -167,9 +177,6 @@
 
                             <field name="commission_amount"
                                    readonly="1"/>
-
-                            <field name="aed_currency_id"
-                                   invisible="1"/>
 
                             <field name="commission_amount_aed"
                                    string="Commission Amount AED (3.6725)"

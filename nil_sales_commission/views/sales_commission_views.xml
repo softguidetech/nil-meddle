@@ -163,7 +163,7 @@
                                    invisible="1"/>
 
                             <field name="salesperson_id"
-                                   string="Commission For"
+                                   string="Account Manager"
                                    readonly="state == 'paid' or auto_key in ('ruba', 'salesperson')"/>
 
                             <field name="commission_rate"

@@ -83,7 +83,8 @@
                                    readonly="1"/>
 
                             <field name="so_no"
-                                   string="SO#"/>
+                                   string="SO#"
+                                   invisible="lcp_payment_method != 'clc'"/>
 
                             <!-- Source: Training -->
                             <field name="lcp_payment_method"
@@ -138,7 +139,8 @@
                                    invisible="lcp_instructor_source != 'vendor'"/>
 
                             <field name="lcp_uber_day_rate"
-                                   string="Uber / Day"/>
+                                   string="Uber / Day"
+                                   invisible="lcp_is_online"/>
                         </group>
 
                         <group>
@@ -153,10 +155,12 @@
                                    invisible="lcp_instructor_source != 'nil_me'"/>
 
                             <field name="venue"
-                                   string="Venue"/>
+                                   string="Venue"
+                                   invisible="lcp_is_online"/>
 
                             <field name="ctrng"
-                                   string="Catering"/>
+                                   string="Catering"
+                                   invisible="lcp_is_online"/>
                         </group>
 
                     </group>
@@ -228,31 +232,9 @@
                                 <!-- NIL ME -->
                                 <div class="o_lcp_summary_line"
                                      invisible="lcp_instructor_source != 'nil_me'">
-                                    <span>Instructor Rate</span>
-                                    <strong>
-                                        <field name="lcp_instructor_md_rate"
-                                               nolabel="1"
-                                               readonly="1"
-                                               class="oe_inline"/>
-                                    </strong>
-                                </div>
-
-                                <div class="o_lcp_summary_line"
-                                     invisible="lcp_instructor_source != 'nil_me'">
                                     <span>Total Instructor Cost</span>
                                     <strong>
                                         <field name="lcp_total_instructor_md"
-                                               nolabel="1"
-                                               readonly="1"
-                                               class="oe_inline"/>
-                                    </strong>
-                                </div>
-
-                                <div class="o_lcp_summary_line"
-                                     invisible="lcp_instructor_source != 'nil_me'">
-                                    <span>Per Diem Days</span>
-                                    <strong>
-                                        <field name="lcp_per_diem_days"
                                                nolabel="1"
                                                readonly="1"
                                                class="oe_inline"/>
@@ -293,7 +275,8 @@
                                     </strong>
                                 </div>
 
-                                <div class="o_lcp_summary_line">
+                                <div class="o_lcp_summary_line"
+                                     invisible="lcp_is_online">
                                     <span>Uber Logistics (Days + 2)</span>
                                     <strong>
                                         <field name="lcp_total_uber_estimate"
@@ -309,7 +292,8 @@
 
 
                         <!-- B. EXISTING LOGISTICS -->
-                        <div class="col-12 col-lg-4">
+                        <div class="col-12 col-lg-4"
+                             invisible="lcp_is_online">
 
                             <div class="o_lcp_summary_card">
 
@@ -356,7 +340,7 @@
                                 </div>
 
                                 <div class="o_lcp_summary_line">
-                                    <span>Uber (Auto-updated)</span>
+                                    <span>Uber</span>
                                     <strong>
                                         <field name="uber"
                                                nolabel="1"
@@ -439,6 +423,9 @@
                     </div>
 
                     <field name="lcp_cost_detail_count"
+                           invisible="1"/>
+
+                    <field name="lcp_is_online"
                            invisible="1"/>
 
                 </page>

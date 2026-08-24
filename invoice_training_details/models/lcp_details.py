@@ -31,6 +31,11 @@ class CrmLead(models.Model):
         compute='_compute_lcp_payment_method',
     )
 
+    lcp_is_online = fields.Boolean(
+        string='Online Training',
+        compute='_compute_lcp_is_online',
+    )
+
     # MANUAL ONLY.
     # CLC training: shown as "CLCs / Seat"
     # Cash training: shown as "USD / Seat"
@@ -229,6 +234,21 @@ class CrmLead(models.Model):
             else:
                 lead.lcp_payment_method = 'cash'
 
+    @api.depends(
+        'training_course_ids.location'
+    )
+    def _compute_lcp_is_online(self):
+        for lead in self:
+            lines = lead.training_course_ids
+
+            lead.lcp_is_online = (
+                bool(lines)
+                and all(
+                    line.location == 'Online'
+                    for line in lines
+                )
+            )
+
     # =========================================================
     # TRAINING DAYS HELPER
     # =========================================================
@@ -279,6 +299,7 @@ class CrmLead(models.Model):
         'training_course_ids.duration',
         'training_course_ids.no_of_student',
         'training_course_ids.payment_method',
+        'training_course_ids.location',
         'lcp_vat_rate',
         'lcp_clcs_per_seat',
         'lcp_rate_card_per_seat',
@@ -391,10 +412,14 @@ class CrmLead(models.Model):
             # =====================================================
 
             total_uber = (
-                (lead.lcp_uber_day_rate or 0.0)
-                * (total_days + 2)
-                if total_days > 0
-                else 0.0
+                0.0
+                if lead.lcp_is_online
+                else (
+                    (lead.lcp_uber_day_rate or 0.0)
+                    * (total_days + 2)
+                    if total_days > 0
+                    else 0.0
+                )
             )
 
             lead.lcp_total_days = total_days
@@ -427,6 +452,9 @@ class CrmLead(models.Model):
 
         total_days = self._lcp_training_days()
 
+        if self.lcp_is_online:
+            return 0.0
+
         if total_days <= 0:
             return 0.0
 
@@ -452,6 +480,7 @@ class CrmLead(models.Model):
         'training_course_ids.training_date_start',
         'training_course_ids.training_date_end',
         'training_course_ids.duration',
+        'training_course_ids.location',
     )
     def _onchange_lcp_uber(self):
         for lead in self:
@@ -493,6 +522,8 @@ class CrmLead(models.Model):
         'cost_details_ids.ins_time',
         'total_training_price',
         'uber',
+        'lcp_total_per_diem',
+        'lcp_total_instructor_cost',
     )
     def _compute_lcp_existing_results(self):
         for lead in self:
@@ -523,8 +554,14 @@ class CrmLead(models.Model):
                     cost_line._get_effective_partner_share()
                 )
 
+                # Final LCP Total Costs =
+                # Existing Cost Details Total Costs
+                # + LCP Total Per Diem
+                # + LCP Total Instructor Cost.
                 lead.lcp_total_costs = (
-                    cost_line.margin1 or 0.0
+                    (cost_line.margin1 or 0.0)
+                    + (lead.lcp_total_per_diem or 0.0)
+                    + (lead.lcp_total_instructor_cost or 0.0)
                 )
 
                 lead.lcp_nilme_profit = (
@@ -538,7 +575,10 @@ class CrmLead(models.Model):
             else:
                 lead.lcp_cost_learning_partner = ''
                 lead.lcp_partner_share = 0.0
-                lead.lcp_total_costs = 0.0
+                lead.lcp_total_costs = (
+                    (lead.lcp_total_per_diem or 0.0)
+                    + (lead.lcp_total_instructor_cost or 0.0)
+                )
                 lead.lcp_nilme_profit = 0.0
                 lead.lcp_profit_margin = 0.0
 
@@ -719,6 +759,7 @@ class TrainingCourse(models.Model):
             'training_date_start',
             'training_date_end',
             'duration',
+            'location',
             'lead_id',
         }.intersection(vals):
             (

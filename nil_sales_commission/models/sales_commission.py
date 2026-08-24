@@ -50,7 +50,7 @@ class SalesCommission(models.Model):
 
     salesperson_id = fields.Many2one(
         'res.users',
-        string='Commission For',
+        string='AM Name',
         index=True,
     )
 
@@ -76,20 +76,20 @@ class SalesCommission(models.Model):
     )
 
     training_value = fields.Monetary(
-        string='Training Value',
+        string='Revenu',
         currency_field='currency_id',
         required=True,
         default=0.0,
     )
 
     commission_rate = fields.Float(
-        string='Commission %',
+        string='Comm %',
         default=0.0,
         required=True,
     )
 
     commission_amount = fields.Monetary(
-        string='Commission Amount',
+        string='Comm Amount',
         currency_field='currency_id',
         required=True,
         default=0.0,

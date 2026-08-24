@@ -95,6 +95,44 @@ class SalesCommission(models.Model):
         default=0.0,
     )
 
+    # Ledger footer helper amounts.
+    # Paid = Paid status only.
+    # Unpaid = Draft + Approved.
+    # Excluded / Cancelled do not count.
+    commission_paid_amount = fields.Monetary(
+        string='Paid Commission',
+        currency_field='currency_id',
+        compute='_compute_paid_unpaid_amounts',
+        compute_sudo=True,
+    )
+
+    commission_unpaid_amount = fields.Monetary(
+        string='Unpaid Commission',
+        currency_field='currency_id',
+        compute='_compute_paid_unpaid_amounts',
+        compute_sudo=True,
+    )
+
+    @api.depends(
+        'commission_amount',
+        'state',
+    )
+    def _compute_paid_unpaid_amounts(self):
+        for rec in self:
+            amount = rec.commission_amount or 0.0
+
+            rec.commission_paid_amount = (
+                amount
+                if rec.state == 'paid'
+                else 0.0
+            )
+
+            rec.commission_unpaid_amount = (
+                amount
+                if rec.state in ('draft', 'pending')
+                else 0.0
+            )
+
     aed_currency_id = fields.Many2one(
         'res.currency',
         string='AED Currency',

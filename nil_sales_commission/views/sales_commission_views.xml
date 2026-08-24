@@ -22,7 +22,7 @@
                        optional="show"/>
 
                 <field name="salesperson_id"
-                       string="Commission For"/>
+                       string="AM"/>
 
                 <field name="lead_id"
                        optional="show"/>

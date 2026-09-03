@@ -19,7 +19,7 @@ class CrmLead(models.Model):
     )
 
     # Payment Method is taken ONLY from Training lines.
-    # Same rule used by Cost Details:
+    # Payment method rule:
     # if ALL Training lines are CLC -> CLC
     # otherwise -> Cash.
     lcp_payment_method = fields.Selection(
@@ -180,9 +180,31 @@ class CrmLead(models.Model):
         compute='_compute_lcp_existing_results',
     )
 
-    lcp_cost_learning_partner = fields.Char(
+    # Kept under the SAME technical field name used by the existing view.
+    # It is now entered directly in LCP and no longer comes from cost.details.
+    lcp_cost_learning_partner = fields.Selection(
+        [
+            ('EnterOne', 'EnterOne'),
+            ('Koenig', 'Koenig'),
+            ('Mira', 'Mira'),
+            ('NIL LTD', 'NIL LTD'),
+            ('NIL SA', 'NIL SA'),
+            ('Other', 'Other'),
+        ],
         string='Learning Partner',
-        compute='_compute_lcp_existing_results',
+    )
+
+    # CLC ONLY. Manual percentage, never hard-coded.
+    lcp_partner_share_pct = fields.Float(
+        string='Partner Share %',
+        default=0.0,
+    )
+
+    # CASH ONLY. Final all-inclusive amount quoted by the partner.
+    lcp_partner_cash_cost = fields.Monetary(
+        string='Partner Cost',
+        currency_field='currency_id',
+        default=0.0,
     )
 
     lcp_partner_share = fields.Monetary(
@@ -508,79 +530,77 @@ class CrmLead(models.Model):
         return result
 
     # =========================================================
-    # EXISTING COST DETAILS RESULTS
+    # EXISTING RESULT FIELD NAMES - STANDALONE CALCULATION
+    # The field/method names are intentionally preserved so the
+    # existing XML and any external references do not need renaming.
+    # There is NO dependency on cost.details.
     # =========================================================
 
     @api.depends(
         'ticket_ids.price',
         'hotel_ids.price',
-        'cost_details_ids.learning_partner',
-        'cost_details_ids.training_vendor',
-        'cost_details_ids.margin1',
-        'cost_details_ids.nilme_share',
-        'cost_details_ids.margin',
-        'cost_details_ids.ins_time',
+        'venue',
+        'ctrng',
         'total_training_price',
         'uber',
+        'lcp_payment_method',
+        'lcp_total_rate_card',
+        'lcp_partner_share_pct',
+        'lcp_partner_cash_cost',
         'lcp_total_per_diem',
         'lcp_total_instructor_cost',
     )
     def _compute_lcp_existing_results(self):
         for lead in self:
-            lead.lcp_ticket_total = sum(
+            ticket_total = sum(
                 lead.ticket_ids.mapped('price')
             )
 
-            lead.lcp_hotel_total = sum(
+            hotel_total = sum(
                 lead.hotel_ids.mapped('price')
             )
 
-            lead.lcp_cost_detail_count = len(
-                lead.cost_details_ids
+            # CLC: Partner Share = Total Rate Card x manual %.
+            # CASH: Partner Share = final all-inclusive partner cost.
+            if lead.lcp_payment_method == 'clc':
+                partner_share = (
+                    (lead.lcp_total_rate_card or 0.0)
+                    * (lead.lcp_partner_share_pct or 0.0)
+                    / 100.0
+                )
+            else:
+                partner_share = (
+                    lead.lcp_partner_cash_cost or 0.0
+                )
+
+            total_costs = (
+                ticket_total
+                + hotel_total
+                + (lead.venue or 0.0)
+                + (lead.ctrng or 0.0)
+                + (lead.uber or 0.0)
+                + (lead.lcp_total_per_diem or 0.0)
+                + (lead.lcp_total_instructor_cost or 0.0)
+                + partner_share
             )
 
-            cost_line = lead.cost_details_ids[:1]
+            revenue = lead.total_training_price or 0.0
+            profit = revenue - total_costs
 
-            if cost_line:
-                # Learning Partner comes ONLY from Cost Details.
-                lead.lcp_cost_learning_partner = (
-                    cost_line.learning_partner
-                    or ''
-                )
+            lead.lcp_ticket_total = ticket_total
+            lead.lcp_hotel_total = hotel_total
+            lead.lcp_partner_share = partner_share
+            lead.lcp_total_costs = total_costs
+            lead.lcp_nilme_profit = profit
+            lead.lcp_profit_margin = (
+                profit / revenue
+                if revenue
+                else 0.0
+            )
 
-                # Partner Share comes from the EXISTING
-                # Cost Details engine.
-                lead.lcp_partner_share = (
-                    cost_line._get_effective_partner_share()
-                )
-
-                # Final LCP Total Costs =
-                # Existing Cost Details Total Costs
-                # + LCP Total Per Diem
-                # + LCP Total Instructor Cost.
-                lead.lcp_total_costs = (
-                    (cost_line.margin1 or 0.0)
-                    + (lead.lcp_total_per_diem or 0.0)
-                    + (lead.lcp_total_instructor_cost or 0.0)
-                )
-
-                lead.lcp_nilme_profit = (
-                    cost_line.nilme_share or 0.0
-                )
-
-                lead.lcp_profit_margin = (
-                    cost_line.margin or 0.0
-                )
-
-            else:
-                lead.lcp_cost_learning_partner = ''
-                lead.lcp_partner_share = 0.0
-                lead.lcp_total_costs = (
-                    (lead.lcp_total_per_diem or 0.0)
-                    + (lead.lcp_total_instructor_cost or 0.0)
-                )
-                lead.lcp_nilme_profit = 0.0
-                lead.lcp_profit_margin = 0.0
+            # Legacy technical field kept only so the existing XML
+            # remains compatible. It no longer counts cost.details.
+            lead.lcp_cost_detail_count = 0
 
     # =========================================================
     # VALIDATION
@@ -595,6 +615,8 @@ class CrmLead(models.Model):
         'lcp_uber_day_rate',
         'lcp_per_diem_rate',
         'lcp_per_diem_days',
+        'lcp_partner_share_pct',
+        'lcp_partner_cash_cost',
     )
     def _check_lcp_values(self):
         for lead in self:
@@ -627,6 +649,14 @@ class CrmLead(models.Model):
                 (
                     'Per Diem Days',
                     lead.lcp_per_diem_days,
+                ),
+                (
+                    'Partner Share %',
+                    lead.lcp_partner_share_pct,
+                ),
+                (
+                    'Partner Cost',
+                    lead.lcp_partner_cash_cost,
                 ),
             ]
 

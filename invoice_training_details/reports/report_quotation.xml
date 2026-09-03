@@ -8,610 +8,470 @@
                 <t t-call="invoice_training_details.custom_invoice_report_layout">
 
                     <t t-set="o" t-value="o.with_context(lang=lang)"/>
-                    <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
-
-                    <style>
-
-                        table[name="training_line_table"] thead th {
-                            background-color: #EAF9FC !important;
-                            color: #075E68 !important;
-                        }
-
-                        .proforma-text-section,
-                        .proforma-text-section * {
-                            font-size: 16px !important;
-                            font-family: inherit !important;
-                        }
-
-                    </style>
-
-                    <!-- Use company record if contact belongs to a company -->
                     <t t-set="customer_partner"
                        t-value="o.partner_id if o.partner_id.is_company else (o.partner_id.parent_id or o.partner_id)"/>
 
+                    <style>
+                        .nil-quotation-root {
+                            width: 100%;
+                            font-family: inherit;
+                            font-size: 15.5px;
+                            line-height: 1.5;
+                            color: #111;
+                        }
 
-                    <!-- Proforma Invoice Title -->
-                    <div class="row" style="margin:0 0 4px 0; padding:0;">
+                        .nil-quotation-title {
+                            color: #0DCAF0;
+                            font-size: 29px;
+                            font-weight: 600;
+                            line-height: 1.1;
+                            margin: 0 0 22px 0;
+                            padding: 0;
+                        }
 
-                        <div class="col-12"
-                             style="margin:0; padding-top:0; padding-bottom:0;">
+                        .nil-quotation-meta {
+                            width: 100%;
+                            border-collapse: collapse;
+                            margin: 0 0 22px 0;
+                        }
 
-                            <span class="h4 text-info"
-                                  style="display:block; margin:0; padding:0;">
-                                Quotation
-                            </span>
+                        .nil-quotation-meta td {
+                            border: 0 !important;
+                            padding: 3px 0 !important;
+                            vertical-align: top !important;
+                            font-size: 15.5px !important;
+                            line-height: 1.55 !important;
+                        }
 
+                        .nil-quotation-meta .label {
+                            font-weight: 700;
+                            white-space: nowrap;
+                            padding-right: 5px !important;
+                        }
+
+                        .nil-training-table {
+                            width: 100%;
+                            border-collapse: collapse !important;
+                            table-layout: auto;
+                            margin: 4px 0 14px 0 !important;
+                        }
+
+                        .nil-training-table thead {
+                            display: table-header-group !important;
+                        }
+
+                        .nil-training-table thead th {
+                            background: #EAF9FC !important;
+                            color: #075E68 !important;
+                            border: 1px solid #A9DCE5 !important;
+                            padding: 9px 7px !important;
+                            font-size: 14.5px !important;
+                            font-weight: 700 !important;
+                            line-height: 1.4 !important;
+                            text-align: center !important;
+                            vertical-align: middle !important;
+                        }
+
+                        .nil-training-table tbody tr {
+                            page-break-inside: avoid !important;
+                        }
+
+                        .nil-training-table tbody td {
+                            border: 1px solid #D0E5EA !important;
+                            padding: 9px 7px !important;
+                            font-size: 14.5px !important;
+                            line-height: 1.45 !important;
+                            vertical-align: middle !important;
+                            background: #fff !important;
+                        }
+
+                        .nil-training-table .text-left {
+                            text-align: left !important;
+                        }
+
+                        .nil-training-table .text-center {
+                            text-align: center !important;
+                        }
+
+                        .nil-total-wrap {
+                            width: 100%;
+                            text-align: right;
+                            margin: 10px 0 24px 0;
+                            page-break-inside: avoid !important;
+                        }
+
+                        .nil-total-table {
+                            width: 315px;
+                            margin-left: auto;
+                            margin-right: 0;
+                            border-collapse: collapse;
+                        }
+
+                        .nil-total-table td {
+                            border: 1px solid #CFE3E8 !important;
+                            background: #fff !important;
+                            padding: 8px 10px !important;
+                            font-size: 14.5px !important;
+                            line-height: 1.45 !important;
+                        }
+
+                        .nil-total-table .total-label {
+                            color: #075E68;
+                            font-weight: 700;
+                            text-align: left;
+                            white-space: nowrap;
+                        }
+
+                        .nil-total-table .total-value {
+                            font-weight: 700;
+                            text-align: right;
+                            white-space: nowrap;
+                        }
+
+                        .nil-terms,
+                        .nil-bank {
+                            width: 100%;
+                            font-size: 15px !important;
+                            line-height: 1.55 !important;
+                            margin: 0;
+                            padding: 0;
+                            page-break-inside: auto !important;
+                        }
+
+                        .nil-terms {
+                            margin-top: 14px;
+                        }
+
+                        .nil-terms *,
+                        .nil-bank * {
+                            font-family: inherit !important;
+                            font-size: 15px !important;
+                            line-height: 1.55 !important;
+                        }
+
+                        .nil-terms p,
+                        .nil-bank p {
+                            margin: 0 0 7px 0 !important;
+                            padding: 0 !important;
+                        }
+
+                        .nil-terms ul,
+                        .nil-terms ol,
+                        .nil-bank ul,
+                        .nil-bank ol {
+                            margin: 0 0 7px 0 !important;
+                            padding-left: 24px !important;
+                        }
+
+                        .nil-terms li,
+                        .nil-bank li {
+                            margin: 0 0 4px 0 !important;
+                            padding: 0 !important;
+                        }
+
+                        .nil-bank {
+                            margin-top: 16px;
+                        }
+
+                        .nil-signature {
+                            width: 100%;
+                            text-align: right;
+                            margin-top: 14px;
+                            page-break-inside: avoid !important;
+                            page-break-before: avoid !important;
+                            white-space: nowrap;
+                        }
+
+                        .nil-signature img {
+                            display: inline-block;
+                            vertical-align: bottom;
+                            object-fit: contain;
+                        }
+                    </style>
+
+                    <div class="nil-quotation-root">
+
+                        <!-- Title -->
+                        <div class="nil-quotation-title">
+                            Quotation
                         </div>
 
-                    </div>
-
-
-                    <!-- Customer Details -->
-                    <div class="row"
-                         style="margin-top:0; padding-top:0; padding-bottom:10px;">
-
-                        <div class="col-8">
-
-                            <div>
-
-                                <!-- Company Name -->
-                                <div style="margin:0 0 3px 0;">
-                                    <strong>Company Name:</strong>
-                                    <span t-field="customer_partner.name"/>
-                                </div>
-
-
-                                <!-- Address -->
-                                <div style="margin:0 0 3px 0;">
-
-                                    <strong>Address:</strong>
-
-                                    <span t-if="customer_partner.street"
-                                          t-field="customer_partner.street"/>
-
-                                    <t t-if="customer_partner.street2">
-                                        <t t-if="customer_partner.street">, </t>
-                                        <span t-field="customer_partner.street2"/>
-                                    </t>
-
-                                    <t t-if="customer_partner.city">
-                                        <t t-if="customer_partner.street or customer_partner.street2">, </t>
-                                        <span t-field="customer_partner.city"/>
-                                    </t>
-
-                                    <t t-if="customer_partner.state_id">
-                                        <t t-if="customer_partner.street or customer_partner.street2 or customer_partner.city">, </t>
-                                        <span t-field="customer_partner.state_id.name"/>
-                                    </t>
-
-                                    <t t-if="customer_partner.zip">
-                                        <t t-if="customer_partner.street or customer_partner.street2 or customer_partner.city or customer_partner.state_id">, </t>
-                                        <span t-field="customer_partner.zip"/>
-                                    </t>
-
-                                    <t t-if="customer_partner.country_id">
-                                        <t t-if="customer_partner.street or customer_partner.street2 or customer_partner.city or customer_partner.state_id or customer_partner.zip">, </t>
-                                        <span t-field="customer_partner.country_id.name"/>
-                                    </t>
-
-                                </div>
-
-
-                                <!-- Email -->
-                                <div t-if="o.partner_id.email or customer_partner.email"
-                                     style="margin:0 0 3px 0;">
-
-                                    <strong>Email:</strong>
-
-                                    <span t-if="o.partner_id.email"
-                                          t-field="o.partner_id.email"/>
-
-                                    <span t-else=""
-                                          t-field="customer_partner.email"/>
-
-                                </div>
-
-
-                                <!-- Tax Number -->
-                                <div t-if="customer_partner.vat"
-                                     style="margin:0 0 3px 0;">
-
-                                    <strong>Tax Number:</strong>
-                                    <span t-field="customer_partner.vat"/>
-
-                                </div>
-
-
-                                <!-- Attention -->
-                                <div t-if="o.partner_id.is_company == False"
-                                     style="margin:0 0 3px 0;">
-
-                                    <strong>Attention:</strong>
-                                    <span t-field="o.partner_id.name"/>
-
-                                </div>
-
-                            </div>
-
-                        </div>
-
-
-                        <!-- Document Details -->
-                        <div class="col-4">
-
-                            <div style="
-                                margin-left:auto;
-                                width:220px;
-                                line-height:1.2;
-                            ">
-
-                                <div style="
-                                    margin:0 0 3px 0;
-                                    padding:0;
-                                    white-space:nowrap;
-                                ">
-                                    <span>Quot#: </span>
-                                    <span t-if="o.name"
-                                          t-esc="
-                                            o.name
-                                            if o.name.startswith('Q')
-                                            else 'Q' + (
-                                                o.name[2:]
-                                                if o.name.startswith('SO')
-                                                else o.name[1:]
-                                                if o.name.startswith('S')
-                                                else o.name
-                                            )
-                                          "/>
-                                </div>
-
-                                <div style="
-                                    margin:0;
-                                    padding:0;
-                                    white-space:nowrap;
-                                ">
-                                    <span>DATE: </span>
-                                    <span t-field="o.date_order"
-                                          t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
-                                </div>
-
-                            </div>
-
-                        </div>
-
-                    </div>
-
-
-                    <!--<table class="table table-sm o_main_table table-borderless" name="order_lines">-->
-                    <!--    <thead class="bg-light text-info">-->
-                    <!--        <tr>-->
-                    <!--            <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>-->
-                    <!--            <th name="th_quantity" class="text-end"><span>QTY</span></th>-->
-                    <!--            <th name="th_rate" class="text-end"><span>RATE</span></th>-->
-                    <!--            <th name="th_amount" class="text-end"><span>AMOUNT</span></th>-->
-                    <!--        </tr>-->
-                    <!--    </thead>-->
-                    <!--    <tbody>-->
-                    <!--        <t t-foreach="o.order_lines" t-as="line">-->
-                    <!--            <tr>-->
-                    <!--                <td class="text-start" style="max-width:50px;"><span t-field="line.name"/></td>-->
-                    <!--                <td class="text-end"><span t-field="line.quantity"/></td>-->
-                    <!--                <td class="text-end"><span t-field="line.price_unit"/></td>-->
-                    <!--                <td class="text-end"><span t-field="line.quantity"/></td>-->
-                    <!--            </tr>-->
-                    <!--        </t>-->
-                    <!--    </tbody>-->
-                    <!--</table>-->
-
-
-                    <!-- TWO-LINE SPACE BEFORE TRAINING TABLE -->
-                    <div style="height:30px;"></div>
-
-
-                    <!-- Training Table -->
-                    <table t-if="o.display_training_table"
-                           class="table table-sm o_main_table table-bordered text-center"
-                           name="training_line_table">
-
-                        <thead>
-
+                        <!-- Customer + quotation details -->
+                        <table class="nil-quotation-meta">
                             <tr>
+                                <td style="width:66%;">
+                                    <table style="width:100%; border-collapse:collapse;">
+                                        <tr>
+                                            <td class="label" style="width:105px;">Company Name:</td>
+                                            <td>
+                                                <span t-field="customer_partner.name"/>
+                                            </td>
+                                        </tr>
 
-                                <th name="th_item"
-                                    style="text-align:center; vertical-align:middle;">
-                                    <span>Item</span>
-                                </th>
+                                        <tr>
+                                            <td class="label">Address:</td>
+                                            <td>
+                                                <span t-if="customer_partner.street"
+                                                      t-field="customer_partner.street"/>
 
+                                                <t t-if="customer_partner.street2">
+                                                    <t t-if="customer_partner.street">, </t>
+                                                    <span t-field="customer_partner.street2"/>
+                                                </t>
 
-                                <th name="th_training_name"
-                                    style="text-align:center; vertical-align:middle;">
-                                    <span>Training Name</span>
-                                </th>
+                                                <t t-if="customer_partner.city">
+                                                    <t t-if="customer_partner.street or customer_partner.street2">, </t>
+                                                    <span t-field="customer_partner.city"/>
+                                                </t>
 
+                                                <t t-if="customer_partner.state_id">
+                                                    <t t-if="customer_partner.street or customer_partner.street2 or customer_partner.city">, </t>
+                                                    <span t-field="customer_partner.state_id.name"/>
+                                                </t>
 
-                                <th t-if="o.display_instructor"
-                                    name="th_training_name"
-                                    style="text-align:center; vertical-align:middle;">
-                                    <span>Instructor Name</span>
-                                </th>
+                                                <t t-if="customer_partner.zip">
+                                                    <t t-if="customer_partner.street or customer_partner.street2 or customer_partner.city or customer_partner.state_id"> </t>
+                                                    <span t-field="customer_partner.zip"/>
+                                                </t>
 
+                                                <t t-if="customer_partner.country_id">
+                                                    <t t-if="customer_partner.street or customer_partner.street2 or customer_partner.city or customer_partner.state_id or customer_partner.zip">, </t>
+                                                    <span t-field="customer_partner.country_id.name"/>
+                                                </t>
+                                            </td>
+                                        </tr>
 
-                                <th name="th_of_students"
-                                    style="text-align:center; vertical-align:middle;">
-                                    <span># Of Students</span>
-                                </th>
+                                        <tr t-if="o.partner_id.email or customer_partner.email">
+                                            <td class="label">Email:</td>
+                                            <td>
+                                                <span t-if="o.partner_id.email"
+                                                      t-field="o.partner_id.email"/>
+                                                <span t-else=""
+                                                      t-field="customer_partner.email"/>
+                                            </td>
+                                        </tr>
 
+                                        <tr t-if="customer_partner.vat">
+                                            <td class="label">Tax Number:</td>
+                                            <td>
+                                                <span t-field="customer_partner.vat"/>
+                                            </td>
+                                        </tr>
 
-                                <th name="th_training_name"
-                                    style="text-align:center; vertical-align:middle;">
+                                        <tr t-if="not o.partner_id.is_company">
+                                            <td class="label">Attention:</td>
+                                            <td>
+                                                <span t-field="o.partner_id.name"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
 
-                                    <span t-if="o.display_location">
-                                        Location
-                                    </span>
+                                <td style="width:34%; padding-left:34px !important;">
+                                    <table style="width:100%; border-collapse:collapse;">
+                                        <tr>
+                                            <td class="label" style="width:72px;">Quot#:</td>
+                                            <td style="white-space:nowrap;">
+                                                <span t-if="o.name"
+                                                      t-esc="
+                                                        o.name
+                                                        if o.name.startswith('Q')
+                                                        else 'Q' + (
+                                                            o.name[2:]
+                                                            if o.name.startswith('SO')
+                                                            else o.name[1:]
+                                                            if o.name.startswith('S')
+                                                            else o.name
+                                                        )
+                                                      "/>
+                                            </td>
+                                        </tr>
 
-                                    <span t-elif="o.display_where">
-                                        Location1
-                                    </span>
-
-                                </th>
-
-
-                                <th name="th_duration"
-                                    style="text-align:center; vertical-align:middle;">
-                                    <span>Duration</span>
-                                </th>
-
-
-                                <th name="th_training_date"
-                                    style="text-align:center; vertical-align:middle;">
-                                    <span>Training Dates</span>
-                                </th>
-
-
-                                <th name="th_training_date"
-                                    style="text-align:center; vertical-align:middle;">
-                                    <span>Training Price</span>
-                                </th>
-
-
-                                <th t-if="o.display_total"
-                                    name="th_training_date"
-                                    style="max-width:80px; text-align:center; vertical-align:middle;">
-                                    <span>Total Price</span>
-                                </th>
-
-                                <!--<th t-if="o.display_downpayment" name="th_training_date" style="max-width:80px;"><span>Advance Payment amount 50% (paid)</span></th>-->
-                                <!--<th t-if="o.display_due_amount" name="th_training_date" style="max-width:80px;"><span>50% amount after training delivery (Not yet paid)</span></th>-->
-
+                                        <tr>
+                                            <td class="label">DATE:</td>
+                                            <td style="white-space:nowrap;">
+                                                <span t-field="o.date_order"
+                                                      t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
                             </tr>
-
-                        </thead>
-
-
-                        <tbody>
-
-                            <t t-set="item" t-value="1"/>
-                            <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
+                        </table>
 
 
-                            <t t-foreach="o.training_course_ids"
-                               t-as="training">
+                        <!-- Training table -->
+                        <table t-if="o.display_training_table"
+                               class="nil-training-table"
+                               name="training_line_table">
 
+                            <thead>
                                 <tr>
+                                    <th style="width:5%;">Item</th>
+                                    <th style="width:36%;">Training Name</th>
+                                    <th t-if="o.display_instructor"
+                                        style="width:13%;">Instructor Name</th>
+                                    <th style="width:10%;"># Of Students</th>
+                                    <th style="width:11%;">Location</th>
+                                    <th style="width:9%;">Duration</th>
+                                    <th style="width:13%;">Training Dates</th>
+                                    <th style="width:10%;">Training Price</th>
+                                </tr>
+                            </thead>
 
-                                    <td style="text-align:center; vertical-align:middle;">
-                                        <span t-esc="item"/>
-                                    </td>
+                            <tbody>
+                                <t t-set="item" t-value="1"/>
 
+                                <t t-foreach="o.training_course_ids"
+                                   t-as="training">
 
-                                    <td style="text-align:left; vertical-align:middle;">
-                                        <span t-field="training.training_id"/>
-                                        <t t-if="training.hyperlink"><span> - </span><a t-att-href="training.hyperlink" target="_blank" style="text-decoration:underline;">Click for Course Content</a></t>
-                                    </td>
-
-
-                                    <td t-if="o.display_instructor"
-                                        style="text-align:center; vertical-align:middle;">
-                                        <span t-field="training.instructor_id.name"/>
-                                    </td>
-
-
-                                    <td style="text-align:center; vertical-align:middle;">
-                                        <span t-field="training.no_of_student"/>
-                                    </td>
-
-
-                                    <td style="text-align:center; vertical-align:middle;">
-
-                                        <span t-if="o.display_location"
-                                              t-field="training.location"/>
-
-                                        <span t-if="o.display_location and o.display_where">, </span>
-
-                                        <span t-if="o.display_where"
-                                              t-field="training.where_location2"/>
-
-                                    </td>
-
-
-                                    <td style="text-align:center; vertical-align:middle;">
-                                        <span t-field="training.duration"/>
-                                    </td>
-
-
-                                    <td style="text-align:center; vertical-align:middle;">
-
-                                        <span t-field="training.training_date_start"/>
-
-                                        -
-
-                                        <span t-field="training.training_date_end"/>
-
-                                    </td>
-
-
-                                    <td style="text-align:center; vertical-align:middle;">
-                                        <span t-field="training.price"/>
-                                    </td>
-
-
-                                    <t t-if="item == 1">
-
-                                        <td t-if="o.display_total"
-                                            t-att-rowspan="total_rows"
-                                            style="text-align:center; vertical-align:middle;">
-
-                                            <span t-field="o.total_training_price"/>
-
+                                    <tr>
+                                        <td class="text-center">
+                                            <span t-esc="item"/>
                                         </td>
 
-                                    </t>
+                                        <td class="text-left">
+                                            <span t-field="training.training_id"/>
 
-                                </tr>
+                                            <t t-if="training.hyperlink">
+                                                <span> - </span>
+                                                <a t-att-href="training.hyperlink"
+                                                   target="_blank"
+                                                   style="text-decoration:underline;">
+                                                    Course Content
+                                                </a>
+                                            </t>
+                                        </td>
 
-                                <t t-set="item"
-                                   t-value="item + 1"/>
+                                        <td t-if="o.display_instructor"
+                                            class="text-center">
+                                            <span t-field="training.instructor_id.name"/>
+                                        </td>
 
-                            </t>
+                                        <td class="text-center">
+                                            <span t-field="training.no_of_student"/>
+                                        </td>
 
-                        </tbody>
+                                        <td class="text-center">
+                                            <span t-if="o.display_location"
+                                                  t-field="training.location"/>
+                                            <span t-if="o.display_location and o.display_where and training.location and training.where_location2">, </span>
+                                            <span t-if="o.display_where"
+                                                  t-field="training.where_location2"/>
+                                        </td>
 
-                    </table>
+                                        <td class="text-center">
+                                            <span t-field="training.duration"/>
+                                        </td>
+
+                                        <td class="text-center"
+                                            style="white-space:nowrap;">
+                                            <span t-field="training.training_date_start"/>
+                                            <span> - </span>
+                                            <span t-field="training.training_date_end"/>
+                                        </td>
+
+                                        <td class="text-center"
+                                            style="white-space:nowrap;">
+                                            <span t-field="training.price"/>
+                                        </td>
+                                    </tr>
+
+                                    <t t-set="item" t-value="item + 1"/>
+                                </t>
+                            </tbody>
+                        </table>
 
 
-                    <div class="row pt-3 pb-2"
-                         style="
-                            page-break-inside:avoid;
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:flex-start;
-                         ">
+                        <!-- Totals -->
+                        <div t-if="o.display_total"
+                             class="nil-total-wrap">
 
-                        <div class="col-auto"
-                             style="flex:1 1 auto;">
-
-                            <table class="table table-sm"
-                                   style="
-                                       background-color:#fff;
-                                       color:white;
-                                       width:auto;
-                                       border:none;
-                                   ">
-                            </table>
-
-                        </div>
-
-
-                        <div class="col-auto"
-                             style="
-                                 min-width:300px;
-                                 flex:0 0 auto;
-                                 margin-left:auto;
-                                 text-align:left;
-                                 position:absolute;
-                                 right:15px;
-                             ">
-
-                            <table class="table table-sm table-border"
-                                   style="
-                                       background-color:#fff;
-                                       width:300px;
-                                   ">
-
-                                <!-- Tax totals -->
+                            <table class="nil-total-table">
                                 <t t-set="tax_totals"
                                    t-value="o.tax_totals"/>
 
-
                                 <t t-if="tax_totals.get('subtotals')">
-
-                                    <!-- Untaxed Amount -->
                                     <t t-foreach="tax_totals.get('subtotals')"
                                        t-as="subtotal">
 
-                                        <tr class="border-grey o_subtotal">
-
-                                            <td style="background-color:#fff;">
-
-                                                <strong t-out="subtotal['name']">
-                                                    Untaxed Amount
-                                                </strong>
-
+                                        <tr>
+                                            <td class="total-label">
+                                                <span t-out="subtotal['name']"/>
                                             </td>
-
-                                            <td style="
-                                                background-color:#fff;
-                                                text-align:right;
-                                            ">
-
-                                                <span t-att-class="oe_subtotal_footer_separator"
-                                                      t-out="subtotal['formatted_amount']"/>
-
+                                            <td class="total-value">
+                                                <span t-out="subtotal['formatted_amount']"/>
                                             </td>
-
                                         </tr>
-
 
                                         <t t-set="subtotal_to_show"
                                            t-value="subtotal['name']"/>
 
-
                                         <t t-call="account.tax_groups_totals"/>
-
                                     </t>
-
                                 </t>
 
-
-                                <!-- Total Amount -->
-                                <tr class="border-grey o_total">
-
-                                    <td style="background-color:#fff;">
-                                        <strong>Total Amount</strong>
+                                <tr>
+                                    <td class="total-label">
+                                        Total Amount
                                     </td>
-
-                                    <td style="
-                                        background-color:#fff;
-                                        text-align:right;
-                                    ">
-
+                                    <td class="total-value">
                                         <span t-out="o.amount_total"
                                               t-options="{
                                                   &quot;widget&quot;: &quot;monetary&quot;,
                                                   &quot;display_currency&quot;: o.currency_id
                                               }"/>
-
                                     </td>
-
                                 </tr>
-
                             </table>
-
                         </div>
 
-                    </div>
+
+                        <!-- Terms
+                             IMPORTANT: term_and_cond is an Html field.
+                             Render it directly as a div, not inside p/span.
+                        -->
+                        <div t-if="o.term_and_cond"
+                             class="nil-terms"
+                             t-field="o.term_and_cond"/>
 
 
-                    <!-- Terms & Conditions -->
-                    <div class="row pt-3 pb-2"
-                         style="page-break-inside:avoid;">
-
-                        <div class="col-8 proforma-text-section"
-                             style="
-                                width:600px;
-                                font-size:16px;
-                                font-family:inherit;
-                             ">
-
-                            <p style="
-                                text-align:justify;
-                                margin:0;
-                                font-size:16px;
-                                font-family:inherit;
-                               ">
-
-                                <span t-field="o.term_and_cond"/>
-
-                            </p>
-
-                        </div>
-
-                    </div>
+                        <!-- Bank details -->
+                        <div t-if="o.bank_details"
+                             class="nil-bank"
+                             t-field="o.bank_details"/>
 
 
-                    <!--<div class="row" style="page-break-inside:avoid;">-->
-                    <!--    <div class="col-6"/>-->
-                    <!--    <div class="col-3">-->
-                    <!--        BALANCE DUE-->
-                    <!--    </div>-->
-                    <!--    <div class="col-3">-->
-                    <!--        <span t-field="o.total_training_price"/>-->
-                    <!--    </div>-->
-                    <!--</div>-->
+                        <!-- Signature + Stamp -->
+                        <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"
+                             class="nil-signature">
 
-
-                    <!-- Bank Details -->
-                    <div class="row pt-3 pb-2"
-                         style="page-break-inside:avoid;">
-
-                        <div class="col-8 proforma-text-section"
-                             style="
-                                width:600px;
-                                font-size:16px;
-                                font-family:inherit;
-                             ">
-
-                            <p style="
-                                text-align:justify;
-                                margin:0;
-                                font-size:16px;
-                                font-family:inherit;
-                               ">
-
-                                <span t-field="o.bank_details"/>
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- Signature + Stamp Bottom Right -->
-                    <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"
-                         class="row"
-                         style="
-                            page-break-inside:avoid;
-                            position:relative;
-                            min-height:170px;
-                         ">
-
-                        <div style="
-                            position:absolute;
-                            bottom:0;
-                            right:0;
-                            text-align:right;
-                            white-space:nowrap;
-                         ">
-
-                            <!-- Signature -->
                             <img t-if="o.company_id.signature and o.display_signature"
                                  t-att-src="image_data_uri(o.company_id.signature)"
                                  style="
-                                    max-height:120px;
-                                    max-width:180px;
+                                    max-height:82px;
+                                    max-width:140px;
                                     width:auto;
                                     height:auto;
-                                    object-fit:contain;
-                                    vertical-align:bottom;
-                                    display:inline-block;
-                                    margin-right:8px;
+                                    margin-right:6px;
                                  "
                                  alt="Signature"/>
 
-
-                            <!-- Stamp -->
                             <img t-if="o.company_id.stamp and o.display_stamp"
                                  t-att-src="image_data_uri(o.company_id.stamp)"
                                  style="
-                                    max-height:135px;
-                                    max-width:165px;
+                                    max-height:92px;
+                                    max-width:140px;
                                     width:auto;
                                     height:auto;
-                                    object-fit:contain;
-                                    vertical-align:bottom;
-                                    display:inline-block;
                                  "
                                  alt="Stamp"/>
-
                         </div>
 
                     </div>
 
                 </t>
-
             </t>
-
         </t>
     </template>
 </odoo>

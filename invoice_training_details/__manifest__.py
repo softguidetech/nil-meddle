@@ -25,19 +25,21 @@
 
         "views/account_move_views.xml",
 
-        # LCP must load before the main CRM inherited view
         "views/lcp_details_views.xml",
         "views/crm_lead_views.xml",
 
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
 
+        # PURCHASE ORDER TRAINING PRINT ONLY
+        "views/purchase_training_report.xml",
+
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",
         "reports/report_quotation.xml",
         "reports/report_pro_invoice.xml",
 
-        # TRAINING PURCHASE ORDER REPORT
+        # KEEP EXISTING FILE UNTOUCHED
         "reports/report_po_document.xml",
 
         "reports/report_action.xml",

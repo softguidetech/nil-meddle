@@ -14,16 +14,18 @@
         "account",
         "crm",
         "sale_management",
+        "purchase",
         "hr",
-        "product"
+        "product",
     ],
 
     "data": [
         "data/report_paperformat.xml",
         "security/ir.model.access.csv",
+
         "views/account_move_views.xml",
 
-        # IMPORTANT: LCP before CRM main inherited view.
+        # LCP must load before the main CRM inherited view
         "views/lcp_details_views.xml",
         "views/crm_lead_views.xml",
 
@@ -34,7 +36,10 @@
         "reports/report_invoice.xml",
         "reports/report_quotation.xml",
         "reports/report_pro_invoice.xml",
+
+        # TRAINING PURCHASE ORDER REPORT
         "reports/report_po_document.xml",
+
         "reports/report_action.xml",
         "reports/report_invoice_KSA.xml",
     ],

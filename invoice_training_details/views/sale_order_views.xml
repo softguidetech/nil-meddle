@@ -46,7 +46,7 @@
                         <!--</group>-->
                         <group>
                             <field name= "bank_details"/>
-                            <field name= "term_and_cond"/>
+                            <field name="term_and_cond" widget="nil_terms_editor" nolabel="1" colspan="2"/>
                         </group>
                     </group>
                     <group>
@@ -132,7 +132,7 @@
                         </group>
                         <group>
                             <field name= "bank_details"/>
-                            <field name= "term_and_cond"/>
+                            <field name="term_and_cond" widget="nil_terms_editor" nolabel="1" colspan="2"/>
                         </group>
                         
                        

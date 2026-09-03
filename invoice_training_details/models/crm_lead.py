@@ -306,6 +306,50 @@ class PurchaseOrder(models.Model):
         string='Terms and Conditions'
     )
 
+    total_training_price = fields.Monetary(
+        string='Total Training Price',
+        compute='_compute_po_training_price',
+        store=True
+    )
+
+    half_advance_payment_before = fields.Monetary(
+        string='Advance Payment Amount'
+    )
+    half_payment_after = fields.Monetary(
+        string='Due Amount'
+    )
+
+    display_training_table = fields.Boolean(
+        string='Display Training Table'
+    )
+    display_signature = fields.Boolean(
+        string='Display Signature'
+    )
+    display_stamp = fields.Boolean(
+        string='Display Stamp'
+    )
+    display_instructor = fields.Boolean(
+        string='Display Instructor'
+    )
+    display_location = fields.Boolean(
+        string='Display Location'
+    )
+    display_downpayment = fields.Boolean(
+        string='Display Downpayment'
+    )
+    display_total = fields.Boolean(
+        string='Display Total Amount'
+    )
+    display_due_amount = fields.Boolean(
+        string='Display Due Amount'
+    )
+    display_where = fields.Boolean(
+        string='Display Where?'
+    )
+    display_description = fields.Boolean(
+        string='Display Description'
+    )
+
     crm_lead_id = fields.Many2one(
         'crm.lead',
         string='CRM Opportunity',
@@ -321,6 +365,13 @@ class PurchaseOrder(models.Model):
         store=True,
         readonly=True
     )
+
+    @api.depends('training_course_ids.price')
+    def _compute_po_training_price(self):
+        for order in self:
+            order.total_training_price = sum(
+                order.training_course_ids.mapped('price')
+            )
 
     def _prepare_invoice(self):
         """Carry the CRM opportunity from the PO to its Vendor Bill."""
@@ -414,6 +465,3 @@ class ProductProduct(models.Model):
     
     cost_clc = fields.Char(string="CLCs Cost")
     hyperlink = fields.Char(string="Hyper Link")
-    
-    
-    

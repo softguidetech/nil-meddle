@@ -23,6 +23,36 @@
                             font-family: inherit !important;
                         }
 
+                        /* Clean multi-page behavior */
+                        table[name="training_line_table"] thead {
+                            display: table-header-group !important;
+                        }
+
+                        table[name="training_line_table"] tbody tr {
+                            page-break-inside: avoid !important;
+                        }
+
+                        .quotation-terms,
+                        .quotation-bank {
+                            page-break-inside: auto !important;
+                            width: 100% !important;
+                        }
+
+                        .quotation-terms p,
+                        .quotation-bank p {
+                            margin-top: 0 !important;
+                            margin-bottom: 5px !important;
+                        }
+
+                        .quotation-signature {
+                            page-break-before: avoid !important;
+                            page-break-inside: avoid !important;
+                            text-align: right;
+                            margin-top: 8px;
+                            min-height: 0 !important;
+                            height: auto !important;
+                        }
+
                     </style>
 
                     <!-- Use company record if contact belongs to a company -->
@@ -408,8 +438,8 @@
                                  flex:0 0 auto;
                                  margin-left:auto;
                                  text-align:left;
-                                 position:absolute;
-                                 right:15px;
+                                 position:relative;
+                                 right:auto;
                              ">
 
                             <table class="table table-sm table-border"
@@ -493,12 +523,11 @@
 
 
                     <!-- Terms & Conditions -->
-                    <div class="row pt-3 pb-2"
-                         style="page-break-inside:avoid;">
+                    <div class="row pt-3 pb-2 quotation-terms">
 
-                        <div class="col-8 proforma-text-section"
+                        <div class="col-12 proforma-text-section"
                              style="
-                                width:600px;
+                                width:100%;
                                 font-size:16px;
                                 font-family:inherit;
                              ">
@@ -531,12 +560,11 @@
 
 
                     <!-- Bank Details -->
-                    <div class="row pt-3 pb-2"
-                         style="page-break-inside:avoid;">
+                    <div class="row pt-3 pb-2 quotation-bank">
 
-                        <div class="col-8 proforma-text-section"
+                        <div class="col-12 proforma-text-section"
                              style="
-                                width:600px;
+                                width:100%;
                                 font-size:16px;
                                 font-family:inherit;
                              ">
@@ -559,27 +587,21 @@
 
                     <!-- Signature + Stamp Bottom Right -->
                     <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"
-                         class="row"
-                         style="
-                            page-break-inside:avoid;
-                            position:relative;
-                            min-height:170px;
-                         ">
+                         class="quotation-signature">
 
                         <div style="
-                            position:absolute;
-                            bottom:0;
-                            right:0;
                             text-align:right;
                             white-space:nowrap;
+                            margin:0;
+                            padding:0;
                          ">
 
                             <!-- Signature -->
                             <img t-if="o.company_id.signature and o.display_signature"
                                  t-att-src="image_data_uri(o.company_id.signature)"
                                  style="
-                                    max-height:120px;
-                                    max-width:180px;
+                                    max-height:90px;
+                                    max-width:150px;
                                     width:auto;
                                     height:auto;
                                     object-fit:contain;
@@ -594,8 +616,8 @@
                             <img t-if="o.company_id.stamp and o.display_stamp"
                                  t-att-src="image_data_uri(o.company_id.stamp)"
                                  style="
-                                    max-height:135px;
-                                    max-width:165px;
+                                    max-height:100px;
+                                    max-width:145px;
                                     width:auto;
                                     height:auto;
                                     object-fit:contain;

@@ -1,0 +1,9 @@
+.nil_terms_editor{width:100%;border:1px solid #d8dadd;border-radius:6px;background:#fff}
+.nil_toolbar{display:flex;flex-wrap:wrap;gap:4px;padding:7px;border-bottom:1px solid #d8dadd;background:#f7f7f8;position:sticky;top:0;z-index:2}
+.nil_toolbar button,.nil_toolbar select,.nil_toolbar input{min-height:30px;border:1px solid #cfd2d6;border-radius:4px;background:#fff;padding:3px 7px}
+.nil_toolbar button:hover{background:#eef7f9}
+.nil_editor_area{min-height:240px;max-height:520px;overflow:auto;padding:14px 16px;outline:none;font-size:15px;line-height:1.5}
+.nil_editor_area p{margin:0 0 8px}
+.nil_editor_area table,.nil-edit-table{width:100%;border-collapse:collapse;margin:10px 0}
+.nil_editor_area td,.nil_editor_area th{border:1px solid #999;padding:8px;min-width:55px;vertical-align:top}
+.nil_editor_area th{font-weight:700;background:#f2f2f2}

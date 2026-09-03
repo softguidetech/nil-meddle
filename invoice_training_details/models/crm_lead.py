@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import fields, models, api
+from odoo import fields, models, api, _
+from odoo.exceptions import UserError
 
 class Lead(models.Model):
     _inherit = 'crm.lead'
@@ -55,6 +56,19 @@ class Lead(models.Model):
     training_id = fields.Many2one('product.template',string='Training Name')
     location = fields.Selection([('Online','Online'),('On site','On site')])
     payment_method = fields.Selection([('cash','Cash'),('clc','CLC')],default='cash')
+    has_cash_training = fields.Boolean(
+        string='Has Cash Training',
+        compute='_compute_has_cash_training'
+    )
+    purchase_order_ids = fields.One2many(
+        'purchase.order',
+        'crm_lead_id',
+        string='Purchase Orders'
+    )
+    purchase_order_count = fields.Integer(
+        string='Purchase Orders',
+        compute='_compute_purchase_order_count'
+    )
     clcs_qty = fields.Float(string='CLCs Qty')
     learnig_partner = fields.Selection([('Koenig','Koenig'),('Mira','Mira'),('EnterOne','EnterOne'),('NIL LTD','NIL LTD'),('NIL SA','NIL SA')])
     con_per = fields.Char(string='Contact Person')
@@ -70,6 +84,72 @@ class Lead(models.Model):
     instructor_logistics = fields.Char(string='Instructor Logistics')
     uber = fields.Float(string='Uber')
     ctrng = fields.Float(string='Catering')  # Now it's manually editable
+
+    @api.depends('training_course_ids.payment_method')
+    def _compute_has_cash_training(self):
+        for lead in self:
+            lead.has_cash_training = any(
+                course.payment_method == 'cash'
+                for course in lead.training_course_ids
+            )
+
+    @api.depends('purchase_order_ids')
+    def _compute_purchase_order_count(self):
+        for lead in self:
+            lead.purchase_order_count = len(lead.purchase_order_ids)
+
+    def action_new_purchase_order(self):
+        """Open a new PO for the Cash training lines of this opportunity."""
+        self.ensure_one()
+
+        cash_courses = self.training_course_ids.filtered(
+            lambda course: course.payment_method == 'cash'
+        )
+        if not cash_courses:
+            raise UserError(_(
+                'New PO is available only when at least one training line '
+                'has Cash as its payment method.'
+            ))
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('New PO'),
+            'res_model': 'purchase.order',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_crm_lead_id': self.id,
+                'default_origin': self.name,
+                'default_partner_id': self.ordering_partner_id.id or False,
+                'default_currency_id': self.currency_id.id or False,
+                'default_is_training_order': True,
+                'default_payment_method': 'cash',
+                'default_training_course_ids': [(6, 0, cash_courses.ids)],
+                'default_instructor_id': self.instructor_id.id or False,
+                'default_descriptions': self.descriptions,
+                'default_training_id': self.training_id.id or False,
+                'default_start_date': self.start_date,
+                'default_end_date': self.to_date,
+                'default_po_reference': self.poref,
+                'default_tr_expiry_date': self.tr_expiry_date,
+            },
+        }
+
+    def action_view_purchase_orders(self):
+        """Show all purchase orders linked to this opportunity."""
+        self.ensure_one()
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('Purchase Orders'),
+            'res_model': 'purchase.order',
+            'view_mode': 'tree,form',
+            'target': 'current',
+            'domain': [('crm_lead_id', '=', self.id)],
+            'context': {
+                'default_crm_lead_id': self.id,
+                'default_partner_id': self.ordering_partner_id.id or False,
+            },
+        }
 
     def action_create_cost_line(self):
         """ Automatically create a new cost line when called """
@@ -147,6 +227,24 @@ class Lead(models.Model):
             'default_hotel_ids': [(6, 0, self.hotel_ids.ids)],
         })
         return quotation_context
+
+
+class PurchaseOrder(models.Model):
+    _inherit = 'purchase.order'
+
+    crm_lead_id = fields.Many2one(
+        'crm.lead',
+        string='CRM Opportunity',
+        index=True,
+        copy=False,
+        ondelete='set null'
+    )
+
+    def _prepare_invoice(self):
+        """Carry the CRM opportunity from the PO to its Vendor Bill."""
+        invoice_vals = super()._prepare_invoice()
+        invoice_vals['crm_lead_id'] = self.crm_lead_id.id or False
+        return invoice_vals
 
 class HotelHotel(models.Model):
     _name = 'hotel.hotel'

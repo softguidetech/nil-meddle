@@ -14,6 +14,7 @@
                         type="object"
                         string="New PO"
                         class="oe_highlight"
+                        groups="purchase.group_purchase_user"
                         invisible="not has_cash_training"/>
             </xpath>
 
@@ -22,6 +23,7 @@
                         type="object"
                         class="oe_stat_button"
                         icon="fa-shopping-cart"
+                        groups="purchase.group_purchase_user"
                         invisible="purchase_order_count == 0">
                     <field name="purchase_order_count"
                            widget="statinfo"

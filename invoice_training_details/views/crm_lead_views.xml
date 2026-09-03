@@ -426,6 +426,31 @@
                                nolabel="1"
                                colspan="2"/>
                     </group>
+
+                    <group>
+                        <group string="Report PDF Element Display">
+                            <field name="display_training_table"/>
+                            <field name="display_signature"/>
+                            <field name="display_stamp"/>
+                        </group>
+
+                        <group string="Column Display">
+                            <field name="display_description"/>
+                            <field name="display_instructor"/>
+                            <field name="display_location"/>
+                            <field name="display_where"/>
+                            <field name="display_total"/>
+                            <field name="display_downpayment"/>
+                            <field name="display_due_amount"/>
+                        </group>
+                    </group>
+
+                    <group invisible="not display_downpayment and not display_due_amount">
+                        <field name="half_advance_payment_before"
+                               invisible="not display_downpayment"/>
+                        <field name="half_payment_after"
+                               invisible="not display_due_amount"/>
+                    </group>
                 </page>
             </xpath>
         </field>
@@ -441,5 +466,179 @@
             </xpath>
         </field>
     </record>
+
+    <template id="purchase_training_print_block">
+        <t t-if="o.is_training_order">
+            <style>
+                table[name="purchase_training_line_table"] thead th {
+                    background-color: #EAF9FC !important;
+                    color: #075E68 !important;
+                }
+                .purchase-training-text,
+                .purchase-training-text * {
+                    font-size: 16px !important;
+                    font-family: inherit !important;
+                }
+            </style>
+
+            <div style="height: 30px;"/>
+
+            <div t-if="o.end_customer_id" style="margin-bottom: 10px;">
+                <strong>End Customer: </strong>
+                <span t-field="o.end_customer_id"/>
+            </div>
+
+            <table t-if="o.display_training_table and o.training_course_ids"
+                   class="table table-sm o_main_table table-bordered text-center"
+                   name="purchase_training_line_table">
+                <thead>
+                    <tr>
+                        <th style="text-align: center; vertical-align: middle;">
+                            <span>Item</span>
+                        </th>
+                        <th style="text-align: center; vertical-align: middle;">
+                            <span>Training Name</span>
+                        </th>
+                        <th t-if="o.display_description"
+                            style="text-align: center; vertical-align: middle;">
+                            <span>Description</span>
+                        </th>
+                        <th t-if="o.display_instructor"
+                            style="text-align: center; vertical-align: middle;">
+                            <span>Instructor Name</span>
+                        </th>
+                        <th style="text-align: center; vertical-align: middle;">
+                            <span># Of Students</span>
+                        </th>
+                        <th t-if="o.display_location or o.display_where"
+                            style="text-align: center; vertical-align: middle;">
+                            <span>Location</span>
+                        </th>
+                        <th style="text-align: center; vertical-align: middle;">
+                            <span>Duration</span>
+                        </th>
+                        <th style="text-align: center; vertical-align: middle;">
+                            <span>Training Dates</span>
+                        </th>
+                        <th style="text-align: center; vertical-align: middle;">
+                            <span>Training Price</span>
+                        </th>
+                        <th t-if="o.display_total"
+                            style="text-align: center; vertical-align: middle;">
+                            <span>Total Price</span>
+                        </th>
+                        <th t-if="o.display_downpayment"
+                            style="text-align: center; vertical-align: middle;">
+                            <span>Advance Payment</span>
+                        </th>
+                        <th t-if="o.display_due_amount"
+                            style="text-align: center; vertical-align: middle;">
+                            <span>Due Amount</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="item" t-value="1"/>
+                    <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
+
+                    <tr t-foreach="o.training_course_ids" t-as="training">
+                        <td style="text-align: center; vertical-align: middle;">
+                            <span t-esc="item"/>
+                        </td>
+                        <td style="text-align: left; vertical-align: middle;">
+                            <span t-field="training.training_id"/>
+                        </td>
+                        <td t-if="o.display_description"
+                            style="text-align: left; vertical-align: middle;">
+                            <span t-field="training.descriptions"/>
+                        </td>
+                        <td t-if="o.display_instructor"
+                            style="text-align: center; vertical-align: middle;">
+                            <span t-field="training.instructor_id"/>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <span t-field="training.no_of_student"/>
+                        </td>
+                        <td t-if="o.display_location or o.display_where"
+                            style="text-align: center; vertical-align: middle;">
+                            <span t-if="o.display_location"
+                                  t-field="training.location"/>
+                            <span t-if="o.display_location and o.display_where">, </span>
+                            <span t-if="o.display_where"
+                                  t-field="training.where_location2"/>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <span t-field="training.duration"/>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <span t-field="training.training_date_start"/>
+                            <span> - </span>
+                            <span t-field="training.training_date_end"/>
+                        </td>
+                        <td style="text-align: center; vertical-align: middle;">
+                            <span t-field="training.price"/>
+                        </td>
+                        <t t-if="item == 1">
+                            <td t-if="o.display_total"
+                                t-att-rowspan="total_rows"
+                                style="text-align: center; vertical-align: middle;">
+                                <span t-field="o.total_training_price"/>
+                            </td>
+                            <td t-if="o.display_downpayment"
+                                t-att-rowspan="total_rows"
+                                style="text-align: center; vertical-align: middle;">
+                                <span t-field="o.half_advance_payment_before"/>
+                            </td>
+                            <td t-if="o.display_due_amount"
+                                t-att-rowspan="total_rows"
+                                style="text-align: center; vertical-align: middle;">
+                                <span t-field="o.half_payment_after"/>
+                            </td>
+                        </t>
+                        <t t-set="item" t-value="item + 1"/>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="row pt-3 pb-2"
+                 t-if="o.term_and_cond"
+                 style="page-break-inside: avoid;">
+                <div class="col-8 purchase-training-text"
+                     style="width: 600px;">
+                    <div t-field="o.term_and_cond"
+                         style="text-align: justify; margin: 0;"/>
+                </div>
+            </div>
+
+            <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"
+                 class="row"
+                 style="page-break-inside: avoid; position: relative; min-height: 170px;">
+                <div style="position: absolute; bottom: 0; right: 0; text-align: right; white-space: nowrap;">
+                    <img t-if="o.company_id.signature and o.display_signature"
+                         t-att-src="image_data_uri(o.company_id.signature)"
+                         style="max-height: 120px; max-width: 180px; width: auto; height: auto; object-fit: contain; vertical-align: bottom; display: inline-block; margin-right: 8px;"
+                         alt="Signature"/>
+                    <img t-if="o.company_id.stamp and o.display_stamp"
+                         t-att-src="image_data_uri(o.company_id.stamp)"
+                         style="max-height: 135px; max-width: 165px; width: auto; height: auto; object-fit: contain; vertical-align: bottom; display: inline-block;"
+                         alt="Stamp"/>
+                </div>
+            </div>
+        </t>
+    </template>
+
+    <template id="purchase_order_training_print"
+              inherit_id="purchase.report_purchaseorder_document">
+        <xpath expr="//div[hasclass('page')]" position="inside">
+            <t t-call="invoice_training_details.purchase_training_print_block"/>
+        </xpath>
+    </template>
+
+    <template id="purchase_rfq_training_print"
+              inherit_id="purchase.report_purchasequotation_document">
+        <xpath expr="//div[hasclass('page')]" position="inside">
+            <t t-call="invoice_training_details.purchase_training_print_block"/>
+        </xpath>
+    </template>
 
 </odoo>

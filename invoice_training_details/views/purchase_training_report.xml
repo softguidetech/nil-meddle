@@ -218,17 +218,6 @@
                                 </td>
                             </tr>
 
-                            <tr class="p-0">
-                                <td class="p-0"
-                                    style="vertical-align:middle;">
-                                    Validity Date
-                                </td>
-                                <td class="p-0"
-                                    style="vertical-align:middle;">
-                                    <span t-field="o.validity_date"/>
-                                </td>
-                            </tr>
-
                         </table>
                     </div>
 

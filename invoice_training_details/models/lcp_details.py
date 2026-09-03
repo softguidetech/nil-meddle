@@ -36,6 +36,11 @@ class CrmLead(models.Model):
         compute='_compute_lcp_is_online',
     )
 
+    lcp_has_onsite = fields.Boolean(
+        string='Has On-site Training',
+        compute='_compute_lcp_is_online',
+    )
+
     # MANUAL ONLY.
     # CLC training: shown as "CLCs / Seat"
     # Cash training: shown as "USD / Seat"
@@ -267,6 +272,14 @@ class CrmLead(models.Model):
                 bool(lines)
                 and all(
                     line.location == 'Online'
+                    for line in lines
+                )
+            )
+
+            lead.lcp_has_onsite = (
+                bool(lines)
+                and any(
+                    line.location == 'On site'
                     for line in lines
                 )
             )

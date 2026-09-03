@@ -312,13 +312,6 @@ class PurchaseOrder(models.Model):
         store=True
     )
 
-    half_advance_payment_before = fields.Monetary(
-        string='Advance Payment Amount'
-    )
-    half_payment_after = fields.Monetary(
-        string='Due Amount'
-    )
-
     display_training_table = fields.Boolean(
         string='Display Training Table'
     )
@@ -334,14 +327,8 @@ class PurchaseOrder(models.Model):
     display_location = fields.Boolean(
         string='Display Location'
     )
-    display_downpayment = fields.Boolean(
-        string='Display Downpayment'
-    )
     display_total = fields.Boolean(
         string='Display Total Amount'
-    )
-    display_due_amount = fields.Boolean(
-        string='Display Due Amount'
     )
     display_where = fields.Boolean(
         string='Display Where?'
@@ -374,9 +361,52 @@ class PurchaseOrder(models.Model):
             )
 
     def _prepare_invoice(self):
-        """Carry the CRM opportunity from the PO to its Vendor Bill."""
+        """
+        Carry the PO training details to the Vendor Bill.
+
+        Important:
+        We CREATE independent training.course rows on the bill instead of
+        re-linking the PO rows. This keeps the PO training table intact and
+        avoids a later/partial bill stealing the same training rows.
+        """
         invoice_vals = super()._prepare_invoice()
-        invoice_vals['crm_lead_id'] = self.crm_lead_id.id or False
+
+        training_lines = []
+        for training in self.training_course_ids:
+            training_lines.append((0, 0, {
+                'name': training.name,
+                'no_of_student': training.no_of_student,
+                'duration': training.duration,
+                'training_date_start': training.training_date_start,
+                'training_date_end': training.training_date_end,
+                'price': training.price,
+                'lead_id': training.lead_id.id or self.crm_lead_id.id or False,
+                'instructor_id': training.instructor_id.id or False,
+                'descriptions': training.descriptions,
+                'training_id': training.training_id.id or False,
+                'poref': training.poref,
+                'invref': training.invref,
+                'tr_expiry_date': training.tr_expiry_date,
+                'where_location2': training.where_location2,
+                'location': training.location,
+                'payment_method': training.payment_method,
+                'clcs_qty': training.clcs_qty,
+            }))
+
+        invoice_vals.update({
+            'crm_lead_id': self.crm_lead_id.id or False,
+            'training_course_ids': training_lines,
+            'term_and_cond': self.term_and_cond,
+            'display_training_table': self.display_training_table,
+            'display_signature': self.display_signature,
+            'display_stamp': self.display_stamp,
+            'display_instructor': self.display_instructor,
+            'display_location': self.display_location,
+            'display_total': self.display_total,
+            'display_where': self.display_where,
+            'display_description': self.display_description,
+        })
+
         return invoice_vals
 
 class HotelHotel(models.Model):
@@ -465,3 +495,6 @@ class ProductProduct(models.Model):
     
     cost_clc = fields.Char(string="CLCs Cost")
     hyperlink = fields.Char(string="Hyper Link")
+    
+    
+    

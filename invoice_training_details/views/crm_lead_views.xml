@@ -9,8 +9,29 @@
 
         <field name="arch" type="xml">
 
+            <xpath expr="//header" position="inside">
+                <button name="action_new_purchase_order"
+                        type="object"
+                        string="New PO"
+                        class="oe_highlight"
+                        invisible="not has_cash_training"/>
+            </xpath>
+
+            <xpath expr="//div[@name='button_box']" position="inside">
+                <button name="action_view_purchase_orders"
+                        type="object"
+                        class="oe_stat_button"
+                        icon="fa-shopping-cart"
+                        invisible="purchase_order_count == 0">
+                    <field name="purchase_order_count"
+                           widget="statinfo"
+                           string="Purchase Orders"/>
+                </button>
+            </xpath>
+
             <xpath expr="//field[@name='tag_ids']" position="after">
                 <field name="instructor_id"/>
+                <field name="has_cash_training" invisible="1"/>
             </xpath>
 
             <xpath expr="//field[@name='partner_id']" position="after">
@@ -363,6 +384,28 @@
 
         </field>
 
+    </record>
+
+    <record id="purchase_order_form_crm_opportunity_link" model="ir.ui.view">
+        <field name="name">purchase.order.form.crm.opportunity.link</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='origin']" position="after">
+                <field name="crm_lead_id" readonly="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="account_move_form_crm_opportunity_link" model="ir.ui.view">
+        <field name="name">account.move.form.crm.opportunity.link</field>
+        <field name="model">account.move</field>
+        <field name="inherit_id" ref="account.view_move_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='invoice_origin']" position="after">
+                <field name="crm_lead_id" readonly="1"/>
+            </xpath>
+        </field>
     </record>
 
 </odoo>

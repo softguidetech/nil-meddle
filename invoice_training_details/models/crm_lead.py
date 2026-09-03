@@ -292,6 +292,16 @@ class Lead(models.Model):
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'
 
+    is_training_order = fields.Boolean(
+        string='Is Training Order'
+    )
+
+    training_course_ids = fields.One2many(
+        'training.course',
+        'purchase_order_id',
+        string='Training Courses'
+    )
+
     crm_lead_id = fields.Many2one(
         'crm.lead',
         string='CRM Opportunity',

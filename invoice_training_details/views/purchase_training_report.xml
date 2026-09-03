@@ -42,11 +42,11 @@
                    t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
 
                 <style>
-                    /* Compact visual proportions matching the reference PO */
+                    /* A4 proportions: readable, airy, not compressed */
                     table[name="training_line_table"] {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-top: 8px;
+                        margin-top: 10px;
                         margin-bottom: 0;
                     }
 
@@ -56,43 +56,60 @@
                         border: 1px solid #9DDDE7 !important;
                         text-align: center !important;
                         vertical-align: middle !important;
-                        font-size: 12px !important;
+                        font-size: 15px !important;
                         font-weight: 700 !important;
-                        line-height: 1.2 !important;
-                        padding: 5px 4px !important;
+                        line-height: 1.35 !important;
+                        padding: 8px 6px !important;
                     }
 
                     table[name="training_line_table"] td {
-                        border: 1px solid #D3E8EC !important;
+                        border: 1px solid #CFE5EA !important;
                         text-align: center !important;
                         vertical-align: middle !important;
-                        font-size: 12px !important;
-                        line-height: 1.25 !important;
-                        padding: 5px 4px !important;
+                        font-size: 15px !important;
+                        line-height: 1.4 !important;
+                        padding: 8px 6px !important;
                     }
 
                     .purchase-training-text,
                     .purchase-training-text * {
-                        font-size: 13px !important;
+                        font-size: 15px !important;
                         font-family: inherit !important;
-                        line-height: 1.35 !important;
+                        line-height: 1.5 !important;
                     }
 
                     .purchase-vendor-block,
                     .purchase-vendor-block * {
-                        font-size: 13px !important;
-                        line-height: 1.35 !important;
+                        font-size: 16px !important;
+                        line-height: 1.45 !important;
                     }
 
                     .purchase-meta,
                     .purchase-meta td {
-                        font-size: 13px !important;
-                        line-height: 1.35 !important;
+                        font-size: 16px !important;
+                        line-height: 1.45 !important;
                     }
 
-                    /* Move the corporate footer visually down for this report only */
+                    .partner-amount-table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin: 0;
+                    }
+
+                    .partner-amount-table td {
+                        font-size: 15px !important;
+                        line-height: 1.4 !important;
+                        padding: 7px 8px !important;
+                        border: 1px solid #CFE5EA !important;
+                    }
+
+                    /* Move the whole footer materially lower for this report only */
                     .footer.o_standard_footer {
-                        transform: translateY(22mm) !important;
+                        position: fixed !important;
+                        top: auto !important;
+                        bottom: -15mm !important;
+                        margin: 0 !important;
+                        padding-top: 0 !important;
                     }
                 </style>
 
@@ -105,7 +122,7 @@
                     <div class="col-12"
                          style="margin:0; padding-top:0; padding-bottom:0;">
 
-                        <span style="display:block; margin:0; padding:0; font-size:24px; font-weight:600; color:#0DCAF0;">
+                        <span style="display:block; margin:0; padding:0; font-size:30px; font-weight:700; color:#0DCAF0;">
 
                             <t t-if="is_clc_order">Work Order</t>
                             <t t-else="">Purchase Order</t>
@@ -122,7 +139,7 @@
                 <!-- ===================================================== -->
 
                 <div class="row"
-                     style="margin-top:14px; padding-top:0; padding-bottom:8px;">
+                     style="margin-top:18px; padding-top:0; padding-bottom:12px;">
 
                     <!-- VENDOR -->
                     <div class="col-8 purchase-vendor-block">
@@ -223,7 +240,7 @@
 
                 </div>
                 <!-- Compact spacing before training table -->
-                <div style="height:6px;"></div>
+                <div style="height:8px;"></div>
 
 
                 <!-- ===================================================== -->
@@ -416,39 +433,33 @@
 
                 <div t-if="o.display_total"
                      style="
-                        margin-top:6px;
-                        display:flex;
-                        justify-content:flex-end;
+                        margin:0;
+                        padding:0;
                         page-break-inside:avoid;
                      ">
 
-                    <table class="table table-sm"
-                           style="
-                                width:270px;
-                                margin:0;
-                                border-collapse:collapse;
-                           ">
+                    <table class="partner-amount-table">
                         <tr>
                             <td style="
-                                border:1px solid #D3E8EC;
-                                font-size:13px;
-                                font-weight:600;
-                                padding:5px 7px;
-                                background:#fff;
+                                width:72%;
+                                background-color:#F8FCFD;
+                                color:#075E68;
+                                font-weight:700;
+                                text-align:left;
                             ">
                                 <span t-if="is_clc_order">NIL ME Invoice Amount</span>
                                 <span t-else="">Partner Invoice Amount</span>
                             </td>
+
                             <td style="
-                                border:1px solid #D3E8EC;
-                                font-size:13px;
+                                width:28%;
+                                background-color:#F8FCFD;
+                                font-weight:700;
                                 text-align:right;
                                 white-space:nowrap;
-                                padding:5px 7px;
-                                background:#fff;
                             ">
                                 <span t-out="o.amount_total"
-          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                      t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                             </td>
                         </tr>
                     </table>
@@ -469,37 +480,33 @@
                 <!-- Terms & Conditions -->
                 <div class="purchase-training-text"
                      style="
-                        margin-top:14px;
+                        margin-top:16px;
                         page-break-inside:avoid;
                         width:100%;
                      ">
 
                     <div style="
-                        border-top:1.5px solid #9DDDE7;
-                        padding-top:8px;
+                        display:inline-block;
+                        background-color:#EAF9FC;
+                        color:#075E68;
+                        font-size:16px;
+                        font-weight:700;
+                        padding:6px 10px;
+                        margin:0 0 8px 0;
                     ">
-
-                        <div style="
-                            color:#075E68;
-                            font-size:14px;
-                            font-weight:700;
-                            margin:0 0 6px 0;
-                        ">
-                            Terms &amp; Conditions:
-                        </div>
-
-                        <div t-if="o.term_and_cond"
-                             t-field="o.term_and_cond"
-                             style="
-                                width:100%;
-                                margin:0;
-                                padding:0;
-                                text-align:justify;
-                                font-size:13px;
-                                line-height:1.45;
-                             "/>
-
+                        Terms &amp; Conditions:
                     </div>
+
+                    <div t-if="o.term_and_cond"
+                         t-field="o.term_and_cond"
+                         style="
+                            width:100%;
+                            margin:0;
+                            padding:0 2px;
+                            text-align:justify;
+                            font-size:15px;
+                            line-height:1.55;
+                         "/>
 
                 </div>
 

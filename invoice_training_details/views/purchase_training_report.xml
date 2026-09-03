@@ -113,15 +113,7 @@
                     }
 
                     /* Keep the corporate footer very close to the physical page bottom */
-                    .footer.o_standard_footer {
-                        position: fixed !important;
-                        top: auto !important;
-                        bottom: -24mm !important;
-                        transform: translateY(8mm) !important;
-                        margin: 0 !important;
-                        padding: 0 !important;
-                    }
-                </style>
+</style>
 
 
                 <!-- ===================================================== -->

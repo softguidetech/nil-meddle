@@ -111,6 +111,57 @@ class Lead(models.Model):
                 'has Cash as its payment method.'
             ))
 
+        purchase_lines = []
+        for course in cash_courses:
+            product = course.training_id
+            if not product:
+                raise UserError(_(
+                    'Every Cash training line must have a Training Name '
+                    'before creating the PO.'
+                ))
+
+            description_lines = [
+                product.display_name or course.name or self.name,
+                'Number of Students: %s' % (course.no_of_student or 0),
+            ]
+
+            if course.duration:
+                description_lines.append(
+                    'Duration: %s' % course.duration
+                )
+            if course.training_date_start:
+                description_lines.append(
+                    'Start Date: %s' % course.training_date_start
+                )
+            if course.training_date_end:
+                description_lines.append(
+                    'Delivery Date: %s' % course.training_date_end
+                )
+            if course.location:
+                description_lines.append(
+                    'Location: %s' % course.location
+                )
+            if course.where_location2:
+                description_lines.append(
+                    'Where: %s' % course.where_location2
+                )
+            if course.descriptions:
+                description_lines.append(
+                    'Description: %s' % course.descriptions
+                )
+
+            purchase_lines.append((0, 0, {
+                'product_id': product.id,
+                'name': '\n'.join(description_lines),
+                'product_qty': 1,
+                'product_uom': (
+                    product.uom_po_id.id
+                    or product.uom_id.id
+                ),
+                'price_unit': course.price,
+                'date_planned': fields.Datetime.now(),
+            }))
+
         return {
             'type': 'ir.actions.act_window',
             'name': _('New PO'),
@@ -120,11 +171,16 @@ class Lead(models.Model):
             'context': {
                 'default_crm_lead_id': self.id,
                 'default_origin': self.name,
-                'default_partner_id': self.ordering_partner_id.id or False,
+                'default_partner_id': (
+                    self.partner_id.id
+                    or self.ordering_partner_id.id
+                    or False
+                ),
                 'default_currency_id': self.currency_id.id or False,
                 'default_is_training_order': True,
                 'default_payment_method': 'cash',
                 'default_training_course_ids': [(6, 0, cash_courses.ids)],
+                'default_order_line': purchase_lines,
                 'default_instructor_id': self.instructor_id.id or False,
                 'default_descriptions': self.descriptions,
                 'default_training_id': self.training_id.id or False,
@@ -147,7 +203,11 @@ class Lead(models.Model):
             'domain': [('crm_lead_id', '=', self.id)],
             'context': {
                 'default_crm_lead_id': self.id,
-                'default_partner_id': self.ordering_partner_id.id or False,
+                'default_partner_id': (
+                    self.partner_id.id
+                    or self.ordering_partner_id.id
+                    or False
+                ),
             },
         }
 
@@ -238,6 +298,14 @@ class PurchaseOrder(models.Model):
         index=True,
         copy=False,
         ondelete='set null'
+    )
+
+    end_customer_id = fields.Many2one(
+        'res.partner',
+        string='End Customer',
+        related='crm_lead_id.training_name',
+        store=True,
+        readonly=True
     )
 
     def _prepare_invoice(self):

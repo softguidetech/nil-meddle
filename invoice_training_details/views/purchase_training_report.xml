@@ -90,26 +90,36 @@
                         line-height: 1.45 !important;
                     }
 
-                    .partner-amount-table {
+                    .partner-amount-wrap {
                         width: 100%;
+                        text-align: right;
+                        margin: 5px 0 0 0;
+                        padding: 0;
+                    }
+
+                    .partner-amount-table {
+                        width: 34%;
+                        margin-left: auto;
+                        margin-right: 0;
                         border-collapse: collapse;
-                        margin: 0;
                     }
 
                     .partner-amount-table td {
                         font-size: 15px !important;
-                        line-height: 1.4 !important;
-                        padding: 7px 8px !important;
+                        line-height: 1.35 !important;
+                        padding: 6px 8px !important;
                         border: 1px solid #CFE5EA !important;
+                        background: #FFFFFF !important;
                     }
 
-                    /* Move the whole footer materially lower for this report only */
+                    /* Keep the corporate footer very close to the physical page bottom */
                     .footer.o_standard_footer {
                         position: fixed !important;
                         top: auto !important;
-                        bottom: -15mm !important;
+                        bottom: -24mm !important;
+                        transform: translateY(8mm) !important;
                         margin: 0 !important;
-                        padding-top: 0 !important;
+                        padding: 0 !important;
                     }
                 </style>
 
@@ -432,28 +442,24 @@
                 <!-- ===================================================== -->
 
                 <div t-if="o.display_total"
-                     style="
-                        margin:0;
-                        padding:0;
-                        page-break-inside:avoid;
-                     ">
+                     class="partner-amount-wrap"
+                     style="page-break-inside:avoid;">
 
                     <table class="partner-amount-table">
                         <tr>
                             <td style="
-                                width:72%;
-                                background-color:#F8FCFD;
+                                width:66%;
                                 color:#075E68;
                                 font-weight:700;
                                 text-align:left;
+                                white-space:nowrap;
                             ">
                                 <span t-if="is_clc_order">NIL ME Invoice Amount</span>
                                 <span t-else="">Partner Invoice Amount</span>
                             </td>
 
                             <td style="
-                                width:28%;
-                                background-color:#F8FCFD;
+                                width:34%;
                                 font-weight:700;
                                 text-align:right;
                                 white-space:nowrap;
@@ -480,18 +486,16 @@
                 <!-- Terms & Conditions -->
                 <div class="purchase-training-text"
                      style="
-                        margin-top:16px;
+                        margin-top:30px;
                         page-break-inside:avoid;
                         width:100%;
                      ">
 
                     <div style="
-                        display:inline-block;
-                        background-color:#EAF9FC;
                         color:#075E68;
                         font-size:16px;
                         font-weight:700;
-                        padding:6px 10px;
+                        padding:0;
                         margin:0 0 8px 0;
                     ">
                         Terms &amp; Conditions:
@@ -502,7 +506,7 @@
                          style="
                             width:100%;
                             margin:0;
-                            padding:0 2px;
+                            padding:0;
                             text-align:justify;
                             font-size:15px;
                             line-height:1.55;

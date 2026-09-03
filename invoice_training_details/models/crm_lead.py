@@ -302,6 +302,10 @@ class PurchaseOrder(models.Model):
         string='Training Courses'
     )
 
+    term_and_cond = fields.Html(
+        string='Terms and Conditions'
+    )
+
     crm_lead_id = fields.Many2one(
         'crm.lead',
         string='CRM Opportunity',

@@ -447,7 +447,8 @@
                                 padding:5px 7px;
                                 background:#fff;
                             ">
-                                <span t-field="o.total_training_price"/>
+                                <span t-out="o.amount_total"
+          t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
                             </td>
                         </tr>
                     </table>
@@ -465,27 +466,40 @@
                 </div>
 
 
-                <!-- Terms are always shown directly after the content above -->
+                <!-- Terms & Conditions -->
                 <div class="purchase-training-text"
                      style="
                         margin-top:14px;
-                        padding:0;
                         page-break-inside:avoid;
                         width:100%;
                      ">
 
-                    <div style="font-weight:700; margin:0 0 4px 0;">
-                        Terms &amp; Conditions:
-                    </div>
+                    <div style="
+                        border-top:1.5px solid #9DDDE7;
+                        padding-top:8px;
+                    ">
 
-                    <div t-if="o.term_and_cond"
-                         t-field="o.term_and_cond"
-                         style="
-                            width:100%;
-                            text-align:justify;
-                            margin:0;
-                            padding:0;
-                         "/>
+                        <div style="
+                            color:#075E68;
+                            font-size:14px;
+                            font-weight:700;
+                            margin:0 0 6px 0;
+                        ">
+                            Terms &amp; Conditions:
+                        </div>
+
+                        <div t-if="o.term_and_cond"
+                             t-field="o.term_and_cond"
+                             style="
+                                width:100%;
+                                margin:0;
+                                padding:0;
+                                text-align:justify;
+                                font-size:13px;
+                                line-height:1.45;
+                             "/>
+
+                    </div>
 
                 </div>
 

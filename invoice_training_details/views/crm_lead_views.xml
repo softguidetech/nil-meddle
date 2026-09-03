@@ -420,6 +420,12 @@
                             <field name="price"/>
                         </tree>
                     </field>
+
+                    <group string="Terms and Conditions">
+                        <field name="term_and_cond"
+                               nolabel="1"
+                               colspan="2"/>
+                    </group>
                 </page>
             </xpath>
         </field>

@@ -60,6 +60,10 @@ class Lead(models.Model):
         string='Has Cash Training',
         compute='_compute_has_cash_training'
     )
+    has_training = fields.Boolean(
+        string='Has Training',
+        compute='_compute_has_training'
+    )
     purchase_order_ids = fields.One2many(
         'purchase.order',
         'crm_lead_id',
@@ -92,6 +96,11 @@ class Lead(models.Model):
                 course.payment_method == 'cash'
                 for course in lead.training_course_ids
             )
+
+    @api.depends('training_course_ids')
+    def _compute_has_training(self):
+        for lead in self:
+            lead.has_training = bool(lead.training_course_ids)
 
     @api.depends('purchase_order_ids')
     def _compute_purchase_order_count(self):
@@ -178,6 +187,7 @@ class Lead(models.Model):
                 ),
                 'default_currency_id': self.currency_id.id or False,
                 'default_is_training_order': True,
+                'default_po_training_type': 'training_vendor',
                 'default_payment_method': 'cash',
                 'default_training_course_ids': [(6, 0, cash_courses.ids)],
                 'default_order_line': purchase_lines,
@@ -188,6 +198,47 @@ class Lead(models.Model):
                 'default_end_date': self.to_date,
                 'default_po_reference': self.poref,
                 'default_tr_expiry_date': self.tr_expiry_date,
+            },
+        }
+
+    def action_new_instructor_purchase_order(self):
+        """
+        Open a Purchase Order dedicated to buying instructor time.
+
+        This is intentionally independent from Cash/CLC. Instructor time can
+        be purchased for either payment method.
+
+        If the Lead has exactly one training line, preload it. If it has more
+        than one, the user chooses the relevant training line on the PO.
+        """
+        self.ensure_one()
+
+        courses = self.training_course_ids
+        if not courses:
+            raise UserError(_('Add at least one Training line before creating an Instructor PO.'))
+
+        default_course = courses if len(courses) == 1 else self.env['training.course']
+        instructor = default_course.instructor_id if default_course else self.instructor_id
+
+        return {
+            'type': 'ir.actions.act_window',
+            'name': _('New Instructor PO'),
+            'res_model': 'purchase.order',
+            'view_mode': 'form',
+            'target': 'current',
+            'context': {
+                'default_crm_lead_id': self.id,
+                'default_origin': self.name,
+                'default_currency_id': self.currency_id.id or False,
+                'default_is_training_order': True,
+                'default_po_training_type': 'instructor',
+                'default_instructor_training_course_id': default_course.id or False,
+                'default_instructor_id': instructor.id or False,
+                'default_instructor_from': default_course.training_date_start or False,
+                'default_instructor_to': default_course.training_date_end or False,
+                # Vendor is intentionally left for the user to choose.
+                # The instructor's HR contact is not always the payable vendor.
+                'default_partner_id': False,
             },
         }
 
@@ -296,6 +347,48 @@ class PurchaseOrder(models.Model):
         string='Is Training Order'
     )
 
+    po_training_type = fields.Selection(
+        [
+            ('training_vendor', 'Training Vendor'),
+            ('instructor', 'Instructor'),
+        ],
+        string='Training PO Type',
+        default='training_vendor',
+        required=True
+    )
+
+    instructor_training_course_id = fields.Many2one(
+        'training.course',
+        string='Training',
+        copy=False,
+        ondelete='set null'
+    )
+    instructor_id = fields.Many2one(
+        'hr.employee',
+        string='Instructor'
+    )
+    instructor_from = fields.Date(
+        string='Instructor From'
+    )
+    instructor_to = fields.Date(
+        string='Instructor To'
+    )
+    instructor_days = fields.Integer(
+        string='No. of Days',
+        compute='_compute_instructor_fee',
+        store=True
+    )
+    instructor_daily_rate = fields.Monetary(
+        string='Daily Rate',
+        currency_field='currency_id'
+    )
+    instructor_total = fields.Monetary(
+        string='Instructor Total',
+        compute='_compute_instructor_fee',
+        store=True,
+        currency_field='currency_id'
+    )
+
     training_course_ids = fields.One2many(
         'training.course',
         'purchase_order_id',
@@ -353,6 +446,118 @@ class PurchaseOrder(models.Model):
         readonly=True
     )
 
+    @api.depends('instructor_from', 'instructor_to', 'instructor_daily_rate')
+    def _compute_instructor_fee(self):
+        for order in self:
+            days = 0
+            if order.instructor_from and order.instructor_to:
+                delta = (order.instructor_to - order.instructor_from).days + 1
+                days = max(delta, 0)
+            order.instructor_days = days
+            order.instructor_total = days * (order.instructor_daily_rate or 0.0)
+
+    @api.onchange('instructor_training_course_id')
+    def _onchange_instructor_training_course_id(self):
+        for order in self:
+            course = order.instructor_training_course_id
+            if not course:
+                continue
+            order.instructor_id = course.instructor_id
+            order.instructor_from = course.training_date_start
+            order.instructor_to = course.training_date_end
+
+    @api.constrains('instructor_from', 'instructor_to', 'po_training_type')
+    def _check_instructor_dates(self):
+        for order in self:
+            if (
+                order.po_training_type == 'instructor'
+                and order.instructor_from
+                and order.instructor_to
+                and order.instructor_to < order.instructor_from
+            ):
+                raise UserError(_('Instructor To date cannot be before Instructor From date.'))
+
+    def _prepare_instructor_fee_line_vals(self):
+        self.ensure_one()
+        course = self.instructor_training_course_id
+        product = course.training_id if course else False
+
+        if not product or not self.instructor_days:
+            return False
+
+        description = ['Instructor Fee']
+        description.append('Training: %s' % (product.display_name or course.name or ''))
+        if self.instructor_id:
+            description.append('Instructor: %s' % self.instructor_id.name)
+        if self.instructor_from:
+            description.append('From: %s' % self.instructor_from)
+        if self.instructor_to:
+            description.append('To: %s' % self.instructor_to)
+        description.append('Days: %s' % self.instructor_days)
+
+        return {
+            'product_id': product.id,
+            'name': '\\n'.join(description),
+            'product_qty': self.instructor_days,
+            'product_uom': product.uom_po_id.id or product.uom_id.id,
+            'price_unit': self.instructor_daily_rate or 0.0,
+            'date_planned': fields.Datetime.now(),
+            'is_instructor_fee_line': True,
+        }
+
+    def _sync_instructor_fee_line(self):
+        """
+        Keep one accounting PO line equal to:
+            quantity = instructor days
+            unit price = daily rate
+
+        This is the amount that later flows to the Vendor Bill.
+        """
+        PurchaseLine = self.env['purchase.order.line']
+
+        for order in self:
+            fee_lines = order.order_line.filtered(
+                lambda line: line.is_instructor_fee_line
+            )
+
+            if order.po_training_type != 'instructor':
+                if fee_lines:
+                    fee_lines.unlink()
+                continue
+
+            vals = order._prepare_instructor_fee_line_vals()
+            if not vals:
+                continue
+
+            if fee_lines:
+                fee_lines[0].write(vals)
+                if len(fee_lines) > 1:
+                    fee_lines[1:].unlink()
+            else:
+                vals['order_id'] = order.id
+                PurchaseLine.create(vals)
+
+    @api.model_create_multi
+    def create(self, vals_list):
+        orders = super().create(vals_list)
+        orders._sync_instructor_fee_line()
+        return orders
+
+    def write(self, vals):
+        result = super().write(vals)
+        if not self.env.context.get('skip_instructor_fee_sync'):
+            relevant = {
+                'po_training_type',
+                'instructor_training_course_id',
+                'instructor_id',
+                'instructor_from',
+                'instructor_to',
+                'instructor_daily_rate',
+            }
+            if relevant.intersection(vals):
+                self.with_context(skip_instructor_fee_sync=True)._sync_instructor_fee_line()
+        return result
+
     @api.depends('training_course_ids.price')
     def _compute_po_training_price(self):
         for order in self:
@@ -362,39 +567,73 @@ class PurchaseOrder(models.Model):
 
     def _prepare_invoice(self):
         """
-        Carry the PO training details to the Vendor Bill.
+        Carry all training/instructor details from the PO to its Vendor Bill.
 
-        Important:
-        We CREATE independent training.course rows on the bill instead of
-        re-linking the PO rows. This keeps the PO training table intact and
-        avoids a later/partial bill stealing the same training rows.
+        Training Vendor PO:
+        - Copy every PO training row to independent account.move training rows.
+
+        Instructor PO:
+        - Copy the selected training as one independent bill training row.
+        - Copy instructor dates, days, daily rate and total.
         """
+        self.ensure_one()
         invoice_vals = super()._prepare_invoice()
 
         training_lines = []
-        for training in self.training_course_ids:
-            training_lines.append((0, 0, {
-                'name': training.name,
-                'no_of_student': training.no_of_student,
-                'duration': training.duration,
-                'training_date_start': training.training_date_start,
-                'training_date_end': training.training_date_end,
-                'price': training.price,
-                'lead_id': training.lead_id.id or self.crm_lead_id.id or False,
-                'instructor_id': training.instructor_id.id or False,
-                'descriptions': training.descriptions,
-                'training_id': training.training_id.id or False,
-                'poref': training.poref,
-                'invref': training.invref,
-                'tr_expiry_date': training.tr_expiry_date,
-                'where_location2': training.where_location2,
-                'location': training.location,
-                'payment_method': training.payment_method,
-                'clcs_qty': training.clcs_qty,
-            }))
+
+        if self.po_training_type == 'instructor':
+            course = self.instructor_training_course_id
+            if course:
+                training_lines.append((0, 0, {
+                    'name': course.name,
+                    'no_of_student': 0,
+                    'duration': (
+                        '%s days' % self.instructor_days
+                        if self.instructor_days else course.duration
+                    ),
+                    'training_date_start': self.instructor_from or course.training_date_start,
+                    'training_date_end': self.instructor_to or course.training_date_end,
+                    # For the Vendor Bill's internal training details, this is
+                    # the payable instructor total, not the customer selling price.
+                    'price': self.instructor_total,
+                    'lead_id': course.lead_id.id or self.crm_lead_id.id or False,
+                    'instructor_id': self.instructor_id.id or course.instructor_id.id or False,
+                    'descriptions': course.descriptions,
+                    'training_id': course.training_id.id or False,
+                    'poref': course.poref,
+                    'invref': course.invref,
+                    'tr_expiry_date': course.tr_expiry_date,
+                    'where_location2': course.where_location2,
+                    'location': course.location,
+                    'payment_method': course.payment_method,
+                    'clcs_qty': course.clcs_qty,
+                }))
+        else:
+            for training in self.training_course_ids:
+                training_lines.append((0, 0, {
+                    'name': training.name,
+                    'no_of_student': training.no_of_student,
+                    'duration': training.duration,
+                    'training_date_start': training.training_date_start,
+                    'training_date_end': training.training_date_end,
+                    'price': training.price,
+                    'lead_id': training.lead_id.id or self.crm_lead_id.id or False,
+                    'instructor_id': training.instructor_id.id or False,
+                    'descriptions': training.descriptions,
+                    'training_id': training.training_id.id or False,
+                    'poref': training.poref,
+                    'invref': training.invref,
+                    'tr_expiry_date': training.tr_expiry_date,
+                    'where_location2': training.where_location2,
+                    'location': training.location,
+                    'payment_method': training.payment_method,
+                    'clcs_qty': training.clcs_qty,
+                }))
 
         invoice_vals.update({
             'crm_lead_id': self.crm_lead_id.id or False,
+            'source_purchase_order_id': self.id,
+            'purchase_training_type': self.po_training_type,
             'training_course_ids': training_lines,
             'term_and_cond': self.term_and_cond,
             'display_training_table': self.display_training_table,
@@ -405,9 +644,28 @@ class PurchaseOrder(models.Model):
             'display_total': self.display_total,
             'display_where': self.display_where,
             'display_description': self.display_description,
+            'instructor_training_course_id': self.instructor_training_course_id.id or False,
+            'instructor_id': self.instructor_id.id or False,
+            'instructor_from': self.instructor_from,
+            'instructor_to': self.instructor_to,
+            'instructor_days': self.instructor_days,
+            'instructor_daily_rate': self.instructor_daily_rate,
+            'instructor_total': self.instructor_total,
         })
 
         return invoice_vals
+
+
+
+class PurchaseOrderLine(models.Model):
+    _inherit = 'purchase.order.line'
+
+    is_instructor_fee_line = fields.Boolean(
+        string='Instructor Fee Line',
+        default=False,
+        copy=False,
+        index=True
+    )
 
 class HotelHotel(models.Model):
     _name = 'hotel.hotel'
@@ -495,6 +753,3 @@ class ProductProduct(models.Model):
     
     cost_clc = fields.Char(string="CLCs Cost")
     hyperlink = fields.Char(string="Hyper Link")
-    
-    
-    

@@ -428,6 +428,9 @@
                     <field name="lcp_is_online"
                            invisible="1"/>
 
+                    <field name="lcp_has_onsite"
+                           invisible="1"/>
+
                 </page>
 
             </xpath>

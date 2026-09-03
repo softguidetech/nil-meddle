@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+<t t-name="invoice_training_details.NilTermsEditor">
+  <div class="nil_terms_editor">
+    <div class="nil_toolbar">
+      <button type="button" data-cmd="bold" t-on-mousedown="cmd"><b>B</b></button>
+      <button type="button" data-cmd="italic" t-on-mousedown="cmd"><i>I</i></button>
+      <button type="button" data-cmd="underline" t-on-mousedown="cmd"><u>U</u></button>
+      <button type="button" data-cmd="justifyLeft" t-on-mousedown="cmd">Left</button>
+      <button type="button" data-cmd="justifyCenter" t-on-mousedown="cmd">Center</button>
+      <button type="button" data-cmd="justifyRight" t-on-mousedown="cmd">Right</button>
+      <button type="button" data-cmd="insertUnorderedList" t-on-mousedown="cmd">• List</button>
+      <button type="button" data-cmd="insertOrderedList" t-on-mousedown="cmd">1. List</button>
+      <select t-on-change="block"><option value="">Style</option><option value="p">Paragraph</option><option value="h2">Heading</option><option value="h3">Subheading</option></select>
+      <select t-on-change="fontSize"><option value="">Size</option><option value="2">Small</option><option value="3">Normal</option><option value="4">Large</option><option value="5">XL</option></select>
+      <select t-on-change="lineHeight"><option value="">Line spacing</option><option value="1">1.0</option><option value="1.15">1.15</option><option value="1.5">1.5</option><option value="2">2.0</option></select>
+      <select t-on-change="paragraphSpace"><option value="">Paragraph gap</option><option value="0">0</option><option value="6">6px</option><option value="10">10px</option><option value="16">16px</option></select>
+      <input type="color" title="Text color" t-on-change="color"/>
+      <button type="button" t-on-mousedown.prevent="insertTable">Table</button>
+      <button type="button" t-on-mousedown.prevent="addRow">+ Row</button>
+      <button type="button" t-on-mousedown.prevent="delRow">- Row</button>
+      <button type="button" t-on-mousedown.prevent="addCol">+ Col</button>
+      <button type="button" t-on-mousedown.prevent="delCol">- Col</button>
+      <button type="button" t-on-mousedown.prevent="cellPadding">Cell Padding</button>
+      <button type="button" t-on-mousedown.prevent="border">Borders</button>
+      <button type="button" t-on-mousedown.prevent="cellBg">Cell BG</button>
+    </div>
+    <div class="nil_editor_area" contenteditable="true" t-ref="editor"
+         t-on-input="save" t-on-blur="save"></div>
+  </div>
+</t>
+</templates>

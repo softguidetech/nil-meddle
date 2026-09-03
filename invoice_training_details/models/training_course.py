@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-from odoo import api, fields, models, tools
-from datetime import datetime
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
 
 
 class TrainingCourse(models.Model):
@@ -16,13 +14,36 @@ class TrainingCourse(models.Model):
     training_date_start = fields.Date(string='Start Date')
     training_date_end = fields.Date(string='Delivery Date')
     price = fields.Float(string='Training Price')
-    move_id = fields.Many2one('account.move', string='Move')
-    lead_id = fields.Many2one('crm.lead', string='Lead')
-    sale_id = fields.Many2one('sale.order', string='Sale Order')
 
-    instructor_id = fields.Many2one('hr.employee', string="Instructor")
+    move_id = fields.Many2one(
+        'account.move',
+        string='Move'
+    )
+    lead_id = fields.Many2one(
+        'crm.lead',
+        string='Lead'
+    )
+    sale_id = fields.Many2one(
+        'sale.order',
+        string='Sale Order'
+    )
+    purchase_order_id = fields.Many2one(
+        'purchase.order',
+        string='Purchase Order',
+        index=True,
+        copy=False,
+        ondelete='set null'
+    )
+
+    instructor_id = fields.Many2one(
+        'hr.employee',
+        string="Instructor"
+    )
     descriptions = fields.Char(string='Description')
-    training_id = fields.Many2one('product.product', string='Training Name')
+    training_id = fields.Many2one(
+        'product.product',
+        string='Training Name'
+    )
     poref = fields.Char(string='PO Reference')
     invref = fields.Char(string='Invoice Reference')
     tr_expiry_date = fields.Char(string='Expiry')
@@ -43,12 +64,10 @@ class TrainingCourse(models.Model):
         related='training_id.default_code',
         string='Internal Ref'
     )
-
     cost_clc = fields.Char(
         related='training_id.product_tmpl_id.cost_clc',
         string="CLCs Cost"
     )
-
     hyperlink = fields.Char(
         related='training_id.product_tmpl_id.hyperlink',
         string="Hyper Link"

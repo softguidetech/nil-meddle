@@ -42,21 +42,48 @@
                    t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
 
                 <style>
-                    table[name="training_line_table"] thead th {
-                        background-color: #EAF9FC !important;
-                        color: #075E68 !important;
+                    /* Same visual spirit as the attached quotation / sales report */
+                    table[name="training_line_table"] {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-top: 10px;
+                        margin-bottom: 0;
                     }
 
-                    table[name="training_line_table"] th,
-                    table[name="training_line_table"] td {
+                    table[name="training_line_table"] thead th {
+                        background-color: #D9F4FA !important;
+                        color: #075E68 !important;
+                        border: 1px solid #9DDDE7 !important;
                         text-align: center !important;
                         vertical-align: middle !important;
+                        font-size: 18px !important;
+                        font-weight: 700 !important;
+                        padding: 7px 5px !important;
+                    }
+
+                    table[name="training_line_table"] td {
+                        border: 1px solid #9DDDE7 !important;
+                        text-align: center !important;
+                        vertical-align: middle !important;
+                        font-size: 18px !important;
+                        padding: 7px 5px !important;
                     }
 
                     .purchase-training-text,
                     .purchase-training-text * {
-                        font-size: 16px !important;
+                        font-size: 18px !important;
                         font-family: inherit !important;
+                        line-height: 1.4 !important;
+                    }
+
+                    /* Push this report footer lower without changing shared layouts/files */
+                    .footer.o_standard_footer {
+                        position: fixed !important;
+                        bottom: -12mm !important;
+                        left: 0 !important;
+                        right: 0 !important;
+                        margin: 0 !important;
+                        padding: 0 !important;
                     }
                 </style>
 
@@ -69,8 +96,7 @@
                     <div class="col-12"
                          style="margin:0; padding-top:0; padding-bottom:0;">
 
-                        <span class="h4 text-info"
-                              style="display:block; margin:0; padding:0;">
+                        <span style="display:block; margin:0; padding:0; font-size:30px; font-weight:bold; color:#0DCAF0;">
 
                             <t t-if="is_clc_order">Work Order</t>
                             <t t-else="">Purchase Order</t>
@@ -90,7 +116,7 @@
                      style="margin-top:0; padding-top:0; padding-bottom:10px;">
 
                     <!-- VENDOR -->
-                    <div class="col-8">
+                    <div class="col-8" style="font-size:20px;">
                         <div>
 
                             <div style="margin:0 0 3px 0;">
@@ -158,7 +184,7 @@
 
 
                     <!-- PURCHASE ORDER INFORMATION -->
-                    <div class="col-4">
+                    <div class="col-4" style="font-size:20px;">
                         <div>
                             <table class="table table-borderless">
 
@@ -228,8 +254,8 @@
                 </div>
 
 
-                <!-- TWO-LINE SPACE BEFORE TRAINING TABLE -->
-                <div style="height:30px;"></div>
+                <!-- Compact spacing before training table -->
+                <div style="height:10px;"></div>
 
 
                 <!-- ===================================================== -->
@@ -289,19 +315,6 @@
                             <th t-if="not is_cisco_u_all_access"
                                 name="th_training_dates">
                                 <span>Training Dates</span>
-                            </th>
-
-                            <th t-if="not is_cisco_u_all_access"
-                                name="th_training_price">
-
-                                <span t-if="is_clc_order">
-                                    Rate Card
-                                </span>
-
-                                <span t-else="">
-                                    Training Price
-                                </span>
-
                             </th>
 
                             <th t-if="o.display_total"
@@ -410,12 +423,6 @@
                                 </td>
 
 
-                                <!-- TRAINING PRICE / RATE CARD -->
-                                <td t-if="not is_cisco_u_all_access">
-                                    <span t-field="training.price"/>
-                                </td>
-
-
                                 <!-- ROW-SPANNED SELECTED TOTALS -->
                                 <t t-if="item == 1">
 
@@ -448,29 +455,31 @@
 
 
                 <!-- ===================================================== -->
-                <!-- TERMS & CONDITIONS - SAME TYPOGRAPHY AS QUOTATION    -->
+                <!-- TERMS & CONDITIONS - IMMEDIATELY AFTER TABLE          -->
                 <!-- ===================================================== -->
 
-                <div t-if="o.term_and_cond"
-                     class="row pt-3 pb-2"
-                     style="page-break-inside:avoid;">
+                <div class="purchase-training-text"
+                     style="
+                        margin-top:6px;
+                        padding-top:0;
+                        page-break-inside:avoid;
+                        width:100%;
+                     ">
 
-                    <div class="col-8 purchase-training-text"
-                         style="
-                            width:600px;
-                            font-size:16px;
-                            font-family:inherit;
-                         ">
-
-                        <div t-field="o.term_and_cond"
-                             style="
-                                text-align:justify;
-                                margin:0;
-                                font-size:16px;
-                                font-family:inherit;
-                             "/>
-
+                    <div style="font-size:18px; font-weight:700; margin:0 0 4px 0;">
+                        Terms &amp; Conditions:
                     </div>
+
+                    <div t-if="o.term_and_cond"
+                         t-field="o.term_and_cond"
+                         style="
+                            width:100%;
+                            text-align:justify;
+                            margin:0;
+                            padding:0;
+                            font-size:18px;
+                            font-family:inherit;
+                         "/>
 
                 </div>
 

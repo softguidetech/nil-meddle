@@ -26,7 +26,14 @@
         "reports/report_action.xml",
         "reports/report_invoice_KSA.xml",
     ],
-    "assets": {"web.assets_backend": ["invoice_training_details/static/src/css/lcp_details.css"]},
+    "assets": {
+        "web.assets_backend": [
+            "invoice_training_details/static/src/css/lcp_details.css",
+            "invoice_training_details/static/src/css/nil_terms_editor.css",
+            "invoice_training_details/static/src/js/nil_terms_editor.js",
+            "invoice_training_details/static/src/xml/nil_terms_editor.xml",
+        ],
+    },
     "installable": True,
     "application": False,
     "auto_install": False,

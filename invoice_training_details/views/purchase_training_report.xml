@@ -3,23 +3,28 @@
 
     <!-- ================================================================ -->
     <!-- PURCHASE ORDER PDF: TRAINING TABLE INSTEAD OF ORDER LINES         -->
-    <!-- This file changes PRINTING ONLY. No form-view/model changes.      -->
+    <!-- PRINTING ONLY                                                     -->
     <!-- ================================================================ -->
+
     <template id="purchase_order_training_report_only"
               inherit_id="purchase.report_purchaseorder_document">
 
-        <!-- Never print the normal PO order-line table for training POs -->
-        <xpath expr="//table[contains(@class, 'o_main_table')]" position="attributes">
+        <!-- Hide normal PO order lines for training POs -->
+        <xpath expr="//table[contains(@class, 'o_main_table')]"
+               position="attributes">
             <attribute name="t-if">not o.is_training_order</attribute>
         </xpath>
 
-        <!-- Never print the normal PO totals block for training POs -->
-        <xpath expr="//div[@id='total']" position="attributes">
+        <!-- Hide normal PO totals for training POs -->
+        <xpath expr="//div[@id='total']"
+               position="attributes">
             <attribute name="t-if">not o.is_training_order</attribute>
         </xpath>
 
-        <!-- Print the training block exactly where the normal lines table starts -->
-        <xpath expr="//table[contains(@class, 'o_main_table')]" position="before">
+        <!-- Training block -->
+        <xpath expr="//table[contains(@class, 'o_main_table')]"
+               position="before">
+
             <t t-if="o.is_training_order">
 
                 <style>
@@ -29,6 +34,7 @@
                         margin-top: 14px;
                         margin-bottom: 16px;
                     }
+
                     .nilme-training-table th {
                         background-color: #EAF9FC !important;
                         color: #075E68 !important;
@@ -39,251 +45,322 @@
                         font-size: 12px !important;
                         font-weight: 700 !important;
                     }
+
                     .nilme-training-table td {
                         border: 1px solid #6f7f89 !important;
                         padding: 7px 5px !important;
                         vertical-align: middle !important;
                         font-size: 12px !important;
                     }
+
                     .nilme-training-terms,
                     .nilme-training-terms * {
                         font-size: 13px !important;
                     }
                 </style>
 
-                <div t-if="o.end_customer_id" style="margin: 8px 0 10px 0; font-size: 13px;">
+
+                <!-- END CUSTOMER -->
+
+                <div t-if="o.end_customer_id"
+                     style="margin: 8px 0 10px 0; font-size: 13px;">
+
                     <strong>End Customer: </strong>
                     <span t-field="o.end_customer_id"/>
+
                 </div>
+
+
+                <!-- TRAINING TABLE -->
 
                 <table t-if="o.display_training_table and o.training_course_ids"
                        class="table table-sm table-bordered nilme-training-table"
                        name="purchase_training_line_table">
+
                     <thead>
                         <tr>
-                            <th>Item</th>
-                            <th>Training Name</th>
-                            <th t-if="o.display_description">Description</th>
-                            <th t-if="o.display_instructor">Instructor Name</th>
-                            <th># Of Students</th>
-                            <th t-if="o.display_location or o.display_where">Location</th>
-                            <th>Duration</th>
-                            <th>Training Dates</th>
-                            <th>Training Price</th>
-                            <th t-if="o.display_total">Total Price</th>
+
+                            <th>
+                                Item
+                            </th>
+
+                            <th>
+                                Training Name
+                            </th>
+
+                            <th t-if="o.display_description">
+                                Description
+                            </th>
+
+                            <th t-if="o.display_instructor">
+                                Instructor Name
+                            </th>
+
+                            <th>
+                                # Of Students
+                            </th>
+
+                            <th t-if="o.display_location or o.display_where">
+                                Location
+                            </th>
+
+                            <th>
+                                Duration
+                            </th>
+
+                            <th>
+                                Training Dates
+                            </th>
+
+                            <th>
+                                Training Price
+                            </th>
+
+                            <th t-if="o.display_total">
+                                Total Price
+                            </th>
+
                         </tr>
                     </thead>
-                    <tbody>
-                        <t t-set="item" t-value="1"/>
-                        <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
 
-                        <tr t-foreach="o.training_course_ids" t-as="training">
+
+                    <tbody>
+
+                        <t t-set="item"
+                           t-value="1"/>
+
+                        <t t-set="total_rows"
+                           t-value="len(o.training_course_ids)"/>
+
+
+                        <tr t-foreach="o.training_course_ids"
+                            t-as="training">
+
+
+                            <!-- ITEM -->
+
                             <td style="text-align:center;">
+
                                 <span t-esc="item"/>
+
                             </td>
+
+
+                            <!-- TRAINING NAME -->
 
                             <td style="text-align:left;">
+
                                 <span t-field="training.training_id"/>
+
                             </td>
 
-                            <td t-if="o.display_description" style="text-align:left;">
+
+                            <!-- DESCRIPTION -->
+
+                            <td t-if="o.display_description"
+                                style="text-align:left;">
+
                                 <span t-field="training.descriptions"/>
+
                             </td>
 
-                            <td t-if="o.display_instructor" style="text-align:center;">
+
+                            <!-- INSTRUCTOR -->
+
+                            <td t-if="o.display_instructor"
+                                style="text-align:center;">
+
                                 <span t-field="training.instructor_id"/>
+
                             </td>
 
+
+                            <!-- NUMBER OF STUDENTS -->
+
                             <td style="text-align:center;">
+
                                 <span t-field="training.no_of_student"/>
+
                             </td>
 
-                            <td t-if="o.display_location or o.display_where" style="text-align:center;">
-                                <span t-if="o.display_location" t-field="training.location"/>
-                                <span t-if="o.display_location and o.display_where and training.location and training.where_location2">, </span>
-                                <span t-if="o.display_where" t-field="training.where_location2"/>
+
+                            <!-- LOCATION -->
+
+                            <td t-if="o.display_location or o.display_where"
+                                style="text-align:center;">
+
+                                <span t-if="o.display_location"
+                                      t-field="training.location"/>
+
+                                <span t-if="
+                                    o.display_location
+                                    and o.display_where
+                                    and training.location
+                                    and training.where_location2
+                                ">
+                                    ,
+                                </span>
+
+                                <span t-if="o.display_where"
+                                      t-field="training.where_location2"/>
+
                             </td>
+
+
+                            <!-- DURATION -->
 
                             <td style="text-align:center;">
+
                                 <span t-field="training.duration"/>
+
                             </td>
 
-                            <td style="text-align:center; white-space:nowrap;">
+
+                            <!-- TRAINING DATES -->
+
+                            <td style="
+                                text-align:center;
+                                white-space:nowrap;
+                            ">
+
                                 <span t-field="training.training_date_start"/>
-                                <span> - </span>
+
+                                <span t-if="
+                                    training.training_date_start
+                                    and training.training_date_end
+                                ">
+                                    -
+                                </span>
+
                                 <span t-field="training.training_date_end"/>
+
                             </td>
 
-                            <td style="text-align:center; white-space:nowrap;">
-                                <span t-field="training.price"
-                                      t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+
+                            <!-- TRAINING PRICE -->
+
+                            <td style="
+                                text-align:center;
+                                white-space:nowrap;
+                            ">
+
+                                <span t-field="training.price"/>
+
                             </td>
+
+
+                            <!-- TOTAL PRICE -->
 
                             <t t-if="item == 1">
+
                                 <td t-if="o.display_total"
                                     t-att-rowspan="total_rows"
-                                    style="text-align:center; white-space:nowrap;">
-                                    <span t-field="o.total_training_price"
-                                          t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
+                                    style="
+                                        text-align:center;
+                                        white-space:nowrap;
+                                    ">
+
+                                    <span t-field="o.total_training_price"/>
+
                                 </td>
+
                             </t>
 
-                            <t t-set="item" t-value="item + 1"/>
+
+                            <t t-set="item"
+                               t-value="item + 1"/>
+
+
                         </tr>
+
                     </tbody>
+
                 </table>
 
-                <!-- Custom training Terms & Conditions -->
-                <div t-if="o.term_and_cond"
-                     class="nilme-training-terms"
-                     style="margin-top: 16px; page-break-inside: avoid; text-align: justify;">
-                    <div t-field="o.term_and_cond"/>
-                </div>
 
-                <!-- Signature + Stamp remain independently controlled -->
-                <div t-if="(o.company_id.signature and o.display_signature) or (o.company_id.stamp and o.display_stamp)"
-                     style="position: relative; min-height: 155px; margin-top: 12px; page-break-inside: avoid;">
-                    <div style="position:absolute; right:0; bottom:0; text-align:right; white-space:nowrap;">
-                        <img t-if="o.company_id.signature and o.display_signature"
-                             t-att-src="image_data_uri(o.company_id.signature)"
-                             style="max-height:120px; max-width:190px; width:auto; height:auto; object-fit:contain; vertical-align:bottom; margin-right:8px;"
-                             alt="Signature"/>
-                        <img t-if="o.company_id.stamp and o.display_stamp"
-                             t-att-src="image_data_uri(o.company_id.stamp)"
-                             style="max-height:135px; max-width:175px; width:auto; height:auto; object-fit:contain; vertical-align:bottom;"
-                             alt="Stamp"/>
-                    </div>
-                </div>
-
-            </t>
-        </xpath>
-    </template>
-
-
-    <!-- ================================================================ -->
-    <!-- RFQ PDF: SAME BEHAVIOUR                                           -->
-    <!-- ================================================================ -->
-    <template id="purchase_rfq_training_report_only"
-              inherit_id="purchase.report_purchasequotation_document">
-
-        <xpath expr="//table[contains(@class, 'o_main_table')]" position="attributes">
-            <attribute name="t-if">not o.is_training_order</attribute>
-        </xpath>
-
-        <xpath expr="//div[@id='total']" position="attributes">
-            <attribute name="t-if">not o.is_training_order</attribute>
-        </xpath>
-
-        <xpath expr="//table[contains(@class, 'o_main_table')]" position="before">
-            <t t-if="o.is_training_order">
-
-                <style>
-                    .nilme-training-table {
-                        width: 100%;
-                        border-collapse: collapse;
-                        margin-top: 14px;
-                        margin-bottom: 16px;
-                    }
-                    .nilme-training-table th {
-                        background-color: #EAF9FC !important;
-                        color: #075E68 !important;
-                        border: 1px solid #6f7f89 !important;
-                        padding: 7px 5px !important;
-                        text-align: center !important;
-                        vertical-align: middle !important;
-                        font-size: 12px !important;
-                        font-weight: 700 !important;
-                    }
-                    .nilme-training-table td {
-                        border: 1px solid #6f7f89 !important;
-                        padding: 7px 5px !important;
-                        vertical-align: middle !important;
-                        font-size: 12px !important;
-                    }
-                    .nilme-training-terms,
-                    .nilme-training-terms * {
-                        font-size: 13px !important;
-                    }
-                </style>
-
-                <div t-if="o.end_customer_id" style="margin: 8px 0 10px 0; font-size: 13px;">
-                    <strong>End Customer: </strong>
-                    <span t-field="o.end_customer_id"/>
-                </div>
-
-                <table t-if="o.display_training_table and o.training_course_ids"
-                       class="table table-sm table-bordered nilme-training-table"
-                       name="purchase_training_line_table">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>Training Name</th>
-                            <th t-if="o.display_description">Description</th>
-                            <th t-if="o.display_instructor">Instructor Name</th>
-                            <th># Of Students</th>
-                            <th t-if="o.display_location or o.display_where">Location</th>
-                            <th>Duration</th>
-                            <th>Training Dates</th>
-                            <th>Training Price</th>
-                            <th t-if="o.display_total">Total Price</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <t t-set="item" t-value="1"/>
-                        <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
-
-                        <tr t-foreach="o.training_course_ids" t-as="training">
-                            <td style="text-align:center;"><span t-esc="item"/></td>
-                            <td style="text-align:left;"><span t-field="training.training_id"/></td>
-                            <td t-if="o.display_description" style="text-align:left;"><span t-field="training.descriptions"/></td>
-                            <td t-if="o.display_instructor" style="text-align:center;"><span t-field="training.instructor_id"/></td>
-                            <td style="text-align:center;"><span t-field="training.no_of_student"/></td>
-                            <td t-if="o.display_location or o.display_where" style="text-align:center;">
-                                <span t-if="o.display_location" t-field="training.location"/>
-                                <span t-if="o.display_location and o.display_where and training.location and training.where_location2">, </span>
-                                <span t-if="o.display_where" t-field="training.where_location2"/>
-                            </td>
-                            <td style="text-align:center;"><span t-field="training.duration"/></td>
-                            <td style="text-align:center; white-space:nowrap;">
-                                <span t-field="training.training_date_start"/><span> - </span><span t-field="training.training_date_end"/>
-                            </td>
-                            <td style="text-align:center; white-space:nowrap;">
-                                <span t-field="training.price"
-                                      t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                            </td>
-                            <t t-if="item == 1">
-                                <td t-if="o.display_total" t-att-rowspan="total_rows" style="text-align:center; white-space:nowrap;">
-                                    <span t-field="o.total_training_price"
-                                          t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                                </td>
-                            </t>
-                            <t t-set="item" t-value="item + 1"/>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- TERMS AND CONDITIONS -->
 
                 <div t-if="o.term_and_cond"
                      class="nilme-training-terms"
-                     style="margin-top:16px; page-break-inside:avoid; text-align:justify;">
+                     style="
+                        margin-top:16px;
+                        page-break-inside:avoid;
+                        text-align:justify;
+                     ">
+
                     <div t-field="o.term_and_cond"/>
+
                 </div>
 
-                <div t-if="(o.company_id.signature and o.display_signature) or (o.company_id.stamp and o.display_stamp)"
-                     style="position:relative; min-height:155px; margin-top:12px; page-break-inside:avoid;">
-                    <div style="position:absolute; right:0; bottom:0; text-align:right; white-space:nowrap;">
-                        <img t-if="o.company_id.signature and o.display_signature"
+
+                <!-- SIGNATURE + STAMP -->
+
+                <div t-if="
+                    (o.company_id.signature and o.display_signature)
+                    or
+                    (o.company_id.stamp and o.display_stamp)
+                "
+                     style="
+                        position:relative;
+                        min-height:155px;
+                        margin-top:12px;
+                        page-break-inside:avoid;
+                     ">
+
+                    <div style="
+                        position:absolute;
+                        right:0;
+                        bottom:0;
+                        text-align:right;
+                        white-space:nowrap;
+                    ">
+
+
+                        <!-- SIGNATURE -->
+
+                        <img t-if="
+                            o.company_id.signature
+                            and o.display_signature
+                        "
                              t-att-src="image_data_uri(o.company_id.signature)"
-                             style="max-height:120px; max-width:190px; width:auto; height:auto; object-fit:contain; vertical-align:bottom; margin-right:8px;"
+                             style="
+                                max-height:120px;
+                                max-width:190px;
+                                width:auto;
+                                height:auto;
+                                object-fit:contain;
+                                vertical-align:bottom;
+                                margin-right:8px;
+                             "
                              alt="Signature"/>
-                        <img t-if="o.company_id.stamp and o.display_stamp"
+
+
+                        <!-- STAMP -->
+
+                        <img t-if="
+                            o.company_id.stamp
+                            and o.display_stamp
+                        "
                              t-att-src="image_data_uri(o.company_id.stamp)"
-                             style="max-height:135px; max-width:175px; width:auto; height:auto; object-fit:contain; vertical-align:bottom;"
+                             style="
+                                max-height:135px;
+                                max-width:175px;
+                                width:auto;
+                                height:auto;
+                                object-fit:contain;
+                                vertical-align:bottom;
+                             "
                              alt="Stamp"/>
+
                     </div>
+
                 </div>
+
 
             </t>
+
         </xpath>
+
     </template>
 
 </odoo>

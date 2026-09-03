@@ -19,6 +19,41 @@ class AccountMove(models.Model):
         ondelete='set null'
     )
 
+    source_purchase_order_id = fields.Many2one(
+        'purchase.order',
+        string='Source Purchase Order',
+        index=True,
+        copy=False,
+        ondelete='set null'
+    )
+    purchase_training_type = fields.Selection(
+        [
+            ('training_vendor', 'Training Vendor'),
+            ('instructor', 'Instructor'),
+        ],
+        string='Training PO Type',
+        copy=False
+    )
+    instructor_training_course_id = fields.Many2one(
+        'training.course',
+        string='Training',
+        copy=False,
+        ondelete='set null'
+    )
+    instructor_from = fields.Date(string='Instructor From', copy=False)
+    instructor_to = fields.Date(string='Instructor To', copy=False)
+    instructor_days = fields.Integer(string='No. of Days', copy=False)
+    instructor_daily_rate = fields.Monetary(
+        string='Daily Rate',
+        currency_field='currency_id',
+        copy=False
+    )
+    instructor_total = fields.Monetary(
+        string='Instructor Total',
+        currency_field='currency_id',
+        copy=False
+    )
+
     training_name = fields.Char(string='Training Name')
     service_name = fields.Char(string='Service Name')
     total_training_price = fields.Monetary(

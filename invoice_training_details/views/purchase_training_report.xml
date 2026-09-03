@@ -42,11 +42,11 @@
                    t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
 
                 <style>
-                    /* Same visual spirit as the attached quotation / sales report */
+                    /* Compact visual proportions matching the reference PO */
                     table[name="training_line_table"] {
                         width: 100%;
                         border-collapse: collapse;
-                        margin-top: 10px;
+                        margin-top: 8px;
                         margin-bottom: 0;
                     }
 
@@ -56,34 +56,43 @@
                         border: 1px solid #9DDDE7 !important;
                         text-align: center !important;
                         vertical-align: middle !important;
-                        font-size: 18px !important;
+                        font-size: 12px !important;
                         font-weight: 700 !important;
-                        padding: 7px 5px !important;
+                        line-height: 1.2 !important;
+                        padding: 5px 4px !important;
                     }
 
                     table[name="training_line_table"] td {
-                        border: 1px solid #9DDDE7 !important;
+                        border: 1px solid #D3E8EC !important;
                         text-align: center !important;
                         vertical-align: middle !important;
-                        font-size: 18px !important;
-                        padding: 7px 5px !important;
+                        font-size: 12px !important;
+                        line-height: 1.25 !important;
+                        padding: 5px 4px !important;
                     }
 
                     .purchase-training-text,
                     .purchase-training-text * {
-                        font-size: 18px !important;
+                        font-size: 13px !important;
                         font-family: inherit !important;
-                        line-height: 1.4 !important;
+                        line-height: 1.35 !important;
                     }
 
-                    /* Push this report footer lower without changing shared layouts/files */
+                    .purchase-vendor-block,
+                    .purchase-vendor-block * {
+                        font-size: 13px !important;
+                        line-height: 1.35 !important;
+                    }
+
+                    .purchase-meta,
+                    .purchase-meta td {
+                        font-size: 13px !important;
+                        line-height: 1.35 !important;
+                    }
+
+                    /* Move the corporate footer visually down for this report only */
                     .footer.o_standard_footer {
-                        position: fixed !important;
-                        bottom: -12mm !important;
-                        left: 0 !important;
-                        right: 0 !important;
-                        margin: 0 !important;
-                        padding: 0 !important;
+                        transform: translateY(22mm) !important;
                     }
                 </style>
 
@@ -96,7 +105,7 @@
                     <div class="col-12"
                          style="margin:0; padding-top:0; padding-bottom:0;">
 
-                        <span style="display:block; margin:0; padding:0; font-size:30px; font-weight:bold; color:#0DCAF0;">
+                        <span style="display:block; margin:0; padding:0; font-size:24px; font-weight:600; color:#0DCAF0;">
 
                             <t t-if="is_clc_order">Work Order</t>
                             <t t-else="">Purchase Order</t>
@@ -113,45 +122,43 @@
                 <!-- ===================================================== -->
 
                 <div class="row"
-                     style="margin-top:0; padding-top:0; padding-bottom:10px;">
+                     style="margin-top:14px; padding-top:0; padding-bottom:8px;">
 
                     <!-- VENDOR -->
-                    <div class="col-8" style="font-size:20px;">
+                    <div class="col-8 purchase-vendor-block">
                         <div>
 
-                            <div style="margin:0 0 3px 0;">
+                            <div style="margin:0 0 1px 0;">
                                 <strong>Company Name:</strong>
+                            </div>
+                            <div style="margin:0 0 4px 0;">
                                 <span t-field="vendor_partner.name"/>
                             </div>
 
-                            <div style="margin:0 0 3px 0;">
+                            <div style="margin:0 0 1px 0;">
                                 <strong>Address:</strong>
-
+                            </div>
+                            <div style="margin:0 0 1px 0;">
                                 <span t-if="vendor_partner.street"
                                       t-field="vendor_partner.street"/>
-
                                 <t t-if="vendor_partner.street2">
                                     <t t-if="vendor_partner.street">, </t>
                                     <span t-field="vendor_partner.street2"/>
                                 </t>
-
-                                <t t-if="vendor_partner.city">
-                                    <t t-if="vendor_partner.street or vendor_partner.street2">, </t>
-                                    <span t-field="vendor_partner.city"/>
-                                </t>
-
+                            </div>
+                            <div style="margin:0 0 3px 0;">
+                                <span t-if="vendor_partner.city"
+                                      t-field="vendor_partner.city"/>
                                 <t t-if="vendor_partner.state_id">
-                                    <t t-if="vendor_partner.street or vendor_partner.street2 or vendor_partner.city">, </t>
+                                    <t t-if="vendor_partner.city">, </t>
                                     <span t-field="vendor_partner.state_id.name"/>
                                 </t>
-
                                 <t t-if="vendor_partner.zip">
-                                    <t t-if="vendor_partner.street or vendor_partner.street2 or vendor_partner.city or vendor_partner.state_id">, </t>
+                                    <t t-if="vendor_partner.city or vendor_partner.state_id"> </t>
                                     <span t-field="vendor_partner.zip"/>
                                 </t>
-
                                 <t t-if="vendor_partner.country_id">
-                                    <t t-if="vendor_partner.street or vendor_partner.street2 or vendor_partner.city or vendor_partner.state_id or vendor_partner.zip">, </t>
+                                    <t t-if="vendor_partner.city or vendor_partner.state_id or vendor_partner.zip">, </t>
                                     <span t-field="vendor_partner.country_id.name"/>
                                 </t>
                             </div>
@@ -159,10 +166,8 @@
                             <div t-if="o.partner_id.email or vendor_partner.email"
                                  style="margin:0 0 3px 0;">
                                 <strong>Email:</strong>
-
                                 <span t-if="o.partner_id.email"
                                       t-field="o.partner_id.email"/>
-
                                 <span t-else=""
                                       t-field="vendor_partner.email"/>
                             </div>
@@ -182,80 +187,54 @@
                         </div>
                     </div>
 
+                    <!-- PO INFORMATION -->
+                    <div class="col-4 purchase-meta">
+                        <table class="table table-borderless"
+                               style="margin:0; width:100%;">
 
-                    <!-- PURCHASE ORDER INFORMATION -->
-                    <div class="col-4" style="font-size:20px;">
-                        <div>
-                            <table class="table table-borderless">
+                            <tr class="p-0">
+                                <td class="p-0"
+                                    style="vertical-align:middle; width:52%;">
+                                    <span t-if="is_clc_order">Work Order</span>
+                                    <span t-else="">Purchase Order</span>
+                                </td>
+                                <td class="p-0"
+                                    style="vertical-align:middle;">
+                                    <span t-if="is_clc_order"
+                                          t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else ('WO-' + o.name if not o.name.startswith('WO-') else o.name)"/>
+                                    <span t-else=""
+                                          t-field="o.name"/>
+                                </td>
+                            </tr>
 
-                                <tr class="p-0">
-                                    <td class="p-0"
-                                        style="vertical-align:middle;">
-                                        <t t-if="is_clc_order">WO#</t>
-                                        <t t-else="">PO#</t>
-                                    </td>
+                            <tr class="p-0">
+                                <td class="p-0"
+                                    style="vertical-align:middle;">
+                                    Date
+                                </td>
+                                <td class="p-0"
+                                    style="vertical-align:middle;">
+                                    <span t-field="o.date_order"/>
+                                </td>
+                            </tr>
 
-                                    <td class="p-0"
-                                        style="vertical-align:middle;">
+                            <tr class="p-0">
+                                <td class="p-0"
+                                    style="vertical-align:middle;">
+                                    Validity Date
+                                </td>
+                                <td class="p-0"
+                                    style="vertical-align:middle;">
+                                    <span t-field="o.validity_date"/>
+                                </td>
+                            </tr>
 
-                                        <span t-if="is_clc_order"
-                                              t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else ('WO-' + o.name if not o.name.startswith('WO-') else o.name)"/>
-
-                                        <span t-else=""
-                                              t-field="o.name"/>
-                                    </td>
-                                </tr>
-
-
-                                <tr class="p-0">
-                                    <td class="p-0"
-                                        style="vertical-align:middle;">
-                                        DATE
-                                    </td>
-
-                                    <td class="p-0"
-                                        style="vertical-align:middle;">
-                                        <span t-field="o.date_order"
-                                              t-options="{&quot;widget&quot;: &quot;date&quot;}"/>
-                                    </td>
-                                </tr>
-
-
-                                <tr t-if="o.partner_ref"
-                                    class="p-0">
-                                    <td class="p-0"
-                                        style="vertical-align:middle;">
-                                        REFERENCE
-                                    </td>
-
-                                    <td class="p-0"
-                                        style="vertical-align:middle;">
-                                        <span t-field="o.partner_ref"/>
-                                    </td>
-                                </tr>
-
-                            </table>
-                        </div>
+                        </table>
                     </div>
 
                 </div>
-
-
-                <!-- ===================================================== -->
-                <!-- END CUSTOMER                                         -->
-                <!-- ===================================================== -->
-
-                <div t-if="o.end_customer_id"
-                     style="margin:0 0 12px 0;">
-
-                    <strong>End Customer:</strong>
-                    <span t-field="o.end_customer_id"/>
-
-                </div>
-
-
                 <!-- Compact spacing before training table -->
-                <div style="height:10px;"></div>
+                <div style="height:6px;"></div>
 
 
                 <!-- ===================================================== -->
@@ -316,13 +295,7 @@
                                 name="th_training_dates">
                                 <span>Training Dates</span>
                             </th>
-
-                            <th t-if="o.display_total"
-                                name="th_total">
-                                <span>Total Price</span>
-                            </th>
-
-                            <th t-if="o.display_downpayment"
+<th t-if="o.display_downpayment"
                                 name="th_advance_payment">
                                 <span>Advance Payment</span>
                             </th>
@@ -425,13 +398,7 @@
 
                                 <!-- ROW-SPANNED SELECTED TOTALS -->
                                 <t t-if="item == 1">
-
-                                    <td t-if="o.display_total"
-                                        t-att-rowspan="total_rows">
-                                        <span t-field="o.total_training_price"/>
-                                    </td>
-
-                                    <td t-if="o.display_downpayment"
+<td t-if="o.display_downpayment"
                                         t-att-rowspan="total_rows">
                                         <span t-field="o.half_advance_payment_before"/>
                                     </td>
@@ -455,18 +422,70 @@
 
 
                 <!-- ===================================================== -->
-                <!-- TERMS & CONDITIONS - IMMEDIATELY AFTER TABLE          -->
+                <!-- TOTAL / END CUSTOMER / TERMS                          -->
                 <!-- ===================================================== -->
 
-                <div class="purchase-training-text"
+                <div t-if="o.display_total"
                      style="
                         margin-top:6px;
-                        padding-top:0;
+                        display:flex;
+                        justify-content:flex-end;
+                        page-break-inside:avoid;
+                     ">
+
+                    <table class="table table-sm"
+                           style="
+                                width:270px;
+                                margin:0;
+                                border-collapse:collapse;
+                           ">
+                        <tr>
+                            <td style="
+                                border:1px solid #D3E8EC;
+                                font-size:13px;
+                                font-weight:600;
+                                padding:5px 7px;
+                                background:#fff;
+                            ">
+                                <span t-if="is_clc_order">NIL ME Invoice Amount</span>
+                                <span t-else="">Partner Invoice Amount</span>
+                            </td>
+                            <td style="
+                                border:1px solid #D3E8EC;
+                                font-size:13px;
+                                text-align:right;
+                                white-space:nowrap;
+                                padding:5px 7px;
+                                background:#fff;
+                            ">
+                                <span t-field="o.total_training_price"/>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+
+
+                <div t-if="o.end_customer_id"
+                     class="purchase-training-text"
+                     style="margin:10px 0 0 0;">
+
+                    <strong>End Customer:</strong>
+                    <span t-field="o.end_customer_id"/>
+
+                </div>
+
+
+                <!-- Terms are always shown directly after the content above -->
+                <div class="purchase-training-text"
+                     style="
+                        margin-top:14px;
+                        padding:0;
                         page-break-inside:avoid;
                         width:100%;
                      ">
 
-                    <div style="font-size:18px; font-weight:700; margin:0 0 4px 0;">
+                    <div style="font-weight:700; margin:0 0 4px 0;">
                         Terms &amp; Conditions:
                     </div>
 
@@ -477,8 +496,6 @@
                             text-align:justify;
                             margin:0;
                             padding:0;
-                            font-size:18px;
-                            font-family:inherit;
                          "/>
 
                 </div>
@@ -493,7 +510,8 @@
                      style="
                         page-break-inside:avoid;
                         position:relative;
-                        min-height:170px;
+                        min-height:245px;
+                        margin-top:10px;
                      ">
 
                     <div style="

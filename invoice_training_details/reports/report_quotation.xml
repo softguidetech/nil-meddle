@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <template id="report_quotation_document_training" name="Quotation Report Training">
         <t t-call="web.html_container">
@@ -349,7 +349,6 @@
 
                                     <td style="text-align:left; vertical-align:middle;">
                                         <span t-field="training.training_id"/>
-                                        <t t-if="training.hyperlink"><span> - </span><a t-att-href="training.hyperlink" target="_blank" style="text-decoration:underline;">Click for Course Content</a></t>
                                     </td>
 
 
@@ -420,6 +419,43 @@
                         </tbody>
 
                     </table>
+
+                    <!-- Course Materials -->
+                    <t t-set="courses_with_content"
+                       t-value="o.training_course_ids.filtered('hyperlink')"/>
+
+                    <div t-if="courses_with_content"
+                         style="
+                            width:100%;
+                            margin:8px 0 4px 0;
+                            padding:0;
+                            font-size:16px;
+                            line-height:1.45;
+                         ">
+
+                        <div style="
+                            margin:0 0 3px 0;
+                            font-weight:700;
+                         ">
+                            Course Materials
+                        </div>
+
+                        <t t-foreach="courses_with_content"
+                           t-as="course_material">
+
+                            <div style="margin:0 0 2px 0;">
+                                <span t-field="course_material.training_id"/>
+                                <span>: </span>
+                                <a t-att-href="course_material.hyperlink"
+                                   target="_blank"
+                                   style="text-decoration:underline;">
+                                    View Course Content
+                                </a>
+                            </div>
+
+                        </t>
+
+                    </div>
 
 
                     <div style="

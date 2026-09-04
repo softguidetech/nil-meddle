@@ -1,5 +1,5 @@
 /* =========================================================
-   NIL TERMS EDITOR - FULL WIDTH
+   TERMS EDITOR: FULL WIDTH
    ========================================================= */
 
 .o_nil_terms_full_width,
@@ -13,60 +13,80 @@
 
 .o_nil_terms_full_width {
     display: block !important;
-    grid-column: 1 / -1 !important;
 }
 
-.nil_terms_toolbar {
-    width: 100% !important;
-    max-width: none !important;
-}
-
+.nil_terms_toolbar,
 .nil_terms_editor_surface {
     width: 100% !important;
     max-width: none !important;
-    min-height: 330px !important;
+    min-width: 0 !important;
     box-sizing: border-box !important;
+}
+
+.nil_terms_editor_surface {
+    min-height: 330px !important;
 }
 
 
 /* =========================================================
-   ODOO 17 CHATTER - ALWAYS BELOW THE FORM
-   Prevents the chatter/notes panel from moving to the right
-   on wide screens or when browser zoom changes.
+   CHATTER: ALWAYS BELOW FORM
+   Applied only to forms marked by force_bottom_chatter.js.
    ========================================================= */
 
-.o_form_view .o_form_view_container,
-.o_form_view.o_xxl_form_view .o_form_view_container,
-.o_xxl_form_view .o_form_view_container {
-    display: flex !important;
-    flex-flow: column nowrap !important;
+.o_form_renderer.o_nil_force_bottom_chatter {
     flex-direction: column !important;
-    width: 100% !important;
-}
+    flex-wrap: nowrap !important;
 
-/* Main form must occupy the full row */
-.o_form_view .o_form_view_container > .o_form_renderer,
-.o_form_view.o_xxl_form_view .o_form_view_container > .o_form_renderer,
-.o_xxl_form_view .o_form_view_container > .o_form_renderer {
+    /*
+     * Odoo adds h-100 on wide layouts. In a forced vertical layout that
+     * would squeeze the sheet/chatter into one viewport and can collapse
+     * the sheet. Override it here.
+     */
+    height: auto !important;
+    min-height: 100% !important;
+
     width: 100% !important;
     max-width: 100% !important;
-    flex: 0 0 auto !important;
+    min-width: 0 !important;
+
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
 }
 
-/* Chatter becomes a full-width block after the form */
-.o_form_view .o_form_view_container > .o-mail-Form-chatter,
-.o_form_view.o_xxl_form_view .o_form_view_container > .o-mail-Form-chatter,
-.o_xxl_form_view .o_form_view_container > .o-mail-Form-chatter,
-.o_form_view .o-mail-Form-chatter,
-.o_xxl_form_view .o-mail-Form-chatter {
+.o_form_renderer.o_nil_force_bottom_chatter > .o_form_sheet_bg {
+    flex: 0 0 auto !important;
+
     width: 100% !important;
     max-width: 100% !important;
+    min-width: 0 !important;
+
+    overflow: visible !important;
+}
+
+.o_form_renderer.o_nil_force_bottom_chatter
+    > .o-mail-Form-chatter.o_nil_bottom_chatter {
+    position: static !important;
+
     flex: 0 0 auto !important;
+    flex-grow: 0 !important;
+    flex-shrink: 0 !important;
+
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+
     border-left: 0 !important;
-    border-top: 1px solid var(--border-color, #dee2e6) !important;
+    border-right: 0 !important;
+    border-top: 1px solid #dee2e6 !important;
 }
 
-/* Neutralize the XXL side-chatter width rules */
-.o_xxl_form_view .o-mail-Form-chatter {
+.o_form_renderer.o_nil_force_bottom_chatter
+    > .o-mail-Form-chatter.o_nil_bottom_chatter
+    > .o-mail-Chatter {
+    width: 100% !important;
+    max-width: 100% !important;
     min-width: 0 !important;
 }

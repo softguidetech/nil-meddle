@@ -70,6 +70,9 @@
                         </div>
                     </div>
 
+                    <!-- Prevent PO/vendor block from overlapping the training table -->
+                    <div style="clear:both; display:block; width:100%; height:8px;"></div>
+
                     <style>
                         table[name="training_line_table"] th {
                             background-color: #D9F4FA !important;
@@ -84,7 +87,10 @@
                         }
                     </style>
                     <t t-set="is_cisco_u_all_access" t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
-                    <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
+                    <table t-if="o.display_training_table"
+                           class="table table-sm o_main_table table-bordered text-center"
+                           name="training_line_table"
+                           style="clear:both; width:100%;">
                         <thead>
                             <tr>
                                 <th style="font-size:18px; text-align:center; vertical-align:middle;">Item</th>

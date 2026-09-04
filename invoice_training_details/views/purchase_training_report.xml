@@ -1,4 +1,4 @@
-
+<?xml version="1.0" encoding="UTF-8"?>
 <odoo>
     <template id="purchase_order_training_report_only"
               inherit_id="purchase.report_purchaseorder_document">
@@ -90,7 +90,7 @@
                     <div class="col-8 po-vendor-info">
                         <div>
                             <strong>
-                                <span t-if="is_instructor_po">Instructor Name:</span>
+                                <span t-if="is_instructor_po">Service Provider:</span>
                                 <span t-else="">Company Name:</span>
                             </strong>
                         </div>
@@ -234,39 +234,28 @@
                          page-break-inside:avoid;
                          width:100%;
                      ">
-                    <div style="
-                        display:table;
-                        width:100%;
-                        table-layout:fixed;
-                     ">
-                        <div style="
-                            display:table-cell;
-                            width:50%;
-                            vertical-align:bottom;
-                            padding-right:20px;
-                         ">
-                            <strong>Instructor Name:</strong>
-                            <span t-if="o.instructor_id"
-                                  t-field="o.instructor_id.name"/>
-                        </div>
 
-                        <div style="
-                            display:table-cell;
-                            width:50%;
-                            vertical-align:bottom;
-                            text-align:right;
-                         ">
-                            <strong>Instructor Signature:</strong>
-                            <span style="
-                                display:inline-block;
-                                width:180px;
-                                margin-left:8px;
-                                border-bottom:1px solid #000;
-                                height:18px;
-                                vertical-align:bottom;
-                             ">&#160;</span>
-                        </div>
+                    <div style="margin:0;">
+                        <strong>Instructor Name:</strong>
+                        <span t-if="o.instructor_id"
+                              t-field="o.instructor_id.name"/>
                     </div>
+
+                    <!-- Space reserved for handwritten signature -->
+                    <div style="height:55px;"></div>
+
+                    <div style="margin:0;">
+                        <strong>Instructor Signature:</strong>
+                        <span style="
+                            display:inline-block;
+                            width:220px;
+                            margin-left:8px;
+                            border-bottom:1px solid #000;
+                            height:18px;
+                            vertical-align:bottom;
+                         ">&#160;</span>
+                    </div>
+
                 </div>
 
                 <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"

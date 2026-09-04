@@ -1,0 +1,73 @@
+
+/* =========================================================
+   NIL TERMS EDITOR - FULL WIDTH
+   ========================================================= */
+
+.o_nil_terms_full_width,
+.o_nil_terms_full_width.o_field_widget,
+.o_nil_terms_full_width .nil_terms_editor_pro,
+.nil_terms_editor_pro {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+}
+
+.o_nil_terms_full_width {
+    display: block !important;
+    grid-column: 1 / -1 !important;
+}
+
+.nil_terms_toolbar {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+.nil_terms_editor_surface {
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 330px !important;
+    box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   ODOO 17 CHATTER - ALWAYS BELOW THE FORM
+   Prevents the chatter/notes panel from moving to the right
+   on wide screens or when browser zoom changes.
+   ========================================================= */
+
+.o_form_view .o_form_view_container,
+.o_form_view.o_xxl_form_view .o_form_view_container,
+.o_xxl_form_view .o_form_view_container {
+    display: flex !important;
+    flex-flow: column nowrap !important;
+    flex-direction: column !important;
+    width: 100% !important;
+}
+
+/* Main form must occupy the full row */
+.o_form_view .o_form_view_container > .o_form_renderer,
+.o_form_view.o_xxl_form_view .o_form_view_container > .o_form_renderer,
+.o_xxl_form_view .o_form_view_container > .o_form_renderer {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+}
+
+/* Chatter becomes a full-width block after the form */
+.o_form_view .o_form_view_container > .o-mail-Form-chatter,
+.o_form_view.o_xxl_form_view .o_form_view_container > .o-mail-Form-chatter,
+.o_xxl_form_view .o_form_view_container > .o-mail-Form-chatter,
+.o_form_view .o-mail-Form-chatter,
+.o_xxl_form_view .o-mail-Form-chatter {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 auto !important;
+    border-left: 0 !important;
+    border-top: 1px solid var(--border-color, #dee2e6) !important;
+}
+
+/* Neutralize the XXL side-chatter width rules */
+.o_xxl_form_view .o-mail-Form-chatter {
+    min-width: 0 !important;
+}

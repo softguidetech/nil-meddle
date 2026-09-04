@@ -181,7 +181,7 @@
                         <span style="padding:0 8px;">|</span>
 
                         <strong>Date:</strong>
-                        <span t-field="o.date_order"/>
+                        <span t-field="o.date_order" t-options="{&quot;widget&quot;:&quot;date&quot;}"/>
 
                         <span style="padding:0 8px;">|</span>
 
@@ -205,6 +205,77 @@
 
                             var currentPage = parseInt(vars.sitepage || '1', 10);
                             var blocks = document.getElementsByClassName('nil_po_repeat_meta');
+
+                            for (var j = 0; j < blocks.length; j++) {
+                                blocks[j].style.display = currentPage > 1 ? 'block' : 'none';
+                            }
+                        })();
+                        ]]>
+                    </script>
+
+                </t>
+
+                <!-- QUOTATION continuation details: PAGE 2+ ONLY -->
+                <t t-if="o and o.env.context.get('quotation_repeat_meta')">
+
+                    <t t-set="quotation_customer_partner"
+                       t-value="o.partner_id if o.partner_id.is_company else (o.partner_id.parent_id or o.partner_id)"/>
+
+                    <div class="nil_quotation_repeat_meta"
+                         style="
+                            display:none;
+                            width:100%;
+                            margin:3px 0 0 0;
+                            padding:0;
+                            text-align:right;
+                            font-size:12px;
+                            line-height:1.2;
+                            white-space:nowrap;
+                         ">
+
+                        <strong>Quotation:</strong>
+
+                        <span t-if="o.name"
+                              t-esc="
+                                o.name
+                                if o.name.startswith('Q')
+                                else 'Q' + (
+                                    o.name[2:]
+                                    if o.name.startswith('SO')
+                                    else o.name[1:]
+                                    if o.name.startswith('S')
+                                    else o.name
+                                )
+                              "/>
+
+                        <span style="padding:0 8px;">|</span>
+
+                        <strong>Date:</strong>
+                        <span t-field="o.date_order"
+                              t-options="{&quot;widget&quot;:&quot;date&quot;}"/>
+
+                        <span style="padding:0 8px;">|</span>
+
+                        <strong>To:</strong>
+                        <span t-field="quotation_customer_partner.name"/>
+
+                    </div>
+
+                    <script type="text/javascript">
+                        <![CDATA[
+                        (function () {
+                            var vars = {};
+                            var parts = document.location.search.substring(1).split('&');
+
+                            for (var i = 0; i < parts.length; i++) {
+                                var pair = parts[i].split('=', 2);
+                                if (pair.length === 2) {
+                                    vars[pair[0]] = unescape(pair[1]);
+                                }
+                            }
+
+                            var currentPage = parseInt(vars.sitepage || '1', 10);
+                            var blocks = document.getElementsByClassName('nil_quotation_repeat_meta');
 
                             for (var j = 0; j < blocks.length; j++) {
                                 blocks[j].style.display = currentPage > 1 ? 'block' : 'none';

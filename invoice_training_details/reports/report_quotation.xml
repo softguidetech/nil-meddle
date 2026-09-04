@@ -379,129 +379,92 @@
                     </table>
 
 
-                    <div class="row pt-3 pb-2"
-                         style="
-                            page-break-inside:avoid;
-                            display:flex;
-                            justify-content:space-between;
-                            align-items:flex-start;
-                         ">
+                    <div style="
+                        width:100%;
+                        margin:6px 0 6px 0;
+                        text-align:right;
+                        page-break-inside:avoid;
+                    ">
 
-                        <div class="col-auto"
-                             style="flex:1 1 auto;">
+                        <table class="table table-sm table-border"
+                               style="
+                                   display:inline-table;
+                                   background-color:#fff;
+                                   width:300px;
+                                   margin:0 0 0 auto;
+                               ">
 
-                            <table class="table table-sm"
-                                   style="
-                                       background-color:#fff;
-                                       color:white;
-                                       width:auto;
-                                       border:none;
-                                   ">
-                            </table>
+                            <!-- Tax totals -->
+                            <t t-set="tax_totals"
+                               t-value="o.tax_totals"/>
 
-                        </div>
+                            <t t-if="tax_totals.get('subtotals')">
 
+                                <t t-foreach="tax_totals.get('subtotals')"
+                                   t-as="subtotal">
 
-                        <div class="col-auto"
-                             style="
-                                 min-width:300px;
-                                 flex:0 0 auto;
-                                 margin-left:auto;
-                                 text-align:left;
-                                 position:absolute;
-                                 right:15px;
-                             ">
+                                    <tr class="border-grey o_subtotal">
 
-                            <table class="table table-sm table-border"
-                                   style="
-                                       background-color:#fff;
-                                       width:300px;
-                                   ">
+                                        <td style="background-color:#fff;">
+                                            <strong t-out="subtotal['name']">
+                                                Untaxed Amount
+                                            </strong>
+                                        </td>
 
-                                <!-- Tax totals -->
-                                <t t-set="tax_totals"
-                                   t-value="o.tax_totals"/>
+                                        <td style="
+                                            background-color:#fff;
+                                            text-align:right;
+                                        ">
+                                            <span t-att-class="oe_subtotal_footer_separator"
+                                                  t-out="subtotal['formatted_amount']"/>
+                                        </td>
 
+                                    </tr>
 
-                                <t t-if="tax_totals.get('subtotals')">
+                                    <t t-set="subtotal_to_show"
+                                       t-value="subtotal['name']"/>
 
-                                    <!-- Untaxed Amount -->
-                                    <t t-foreach="tax_totals.get('subtotals')"
-                                       t-as="subtotal">
-
-                                        <tr class="border-grey o_subtotal">
-
-                                            <td style="background-color:#fff;">
-
-                                                <strong t-out="subtotal['name']">
-                                                    Untaxed Amount
-                                                </strong>
-
-                                            </td>
-
-                                            <td style="
-                                                background-color:#fff;
-                                                text-align:right;
-                                            ">
-
-                                                <span t-att-class="oe_subtotal_footer_separator"
-                                                      t-out="subtotal['formatted_amount']"/>
-
-                                            </td>
-
-                                        </tr>
-
-
-                                        <t t-set="subtotal_to_show"
-                                           t-value="subtotal['name']"/>
-
-
-                                        <t t-call="account.tax_groups_totals"/>
-
-                                    </t>
+                                    <t t-call="account.tax_groups_totals"/>
 
                                 </t>
 
+                            </t>
 
-                                <!-- Total Amount -->
-                                <tr class="border-grey o_total">
+                            <!-- Total Amount -->
+                            <tr class="border-grey o_total">
 
-                                    <td style="background-color:#fff;">
-                                        <strong>Total Amount</strong>
-                                    </td>
+                                <td style="background-color:#fff;">
+                                    <strong>Total Amount</strong>
+                                </td>
 
-                                    <td style="
-                                        background-color:#fff;
-                                        text-align:right;
-                                    ">
+                                <td style="
+                                    background-color:#fff;
+                                    text-align:right;
+                                ">
+                                    <span t-out="o.amount_total"
+                                          t-options="{
+                                              &quot;widget&quot;: &quot;monetary&quot;,
+                                              &quot;display_currency&quot;: o.currency_id
+                                          }"/>
+                                </td>
 
-                                        <span t-out="o.amount_total"
-                                              t-options="{
-                                                  &quot;widget&quot;: &quot;monetary&quot;,
-                                                  &quot;display_currency&quot;: o.currency_id
-                                              }"/>
+                            </tr>
 
-                                    </td>
-
-                                </tr>
-
-                            </table>
-
-                        </div>
+                        </table>
 
                     </div>
 
 
                     <!-- Terms & Conditions -->
-                    <div class="row pt-3 pb-2"
-                         style="page-break-inside:avoid;">
+                    <div class="row pb-2"
+                         style="margin-top:0; padding-top:0; page-break-inside:avoid;">
 
                         <div class="col-12 proforma-text-section"
-     style="
-        width:100%;
-        font-size:16px;
-        font-family:inherit;
-     ">
+                             style="
+                                width:100%;
+                                font-size:16px;
+                                font-family:inherit;
+                             ">
 
                             <p style="
                                 text-align:justify;

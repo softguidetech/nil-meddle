@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
-
-    <!-- Training Invoice - UAE -->
     <record id="account_invoices_training_report" model="ir.actions.report">
         <field name="name">Training Invoices - UAE</field>
         <field name="model">account.move</field>
@@ -11,12 +9,10 @@
         <field name="print_report_name">(object._get_report_base_filename())</field>
         <field name="attachment"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="paperformat_id" ref="invoice_training_details.paperformat_training_report_compact"/>
+        <field name="paperformat_id" ref="invoice_training_details.paperformat_euro_training_report"/>
         <field name="binding_type">report</field>
     </record>
 
-
-    <!-- Training Quotation -->
     <record id="quotation_training_report" model="ir.actions.report">
         <field name="name">Training Quotation</field>
         <field name="model">sale.order</field>
@@ -26,12 +22,10 @@
         <field name="print_report_name">'Quotation - %s' % object.name</field>
         <field name="attachment"/>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
-        <field name="paperformat_id" ref="invoice_training_details.paperformat_training_report_compact"/>
+        <field name="paperformat_id" ref="invoice_training_details.paperformat_euro_training_report"/>
         <field name="binding_type">report</field>
     </record>
 
-
-    <!-- Professional Services Invoice -->
     <record id="account_invoices_pro_training_report" model="ir.actions.report">
         <field name="name">Professional Services Invoices</field>
         <field name="model">account.move</field>
@@ -41,12 +35,10 @@
         <field name="print_report_name">(object._get_report_base_filename())</field>
         <field name="attachment"/>
         <field name="binding_model_id" ref="account.model_account_move"/>
-        <field name="paperformat_id" ref="invoice_training_details.paperformat_training_report_compact"/>
+        <field name="paperformat_id" ref="invoice_training_details.paperformat_euro_training_report"/>
         <field name="binding_type">report</field>
     </record>
 
-
-    <!-- Training PO -->
     <record id="quotation_po_training_report" model="ir.actions.report">
         <field name="name">Training PO</field>
         <field name="model">sale.order</field>
@@ -56,8 +48,7 @@
         <field name="print_report_name">'PO#' + (object.name or '')</field>
         <field name="attachment"/>
         <field name="binding_model_id" ref="sale.model_sale_order"/>
-        <field name="paperformat_id" ref="invoice_training_details.paperformat_training_report_compact"/>
+        <field name="paperformat_id" ref="invoice_training_details.paperformat_euro_training_report"/>
         <field name="binding_type">report</field>
     </record>
-
 </odoo>

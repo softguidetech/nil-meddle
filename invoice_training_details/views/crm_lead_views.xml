@@ -104,8 +104,8 @@
                 <!-- COST DETAILS -->
                 <!-- ===================================================== -->
 
-                <page id="clcs" name="Costs Details">
-
+<page id="clcs" name="Costs Details" invisible="1">
+    
                     <group>
 
                         <button name="action_create_cost_line"

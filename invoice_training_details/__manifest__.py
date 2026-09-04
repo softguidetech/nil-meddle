@@ -5,7 +5,6 @@
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
-
     "author": "SoftGuide Tech",
     "website": "https://www.softguidetech.com",
     "license": "LGPL-3",
@@ -17,19 +16,18 @@
         "purchase",
         "hr",
         "product",
+        "mail",
     ],
 
     "data": [
         "data/report_paperformat.xml",
         "security/ir.model.access.csv",
-
         "views/account_move_views.xml",
         "views/lcp_details_views.xml",
         "views/crm_lead_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
         "views/purchase_training_report.xml",
-
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",
         "reports/report_quotation.xml",
@@ -42,11 +40,10 @@
     "assets": {
         "web.assets_backend": [
             "invoice_training_details/static/src/css/lcp_details.css",
-
             "invoice_training_details/static/src/css/nil_terms_editor.css",
             "invoice_training_details/static/src/css/nil_layout_fix.css",
-
             "invoice_training_details/static/src/js/nil_terms_editor.js",
+            "invoice_training_details/static/src/js/force_bottom_chatter.js",
             "invoice_training_details/static/src/xml/nil_terms_editor.xml",
         ],
     },

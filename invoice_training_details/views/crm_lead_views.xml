@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <odoo>
 
     <record id="crm_reveal_lead_opportunity_form_training" model="ir.ui.view">
@@ -10,30 +10,13 @@
         <field name="arch" type="xml">
 
             <xpath expr="//header" position="inside">
-                <button name="action_new_purchase_order"
-                        type="object"
-                        string="New PO"
-                        class="oe_highlight"
-                        groups="purchase.group_purchase_user"
-                        invisible="not has_cash_training"/>
-                <button name="action_new_instructor_purchase_order"
-                        type="object"
-                        string="New Instructor PO"
-                        class="btn-secondary"
-                        groups="purchase.group_purchase_user"
-                        invisible="not has_training"/>
+                <button name="action_new_purchase_order" type="object" string="New PO" class="oe_highlight" groups="purchase.group_purchase_user" invisible="not has_cash_training"/>
+                <button name="action_new_instructor_purchase_order" type="object" string="New Instructor PO" class="btn-secondary" groups="purchase.group_purchase_user" invisible="not has_training"/>
             </xpath>
 
             <xpath expr="//div[@name='button_box']" position="inside">
-                <button name="action_view_purchase_orders"
-                        type="object"
-                        class="oe_stat_button"
-                        icon="fa-shopping-cart"
-                        groups="purchase.group_purchase_user"
-                        invisible="purchase_order_count == 0">
-                    <field name="purchase_order_count"
-                           widget="statinfo"
-                           string="Purchase Orders"/>
+                <button name="action_view_purchase_orders" type="object" class="oe_stat_button" icon="fa-shopping-cart" groups="purchase.group_purchase_user" invisible="purchase_order_count == 0">
+                    <field name="purchase_order_count" widget="statinfo" string="Purchase Orders"/>
                 </button>
             </xpath>
 
@@ -47,13 +30,7 @@
                 <field name="ordering_partner_id"/>
             </xpath>
 
-            <xpath expr="//page[@name='internal_notes']" position="before">
-
-                <!-- ===================================================== -->
-                <!-- TRAINING -->
-                <!-- ===================================================== -->
-
-                <page id="training" name="Training">
+            <xpath expr="//page[@name='lcp_details']" position="before"><!-- TRAINING - first custom tab --><page id="training" name="Training">
 
                     <group>
                         <field name="training_name"/>
@@ -81,9 +58,7 @@
 
                             <field name="training_date_end" width="10"/>
 
-                            <field name="price"
-                                   widget="monetary"
-                                   options="{'currency_field': 'currency_id'}"/>
+                            <field name="price" widget="monetary" options="{'currency_field': 'currency_id'}"/>
 
                         </tree>
 
@@ -100,166 +75,7 @@
                 </page>
 
 
-                <!-- ===================================================== -->
-                <!-- COST DETAILS -->
-                <!-- ===================================================== -->
-
-<page id="clcs" name="Costs Details" invisible="1">
-    
-                    <group>
-
-                        <button name="action_create_cost_line"
-                                type="object"
-                                string="Add Cost Line"
-                                class="oe_highlight"/>
-
-                    </group>
-
-
-                    <field name="cost_details_ids" nolabel="1">
-
-                        <tree editable="bottom">
-
-                            <!-- Hidden helper used for EnterOne CLC condition -->
-                            <field name="is_clc"
-                                   column_invisible="1"/>
-
-
-                            <!-- Learning Partner -->
-                            <field name="learning_partner"
-                                   string="Learning Partner"
-                                   width="140"/>
-
-
-                            <!-- Logistics -->
-                            <field name="total_price_all"
-                                   string="Logistics Cost"
-                                   width="120"
-                                   readonly="1"/>
-
-
-                            <!-- Instructor -->
-                            <field name="ins_time"
-                                   string="Instructor"
-                                   width="110"/>
-
-
-                            <!-- Total Costs -->
-                            <field name="margin1"
-                                   string="Total Costs"
-                                   width="120"
-                                   readonly="1"/>
-
-
-                            <!-- NIL ME Share -->
-                            <field name="nilme_share"
-                                   string="NIL ME Share $"
-                                   width="130"
-                                   readonly="1"/>
-
-
-                            <!-- Partner Share -->
-                            <field name="training_vendor"
-                                   string="Partner Share"
-                                   width="120"
-                                   readonly="learning_partner == 'EnterOne' and is_clc"
-                                   force_save="1"/>
-
-
-                            <!-- Margin -->
-                            <field name="margin"
-                                   string="Margin (%)"
-                                   widget="percentage"
-                                   width="100"
-                                   readonly="1"/>
-
-
-                            <!-- Sales Commission -->
-                            <field name="sales_commission"
-                                   string="Sales Commission (5%)"
-                                   width="150"
-                                   readonly="1"/>
-
-                        </tree>
-
-                    </field>
-
-                </page>
-
-
-                <!-- ===================================================== -->
-                <!-- PROFESSIONAL SERVICES -->
-                <!-- ===================================================== -->
-
-                <page id="pro" name="Professional Services">
-
-                    <group>
-                        <field name="ordering_partner_id"/>
-                    </group>
-
-                    <field name="pro_service_ids">
-
-                        <tree editable="bottom">
-
-                            <field name="training_id"/>
-
-                            <field name="end_customer_id"/>
-
-                            <field name="cisco_am"/>
-
-                            <field name="con_per"/>
-
-                            <field name="duration"/>
-
-                            <field name="training_date_end"/>
-
-                            <field name="price"/>
-
-                        </tree>
-
-                    </field>
-
-                    <group>
-
-                        <group>
-                            <field name="total_service_price"/>
-                        </group>
-
-                    </group>
-
-                </page>
-
-
-                <!-- ===================================================== -->
-                <!-- EXTRA INFORMATION -->
-                <!-- ===================================================== -->
-
-                <page id="extra_information" string="Extra Information">
-
-                    <group>
-
-                        <group>
-
-                            <field name="clcs_qty"/>
-
-                            <field name="tr_expiry_date"/>
-
-                            <field name="poref"/>
-
-                            <field name="invref"/>
-
-                        </group>
-
-                    </group>
-
-                </page>
-
-
-                <!-- ===================================================== -->
-                <!-- LOGISTICS -->
-                <!-- ===================================================== -->
-
-                <page id="logistics" string="Logistics">
+                </xpath><xpath expr="//page[@name='lcp_details']" position="after"><!-- LOGISTICS - immediately after LCP --><page id="logistics" string="Logistics">
 
                     <group>
 
@@ -286,11 +102,9 @@
 
                             <field name="duration"/>
 
-                            <field name="time_from"
-                                   widget="timesheet_uom"/>
+                            <field name="time_from" widget="timesheet_uom"/>
 
-                            <field name="time_to"
-                                   widget="timesheet_uom"/>
+                            <field name="time_to" widget="timesheet_uom"/>
 
                             <field name="stop"/>
 
@@ -346,8 +160,7 @@
 
                         <field name="to_date"/>
 
-                        <field name="book_details_id"
-                               widget="many2many_binary"/>
+                        <field name="book_details_id" widget="many2many_binary"/>
 
                         <field name="details"/>
 
@@ -364,15 +177,126 @@
 
                 </page>
 
-            </xpath>
+            <!-- REMAINING VISIBLE CUSTOM TABS --><page id="extra_information" string="Extra Information">
+
+                    <group>
+
+                        <group>
+
+                            <field name="clcs_qty"/>
+
+                            <field name="tr_expiry_date"/>
+
+                            <field name="poref"/>
+
+                            <field name="invref"/>
+
+                        </group>
+
+                    </group>
+
+                </page>
 
 
-            <!-- ========================================================= -->
+                <!-- HIDDEN LEGACY TABS --><page id="clcs" name="Costs Details" invisible="1">
+    
+                    <group>
+
+                        <button name="action_create_cost_line" type="object" string="Add Cost Line" class="oe_highlight"/>
+
+                    </group>
+
+
+                    <field name="cost_details_ids" nolabel="1">
+
+                        <tree editable="bottom">
+
+                            <!-- Hidden helper used for EnterOne CLC condition -->
+                            <field name="is_clc" column_invisible="1"/>
+
+
+                            <!-- Learning Partner -->
+                            <field name="learning_partner" string="Learning Partner" width="140"/>
+
+
+                            <!-- Logistics -->
+                            <field name="total_price_all" string="Logistics Cost" width="120" readonly="1"/>
+
+
+                            <!-- Instructor -->
+                            <field name="ins_time" string="Instructor" width="110"/>
+
+
+                            <!-- Total Costs -->
+                            <field name="margin1" string="Total Costs" width="120" readonly="1"/>
+
+
+                            <!-- NIL ME Share -->
+                            <field name="nilme_share" string="NIL ME Share $" width="130" readonly="1"/>
+
+
+                            <!-- Partner Share -->
+                            <field name="training_vendor" string="Partner Share" width="120" readonly="learning_partner == 'EnterOne' and is_clc" force_save="1"/>
+
+
+                            <!-- Margin -->
+                            <field name="margin" string="Margin (%)" widget="percentage" width="100" readonly="1"/>
+
+
+                            <!-- Sales Commission -->
+                            <field name="sales_commission" string="Sales Commission (5%)" width="150" readonly="1"/>
+
+                        </tree>
+
+                    </field>
+
+                </page>
+
+
+                <page id="pro" name="Professional Services" invisible="1">
+
+                    <group>
+                        <field name="ordering_partner_id"/>
+                    </group>
+
+                    <field name="pro_service_ids">
+
+                        <tree editable="bottom">
+
+                            <field name="training_id"/>
+
+                            <field name="end_customer_id"/>
+
+                            <field name="cisco_am"/>
+
+                            <field name="con_per"/>
+
+                            <field name="duration"/>
+
+                            <field name="training_date_end"/>
+
+                            <field name="price"/>
+
+                        </tree>
+
+                    </field>
+
+                    <group>
+
+                        <group>
+                            <field name="total_service_price"/>
+                        </group>
+
+                    </group>
+
+                </page>
+
+
+                </xpath><!-- ========================================================= -->
             <!-- EXPECTED REVENUE IN USD -->
             <!-- ========================================================= -->
 
-            <xpath expr="//field[@name='expected_revenue']"
-                   position="attributes">
+            <xpath expr="//field[@name='expected_revenue']" position="attributes">
 
                 <attribute name="widget">monetary</attribute>
 
@@ -383,11 +307,9 @@
             </xpath>
 
 
-            <xpath expr="//field[@name='expected_revenue']"
-                   position="after">
+            <xpath expr="//field[@name='expected_revenue']" position="after">
 
-                <field name="currency_id"
-                       invisible="1"/>
+                <field name="currency_id" invisible="1"/>
 
             </xpath>
 
@@ -409,16 +331,13 @@
                 <field name="crm_lead_id" readonly="1"/>
                 <field name="end_customer_id" readonly="1"/>
                 <field name="is_training_order" invisible="1"/>
-                <field name="po_training_type"
-                       invisible="not is_training_order"/>
+                <field name="po_training_type" invisible="not is_training_order"/>
             </xpath>
 
             <xpath expr="//sheet/notebook" position="inside">
 
                 <!-- TRAINING VENDOR PO -->
-                <page string="Training"
-                      name="training"
-                      invisible="not is_training_order or po_training_type != 'training_vendor'">
+                <page string="Training" name="training" invisible="not is_training_order or po_training_type != 'training_vendor'">
 
                     <field name="training_course_ids">
                         <tree editable="bottom">
@@ -439,9 +358,7 @@
                     </field>
 
                     <group string="Terms and Conditions">
-                        <field name="term_and_cond"
-                               nolabel="1"
-                               colspan="2"/>
+                        <field name="term_and_cond" nolabel="1" colspan="2"/>
                     </group>
 
                     <group>
@@ -463,32 +380,24 @@
 
 
                 <!-- INSTRUCTOR PO -->
-                <page string="Instructor"
-                      name="instructor_purchase"
-                      invisible="not is_training_order or po_training_type != 'instructor'">
+                <page string="Instructor" name="instructor_purchase" invisible="not is_training_order or po_training_type != 'instructor'">
 
                     <group string="Training &amp; Instructor">
                         <group>
-                            <field name="instructor_training_course_id"
-                                   domain="[('lead_id', '=', crm_lead_id)]"
-                                   required="po_training_type == 'instructor'"/>
-                            <field name="instructor_id"
-                                   required="po_training_type == 'instructor'"/>
+                            <field name="instructor_training_course_id" domain="[('lead_id', '=', crm_lead_id)]" required="po_training_type == 'instructor'"/>
+                            <field name="instructor_id" required="po_training_type == 'instructor'"/>
                         </group>
 
                         <group>
-                            <field name="instructor_from"
-                                   required="po_training_type == 'instructor'"/>
-                            <field name="instructor_to"
-                                   required="po_training_type == 'instructor'"/>
+                            <field name="instructor_from" required="po_training_type == 'instructor'"/>
+                            <field name="instructor_to" required="po_training_type == 'instructor'"/>
                             <field name="instructor_days" readonly="1"/>
                         </group>
                     </group>
 
                     <group string="Instructor Fee">
                         <group>
-                            <field name="instructor_daily_rate"
-                                   required="po_training_type == 'instructor'"/>
+                            <field name="instructor_daily_rate" required="po_training_type == 'instructor'"/>
                         </group>
                         <group>
                             <field name="instructor_total" readonly="1"/>
@@ -501,9 +410,7 @@
                     </div>
 
                     <group string="Terms and Conditions">
-                        <field name="term_and_cond"
-                               nolabel="1"
-                               colspan="2"/>
+                        <field name="term_and_cond" nolabel="1" colspan="2"/>
                     </group>
 
                     <group>
@@ -533,18 +440,12 @@
 
             <xpath expr="//field[@name='invoice_origin']" position="after">
                 <field name="crm_lead_id" readonly="1"/>
-                <field name="source_purchase_order_id"
-                       readonly="1"
-                       invisible="not source_purchase_order_id"/>
-                <field name="purchase_training_type"
-                       readonly="1"
-                       invisible="not source_purchase_order_id"/>
+                <field name="source_purchase_order_id" readonly="1" invisible="not source_purchase_order_id"/>
+                <field name="purchase_training_type" readonly="1" invisible="not source_purchase_order_id"/>
             </xpath>
 
             <xpath expr="//sheet/notebook" position="inside">
-                <page string="Training Details"
-                      name="purchase_training_bill"
-                      invisible="not source_purchase_order_id">
+                <page string="Training Details" name="purchase_training_bill" invisible="not source_purchase_order_id">
 
                     <group invisible="purchase_training_type != 'instructor'">
                         <group string="Instructor">
@@ -560,9 +461,7 @@
                         </group>
                     </group>
 
-                    <field name="training_course_ids"
-                           readonly="1"
-                           invisible="purchase_training_type == 'instructor'">
+                    <field name="training_course_ids" readonly="1" invisible="purchase_training_type == 'instructor'">
                         <tree>
                             <field name="training_id"/>
                             <field name="descriptions"/>
@@ -577,9 +476,7 @@
                         </tree>
                     </field>
 
-                    <field name="training_course_ids"
-                           readonly="1"
-                           invisible="purchase_training_type != 'instructor'">
+                    <field name="training_course_ids" readonly="1" invisible="purchase_training_type != 'instructor'">
                         <tree>
                             <field name="training_id"/>
                             <field name="instructor_id"/>
@@ -591,12 +488,8 @@
                         </tree>
                     </field>
 
-                    <group string="Terms and Conditions"
-                           invisible="not term_and_cond">
-                        <field name="term_and_cond"
-                               readonly="1"
-                               nolabel="1"
-                               colspan="2"/>
+                    <group string="Terms and Conditions" invisible="not term_and_cond">
+                        <field name="term_and_cond" readonly="1" nolabel="1" colspan="2"/>
                     </group>
 
                 </page>

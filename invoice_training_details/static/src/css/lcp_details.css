@@ -1,43 +1,258 @@
-/* LCP Details - Pricing Setup + Summary */
+/* =========================================================
+   NIL ME - LCP DETAILS DASHBOARD
+   Scoped only to CRM -> LCP Details
+   ========================================================= */
 
-.o_lcp_summary_card {
-    height: 100%;
-    border: 1px solid var(--border-color, #dee2e6);
-    border-radius: 6px;
-    padding: 18px;
-    background: var(--o-view-background-color, #fff);
+.o_form_view .o_lcp_dashboard {
+    --lcp-purple: #6f42c1;
+    --lcp-purple-soft: #f4effc;
+    --lcp-blue: #0d6efd;
+    --lcp-blue-soft: #eef5ff;
+    --lcp-cyan: #0dcaf0;
+    --lcp-cyan-soft: #eefbfe;
+    --lcp-green: #198754;
+    --lcp-green-soft: #edf8f2;
+    --lcp-orange: #fd7e14;
+    --lcp-orange-soft: #fff4e9;
+    --lcp-red: #dc3545;
+    --lcp-slate: #5f6772;
+    --lcp-border: #e5e7eb;
+    --lcp-shadow: 0 8px 24px rgba(15, 23, 42, .07);
+    --lcp-shadow-hover: 0 14px 30px rgba(15, 23, 42, .12);
+
+    padding-top: 8px;
 }
 
-.o_lcp_summary_title {
-    font-size: 16px;
+/* -------------------------
+   Section headings
+   ------------------------- */
+
+.o_form_view .o_lcp_dashboard .o_lcp_section_title {
+    display: block;
+    margin: 18px 0 14px 0 !important;
+    padding: 11px 14px !important;
+    border: 1px solid var(--lcp-border);
+    border-left: 5px solid var(--lcp-purple);
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--lcp-purple-soft), #ffffff 72%);
+    color: #38205f;
+    font-size: 15px;
     font-weight: 700;
-    margin-bottom: 16px;
+    letter-spacing: .15px;
+    box-shadow: 0 3px 10px rgba(15, 23, 42, .04);
 }
 
-.o_lcp_summary_note {
-    font-size: 12px;
-    color: var(--o-gray-600, #6c757d);
+.o_form_view .o_lcp_dashboard .o_lcp_section_2 {
+    border-left-color: var(--lcp-cyan);
+    background: linear-gradient(90deg, var(--lcp-cyan-soft), #ffffff 72%);
+    color: #075e68;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_section_3 {
+    border-left-color: var(--lcp-green);
+    background: linear-gradient(90deg, var(--lcp-green-soft), #ffffff 72%);
+    color: #145c3c;
+}
+
+/* -------------------------
+   General LCP form groups
+   ------------------------- */
+
+.o_form_view .o_lcp_dashboard .o_group {
+    column-gap: 18px;
+}
+
+.o_form_view .o_lcp_dashboard .o_group .o_cell {
+    transition: transform .16s ease, background-color .16s ease;
+}
+
+.o_form_view .o_lcp_dashboard .o_field_widget:not(.o_field_x2many):not(.o_field_boolean) {
+    border-radius: 7px;
+}
+
+.o_form_view .o_lcp_dashboard input,
+.o_form_view .o_lcp_dashboard select,
+.o_form_view .o_lcp_dashboard .o_input {
+    transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
+}
+
+.o_form_view .o_lcp_dashboard input:focus,
+.o_form_view .o_lcp_dashboard select:focus,
+.o_form_view .o_lcp_dashboard .o_input:focus {
+    border-color: rgba(111, 66, 193, .55) !important;
+    box-shadow: 0 0 0 3px rgba(111, 66, 193, .10) !important;
+}
+
+/* -------------------------
+   Summary cards
+   ------------------------- */
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_card {
+    height: 100%;
+    border: 1px solid var(--lcp-border);
+    border-radius: 14px;
+    padding: 18px 18px 16px;
+    background: #fff;
+    box-shadow: var(--lcp-shadow);
+    position: relative;
+    overflow: hidden;
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_card::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    right: 0;
+    height: 4px;
+    background: var(--lcp-purple);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--lcp-shadow-hover);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_card_training {
+    background: linear-gradient(180deg, var(--lcp-purple-soft) 0, #fff 54px);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_card_training::before {
+    background: var(--lcp-purple);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_card_logistics {
+    background: linear-gradient(180deg, var(--lcp-blue-soft) 0, #fff 54px);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_card_logistics::before {
+    background: var(--lcp-blue);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_card_profit {
+    background: linear-gradient(180deg, var(--lcp-green-soft) 0, #fff 54px);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_card_profit::before {
+    background: var(--lcp-green);
+}
+
+/* -------------------------
+   Card headings and notes
+   ------------------------- */
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_title {
+    font-size: 16px;
+    font-weight: 800;
     margin-bottom: 14px;
+    color: #1f2937;
+    letter-spacing: .1px;
 }
 
-.o_lcp_summary_line {
+.o_form_view .o_lcp_dashboard .o_lcp_summary_note {
+    font-size: 12px;
+    color: var(--lcp-slate);
+    margin-bottom: 13px;
+    line-height: 1.45;
+}
+
+/* -------------------------
+   Financial rows
+   ------------------------- */
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_line {
     display: flex;
     justify-content: space-between;
-    align-items: baseline;
+    align-items: center;
     gap: 14px;
-    padding: 6px 0;
+    padding: 8px 6px;
+    border-radius: 7px;
+    transition: background-color .14s ease, transform .14s ease;
 }
 
-.o_lcp_summary_line > strong {
+.o_form_view .o_lcp_dashboard .o_lcp_summary_line:hover {
+    background: rgba(111, 66, 193, .045);
+    transform: translateX(2px);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_line > span {
+    color: #4b5563;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_line > strong {
     white-space: nowrap;
     text-align: right;
-}
-
-.o_lcp_summary_divider {
-    border-top: 1px solid var(--border-color, #dee2e6);
-    margin: 8px 0;
-}
-
-.o_lcp_summary_total {
     font-weight: 700;
+    color: #111827;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_line .o_field_widget {
+    font-variant-numeric: tabular-nums;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_divider {
+    border-top: 1px dashed #d7dbe2;
+    margin: 9px 0;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_total {
+    font-weight: 800;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_highlight_total {
+    margin-top: 2px;
+    padding: 9px 8px;
+    background: rgba(25, 135, 84, .06);
+    border: 1px solid rgba(25, 135, 84, .12);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_card_profit .o_lcp_highlight_total > strong,
+.o_form_view .o_lcp_dashboard .o_lcp_card_profit .o_lcp_highlight_total .o_field_widget {
+    color: var(--lcp-green) !important;
+}
+
+/* Total Costs gets a warmer visual cue */
+.o_form_view .o_lcp_dashboard .o_lcp_card_profit .o_lcp_summary_line:has(.o_field_widget[name="lcp_total_costs"]) {
+    background: var(--lcp-orange-soft);
+}
+
+/* -------------------------
+   Readonly monetary fields
+   ------------------------- */
+
+.o_form_view .o_lcp_dashboard .o_field_widget[readonly] {
+    color: #1f2937;
+}
+
+/* -------------------------
+   Notebook tab accent
+   ------------------------- */
+
+.o_form_view .nav-tabs .nav-link[name="lcp_details"] {
+    font-weight: 700;
+    color: var(--lcp-purple, #6f42c1);
+}
+
+.o_form_view .nav-tabs .nav-link[name="lcp_details"].active {
+    color: #4d2a86;
+    border-bottom-color: #6f42c1 !important;
+    box-shadow: inset 0 -3px 0 #6f42c1;
+}
+
+/* -------------------------
+   Responsive polish
+   ------------------------- */
+
+@media (max-width: 991.98px) {
+    .o_form_view .o_lcp_dashboard .o_lcp_summary_card {
+        margin-bottom: 12px;
+    }
+}
+
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+    .o_form_view .o_lcp_dashboard *,
+    .o_form_view .o_lcp_dashboard *::before,
+    .o_form_view .o_lcp_dashboard *::after {
+        transition: none !important;
+        animation: none !important;
+    }
 }

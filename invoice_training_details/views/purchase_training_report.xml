@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+
 <odoo>
     <template id="purchase_order_training_report_only"
               inherit_id="purchase.report_purchaseorder_document">
@@ -88,19 +88,43 @@
 
                 <div class="row" style="margin-top:18px; padding-bottom:12px;">
                     <div class="col-8 po-vendor-info">
-                        <div><strong>Company Name:</strong></div>
-                        <div style="margin-bottom:4px;"><span t-field="vendor_partner.name"/></div>
-                        <div><strong>Address:</strong></div>
                         <div>
-                            <span t-if="vendor_partner.street" t-field="vendor_partner.street"/>
-                            <t t-if="vendor_partner.street2">, <span t-field="vendor_partner.street2"/></t>
+                            <strong>
+                                <span t-if="is_instructor_po">Instructor Name:</span>
+                                <span t-else="">Company Name:</span>
+                            </strong>
                         </div>
-                        <div style="margin-bottom:3px;">
-                            <span t-if="vendor_partner.city" t-field="vendor_partner.city"/>
-                            <t t-if="vendor_partner.state_id">, <span t-field="vendor_partner.state_id.name"/></t>
-                            <t t-if="vendor_partner.zip"> <span t-field="vendor_partner.zip"/></t>
-                            <t t-if="vendor_partner.country_id">, <span t-field="vendor_partner.country_id.name"/></t>
+                        <div style="margin-bottom:4px;">
+                            <span t-if="is_instructor_po and o.instructor_id"
+                                  t-field="o.instructor_id.name"/>
+                            <span t-else=""
+                                  t-field="vendor_partner.name"/>
                         </div>
+                        <t t-if="vendor_partner.street or vendor_partner.street2 or vendor_partner.city or vendor_partner.zip">
+                            <div><strong>Address:</strong></div>
+                            <div>
+                                <span t-if="vendor_partner.street" t-field="vendor_partner.street"/>
+                                <t t-if="vendor_partner.street2">
+                                    <t t-if="vendor_partner.street">, </t>
+                                    <span t-field="vendor_partner.street2"/>
+                                </t>
+                            </div>
+                            <div style="margin-bottom:3px;">
+                                <span t-if="vendor_partner.city" t-field="vendor_partner.city"/>
+                                <t t-if="vendor_partner.state_id">
+                                    <t t-if="vendor_partner.city">, </t>
+                                    <span t-field="vendor_partner.state_id.name"/>
+                                </t>
+                                <t t-if="vendor_partner.zip">
+                                    <t t-if="vendor_partner.city or vendor_partner.state_id"> </t>
+                                    <span t-field="vendor_partner.zip"/>
+                                </t>
+                                <t t-if="vendor_partner.country_id">
+                                    <t t-if="vendor_partner.city or vendor_partner.state_id or vendor_partner.zip">, </t>
+                                    <span t-field="vendor_partner.country_id.name"/>
+                                </t>
+                            </div>
+                        </t>
                         <div t-if="o.partner_id.email or vendor_partner.email">
                             <strong>Email:</strong>
                             <span t-if="o.partner_id.email" t-field="o.partner_id.email"/>
@@ -201,6 +225,48 @@
                     <div t-if="o.term_and_cond"
                          t-field="o.term_and_cond"
                          style="text-align:justify; margin:0; padding:0;"/>
+                </div>
+
+                <div t-if="is_instructor_po"
+                     class="po-text"
+                     style="
+                         margin-top:16px;
+                         page-break-inside:avoid;
+                         width:100%;
+                     ">
+                    <div style="
+                        display:table;
+                        width:100%;
+                        table-layout:fixed;
+                     ">
+                        <div style="
+                            display:table-cell;
+                            width:50%;
+                            vertical-align:bottom;
+                            padding-right:20px;
+                         ">
+                            <strong>Instructor Name:</strong>
+                            <span t-if="o.instructor_id"
+                                  t-field="o.instructor_id.name"/>
+                        </div>
+
+                        <div style="
+                            display:table-cell;
+                            width:50%;
+                            vertical-align:bottom;
+                            text-align:right;
+                         ">
+                            <strong>Instructor Signature:</strong>
+                            <span style="
+                                display:inline-block;
+                                width:180px;
+                                margin-left:8px;
+                                border-bottom:1px solid #000;
+                                height:18px;
+                                vertical-align:bottom;
+                             ">&#160;</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"

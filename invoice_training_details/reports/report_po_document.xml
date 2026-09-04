@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+
 <odoo>
     <template id="report_po_document_training" name="Training PUrchase Order">
         <t t-call="web.html_container">
@@ -67,17 +67,16 @@
                             ">
                                 <table class="table table-borderless"
                                        style="
-                                           width:100%;
-                                           margin:0;
+                                           width:auto;
+                                           margin:0 0 0 auto;
                                            border-collapse:collapse;
-                                           table-layout:fixed;
                                        ">
                                     <tr>
-                                        <td style="width:45%; border:0; padding:0 8px 4px 0; vertical-align:top; font-size:20px; white-space:nowrap;">
+                                        <td style="border:0; padding:0 8px 4px 0; vertical-align:top; font-size:20px; white-space:nowrap;">
                                             <span t-if="is_clc_order">Work Order:</span>
                                             <span t-if="not is_clc_order">Purchase Order:</span>
                                         </td>
-                                        <td style="width:55%; border:0; padding:0 0 4px 0; vertical-align:top; font-size:20px; white-space:nowrap;">
+                                        <td style="border:0; padding:0 0 4px 0; vertical-align:top; font-size:20px; white-space:nowrap;">
                                             <span t-if="is_clc_order" t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else 'WO-' + o.name"/>
                                             <span t-if="not is_clc_order" t-field="o.name"/>
                                         </td>
@@ -85,7 +84,7 @@
                                     <tr>
                                         <td style="border:0; padding:0 8px 4px 0; vertical-align:top; font-size:20px; white-space:nowrap;">Date:</td>
                                         <td style="border:0; padding:0 0 4px 0; vertical-align:top; font-size:20px; white-space:nowrap;">
-                                            <span t-field="o.date_order"/>
+                                            <span t-field="o.date_order" t-options="{&quot;widget&quot;:&quot;date&quot;}"/>
                                         </td>
                                     </tr>
                                     <tr>
@@ -111,6 +110,30 @@
                             text-align: center !important;
                             vertical-align: middle !important;
                         }
+
+                        /* Invoice total box only */
+                        .po-invoice-total-box,
+                        .po-invoice-total-box * {
+                            direction:ltr !important;
+                        }
+
+                        .po-invoice-total-box td,
+                        .po-invoice-total-box th,
+                        .po-invoice-total-box span,
+                        .po-invoice-total-box strong {
+                            font-size:18px !important;
+                            font-weight:700 !important;
+                        }
+
+                        .po-invoice-total-box td:first-child {
+                            text-align:left !important;
+                        }
+
+                        .po-invoice-total-box td:last-child {
+                            text-align:right !important;
+                            white-space:nowrap !important;
+                        }
+
                     </style>
                     <t t-set="is_cisco_u_all_access" t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
@@ -172,7 +195,7 @@
                         text-align:right;
                         page-break-inside:avoid;
                     ">
-                        <table class="table table-sm table-border"
+                        <table class="table table-sm table-border po-invoice-total-box"
                                style="
                                    display:inline-table;
                                    width:auto;

@@ -9,6 +9,13 @@
 
             <t t-set="company" t-value="o.company_id if o else request.env.company"/>
 
+            <style>
+                /* Reduce only the vertical gap between the shared header and report body */
+                .article {
+                    margin-top: -10mm !important;
+                }
+            </style>
+
             <div t-attf-class="header o_company_#{company.id}_layout"
                  style="padding:0; margin:0 0 -4px 0;">
 

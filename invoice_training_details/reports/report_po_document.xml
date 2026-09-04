@@ -29,11 +29,27 @@
                            SAME VISUAL LANGUAGE AS THE QUOTATION
                            ===================================================== */
 
+                        /* Outer continuation table is structural only.
+                           It must NEVER print borders/lines. */
+                        .po-repeat-frame,
+                        .po-repeat-frame > thead,
+                        .po-repeat-frame > tbody,
+                        .po-repeat-frame > thead > tr,
+                        .po-repeat-frame > tbody > tr,
+                        .po-repeat-frame > thead > tr > td,
+                        .po-repeat-frame > tbody > tr > td {
+                            border:none !important;
+                            border-width:0 !important;
+                            outline:none !important;
+                            box-shadow:none !important;
+                            background:transparent !important;
+                        }
+
                         .po-repeat-frame {
                             width:100% !important;
-                            border-collapse:collapse !important;
+                            border-collapse:separate !important;
+                            border-spacing:0 !important;
                             table-layout:fixed !important;
-                            border:0 !important;
                             margin:0 !important;
                             padding:0 !important;
                         }
@@ -48,7 +64,6 @@
 
                         .po-repeat-frame > thead > tr > td,
                         .po-repeat-frame > tbody > tr > td {
-                            border:0 !important;
                             margin:0 !important;
                             padding:0 !important;
                             vertical-align:top !important;
@@ -58,6 +73,20 @@
                         .po-text-section * {
                             font-size:16px !important;
                             font-family:inherit !important;
+                        }
+
+                        /* Slightly larger PO header/meta text */
+                        .po-header-info,
+                        .po-header-info * {
+                            font-size:16px !important;
+                            line-height:1.35 !important;
+                            font-family:inherit !important;
+                        }
+
+                        /* Same cyan as Work Order / Purchase Order title */
+                        .po-label {
+                            color:#0DCAF0 !important;
+                            font-weight:700 !important;
                         }
 
 
@@ -78,11 +107,13 @@
 
                         table[name="training_line_table"] thead th {
                             background-color:#EAF9FC !important;
-                            color:#075E68 !important;
+                            color:#0DCAF0 !important;
                             text-align:center !important;
                             vertical-align:middle !important;
                             padding:6px 5px !important;
                             line-height:1.25 !important;
+                            font-size:15px !important;
+                            font-weight:700 !important;
                         }
 
                         table[name="training_line_table"] td {
@@ -90,6 +121,7 @@
                             vertical-align:middle !important;
                             padding:6px 5px !important;
                             line-height:1.3 !important;
+                            font-size:15px !important;
                         }
 
                         table[name="training_line_table"] tr {
@@ -177,7 +209,7 @@
 
 
                                     <!-- VENDOR + DOCUMENT DETAILS -->
-                                    <div class="row"
+                                    <div class="row po-header-info"
                                          style="
                                             margin-top:0;
                                             padding-top:0;
@@ -190,14 +222,14 @@
                                             <div>
 
                                                 <div style="margin:0 0 3px 0;">
-                                                    <strong>Company Name:</strong>
+                                                    <strong class="po-label">Company Name:</strong>
                                                     <span t-field="vendor_partner.name"/>
                                                 </div>
 
 
                                                 <div style="margin:0 0 3px 0;">
 
-                                                    <strong>Address:</strong>
+                                                    <strong class="po-label">Address:</strong>
 
                                                     <span t-if="vendor_partner.street"
                                                           t-field="vendor_partner.street"/>
@@ -233,7 +265,7 @@
                                                 <div t-if="o.partner_id.email or vendor_partner.email"
                                                      style="margin:0 0 3px 0;">
 
-                                                    <strong>Email:</strong>
+                                                    <strong class="po-label">Email:</strong>
 
                                                     <span t-if="o.partner_id.email"
                                                           t-field="o.partner_id.email"/>
@@ -247,7 +279,7 @@
                                                 <div t-if="vendor_partner.vat"
                                                      style="margin:0 0 3px 0;">
 
-                                                    <strong>Tax Number:</strong>
+                                                    <strong class="po-label">Tax Number:</strong>
                                                     <span t-field="vendor_partner.vat"/>
 
                                                 </div>
@@ -256,7 +288,7 @@
                                                 <div t-if="o.partner_id.is_company == False"
                                                      style="margin:0 0 3px 0;">
 
-                                                    <strong>Attention:</strong>
+                                                    <strong class="po-label">Attention:</strong>
                                                     <span t-field="o.partner_id.name"/>
 
                                                 </div>
@@ -281,8 +313,8 @@
                                                     white-space:nowrap;
                                                 ">
 
-                                                    <span t-if="is_clc_order">Work Order: </span>
-                                                    <span t-if="not is_clc_order">Purchase Order: </span>
+                                                    <span t-if="is_clc_order" class="po-label">Work Order: </span>
+                                                    <span t-if="not is_clc_order" class="po-label">Purchase Order: </span>
 
                                                     <span t-if="is_clc_order"
                                                           t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else ('WO-' + o.name if not o.name.startswith('WO-') else o.name)"/>
@@ -299,7 +331,7 @@
                                                     white-space:nowrap;
                                                 ">
 
-                                                    <span>DATE: </span>
+                                                    <span class="po-label">DATE: </span>
 
                                                     <span t-field="o.date_order"
                                                           t-options="{&quot;widget&quot;:&quot;date&quot;}"/>
@@ -314,7 +346,7 @@
                                                         white-space:nowrap;
                                                      ">
 
-                                                    <span>Validity Date: </span>
+                                                    <span class="po-label">Validity Date: </span>
                                                     <span t-field="o.validity_date"/>
 
                                                 </div>
@@ -563,6 +595,7 @@
                                                    width:300px;
                                                    margin-left:auto;
                                                    margin-right:0;
+                                                   font-size:15px;
                                                ">
 
                                             <t t-set="tax_totals"
@@ -578,7 +611,7 @@
 
                                                         <td style="background-color:#fff;">
 
-                                                            <strong t-out="subtotal['name']">
+                                                            <strong class="po-label" t-out="subtotal['name']">
                                                                 Untaxed Amount
                                                             </strong>
 
@@ -613,11 +646,11 @@
 
                                                 <td style="background-color:#fff;">
 
-                                                    <strong t-if="is_clc_order">
+                                                    <strong t-if="is_clc_order" class="po-label">
                                                         NIL ME Invoice Amount
                                                     </strong>
 
-                                                    <strong t-if="not is_clc_order">
+                                                    <strong t-if="not is_clc_order" class="po-label">
                                                         Partner Invoice Amount
                                                     </strong>
 

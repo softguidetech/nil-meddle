@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+
 <odoo>
     <template id="report_quotation_document_training" name="Quotation Report Training">
         <t t-call="web.html_container">
@@ -21,6 +21,49 @@
                         .proforma-text-section * {
                             font-size: 16px !important;
                             font-family: inherit !important;
+                        }
+
+
+                        /* TABLES: LTR + black text */
+                        table,
+                        table * {
+                            direction:ltr !important;
+                            color:#000 !important;
+                        }
+
+                        /* Table headings: shaded + bold + black */
+                        table thead th {
+                            background-color:#EAF9FC !important;
+                            color:#000 !important;
+                            font-weight:700 !important;
+                        }
+
+                        /* TOTAL TABLE: one font size everywhere */
+                        .quotation-total-box,
+                        .quotation-total-box td,
+                        .quotation-total-box th,
+                        .quotation-total-box span,
+                        .quotation-total-box strong {
+                            font-size:16px !important;
+                            color:#000 !important;
+                            direction:ltr !important;
+                        }
+
+                        .quotation-total-box td:first-child {
+                            text-align:left !important;
+                            font-weight:700 !important;
+                            background-color:#EAF9FC !important;
+                        }
+
+                        .quotation-total-box td:first-child strong {
+                            font-weight:700 !important;
+                        }
+
+                        .quotation-total-box td:last-child {
+                            text-align:right !important;
+                            font-weight:400 !important;
+                            background-color:#fff !important;
+                            white-space:nowrap !important;
                         }
 
                     </style>
@@ -386,7 +429,7 @@
                         page-break-inside:avoid;
                     ">
 
-                        <table class="table table-sm table-border"
+                        <table class="table table-sm table-border quotation-total-box"
                                style="
                                    display:inline-table;
                                    background-color:#fff;

@@ -149,49 +149,69 @@
 
                 </div>
 
-                <!-- Compact PO/WO continuation info.
-                     It repeats with the real PDF header and stays short enough
-                     not to collide with the report body. -->
-                <t t-if="o and o.env.context.get('po_repeat_header')">
+                <!-- PO / WO continuation details: PAGE 2+ ONLY -->
+                <t t-if="o and o.env.context.get('po_repeat_meta')">
 
-                    <t t-set="po_vendor_partner"
-                       t-value="o.partner_id if o.partner_id.is_company else (o.partner_id.parent_id or o.partner_id)"/>
-
-                    <t t-set="po_is_clc_order"
+                    <t t-set="po_repeat_is_clc"
                        t-value="'clc' in [(method or '').lower() for method in o.training_course_ids.mapped('payment_method')]"/>
 
-                    <div style="
-                        margin:4px 0 0 0;
-                        padding:0;
-                        width:100%;
-                        font-size:11px;
-                        line-height:1.2;
-                        white-space:nowrap;
-                    ">
+                    <div class="nil_po_repeat_meta"
+                         style="
+                            display:none;
+                            width:100%;
+                            margin:3px 0 0 0;
+                            padding:0;
+                            text-align:right;
+                            font-size:12px;
+                            line-height:1.2;
+                            white-space:nowrap;
+                         ">
 
-                        <strong style="color:#0DCAF0;">
-                            <span t-if="po_is_clc_order">Work Order:</span>
-                            <span t-if="not po_is_clc_order">Purchase Order:</span>
+                        <strong>
+                            <span t-if="po_repeat_is_clc">Work Order:</span>
+                            <span t-if="not po_repeat_is_clc">Purchase Order:</span>
                         </strong>
 
-                        <span t-if="po_is_clc_order"
-                              t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else ('WO-' + o.name if not o.name.startswith('WO-') else o.name)"/>
+                        <span t-if="po_repeat_is_clc"
+                              t-esc="o.name.replace('PO-', 'WO-', 1) if o.name.startswith('PO-') else 'WO-' + o.name"/>
 
-                        <span t-if="not po_is_clc_order"
+                        <span t-if="not po_repeat_is_clc"
                               t-field="o.name"/>
 
-                        <span style="padding:0 7px;">|</span>
+                        <span style="padding:0 8px;">|</span>
 
-                        <strong style="color:#0DCAF0;">DATE:</strong>
-                        <span t-field="o.date_order"
-                              t-options="{&quot;widget&quot;:&quot;date&quot;}"/>
+                        <strong>Date:</strong>
+                        <span t-field="o.date_order"/>
 
-                        <span style="padding:0 7px;">|</span>
+                        <span style="padding:0 8px;">|</span>
 
-                        <strong style="color:#0DCAF0;">To:</strong>
-                        <span t-field="po_vendor_partner.name"/>
+                        <strong>Validity Date:</strong>
+                        <span t-field="o.validity_date"/>
 
                     </div>
+
+                    <script type="text/javascript">
+                        <![CDATA[
+                        (function () {
+                            var vars = {};
+                            var parts = document.location.search.substring(1).split('&');
+
+                            for (var i = 0; i < parts.length; i++) {
+                                var pair = parts[i].split('=', 2);
+                                if (pair.length === 2) {
+                                    vars[pair[0]] = unescape(pair[1]);
+                                }
+                            }
+
+                            var currentPage = parseInt(vars.sitepage || '1', 10);
+                            var blocks = document.getElementsByClassName('nil_po_repeat_meta');
+
+                            for (var j = 0; j < blocks.length; j++) {
+                                blocks[j].style.display = currentPage > 1 ? 'block' : 'none';
+                            }
+                        })();
+                        ]]>
+                    </script>
 
                 </t>
 

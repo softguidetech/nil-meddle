@@ -1,258 +1,437 @@
 /* =========================================================
-   NIL ME - LCP DETAILS DASHBOARD
-   Scoped only to CRM -> LCP Details
+   NIL ME / LCP Financial Dashboard
+   Scoped to the LCP tab only
    ========================================================= */
 
 .o_form_view .o_lcp_dashboard {
+    --lcp-ink: #172033;
+    --lcp-muted: #6b7280;
+    --lcp-border: #e7eaf0;
     --lcp-purple: #6f42c1;
     --lcp-purple-soft: #f4effc;
-    --lcp-blue: #0d6efd;
+    --lcp-blue: #2476e5;
     --lcp-blue-soft: #eef5ff;
-    --lcp-cyan: #0dcaf0;
-    --lcp-cyan-soft: #eefbfe;
+    --lcp-teal: #118c8b;
+    --lcp-teal-soft: #ebf8f7;
     --lcp-green: #198754;
     --lcp-green-soft: #edf8f2;
-    --lcp-orange: #fd7e14;
-    --lcp-orange-soft: #fff4e9;
-    --lcp-red: #dc3545;
-    --lcp-slate: #5f6772;
-    --lcp-border: #e5e7eb;
-    --lcp-shadow: 0 8px 24px rgba(15, 23, 42, .07);
-    --lcp-shadow-hover: 0 14px 30px rgba(15, 23, 42, .12);
+    --lcp-amber: #b96b13;
+    --lcp-amber-soft: #fff6e9;
+    --lcp-shadow: 0 8px 22px rgba(25, 35, 58, .07);
+    --lcp-shadow-hover: 0 14px 32px rgba(25, 35, 58, .12);
 
-    padding-top: 8px;
+    padding: 8px 2px 22px;
 }
 
-/* -------------------------
-   Section headings
-   ------------------------- */
+/* Hero */
+.o_form_view .o_lcp_dashboard .o_lcp_hero {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 20px;
+    margin: 4px 0 20px;
+    border: 1px solid #e8e2f3;
+    border-radius: 16px;
+    background:
+        radial-gradient(circle at 92% 10%, rgba(111, 66, 193, .11), transparent 34%),
+        linear-gradient(135deg, #fbf9ff 0%, #ffffff 58%);
+    box-shadow: 0 6px 18px rgba(75, 49, 116, .06);
+    animation: lcpFadeIn .32s ease both;
+}
 
-.o_form_view .o_lcp_dashboard .o_lcp_section_title {
-    display: block;
-    margin: 18px 0 14px 0 !important;
-    padding: 11px 14px !important;
+.o_form_view .o_lcp_dashboard .o_lcp_hero_icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: linear-gradient(135deg, #7c4dcb, #5b34a6);
+    box-shadow: 0 7px 16px rgba(111, 66, 193, .22);
+    font-size: 19px;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_hero_title {
+    font-size: 21px;
+    line-height: 1.2;
+    font-weight: 800;
+    color: var(--lcp-ink);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_hero_subtitle {
+    margin-top: 4px;
+    color: var(--lcp-muted);
+    font-size: 13px;
+}
+
+/* Section headers */
+.o_form_view .o_lcp_dashboard .o_lcp_section_header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    margin: 22px 2px 12px;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_section_kicker {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.4px;
+    color: var(--lcp-purple);
+    margin-bottom: 2px;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_section_name {
+    color: var(--lcp-ink);
+    font-size: 17px;
+    font-weight: 800;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_heading .o_lcp_section_kicker {
+    color: var(--lcp-teal);
+}
+
+/* Input cards */
+.o_form_view .o_lcp_dashboard .o_lcp_input_grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_card {
+    min-width: 0;
+    padding: 15px 16px 14px;
     border: 1px solid var(--lcp-border);
-    border-left: 5px solid var(--lcp-purple);
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: var(--lcp-shadow);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    animation: lcpRise .34s ease both;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_card:nth-child(2) { animation-delay: .03s; }
+.o_form_view .o_lcp_dashboard .o_lcp_input_card:nth-child(3) { animation-delay: .06s; }
+.o_form_view .o_lcp_dashboard .o_lcp_input_card:nth-child(4) { animation-delay: .09s; }
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--lcp-shadow-hover);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_commercial:hover { border-color: #d9cbed; }
+.o_form_view .o_lcp_dashboard .o_lcp_input_pricing:hover { border-color: #c9ddfb; }
+.o_form_view .o_lcp_dashboard .o_lcp_input_instructor:hover { border-color: #c5e8e5; }
+.o_form_view .o_lcp_dashboard .o_lcp_input_onsite:hover { border-color: #f0d6b8; }
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_card_header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding-bottom: 11px;
+    margin-bottom: 7px;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_icon_box {
+    width: 34px;
+    height: 34px;
+    flex: 0 0 34px;
     border-radius: 10px;
-    background: linear-gradient(90deg, var(--lcp-purple-soft), #ffffff 72%);
-    color: #38205f;
-    font-size: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_commercial .o_lcp_icon_box {
+    color: var(--lcp-purple);
+    background: var(--lcp-purple-soft);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_input_pricing .o_lcp_icon_box {
+    color: var(--lcp-blue);
+    background: var(--lcp-blue-soft);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_input_instructor .o_lcp_icon_box {
+    color: var(--lcp-teal);
+    background: var(--lcp-teal-soft);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_input_onsite .o_lcp_icon_box {
+    color: var(--lcp-amber);
+    background: var(--lcp-amber-soft);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_card_title {
+    font-weight: 800;
+    color: var(--lcp-ink);
+    font-size: 14px;
+    line-height: 1.2;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_input_card_hint {
+    margin-top: 2px;
+    font-size: 11px;
+    color: var(--lcp-muted);
+}
+
+/* Input rows */
+.o_form_view .o_lcp_dashboard .o_lcp_field_row {
+    padding: 8px 0 7px;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_field_label {
+    margin-bottom: 4px;
+    color: #667085;
+    font-size: 11px;
     font-weight: 700;
-    letter-spacing: .15px;
-    box-shadow: 0 3px 10px rgba(15, 23, 42, .04);
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_section_2 {
-    border-left-color: var(--lcp-cyan);
-    background: linear-gradient(90deg, var(--lcp-cyan-soft), #ffffff 72%);
-    color: #075e68;
+.o_form_view .o_lcp_dashboard .o_lcp_field_control {
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_section_3 {
-    border-left-color: var(--lcp-green);
-    background: linear-gradient(90deg, var(--lcp-green-soft), #ffffff 72%);
-    color: #145c3c;
-}
-
-/* -------------------------
-   General LCP form groups
-   ------------------------- */
-
-.o_form_view .o_lcp_dashboard .o_group {
-    column-gap: 18px;
-}
-
-.o_form_view .o_lcp_dashboard .o_group .o_cell {
-    transition: transform .16s ease, background-color .16s ease;
-}
-
-.o_form_view .o_lcp_dashboard .o_field_widget:not(.o_field_x2many):not(.o_field_boolean) {
-    border-radius: 7px;
-}
-
-.o_form_view .o_lcp_dashboard input,
-.o_form_view .o_lcp_dashboard select,
-.o_form_view .o_lcp_dashboard .o_input {
+.o_form_view .o_lcp_dashboard .o_lcp_field_control .o_input,
+.o_form_view .o_lcp_dashboard .o_lcp_field_control input,
+.o_form_view .o_lcp_dashboard .o_lcp_field_control select {
+    border-radius: 9px !important;
+    min-height: 35px;
+    background: #fbfcfe;
+    border-color: #e1e5eb !important;
     transition: border-color .16s ease, box-shadow .16s ease, background-color .16s ease;
 }
 
-.o_form_view .o_lcp_dashboard input:focus,
-.o_form_view .o_lcp_dashboard select:focus,
-.o_form_view .o_lcp_dashboard .o_input:focus {
+.o_form_view .o_lcp_dashboard .o_lcp_field_control .o_input:focus,
+.o_form_view .o_lcp_dashboard .o_lcp_field_control input:focus,
+.o_form_view .o_lcp_dashboard .o_lcp_field_control select:focus {
+    background: #fff;
     border-color: rgba(111, 66, 193, .55) !important;
-    box-shadow: 0 0 0 3px rgba(111, 66, 193, .10) !important;
+    box-shadow: 0 0 0 3px rgba(111, 66, 193, .09) !important;
 }
 
-/* -------------------------
-   Summary cards
-   ------------------------- */
+.o_form_view .o_lcp_dashboard .o_lcp_revenue_row {
+    margin: 3px 0 4px;
+    padding: 9px 10px;
+    border-radius: 10px;
+    background: var(--lcp-blue-soft);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_big_value {
+    font-size: 17px;
+    font-weight: 800;
+    color: #174f99;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_online_note {
+    margin-top: 10px;
+    padding: 9px 10px;
+    border-radius: 9px;
+    color: #356c70;
+    background: #eefafa;
+    font-size: 12px;
+}
+
+/* Summary layout */
+.o_form_view .o_lcp_dashboard .o_lcp_summary_grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_card {
-    height: 100%;
+    min-width: 0;
     border: 1px solid var(--lcp-border);
-    border-radius: 14px;
-    padding: 18px 18px 16px;
+    border-radius: 16px;
+    padding: 17px;
     background: #fff;
     box-shadow: var(--lcp-shadow);
     position: relative;
     overflow: hidden;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    transition: transform .18s ease, box-shadow .18s ease;
+    animation: lcpRise .35s ease both;
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--lcp-shadow-hover);
 }
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_card::before {
     content: "";
     position: absolute;
     left: 0;
-    top: 0;
     right: 0;
+    top: 0;
     height: 4px;
-    background: var(--lcp-purple);
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_summary_card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--lcp-shadow-hover);
+.o_form_view .o_lcp_dashboard .o_lcp_card_training::before { background: var(--lcp-purple); }
+.o_form_view .o_lcp_dashboard .o_lcp_card_logistics::before { background: var(--lcp-blue); }
+.o_form_view .o_lcp_dashboard .o_lcp_card_profit::before { background: var(--lcp-green); }
+
+.o_form_view .o_lcp_dashboard .o_lcp_summary_header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_card_training {
-    background: linear-gradient(180deg, var(--lcp-purple-soft) 0, #fff 54px);
-}
-.o_form_view .o_lcp_dashboard .o_lcp_card_training::before {
-    background: var(--lcp-purple);
-}
-
-.o_form_view .o_lcp_dashboard .o_lcp_card_logistics {
-    background: linear-gradient(180deg, var(--lcp-blue-soft) 0, #fff 54px);
-}
-.o_form_view .o_lcp_dashboard .o_lcp_card_logistics::before {
-    background: var(--lcp-blue);
+.o_form_view .o_lcp_dashboard .o_lcp_summary_icon {
+    width: 38px;
+    height: 38px;
+    flex: 0 0 38px;
+    border-radius: 11px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_card_profit {
-    background: linear-gradient(180deg, var(--lcp-green-soft) 0, #fff 54px);
+.o_form_view .o_lcp_dashboard .o_lcp_card_training .o_lcp_summary_icon {
+    color: var(--lcp-purple);
+    background: var(--lcp-purple-soft);
 }
-.o_form_view .o_lcp_dashboard .o_lcp_card_profit::before {
-    background: var(--lcp-green);
+.o_form_view .o_lcp_dashboard .o_lcp_card_logistics .o_lcp_summary_icon {
+    color: var(--lcp-blue);
+    background: var(--lcp-blue-soft);
 }
-
-/* -------------------------
-   Card headings and notes
-   ------------------------- */
+.o_form_view .o_lcp_dashboard .o_lcp_card_profit .o_lcp_summary_icon {
+    color: var(--lcp-green);
+    background: var(--lcp-green-soft);
+}
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_title {
-    font-size: 16px;
+    color: var(--lcp-ink);
+    font-size: 15px;
     font-weight: 800;
-    margin-bottom: 14px;
-    color: #1f2937;
-    letter-spacing: .1px;
 }
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_note {
-    font-size: 12px;
-    color: var(--lcp-slate);
-    margin-bottom: 13px;
-    line-height: 1.45;
+    margin-top: 1px;
+    color: var(--lcp-muted);
+    font-size: 11px;
 }
-
-/* -------------------------
-   Financial rows
-   ------------------------- */
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_line {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 14px;
-    padding: 8px 6px;
-    border-radius: 7px;
+    gap: 12px;
+    padding: 9px 7px;
+    border-radius: 8px;
     transition: background-color .14s ease, transform .14s ease;
 }
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_line:hover {
-    background: rgba(111, 66, 193, .045);
+    background: #f8f9fb;
     transform: translateX(2px);
 }
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_line > span {
-    color: #4b5563;
+    color: #596273;
+    font-size: 12px;
 }
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_line > strong {
+    color: #1c2433;
+    font-weight: 800;
     white-space: nowrap;
     text-align: right;
-    font-weight: 700;
-    color: #111827;
 }
 
 .o_form_view .o_lcp_dashboard .o_lcp_summary_line .o_field_widget {
     font-variant-numeric: tabular-nums;
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_summary_divider {
-    border-top: 1px dashed #d7dbe2;
-    margin: 9px 0;
+.o_form_view .o_lcp_dashboard .o_lcp_metric_accent {
+    background: var(--lcp-purple-soft);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_metric_accent > strong {
+    color: var(--lcp-purple);
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_summary_total {
+.o_form_view .o_lcp_dashboard .o_lcp_cost_row {
+    background: var(--lcp-amber-soft);
+}
+.o_form_view .o_lcp_dashboard .o_lcp_cost_row > strong {
+    color: var(--lcp-amber);
+}
+
+.o_form_view .o_lcp_dashboard .o_lcp_profit_row {
+    margin-top: 4px;
+    padding: 11px 9px;
+    background: var(--lcp-green-soft);
+    border: 1px solid #d7eddf;
+}
+.o_form_view .o_lcp_dashboard .o_lcp_profit_row > span,
+.o_form_view .o_lcp_dashboard .o_lcp_profit_row > strong {
+    color: var(--lcp-green);
     font-weight: 800;
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_highlight_total {
-    margin-top: 2px;
-    padding: 9px 8px;
-    background: rgba(25, 135, 84, .06);
-    border: 1px solid rgba(25, 135, 84, .12);
+.o_form_view .o_lcp_dashboard .o_lcp_margin_row {
+    padding: 10px 9px;
+    background: #f5fbf7;
+}
+.o_form_view .o_lcp_dashboard .o_lcp_margin_row > span,
+.o_form_view .o_lcp_dashboard .o_lcp_margin_row > strong {
+    color: #146c43;
+    font-weight: 800;
 }
 
-.o_form_view .o_lcp_dashboard .o_lcp_card_profit .o_lcp_highlight_total > strong,
-.o_form_view .o_lcp_dashboard .o_lcp_card_profit .o_lcp_highlight_total .o_field_widget {
-    color: var(--lcp-green) !important;
+.o_form_view .o_lcp_dashboard .o_lcp_summary_divider {
+    border-top: 1px dashed #d9dde5;
+    margin: 8px 0;
 }
 
-/* Total Costs gets a warmer visual cue */
-.o_form_view .o_lcp_dashboard .o_lcp_card_profit .o_lcp_summary_line:has(.o_field_widget[name="lcp_total_costs"]) {
-    background: var(--lcp-orange-soft);
-}
-
-/* -------------------------
-   Readonly monetary fields
-   ------------------------- */
-
-.o_form_view .o_lcp_dashboard .o_field_widget[readonly] {
-    color: #1f2937;
-}
-
-/* -------------------------
-   Notebook tab accent
-   ------------------------- */
-
-.o_form_view .nav-tabs .nav-link[name="lcp_details"] {
-    font-weight: 700;
-    color: var(--lcp-purple, #6f42c1);
-}
-
+/* Tab: subtle, not the main event */
 .o_form_view .nav-tabs .nav-link[name="lcp_details"].active {
-    color: #4d2a86;
-    border-bottom-color: #6f42c1 !important;
-    box-shadow: inset 0 -3px 0 #6f42c1;
+    font-weight: 700;
+    color: #5f3aa4;
 }
 
-/* -------------------------
-   Responsive polish
-   ------------------------- */
-
-@media (max-width: 991.98px) {
-    .o_form_view .o_lcp_dashboard .o_lcp_summary_card {
-        margin-bottom: 12px;
+/* Responsive */
+@media (max-width: 1199.98px) {
+    .o_form_view .o_lcp_dashboard .o_lcp_input_grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
-/* Reduced motion accessibility */
+@media (max-width: 991.98px) {
+    .o_form_view .o_lcp_dashboard .o_lcp_summary_grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_form_view .o_lcp_dashboard .o_lcp_input_grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Motion */
+@keyframes lcpFadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes lcpRise {
+    from {
+        opacity: 0;
+        transform: translateY(7px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     .o_form_view .o_lcp_dashboard *,
     .o_form_view .o_lcp_dashboard *::before,
     .o_form_view .o_lcp_dashboard *::after {
-        transition: none !important;
         animation: none !important;
+        transition: none !important;
     }
 }

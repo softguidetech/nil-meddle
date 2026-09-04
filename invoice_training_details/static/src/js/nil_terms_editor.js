@@ -1,32 +1,145 @@
 /** @odoo-module **/
 
-import { Component, onMounted, useRef } from "@odoo/owl";
+import { Component, onMounted, onWillUnmount, onWillUpdateProps, useRef } from "@odoo/owl";
 import { registry } from "@web/core/registry";
 import { standardFieldProps } from "@web/views/fields/standard_field_props";
 
-class NilTermsEditor extends Component {
+export class NilTermsEditor extends Component {
     static template = "invoice_training_details.NilTermsEditor";
     static props = { ...standardFieldProps };
 
     setup() {
-        this.editor = useRef("editor");
+        this.editorRef = useRef("editor");
+        this.savedRange = null;
+        this.commitTimer = null;
+        this.internalUpdate = false;
+
+        this._selectionHandler = () => {
+            this.rememberSelection();
+        };
 
         onMounted(() => {
-            this.editor.el.innerHTML =
-                this.props.record.data[this.props.name] || "";
+            this._setHtml(this.props.record.data[this.props.name] || "");
+            document.addEventListener("selectionchange", this._selectionHandler);
+        });
+
+        onWillUpdateProps((nextProps) => {
+            const nextValue = nextProps.record.data[nextProps.name] || "";
+
+            if (
+                this.editorRef.el &&
+                !this.internalUpdate &&
+                document.activeElement !== this.editorRef.el &&
+                this.editorRef.el.innerHTML !== nextValue
+            ) {
+                this._setHtml(nextValue);
+            }
+
+            this.internalUpdate = false;
+        });
+
+        onWillUnmount(() => {
+            document.removeEventListener(
+                "selectionchange",
+                this._selectionHandler
+            );
+
+            if (this.commitTimer) {
+                clearTimeout(this.commitTimer);
+            }
         });
     }
 
-    save() {
-        this.props.record.update({
-            [this.props.name]: this.editor.el.innerHTML,
-        });
+    _setHtml(value) {
+        if (this.editorRef.el) {
+            this.editorRef.el.innerHTML = value || "";
+        }
     }
 
-    cmd(ev) {
-        ev.preventDefault();
+    rememberSelection() {
+        const editor = this.editorRef.el;
+        const selection = window.getSelection();
 
-        this.editor.el.focus();
+        if (!editor || !selection || !selection.rangeCount) {
+            return;
+        }
+
+        const range = selection.getRangeAt(0);
+
+        let node = range.commonAncestorContainer;
+
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            node = node.parentElement;
+        }
+
+        if (node && editor.contains(node)) {
+            this.savedRange = range.cloneRange();
+        }
+    }
+
+    restoreSelection() {
+        if (!this.savedRange) {
+            return false;
+        }
+
+        const selection = window.getSelection();
+
+        selection.removeAllRanges();
+        selection.addRange(this.savedRange);
+
+        return true;
+    }
+
+    focusEditor() {
+        this.editorRef.el.focus();
+        this.restoreSelection();
+    }
+
+    save(immediate = false) {
+        if (!this.editorRef.el) {
+            return;
+        }
+
+        const commit = () => {
+            this.internalUpdate = true;
+
+            this.props.record.update({
+                [this.props.name]: this.editorRef.el.innerHTML,
+            });
+        };
+
+        if (this.commitTimer) {
+            clearTimeout(this.commitTimer);
+        }
+
+        if (immediate) {
+            commit();
+        } else {
+            this.commitTimer = setTimeout(commit, 180);
+        }
+    }
+
+    onEditorInput() {
+        this.rememberSelection();
+        this.save(false);
+    }
+
+    onEditorBlur() {
+        this.save(true);
+    }
+
+    onToolbarMouseDown(ev) {
+        if (ev.target.tagName === "BUTTON") {
+            ev.preventDefault();
+        }
+
+        this.rememberSelection();
+    }
+
+    execCommand(ev) {
+        const command = ev.currentTarget.dataset.command;
+
+        this.focusEditor();
 
         document.execCommand(
             "styleWithCSS",
@@ -35,58 +148,75 @@ class NilTermsEditor extends Component {
         );
 
         document.execCommand(
-            ev.currentTarget.dataset.cmd,
+            command,
             false,
             null
         );
 
-        this.save();
+        this.rememberSelection();
+        this.save(true);
     }
 
-    block(ev) {
-        if (!ev.target.value) {
+    setBlock(ev) {
+        const value = ev.target.value;
+
+        if (!value) {
             return;
         }
 
-        this.editor.el.focus();
+        this.focusEditor();
 
         document.execCommand(
             "formatBlock",
             false,
-            ev.target.value
+            value
         );
 
         ev.target.value = "";
 
-        this.save();
+        this.rememberSelection();
+        this.save(true);
     }
 
-    fontSize(ev) {
-        if (!ev.target.value) {
+    setFontSize(ev) {
+        const value = ev.target.value;
+
+        if (!value) {
             return;
         }
 
-        this.editor.el.focus();
+        this.focusEditor();
 
         document.execCommand(
             "styleWithCSS",
             false,
-            true
+            false
         );
 
         document.execCommand(
             "fontSize",
             false,
-            ev.target.value
+            "7"
         );
+
+        for (
+            const font of
+            this.editorRef.el.querySelectorAll('font[size="7"]')
+        ) {
+            font.removeAttribute("size");
+            font.style.fontSize = value;
+        }
 
         ev.target.value = "";
 
-        this.save();
+        this.rememberSelection();
+        this.save(true);
     }
 
-    color(ev) {
-        this.editor.el.focus();
+    setTextColor(ev) {
+        const value = ev.target.value;
+
+        this.focusEditor();
 
         document.execCommand(
             "styleWithCSS",
@@ -97,125 +227,226 @@ class NilTermsEditor extends Component {
         document.execCommand(
             "foreColor",
             false,
-            ev.target.value
+            value
         );
 
-        this.save();
+        this.rememberSelection();
+        this.save(true);
     }
 
-    selectedBlocks() {
-        const sel = window.getSelection();
+    setHighlight(ev) {
+        const value = ev.target.value;
 
-        if (!sel || !sel.rangeCount) {
-            return [];
+        this.focusEditor();
+
+        document.execCommand(
+            "styleWithCSS",
+            false,
+            true
+        );
+
+        document.execCommand(
+            "hiliteColor",
+            false,
+            value
+        );
+
+        this.rememberSelection();
+        this.save(true);
+    }
+
+    _currentRange() {
+        const selection = window.getSelection();
+
+        if (selection && selection.rangeCount) {
+            const range = selection.getRangeAt(0);
+
+            let node = range.commonAncestorContainer;
+
+            if (node.nodeType !== Node.ELEMENT_NODE) {
+                node = node.parentElement;
+            }
+
+            if (node && this.editorRef.el.contains(node)) {
+                return range;
+            }
         }
 
-        const range = sel.getRangeAt(0);
+        return this.savedRange;
+    }
 
-        let node =
-            range.startContainer.nodeType === 1
-                ? range.startContainer
-                : range.startContainer.parentElement;
+    _closestBlock(node) {
+        let element = node;
 
-        const block =
-            node &&
-            node.closest(
-                "p,div,li,td,th,h1,h2,h3,h4"
-            );
+        if (!element) {
+            return null;
+        }
+
+        if (element.nodeType !== Node.ELEMENT_NODE) {
+            element = element.parentElement;
+        }
+
+        const block = element?.closest(
+            "p,div,li,td,th,blockquote,h1,h2,h3,h4,h5,h6"
+        );
 
         return (
             block &&
-            this.editor.el.contains(block)
+            this.editorRef.el.contains(block)
         )
-            ? [block]
-            : [];
+            ? block
+            : null;
     }
 
-    lineHeight(ev) {
+    _selectedBlocks() {
+        const range = this._currentRange();
+
+        if (!range) {
+            return [];
+        }
+
+        if (range.collapsed) {
+            const block = this._closestBlock(
+                range.startContainer
+            );
+
+            return block ? [block] : [];
+        }
+
+        const selector =
+            "p,div,li,td,th,blockquote,h1,h2,h3,h4,h5,h6";
+
+        const blocks = [];
+
+        for (
+            const node of
+            this.editorRef.el.querySelectorAll(selector)
+        ) {
+            try {
+                if (range.intersectsNode(node)) {
+                    blocks.push(node);
+                }
+            } catch {
+            }
+        }
+
+        if (!blocks.length) {
+            const block = this._closestBlock(
+                range.startContainer
+            );
+
+            if (block) {
+                blocks.push(block);
+            }
+        }
+
+        return blocks;
+    }
+
+    setLineHeight(ev) {
         const value = ev.target.value;
 
         if (!value) {
             return;
         }
 
-        for (const el of this.selectedBlocks()) {
-            el.style.lineHeight = value;
+        this.focusEditor();
+
+        for (const block of this._selectedBlocks()) {
+            block.style.lineHeight = value;
         }
 
         ev.target.value = "";
 
-        this.save();
+        this.rememberSelection();
+        this.save(true);
     }
 
-    paragraphSpace(ev) {
+    setParagraphGap(ev) {
         const value = ev.target.value;
 
         if (value === "") {
             return;
         }
 
-        for (const el of this.selectedBlocks()) {
-            el.style.marginBottom =
-                `${value}px`;
+        this.focusEditor();
+
+        for (const block of this._selectedBlocks()) {
+            block.style.marginBottom = `${value}px`;
         }
 
         ev.target.value = "";
 
-        this.save();
+        this.rememberSelection();
+        this.save(true);
     }
 
-    insertTable() {
-        this.editor.el.focus();
+    setIndent(ev) {
+        const value = ev.target.value;
 
-        const rows = Math.max(
-            1,
-            Math.min(
-                20,
-                parseInt(
-                    prompt(
-                        "Rows",
-                        "3"
-                    ) || "3"
-                )
-            )
-        );
+        if (value === "") {
+            return;
+        }
 
-        const cols = Math.max(
-            1,
-            Math.min(
-                12,
-                parseInt(
-                    prompt(
-                        "Columns",
-                        "3"
-                    ) || "3"
-                )
-            )
-        );
+        this.focusEditor();
 
-        let html =
-            '<table class="nil-edit-table"><tbody>';
+        for (const block of this._selectedBlocks()) {
+            block.style.marginLeft = `${value}px`;
+        }
 
-        for (
-            let row = 0;
-            row < rows;
-            row++
-        ) {
+        ev.target.value = "";
+
+        this.rememberSelection();
+        this.save(true);
+    }
+
+    insertTable(ev) {
+        const value = ev.target.value;
+
+        if (!value) {
+            return;
+        }
+
+        const [rowsText, colsText] =
+            value.split("x");
+
+        const rows = parseInt(rowsText, 10);
+        const cols = parseInt(colsText, 10);
+
+        this.focusEditor();
+
+        let html = `
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+                margin:10px 0;
+            ">
+                <tbody>
+        `;
+
+        for (let r = 0; r < rows; r++) {
             html += "<tr>";
 
-            for (
-                let col = 0;
-                col < cols;
-                col++
-            ) {
-                html += "<td><br/></td>";
+            for (let c = 0; c < cols; c++) {
+                html += `
+                    <td style="
+                        border:1px solid #777;
+                        padding:8px;
+                        vertical-align:top;
+                    ">
+                        <br/>
+                    </td>
+                `;
             }
 
             html += "</tr>";
         }
 
-        html +=
-            "</tbody></table><p><br/></p>";
+        html += `
+                </tbody>
+            </table>
+            <p><br/></p>
+        `;
 
         document.execCommand(
             "insertHTML",
@@ -223,247 +454,462 @@ class NilTermsEditor extends Component {
             html
         );
 
-        this.save();
+        ev.target.value = "";
+
+        this.rememberSelection();
+        this.save(true);
     }
 
-    cell() {
-        const sel = window.getSelection();
+    _currentCell() {
+        const range = this._currentRange();
 
-        if (!sel || !sel.rangeCount) {
+        if (!range) {
             return null;
         }
 
-        let node =
-            sel
-                .getRangeAt(0)
-                .startContainer;
+        let node = range.startContainer;
 
-        node =
-            node.nodeType === 1
-                ? node
-                : node.parentElement;
+        if (node.nodeType !== Node.ELEMENT_NODE) {
+            node = node.parentElement;
+        }
 
-        const cell =
-            node &&
-            node.closest("td,th");
+        const cell = node?.closest("td,th");
 
         return (
             cell &&
-            this.editor.el.contains(cell)
+            this.editorRef.el.contains(cell)
         )
             ? cell
             : null;
     }
 
+    _currentTable() {
+        return (
+            this._currentCell()?.closest("table") ||
+            null
+        );
+    }
+
     addRow() {
-        const cell = this.cell();
+        const cell = this._currentCell();
 
         if (!cell) {
             return;
         }
 
-        const row = cell.parentElement;
+        const row = cell.closest("tr");
 
-        const clone =
-            row.cloneNode(true);
+        const newRow = row.cloneNode(true);
 
-        clone
-            .querySelectorAll(
-                "td,th"
+        for (
+            const newCell of
+            newRow.querySelectorAll("td,th")
+        ) {
+            newCell.removeAttribute("rowspan");
+            newCell.innerHTML = "<br/>";
+        }
+
+        row.after(newRow);
+
+        this.save(true);
+    }
+
+    deleteRow() {
+        const cell = this._currentCell();
+
+        if (!cell) {
+            return;
+        }
+
+        const table = cell.closest("table");
+        const row = cell.closest("tr");
+
+        if (table.rows.length <= 1) {
+            return;
+        }
+
+        row.remove();
+
+        this.save(true);
+    }
+
+    addColumn() {
+        const cell = this._currentCell();
+
+        if (!cell) {
+            return;
+        }
+
+        const table = cell.closest("table");
+        const index = cell.cellIndex;
+
+        for (const row of table.rows) {
+            const reference =
+                row.cells[index] ||
+                row.cells[row.cells.length - 1];
+
+            const newCell =
+                document.createElement(
+                    reference?.tagName === "TH"
+                        ? "th"
+                        : "td"
+                );
+
+            newCell.innerHTML = "<br/>";
+            newCell.style.border =
+                "1px solid #777";
+            newCell.style.padding =
+                "8px";
+            newCell.style.verticalAlign =
+                "top";
+
+            if (reference) {
+                reference.after(newCell);
+            } else {
+                row.appendChild(newCell);
+            }
+        }
+
+        this.save(true);
+    }
+
+    deleteColumn() {
+        const cell = this._currentCell();
+
+        if (!cell) {
+            return;
+        }
+
+        const table = cell.closest("table");
+        const index = cell.cellIndex;
+
+        if (
+            table.rows[0]?.cells.length <= 1
+        ) {
+            return;
+        }
+
+        for (const row of table.rows) {
+            if (row.cells[index]) {
+                row.deleteCell(index);
+            }
+        }
+
+        this.save(true);
+    }
+
+    mergeRight() {
+        const cell = this._currentCell();
+
+        if (!cell) {
+            return;
+        }
+
+        const row = cell.closest("tr");
+
+        const next =
+            row.cells[
+                cell.cellIndex + 1
+            ];
+
+        if (!next) {
+            return;
+        }
+
+        const currentSpan =
+            parseInt(
+                cell.getAttribute("colspan") ||
+                "1",
+                10
+            );
+
+        const nextSpan =
+            parseInt(
+                next.getAttribute("colspan") ||
+                "1",
+                10
+            );
+
+        const currentContent =
+            cell.innerHTML.trim();
+
+        const nextContent =
+            next.innerHTML.trim();
+
+        if (
+            nextContent &&
+            nextContent !== "<br>"
+        ) {
+            cell.innerHTML =
+                (
+                    currentContent &&
+                    currentContent !== "<br>"
+                        ? currentContent + " "
+                        : ""
+                ) +
+                nextContent;
+        }
+
+        cell.setAttribute(
+            "colspan",
+            String(
+                currentSpan +
+                nextSpan
             )
-            .forEach(
-                (item) =>
-                    item.innerHTML =
-                        "<br/>"
-            );
+        );
 
-        row.after(clone);
+        next.remove();
 
-        this.save();
+        this.save(true);
     }
 
-    delRow() {
-        const cell = this.cell();
+    splitCell() {
+        const cell = this._currentCell();
 
         if (!cell) {
             return;
         }
 
-        cell
-            .parentElement
-            .remove();
+        const colspan =
+            parseInt(
+                cell.getAttribute("colspan") ||
+                "1",
+                10
+            );
 
-        this.save();
+        if (colspan <= 1) {
+            return;
+        }
+
+        cell.setAttribute(
+            "colspan",
+            "1"
+        );
+
+        for (
+            let i = 1;
+            i < colspan;
+            i++
+        ) {
+            const newCell =
+                document.createElement(
+                    cell.tagName.toLowerCase()
+                );
+
+            newCell.innerHTML = "<br/>";
+            newCell.style.cssText =
+                cell.style.cssText;
+
+            cell.after(newCell);
+        }
+
+        this.save(true);
     }
 
-    addCol() {
-        const cell = this.cell();
+    toggleHeaderCell() {
+        const cell = this._currentCell();
 
         if (!cell) {
+            return;
+        }
+
+        const replacement =
+            document.createElement(
+                cell.tagName === "TH"
+                    ? "td"
+                    : "th"
+            );
+
+        for (const attr of cell.attributes) {
+            replacement.setAttribute(
+                attr.name,
+                attr.value
+            );
+        }
+
+        replacement.innerHTML =
+            cell.innerHTML;
+
+        cell.replaceWith(
+            replacement
+        );
+
+        this.save(true);
+    }
+
+    setCellPadding(ev) {
+        const value = ev.target.value;
+
+        if (value === "") {
             return;
         }
 
         const table =
-            cell.closest("table");
+            this._currentTable();
 
-        const index =
-            cell.cellIndex;
+        if (!table) {
+            ev.target.value = "";
+            return;
+        }
 
-        table
-            .querySelectorAll("tr")
-            .forEach((row) => {
-                const ref =
-                    row.cells[index];
+        for (
+            const cell of
+            table.querySelectorAll("td,th")
+        ) {
+            cell.style.padding =
+                `${value}px`;
+        }
 
-                const newCell =
-                    document.createElement(
-                        ref &&
-                        ref.tagName === "TH"
-                            ? "th"
-                            : "td"
-                    );
+        ev.target.value = "";
 
-                newCell.innerHTML =
-                    "<br/>";
-
-                if (ref) {
-                    ref.after(
-                        newCell
-                    );
-                } else {
-                    row.appendChild(
-                        newCell
-                    );
-                }
-            });
-
-        this.save();
+        this.save(true);
     }
 
-    delCol() {
-        const cell = this.cell();
+    setBorderWidth(ev) {
+        const value = ev.target.value;
 
-        if (!cell) {
+        if (value === "") {
             return;
         }
 
         const table =
-            cell.closest("table");
+            this._currentTable();
 
-        const index =
-            cell.cellIndex;
+        if (!table) {
+            ev.target.value = "";
+            return;
+        }
 
-        table
-            .querySelectorAll("tr")
-            .forEach((row) => {
-                if (
-                    row.cells[index]
-                ) {
-                    row
-                        .cells[index]
-                        .remove();
-                }
-            });
+        for (
+            const cell of
+            table.querySelectorAll("td,th")
+        ) {
+            cell.style.border =
+                value === "0"
+                    ? "none"
+                    : `${value}px solid #777`;
+        }
 
-        this.save();
+        ev.target.value = "";
+
+        this.save(true);
     }
 
-    cellPadding() {
-        const cell = this.cell();
+    setCellBackground(ev) {
+        const cell =
+            this._currentCell();
 
         if (!cell) {
             return;
         }
 
-        const value =
-            prompt(
-                "Cell padding (px)",
-                "8"
-            );
+        cell.style.backgroundColor =
+            ev.target.value;
 
-        if (value !== null) {
-            cell
-                .closest("table")
-                .querySelectorAll(
-                    "td,th"
-                )
-                .forEach(
-                    (item) => {
-                        item.style.padding =
-                            `${parseInt(value) || 0}px`;
-                    }
-                );
-        }
-
-        this.save();
+        this.save(true);
     }
 
-    border() {
-        const cell = this.cell();
+    setCellVerticalAlign(ev) {
+        const value = ev.target.value;
 
-        if (!cell) {
+        if (!value) {
             return;
         }
 
-        const value =
-            prompt(
-                "Border width (px)",
-                "1"
-            );
+        const cell =
+            this._currentCell();
 
-        if (value !== null) {
-            cell
-                .closest("table")
-                .querySelectorAll(
-                    "td,th"
-                )
-                .forEach(
-                    (item) => {
-                        item.style.border =
-                            `${parseInt(value) || 0}px solid #999`;
-                    }
-                );
-        }
-
-        this.save();
-    }
-
-    cellBg() {
-        const cell = this.cell();
-
-        if (!cell) {
-            return;
-        }
-
-        const value =
-            prompt(
-                "Cell background color",
-                "#ffffff"
-            );
-
-        if (value) {
-            cell.style.backgroundColor =
+        if (cell) {
+            cell.style.verticalAlign =
                 value;
         }
 
-        this.save();
+        ev.target.value = "";
+
+        this.save(true);
+    }
+
+    setTableWidth(ev) {
+        const value = ev.target.value;
+
+        if (!value) {
+            return;
+        }
+
+        const table =
+            this._currentTable();
+
+        if (table) {
+            table.style.width =
+                value;
+        }
+
+        ev.target.value = "";
+
+        this.save(true);
+    }
+
+    setTableAlign(ev) {
+        const value = ev.target.value;
+
+        if (!value) {
+            return;
+        }
+
+        const table =
+            this._currentTable();
+
+        if (table) {
+            if (value === "center") {
+                table.style.marginLeft =
+                    "auto";
+
+                table.style.marginRight =
+                    "auto";
+            } else if (
+                value === "right"
+            ) {
+                table.style.marginLeft =
+                    "auto";
+
+                table.style.marginRight =
+                    "0";
+            } else {
+                table.style.marginLeft =
+                    "0";
+
+                table.style.marginRight =
+                    "auto";
+            }
+        }
+
+        ev.target.value = "";
+
+        this.save(true);
+    }
+
+    clearFormatting() {
+        this.focusEditor();
+
+        document.execCommand(
+            "removeFormat",
+            false,
+            null
+        );
+
+        this.rememberSelection();
+        this.save(true);
     }
 }
 
-NilTermsEditor.template =
-    "invoice_training_details.NilTermsEditor";
+registry.category("fields").add(
+    "nil_terms_editor",
+    {
+        component: NilTermsEditor,
 
-registry
-    .category("fields")
-    .add(
-        "nil_terms_editor",
-        {
-            component:
-                NilTermsEditor,
-
-            supportedTypes: [
-                "html",
-                "text",
-            ],
-        }
-    );
+        supportedTypes: [
+            "html",
+            "text",
+        ],
+    }
+);

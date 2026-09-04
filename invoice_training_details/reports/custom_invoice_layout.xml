@@ -4,20 +4,19 @@
               inherit_id="web.external_layout_standard"
               primary="True">
 
+        <!-- Move actual report body upward slightly.
+             This targets the BODY article itself, not CSS inside the PDF header. -->
+        <xpath expr="//div[contains(@t-attf-class, 'article')]" position="attributes">
+            <attribute name="style">margin-top:-8mm;</attribute>
+        </xpath>
+
         <!-- HEADER -->
         <div t-attf-class="header o_company_#{company.id}_layout" position="replace">
 
             <t t-set="company" t-value="o.company_id if o else request.env.company"/>
 
-            <style>
-                /* Reduce only the vertical gap between the shared header and report body */
-                .article {
-                    margin-top: -10mm !important;
-                }
-            </style>
-
             <div t-attf-class="header o_company_#{company.id}_layout"
-                 style="padding:0; margin:0 0 -4px 0;">
+                 style="padding:0; margin:0;">
 
                 <div class="row"
                      style="
@@ -50,7 +49,7 @@
                             <t t-esc="company.name"/>
                         </div>
 
-                        <!-- Address -->
+                        <!-- Address without P.O Box -->
                         <div style="
                             margin:0 0 2px 0;
                             padding:0;
@@ -69,42 +68,25 @@
 
                         <!-- P.O Box -->
                         <div t-if="'P.O Box 338408' in (company.street or '') or 'P.O. Box 338408' in (company.street or '') or 'P.O Box 338408' in (company.street2 or '') or 'P.O. Box 338408' in (company.street2 or '')"
-                             style="
-                                margin:0 0 2px 0;
-                                padding:0;
-                                font-size:12px;
-                                font-weight:400;
-                                line-height:1.35;
-                             ">
+                             style="margin:0 0 2px 0; padding:0; font-size:12px; font-weight:400; line-height:1.35;">
                             P.O Box 338408
                         </div>
 
                         <div t-if="company.city or company.state_id or company.zip or company.country_id"
-                             style="
-                                margin:0 0 3px 0;
-                                padding:0;
-                                font-size:12px;
-                                font-weight:400;
-                                line-height:1.35;
-                             ">
-
+                             style="margin:0 0 3px 0; padding:0; font-size:12px; font-weight:400; line-height:1.35;">
                             <span t-if="company.city" t-field="company.city"/>
-
                             <t t-if="company.state_id">
                                 <t t-if="company.city">, </t>
                                 <span t-field="company.state_id.name"/>
                             </t>
-
                             <t t-if="company.zip">
                                 <t t-if="company.city or company.state_id"> </t>
                                 <span t-field="company.zip"/>
                             </t>
-
                             <t t-if="company.country_id">
                                 <t t-if="company.city or company.state_id or company.zip">, </t>
                                 <span t-field="company.country_id.name"/>
                             </t>
-
                         </div>
 
                         <!-- Contact -->
@@ -140,7 +122,6 @@
                             margin:0;
                             text-align:right;
                          ">
-
                         <img t-if="company.logo"
                              t-att-src="image_data_uri(company.logo)"
                              style="
@@ -153,13 +134,10 @@
                                 padding:0;
                              "
                              alt="Logo"/>
-
                     </div>
 
                 </div>
-
             </div>
-
         </div>
 
         <!-- FOOTER -->

@@ -2,7 +2,7 @@ from odoo import Command, api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 
-RUBA_COMMISSION_RATE = 1.0
+RUBA_COMMISSION_RATE = 1.5
 RUBA_NAME = 'ruba khattam'
 
 FIXED_SALESPERSON_RATES = {
@@ -186,7 +186,7 @@ class SalesCommission(models.Model):
     # Manual rows keep False/NULL, so multiple manual rows remain allowed.
     auto_key = fields.Selection(
         [
-            ('ruba', 'Ruba 1%'),
+            ('ruba', 'Ruba 1.5%'),
             ('salesperson', 'Fixed Salesperson'),
         ],
         string='Commission Type',
@@ -269,7 +269,7 @@ class SalesCommission(models.Model):
     )
 
     profit_nilme_share = fields.Float(
-        string='NIL ME Profit',
+        string='NIL ME Share $',
         compute='_compute_profit_margin_summary',
         compute_sudo=True,
     )
@@ -298,39 +298,48 @@ class SalesCommission(models.Model):
 
     @api.depends(
         'lead_id',
+        'lead_id.total_training_price',
+        'lead_id.cost_details_ids',
+        'lead_id.cost_details_ids.nilme_share',
+        'lead_id.cost_details_ids.margin1',
+        'lead_id.cost_details_ids.learning_partner',
     )
     def _compute_profit_margin_summary(self):
-        """
-        Profit summary is a DIRECT mirror of CRM Lead -> LCP Details.
-
-        Do not recalculate Cost Details here.
-        LCP remains the single source for:
-        - Learning Partner
-        - Total Costs
-        - NIL ME Profit
-        - Profit Margin
-        """
         for rec in self:
-            lead = rec.lead_id.sudo()
+            cost_lines = (
+                rec.lead_id.cost_details_ids.sudo()
+                if rec.lead_id
+                else self.env['cost.details']
+            )
 
-            if lead:
-                rec.profit_learning_partner = (
-                    lead.lcp_cost_learning_partner or ''
-                )
-                rec.profit_total_costs = (
-                    lead.lcp_total_costs or 0.0
-                )
-                rec.profit_nilme_share = (
-                    lead.lcp_nilme_profit or 0.0
-                )
-                rec.profit_margin_pct = (
-                    lead.lcp_profit_margin or 0.0
-                )
-            else:
-                rec.profit_learning_partner = ''
-                rec.profit_total_costs = 0.0
-                rec.profit_nilme_share = 0.0
-                rec.profit_margin_pct = 0.0
+            partner_labels = []
+            for line in cost_lines:
+                if line.learning_partner:
+                    label = dict(
+                        line._fields['learning_partner'].selection
+                    ).get(
+                        line.learning_partner,
+                        line.learning_partner,
+                    )
+                    if label not in partner_labels:
+                        partner_labels.append(label)
+
+            total_costs = sum(cost_lines.mapped('margin1'))
+            nilme_share = sum(cost_lines.mapped('nilme_share'))
+            total_training_price = float(
+                rec.lead_id.total_training_price or 0.0
+            ) if rec.lead_id else 0.0
+
+            rec.profit_learning_partner = ', '.join(partner_labels)
+            rec.profit_total_costs = total_costs
+            rec.profit_nilme_share = nilme_share
+            # Odoo's percentage widget expects a ratio.
+            # Example: 0.4768 is displayed as 47.68%.
+            rec.profit_margin_pct = (
+                (nilme_share / total_training_price)
+                if total_training_price
+                else 0.0
+            )
 
     _sql_constraints = [
         (
@@ -446,7 +455,6 @@ class SalesCommission(models.Model):
             keeper.with_context(
                 nil_auto_sync=True,
                 nil_skip_paid_lock=True,
-                nil_preserve_paid_ruba_rate=True,
             ).write({
                 'auto_key': 'ruba',
                 'is_auto_ruba': True,
@@ -463,8 +471,7 @@ class SalesCommission(models.Model):
 
             if paid_extras:
                 paid_extras.with_context(
-                    nil_skip_paid_lock=True,
-                    nil_preserve_paid_ruba_rate=True,
+                    nil_skip_paid_lock=True
                 ).write({
                     'auto_key': False,
                     'is_auto_ruba': False,
@@ -663,11 +670,8 @@ class SalesCommission(models.Model):
         for rec in self:
             rec_vals = dict(vals)
 
-            preserve_paid_ruba = (
-                rec.state == 'paid'
-                and self.env.context.get(
-                    'nil_preserve_paid_ruba_rate'
-                )
+            auto_sync = self.env.context.get(
+                'nil_auto_sync'
             )
 
             resulting_auto_key = rec_vals.get(
@@ -685,19 +689,17 @@ class SalesCommission(models.Model):
             )
 
             if resulting_auto_key == 'ruba':
+                ruba_user = rec._nil_get_ruba_user()
+
+                rec_vals['salesperson_id'] = (
+                    ruba_user.id
+                    if ruba_user
+                    else rec.salesperson_id.id
+                )
+                rec_vals['commission_rate'] = (
+                    RUBA_COMMISSION_RATE
+                )
                 rec_vals['is_auto_ruba'] = True
-
-                if not preserve_paid_ruba:
-                    ruba_user = rec._nil_get_ruba_user()
-
-                    rec_vals['salesperson_id'] = (
-                        ruba_user.id
-                        if ruba_user
-                        else rec.salesperson_id.id
-                    )
-                    rec_vals['commission_rate'] = (
-                        RUBA_COMMISSION_RATE
-                    )
 
             elif resulting_auto_key == 'salesperson':
                 fixed_rate = (
@@ -743,13 +745,10 @@ class SalesCommission(models.Model):
             )
 
             if (
-                not preserve_paid_ruba
-                and (
-                    'training_value' in rec_vals
-                    or 'commission_rate' in rec_vals
-                    or 'salesperson_id' in rec_vals
-                    or 'auto_key' in rec_vals
-                )
+                'training_value' in rec_vals
+                or 'commission_rate' in rec_vals
+                or 'salesperson_id' in rec_vals
+                or 'auto_key' in rec_vals
             ):
                 rec_vals['commission_amount'] = (
                     training_value
@@ -819,7 +818,7 @@ class SalesCommission(models.Model):
 
         Paid rows are reversed first.
 
-        Automatic Ruba delete = exclude the whole invoice so Ruba's 1%
+        Automatic Ruba delete = exclude the whole invoice so Ruba's 1.5%
         is not recreated on the next backfill.
 
         Migration/sync cleanup bypasses that exclusion behavior.

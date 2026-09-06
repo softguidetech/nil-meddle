@@ -174,7 +174,7 @@
         </div>
 
         <!-- On-site -->
-        <div class="col-12 col-md-6 col-xl-3">
+        <div class="col-12 col-md-6 col-xl-3" invisible="lcp_is_online">
             <div class="card h-100 shadow-sm border-top border-3 border-warning">
                 <div class="card-header bg-light fw-bold py-2">
                     <i class="fa fa-map-marker text-warning me-2"/>

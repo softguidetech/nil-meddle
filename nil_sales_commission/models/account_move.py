@@ -205,12 +205,12 @@ class AccountMove(models.Model):
             ], limit=1)
 
             if not auto_ruba and ruba_user:
-                # Adopt an older Ruba 1% / legacy 1.5% row instead of creating a duplicate.
+                # Adopt an older automatic Ruba row instead of creating a duplicate.
                 old_ruba = Commission.search([
                     ('invoice_id', '=', invoice.id),
                     ('auto_key', '=', False),
                     ('salesperson_id', '=', ruba_user.id),
-                    ('commission_rate', 'in', [1.0, 1.5]),
+                    ('is_auto_ruba', '=', True),
                 ], order='id asc', limit=1)
 
                 if old_ruba:

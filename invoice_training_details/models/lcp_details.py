@@ -620,10 +620,16 @@ class CrmLead(models.Model):
             revenue = lead.total_training_price or 0.0
             net_after_costs = revenue - operational_costs
 
-            # EnterOne: fixed 20% share from the net amount AFTER costs.
-            # NIL ME keeps the remaining 80%.
+            # EnterOne: fixed 20% of Total Rate Card after deducting
+            # Instructor Cost + Flight/Tickets + Hotel only.
             if lead.lcp_cost_learning_partner == 'EnterOne':
-                partner_share = max(net_after_costs, 0.0) * 0.20
+                enterone_share_base = (
+                    (lead.lcp_total_rate_card or 0.0)
+                    - (lead.lcp_total_instructor_cost or 0.0)
+                    - ticket_total
+                    - hotel_total
+                )
+                partner_share = max(enterone_share_base, 0.0) * 0.20
                 profit = net_after_costs - partner_share
 
             # Koenig: keep the existing calculation logic unchanged.

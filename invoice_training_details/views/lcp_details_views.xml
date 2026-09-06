@@ -194,14 +194,6 @@
                         <field name="lcp_per_diem_days" nolabel="1" class="w-100 mb-3"/>
                     </div>
 
-                    <div invisible="lcp_is_online">
-                        <div class="small text-muted fw-bold mb-1">Venue</div>
-                        <field name="venue" nolabel="1" class="w-100 mb-3"/>
-
-                        <div class="small text-muted fw-bold mb-1">Catering</div>
-                        <field name="ctrng" nolabel="1" class="w-100"/>
-                    </div>
-
                     <div invisible="not lcp_is_online" class="alert alert-success py-2 px-3 mb-0">
                         <i class="fa fa-globe me-2"/>
                         Online training
@@ -271,9 +263,9 @@
                                 </td>
                             </tr>
                             <tr invisible="lcp_is_online">
-                                <td class="text-muted">Uber Logistics</td>
+                                <td class="text-muted">Total Logistics</td>
                                 <td class="text-end fw-bold">
-                                    <field name="lcp_total_uber_estimate" nolabel="1" readonly="1" class="oe_inline"/>
+                                    <field name="lcp_total_logistics" nolabel="1" readonly="1" class="oe_inline"/>
                                 </td>
                             </tr>
                         </tbody>

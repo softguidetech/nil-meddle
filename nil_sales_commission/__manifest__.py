@@ -20,6 +20,7 @@ NIL Sales Commission
         'crm',
         'sale_crm',
         'account',
+        'invoice_training_details',
     ],
     'data': [
         'security/commission_security.xml',

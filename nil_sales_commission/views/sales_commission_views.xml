@@ -22,7 +22,7 @@
                        optional="show"/>
 
                 <field name="salesperson_id"
-                       string="AM"/>
+                       string="Commission For"/>
 
                 <field name="lead_id"
                        optional="show"/>
@@ -163,7 +163,7 @@
                                    invisible="1"/>
 
                             <field name="salesperson_id"
-                                   string="Account Manager"
+                                   string="Commission For"
                                    readonly="state == 'paid' or auto_key in ('ruba', 'salesperson')"/>
 
                             <field name="commission_rate"
@@ -220,7 +220,7 @@
                         <div class="border rounded p-2 bg-light"
                              style="flex: 0 1 180px; min-width: 180px; max-width: 210px;">
                             <div class="text-muted fw-bold mb-1">
-                                NIL ME Share $
+                                NIL ME Profit
                             </div>
                             <div class="fs-5 fw-bold">
                                 <field name="profit_nilme_share"
@@ -319,7 +319,7 @@
                         domain="[('state', '=', 'excluded')]"/>
 
                 <filter name="ruba_auto"
-                        string="Ruba 1.5%"
+                        string="Ruba 1%"
                         domain="[('auto_key', '=', 'ruba')]"/>
 
                 <filter name="fixed_sales"

@@ -185,6 +185,12 @@ class CrmLead(models.Model):
         compute='_compute_lcp_existing_results',
     )
 
+    lcp_total_logistics = fields.Monetary(
+        string='Total Logistics',
+        currency_field='currency_id',
+        compute='_compute_lcp_existing_results',
+    )
+
     # Kept under the SAME technical field name used by the existing view.
     # It is now entered directly in LCP and no longer comes from cost.details.
     lcp_cost_learning_partner = fields.Selection(
@@ -637,8 +643,19 @@ class CrmLead(models.Model):
 
             total_costs = operational_costs + partner_share
 
+            # Total Logistics = Uber + Per Diem + Hotel + Flight/Tickets.
+            # Hotel and Flight/Tickets apply only when the instructor is from NIL ME,
+            # exactly as agreed in the existing costing logic.
+            total_logistics = (
+                uber_cost
+                + per_diem_cost
+                + (ticket_total if lead.lcp_instructor_source == 'nil_me' else 0.0)
+                + (hotel_total if lead.lcp_instructor_source == 'nil_me' else 0.0)
+            )
+
             lead.lcp_ticket_total = ticket_total
             lead.lcp_hotel_total = hotel_total
+            lead.lcp_total_logistics = total_logistics
             lead.lcp_partner_share = partner_share
             lead.lcp_total_costs = total_costs
             lead.lcp_nilme_profit = profit

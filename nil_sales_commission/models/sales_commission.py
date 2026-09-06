@@ -1,4 +1,4 @@
-
+from odoo import Command, api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -296,9 +296,14 @@ class SalesCommission(models.Model):
                 else self.env['cost.details']
             )
 
-    @api.depends('lead_id')
+    @api.depends(
+        'lead_id',
+        'lead_id.lcp_cost_learning_partner',
+        'lead_id.lcp_total_costs',
+        'lead_id.lcp_nilme_profit',
+        'lead_id.lcp_profit_margin',
+    )
     def _compute_profit_margin_summary(self):
-        """Read the Profit Margin summary directly from CRM LCP."""
         for rec in self:
             lead = rec.lead_id.sudo()
 
@@ -309,34 +314,18 @@ class SalesCommission(models.Model):
                 rec.profit_margin_pct = 0.0
                 continue
 
-            required_fields = (
-                'lcp_cost_learning_partner',
-                'lcp_total_costs',
-                'lcp_nilme_profit',
-                'lcp_profit_margin',
-            )
-
-            if not all(
-                field_name in lead._fields
-                for field_name in required_fields
-            ):
-                rec.profit_learning_partner = ''
-                rec.profit_total_costs = 0.0
-                rec.profit_nilme_share = 0.0
-                rec.profit_margin_pct = 0.0
-                continue
-
+            # Read the displayed LCP Profit Margin block directly.
             rec.profit_learning_partner = (
-                lead['lcp_cost_learning_partner'] or ''
+                lead.lcp_cost_learning_partner or ''
             )
             rec.profit_total_costs = (
-                lead['lcp_total_costs'] or 0.0
+                lead.lcp_total_costs or 0.0
             )
             rec.profit_nilme_share = (
-                lead['lcp_nilme_profit'] or 0.0
+                lead.lcp_nilme_profit or 0.0
             )
             rec.profit_margin_pct = (
-                lead['lcp_profit_margin'] or 0.0
+                lead.lcp_profit_margin or 0.0
             )
 
     _sql_constraints = [

@@ -133,7 +133,7 @@ class AccountMove(models.Model):
         FINAL COMMISSION LOGIC
 
         Every Customer Invoice dated from 01-Jun-2026 onward:
-        1. Ruba Khattam ALWAYS gets 1.5%.
+        1. Ruba Khattam ALWAYS gets 1%.
         2. If deal salesperson is Loudy Abdo, Loudy gets 5%.
         3. If deal salesperson is Baraa Abo Saleh, Baraa gets 2%.
         4. No salesperson filter controls whether the invoice appears.
@@ -197,7 +197,7 @@ class AccountMove(models.Model):
             }
 
             # -------------------------------------------------------------
-            # 1) RUBA: ONE automatic 1.5% row per invoice
+            # 1) RUBA: ONE automatic 1% row per invoice
             # -------------------------------------------------------------
             auto_ruba = Commission.search([
                 ('invoice_id', '=', invoice.id),
@@ -205,12 +205,12 @@ class AccountMove(models.Model):
             ], limit=1)
 
             if not auto_ruba and ruba_user:
-                # Adopt an older Ruba 1.5% row instead of creating a duplicate.
+                # Adopt an older Ruba 1% / legacy 1.5% row instead of creating a duplicate.
                 old_ruba = Commission.search([
                     ('invoice_id', '=', invoice.id),
                     ('auto_key', '=', False),
                     ('salesperson_id', '=', ruba_user.id),
-                    ('commission_rate', '=', 1.5),
+                    ('commission_rate', 'in', [1.0, 1.5]),
                 ], order='id asc', limit=1)
 
                 if old_ruba:
@@ -231,9 +231,9 @@ class AccountMove(models.Model):
                         if ruba_user
                         else False
                     ),
-                    'commission_rate': 1.5,
+                    'commission_rate': 1.0,
                     'commission_amount': (
-                        training_value * 0.015
+                        training_value * 0.01
                     ),
                     'state': (
                         'excluded'
@@ -258,7 +258,7 @@ class AccountMove(models.Model):
                         if ruba_user
                         else auto_ruba.salesperson_id.id
                     ),
-                    'commission_rate': 1.5,
+                    'commission_rate': 1.0,
                     'is_auto_ruba': True,
                     'auto_key': 'ruba',
                 })

@@ -93,7 +93,7 @@
                 </div>
                 <div class="card-body">
                     <div class="small text-muted fw-bold mb-1">Learning Partner</div>
-                    <field name="lcp_cost_learning_partner" readonly="1" nolabel="1" class="w-100 mb-3"/>
+                    <field name="lcp_cost_learning_partner" nolabel="1" class="w-100 mb-3"/>
 
                     <div invisible="lcp_payment_method != 'clc'">
                         <div class="small text-muted fw-bold mb-1">SO#</div>

@@ -114,7 +114,7 @@ class CrmLead(models.Model):
         - commission amount
 
         Rates:
-        - Ruba Khattam = 1.5%
+        - Ruba Khattam = 1%
         - Loudy Abdo = 5%
         - Baraa Abo Saleh = 2%
         """

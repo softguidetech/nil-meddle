@@ -1,4 +1,4 @@
-from odoo import Command, api, fields, models, _
+
 from odoo.exceptions import UserError, ValidationError
 
 
@@ -269,7 +269,7 @@ class SalesCommission(models.Model):
     )
 
     profit_nilme_share = fields.Float(
-        string='NIL ME Profit',
+        string='NIL ME Share $',
         compute='_compute_profit_margin_summary',
         compute_sudo=True,
     )
@@ -298,21 +298,7 @@ class SalesCommission(models.Model):
 
     @api.depends('lead_id')
     def _compute_profit_margin_summary(self):
-        """
-        Mirror the Profit Margin block directly from CRM -> LCP Details.
-
-        IMPORTANT:
-        LCP fields are accessed dynamically instead of putting them inside
-        @api.depends. This keeps nil_sales_commission safe during registry
-        loading even if invoice_training_details is loaded later.
-        """
-        lcp_fields = {
-            'learning_partner': 'lcp_cost_learning_partner',
-            'total_costs': 'lcp_total_costs',
-            'nilme_profit': 'lcp_nilme_profit',
-            'profit_margin': 'lcp_profit_margin',
-        }
-
+        """Read the Profit Margin summary directly from CRM LCP."""
         for rec in self:
             lead = rec.lead_id.sudo()
 
@@ -323,11 +309,16 @@ class SalesCommission(models.Model):
                 rec.profit_margin_pct = 0.0
                 continue
 
-            # If LCP is temporarily unavailable during module loading,
-            # do not crash Odoo. The values simply stay blank/zero.
+            required_fields = (
+                'lcp_cost_learning_partner',
+                'lcp_total_costs',
+                'lcp_nilme_profit',
+                'lcp_profit_margin',
+            )
+
             if not all(
                 field_name in lead._fields
-                for field_name in lcp_fields.values()
+                for field_name in required_fields
             ):
                 rec.profit_learning_partner = ''
                 rec.profit_total_costs = 0.0
@@ -336,16 +327,16 @@ class SalesCommission(models.Model):
                 continue
 
             rec.profit_learning_partner = (
-                lead[lcp_fields['learning_partner']] or ''
+                lead['lcp_cost_learning_partner'] or ''
             )
             rec.profit_total_costs = (
-                lead[lcp_fields['total_costs']] or 0.0
+                lead['lcp_total_costs'] or 0.0
             )
             rec.profit_nilme_share = (
-                lead[lcp_fields['nilme_profit']] or 0.0
+                lead['lcp_nilme_profit'] or 0.0
             )
             rec.profit_margin_pct = (
-                lead[lcp_fields['profit_margin']] or 0.0
+                lead['lcp_profit_margin'] or 0.0
             )
 
     _sql_constraints = [
@@ -825,7 +816,7 @@ class SalesCommission(models.Model):
 
         Paid rows are reversed first.
 
-        Automatic Ruba delete = exclude the whole invoice so Ruba's 1.5%
+        Automatic Ruba delete = exclude the whole invoice so Ruba's 1%
         is not recreated on the next backfill.
 
         Migration/sync cleanup bypasses that exclusion behavior.

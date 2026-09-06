@@ -558,6 +558,7 @@ class CrmLead(models.Model):
         'total_training_price',
         'uber',
         'lcp_payment_method',
+        'lcp_cost_learning_partner',
         'lcp_total_rate_card',
         'lcp_partner_share_pct',
         'lcp_partner_cash_cost',

@@ -191,10 +191,6 @@ class CrmLead(models.Model):
         [
             ('EnterOne', 'EnterOne'),
             ('Koenig', 'Koenig'),
-            ('Mira', 'Mira'),
-            ('NIL LTD', 'NIL LTD'),
-            ('NIL SA', 'NIL SA'),
-            ('Other', 'Other'),
         ],
         string='Learning Partner',
     )
@@ -417,11 +413,16 @@ class CrmLead(models.Model):
                 total_vendor_instructor = 0.0
                 total_instructor_cost = total_instructor_md
 
+                # Per Diem is an on-site cost only.
                 total_per_diem = (
-                    (lead.lcp_per_diem_rate or 0.0)
-                    * max(
-                        lead.lcp_per_diem_days or 0,
-                        0,
+                    0.0
+                    if lead.lcp_is_online
+                    else (
+                        (lead.lcp_per_diem_rate or 0.0)
+                        * max(
+                            lead.lcp_per_diem_days or 0,
+                            0,
+                        )
                     )
                 )
 
@@ -562,43 +563,78 @@ class CrmLead(models.Model):
         'lcp_partner_cash_cost',
         'lcp_total_per_diem',
         'lcp_total_instructor_cost',
+        'lcp_instructor_source',
+        'lcp_is_online',
     )
     def _compute_lcp_existing_results(self):
         for lead in self:
-            ticket_total = sum(
-                lead.ticket_ids.mapped('price')
+            # On-line training must not carry any on-site cost.
+            # Flight, hotel, venue, catering, Uber and per diem are all
+            # treated as zero when every training line is Online.
+            if lead.lcp_is_online:
+                ticket_total = 0.0
+                hotel_total = 0.0
+                venue_cost = 0.0
+                catering_cost = 0.0
+                uber_cost = 0.0
+                per_diem_cost = 0.0
+            else:
+                ticket_total = sum(
+                    lead.ticket_ids.mapped('price')
+                )
+                hotel_total = sum(
+                    lead.hotel_ids.mapped('price')
+                )
+                venue_cost = lead.venue or 0.0
+                catering_cost = lead.ctrng or 0.0
+                uber_cost = lead.uber or 0.0
+                per_diem_cost = lead.lcp_total_per_diem or 0.0
+
+            # Operational costs before partner share.
+            # Instructor cost is valid for both Online and On-site.
+            # Hotel and flight are included only for an NIL ME instructor
+            # and only for On-site training.
+            nil_me_instructor_costs = 0.0
+            if lead.lcp_instructor_source == 'nil_me':
+                nil_me_instructor_costs = (
+                    (lead.lcp_total_instructor_cost or 0.0)
+                    + ticket_total
+                    + hotel_total
+                )
+
+            operational_costs = (
+                nil_me_instructor_costs
+                + venue_cost
+                + catering_cost
+                + uber_cost
+                + per_diem_cost
             )
 
-            hotel_total = sum(
-                lead.hotel_ids.mapped('price')
-            )
+            revenue = lead.total_training_price or 0.0
+            net_after_costs = revenue - operational_costs
 
-            # CLC: Partner Share = Total Rate Card x manual %.
-            # CASH: Partner Share = final all-inclusive partner cost.
-            if lead.lcp_payment_method == 'clc':
+            # EnterOne: fixed 20% share from the net amount AFTER costs.
+            # NIL ME keeps the remaining 80%.
+            if lead.lcp_cost_learning_partner == 'EnterOne':
+                partner_share = max(net_after_costs, 0.0) * 0.20
+                profit = net_after_costs - partner_share
+
+            # Koenig: keep the existing calculation logic unchanged.
+            elif lead.lcp_payment_method == 'clc':
                 partner_share = (
                     (lead.lcp_total_rate_card or 0.0)
                     * (lead.lcp_partner_share_pct or 0.0)
                     / 100.0
                 )
+                profit = net_after_costs - partner_share
+
             else:
                 partner_share = (
                     lead.lcp_partner_cash_cost or 0.0
                 )
+                profit = net_after_costs - partner_share
 
-            total_costs = (
-                ticket_total
-                + hotel_total
-                + (lead.venue or 0.0)
-                + (lead.ctrng or 0.0)
-                + (lead.uber or 0.0)
-                + (lead.lcp_total_per_diem or 0.0)
-                + (lead.lcp_total_instructor_cost or 0.0)
-                + partner_share
-            )
-
-            revenue = lead.total_training_price or 0.0
-            profit = revenue - total_costs
+            total_costs = operational_costs + partner_share
 
             lead.lcp_ticket_total = ticket_total
             lead.lcp_hotel_total = hotel_total

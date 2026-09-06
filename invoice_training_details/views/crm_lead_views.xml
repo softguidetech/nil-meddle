@@ -96,7 +96,6 @@
 
                             <field name="origin_id"/>
 
-                            <field name="destination_id"/>
 
                             <field name="date"/>
 
@@ -464,7 +463,6 @@
                     <field name="training_course_ids" readonly="1" invisible="purchase_training_type == 'instructor'">
                         <tree>
                             <field name="training_id"/>
-                            <field name="descriptions"/>
                             <field name="instructor_id"/>
                             <field name="location"/>
                             <field name="where_location2"/>

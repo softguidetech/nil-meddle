@@ -1,4 +1,4 @@
-
+from odoo import api, fields, models
 
 
 class CrmLead(models.Model):
@@ -114,7 +114,7 @@ class CrmLead(models.Model):
         - commission amount
 
         Rates:
-        - Ruba Khattam = 1%
+        - Ruba Khattam = 1.5%
         - Loudy Abdo = 5%
         - Baraa Abo Saleh = 2%
         """

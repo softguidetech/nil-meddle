@@ -2,7 +2,7 @@ from odoo import Command, api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
 
 
-RUBA_COMMISSION_RATE = 1.5
+RUBA_COMMISSION_RATE = 1.0
 RUBA_NAME = 'ruba khattam'
 
 FIXED_SALESPERSON_RATES = {
@@ -186,7 +186,7 @@ class SalesCommission(models.Model):
     # Manual rows keep False/NULL, so multiple manual rows remain allowed.
     auto_key = fields.Selection(
         [
-            ('ruba', 'Ruba 1.5%'),
+            ('ruba', 'Ruba 1%'),
             ('salesperson', 'Fixed Salesperson'),
         ],
         string='Commission Type',
@@ -269,7 +269,7 @@ class SalesCommission(models.Model):
     )
 
     profit_nilme_share = fields.Float(
-        string='NIL ME Share $',
+        string='NIL ME Profit',
         compute='_compute_profit_margin_summary',
         compute_sudo=True,
     )
@@ -296,49 +296,56 @@ class SalesCommission(models.Model):
                 else self.env['cost.details']
             )
 
-    @api.depends(
-        'lead_id',
-        'lead_id.total_training_price',
-        'lead_id.cost_details_ids',
-        'lead_id.cost_details_ids.nilme_share',
-        'lead_id.cost_details_ids.margin1',
-        'lead_id.cost_details_ids.learning_partner',
-    )
+    @api.depends('lead_id')
     def _compute_profit_margin_summary(self):
+        """
+        Mirror the Profit Margin block directly from CRM -> LCP Details.
+
+        IMPORTANT:
+        LCP fields are accessed dynamically instead of putting them inside
+        @api.depends. This keeps nil_sales_commission safe during registry
+        loading even if invoice_training_details is loaded later.
+        """
+        lcp_fields = {
+            'learning_partner': 'lcp_cost_learning_partner',
+            'total_costs': 'lcp_total_costs',
+            'nilme_profit': 'lcp_nilme_profit',
+            'profit_margin': 'lcp_profit_margin',
+        }
+
         for rec in self:
-            cost_lines = (
-                rec.lead_id.cost_details_ids.sudo()
-                if rec.lead_id
-                else self.env['cost.details']
+            lead = rec.lead_id.sudo()
+
+            if not lead:
+                rec.profit_learning_partner = ''
+                rec.profit_total_costs = 0.0
+                rec.profit_nilme_share = 0.0
+                rec.profit_margin_pct = 0.0
+                continue
+
+            # If LCP is temporarily unavailable during module loading,
+            # do not crash Odoo. The values simply stay blank/zero.
+            if not all(
+                field_name in lead._fields
+                for field_name in lcp_fields.values()
+            ):
+                rec.profit_learning_partner = ''
+                rec.profit_total_costs = 0.0
+                rec.profit_nilme_share = 0.0
+                rec.profit_margin_pct = 0.0
+                continue
+
+            rec.profit_learning_partner = (
+                lead[lcp_fields['learning_partner']] or ''
             )
-
-            partner_labels = []
-            for line in cost_lines:
-                if line.learning_partner:
-                    label = dict(
-                        line._fields['learning_partner'].selection
-                    ).get(
-                        line.learning_partner,
-                        line.learning_partner,
-                    )
-                    if label not in partner_labels:
-                        partner_labels.append(label)
-
-            total_costs = sum(cost_lines.mapped('margin1'))
-            nilme_share = sum(cost_lines.mapped('nilme_share'))
-            total_training_price = float(
-                rec.lead_id.total_training_price or 0.0
-            ) if rec.lead_id else 0.0
-
-            rec.profit_learning_partner = ', '.join(partner_labels)
-            rec.profit_total_costs = total_costs
-            rec.profit_nilme_share = nilme_share
-            # Odoo's percentage widget expects a ratio.
-            # Example: 0.4768 is displayed as 47.68%.
+            rec.profit_total_costs = (
+                lead[lcp_fields['total_costs']] or 0.0
+            )
+            rec.profit_nilme_share = (
+                lead[lcp_fields['nilme_profit']] or 0.0
+            )
             rec.profit_margin_pct = (
-                (nilme_share / total_training_price)
-                if total_training_price
-                else 0.0
+                lead[lcp_fields['profit_margin']] or 0.0
             )
 
     _sql_constraints = [

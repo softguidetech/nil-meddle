@@ -5,10 +5,16 @@ from odoo import api, fields, models
 class SaleOrder(models.Model):
     _inherit = "sale.order"
 
-    # Legacy compatibility only. The SO approval workflow is disabled.
+    # Legacy compatibility only. Old database views still reference this
+    # field, but SO approval must always behave as disabled.
     so_order_approval_route = fields.Selection(
-        related='company_id.so_order_approval_route',
+        selection=[
+            ('no', 'No'),
+            ('optional', 'Optional'),
+            ('required', 'Required')
+        ],
         string="Use Approval Route",
+        compute="_compute_legacy_so_approval_route",
         readonly=True,
     )
 
@@ -57,6 +63,10 @@ class SaleOrder(models.Model):
         string="Lock Amount Total",
         compute="_compute_lock_amount_total",
     )
+
+    def _compute_legacy_so_approval_route(self):
+        for order in self:
+            order.so_order_approval_route = 'no'
 
     def _get_usd_pricelist(self):
         self.ensure_one()

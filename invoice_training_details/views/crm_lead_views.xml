@@ -12,6 +12,7 @@
             <xpath expr="//header" position="inside">
                 <button name="action_new_purchase_order" type="object" string="New PO" class="oe_highlight" groups="purchase.group_purchase_user" invisible="not has_cash_training"/>
                 <button name="action_new_instructor_purchase_order" type="object" string="New Instructor PO" class="btn-secondary" groups="purchase.group_purchase_user" invisible="not has_training"/>
+                <button name="action_new_training_so" type="object" string="New SO" class="oe_highlight"/>
             </xpath>
 
             <xpath expr="//div[@name='button_box']" position="inside">
@@ -96,6 +97,7 @@
 
                             <field name="origin_id"/>
 
+                            <field name="destination_id"/>
 
                             <field name="date"/>
 
@@ -463,6 +465,7 @@
                     <field name="training_course_ids" readonly="1" invisible="purchase_training_type == 'instructor'">
                         <tree>
                             <field name="training_id"/>
+                            <field name="descriptions"/>
                             <field name="instructor_id"/>
                             <field name="location"/>
                             <field name="where_location2"/>

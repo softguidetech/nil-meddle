@@ -43,29 +43,45 @@
 }
 
 /* =========================================================
-   REPEATED LCP: TRUE FULL WIDTH
+   REPEATED LCP: REAL FULL-WIDTH LAYOUT
    ========================================================= */
 
-/* The FormCompiler marks only the CRM form that contains the repeated LCP.
-   Remove Odoo's centered sheet max-width on that form only. */
+/* Do not rely only on the compiler helper class. Target the actual form
+   that contains the LCP widget as well, so Odoo's centered sheet max-width
+   cannot squeeze the cards into the left side of the screen. */
 .o_form_renderer.o_nil_lcp_full_width,
+.o_form_renderer:has(.o_lcp_per_training),
 .o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg,
-.o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg > .o_form_sheet {
+.o_form_renderer:has(.o_lcp_per_training) > .o_form_sheet_bg,
+.o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg > .o_form_sheet,
+.o_form_renderer:has(.o_lcp_per_training) > .o_form_sheet_bg > .o_form_sheet,
+.o_form_sheet_bg:has(.o_lcp_per_training),
+.o_form_sheet_bg:has(.o_lcp_per_training) > .o_form_sheet,
+.o_form_sheet:has(.o_lcp_per_training) {
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
 }
 
-.o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg > .o_form_sheet {
+.o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg > .o_form_sheet,
+.o_form_renderer:has(.o_lcp_per_training) > .o_form_sheet_bg > .o_form_sheet,
+.o_form_sheet_bg:has(.o_lcp_per_training) > .o_form_sheet {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
 
-.o_lcp_full_width_page,
-.o_lcp_full_width_page .o_field_widget,
-.o_lcp_per_training,
-.o_lcp_per_training.o_field_widget,
-.o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white {
+/* Every notebook / tab / field wrapper between the sheet and the custom
+   widget must also be allowed to grow. This is the layer that was still
+   keeping the visible LCP around 900px wide. */
+.o_form_renderer:has(.o_lcp_per_training) .o_notebook,
+.o_form_renderer:has(.o_lcp_per_training) .o_notebook_content,
+.o_form_renderer:has(.o_lcp_per_training) .tab-content,
+.o_form_renderer:has(.o_lcp_per_training) .tab-pane,
+.o_form_renderer:has(.o_lcp_per_training) .o_lcp_full_width_page,
+.o_form_renderer:has(.o_lcp_per_training) .o_lcp_full_width_page > .o_field_widget,
+.o_form_renderer:has(.o_lcp_per_training) .o_lcp_full_width_page .o_field_x2many,
+.o_form_renderer:has(.o_lcp_per_training) .o_lcp_per_training,
+.o_form_renderer:has(.o_lcp_per_training) .o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white {
     display: block !important;
     width: 100% !important;
     max-width: none !important;
@@ -86,6 +102,103 @@
     padding: 0 !important;
 }
 
+/* Header must span the same full width as the cards. */
+.o_lcp_per_training .card.bg-dark {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* =========================================================
+   FORCE THE CARDS TO USE THE ENTIRE ROW
+   ========================================================= */
+
+/* Input cards: four equal cards across the available width. */
+@media (min-width: 1200px) {
+    .o_lcp_per_training .row.g-3.mb-4 {
+        display: grid !important;
+        grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .o_lcp_per_training .row.g-3.mb-4 > .col-12 {
+        width: auto !important;
+        max-width: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* Online has no On-site Costs card, so the three remaining cards fill
+       the row instead of leaving an empty fourth column. */
+    .o_lcp_per_training .row.g-3.mb-4:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0) {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+
+    .o_lcp_per_training .row.g-3.mb-4
+        > .col-12:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0) {
+        display: none !important;
+    }
+
+    /* Summary: three equal cards across the full row. */
+    .o_lcp_per_training .row.g-3.mb-3 {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .o_lcp_per_training .row.g-3.mb-3 > .col-12 {
+        width: auto !important;
+        max-width: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    /* Online hides Logistics, so the two remaining summary cards share the
+       complete row equally. */
+    .o_lcp_per_training .row.g-3.mb-3:not(:has(> .col-12:nth-child(2))) {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1199.98px) {
+    .o_lcp_per_training .row.g-3.mb-4,
+    .o_lcp_per_training .row.g-3.mb-3 {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+
+    .o_lcp_per_training .row.g-3.mb-4 > .col-12,
+    .o_lcp_per_training .row.g-3.mb-3 > .col-12 {
+        width: auto !important;
+        max-width: none !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .o_lcp_per_training .row.g-3.mb-4,
+    .o_lcp_per_training .row.g-3.mb-3 {
+        display: grid !important;
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 1rem !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+    }
+}
+
 /* =========================================================
    REMOVE ONLY THE EXTRA NOTES
    Keep training name + Cash/CLC + Online/On-site badges.
@@ -96,21 +209,6 @@
 .o_lcp_per_training .alert.alert-success.h-100.d-flex.align-items-center.mb-0,
 .o_lcp_per_training .card.bg-dark .small.text-white-50 {
     display: none !important;
-}
-
-/* When Online hides the On-site card, let the remaining 3 input cards use
-   the whole row instead of leaving a blank quarter. */
-@media (min-width: 1200px) {
-    .o_lcp_per_training .row.g-3.mb-4:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0)
-        > .col-12:not(:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0)) {
-        flex: 0 0 auto !important;
-        width: 33.333333% !important;
-    }
-
-    .o_lcp_per_training .row.g-3.mb-4
-        > .col-12:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0) {
-        display: none !important;
-    }
 }
 
 /* =========================================================

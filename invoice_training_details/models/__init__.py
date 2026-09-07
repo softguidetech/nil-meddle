@@ -9,3 +9,4 @@ from . import res_company
 from . import cost_details
 from . import lcp_details
 from . import lcp_per_training
+from . import lcp_partner_rules

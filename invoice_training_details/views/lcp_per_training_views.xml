@@ -41,6 +41,9 @@
                             <field name="lcp_partner_cash_cost"/>
                             <field name="lcp_venue_cost"/>
                             <field name="lcp_catering_cost"/>
+                            <field name="lcp_koenig_discount_pct"/>
+                            <field name="lcp_koenig_discounted_seat_cost"/>
+                            <field name="lcp_koenig_nil_return"/>
 
                             <field name="lcp_is_online"/>
                             <field name="lcp_days"/>
@@ -70,7 +73,7 @@
                    position="before">
                 <field name="lcp_training_course_id"
                        string="Training"
-                       domain="[('lead_id', '=', parent.id)]"
+                       domain="[('lead_id', '=', parent.id), ('location', '=', 'On site')]"
                        options="{'no_create': True}"/>
             </xpath>
 
@@ -78,8 +81,20 @@
                    position="before">
                 <field name="lcp_training_course_id"
                        string="Training"
-                       domain="[('lead_id', '=', parent.id)]"
+                       domain="[('lead_id', '=', parent.id), ('location', '=', 'On site')]"
                        options="{'no_create': True}"/>
+            </xpath>
+
+            <xpath expr="//page[@id='logistics']//field[@name='ticket_ids']/tree/field[@name='currency_id']"
+                   position="attributes">
+                <attribute name="column_invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
+            </xpath>
+
+            <xpath expr="//page[@id='logistics']//field[@name='hotel_ids']/tree/field[@name='currency_id']"
+                   position="attributes">
+                <attribute name="column_invisible">1</attribute>
+                <attribute name="readonly">1</attribute>
             </xpath>
 
         </field>

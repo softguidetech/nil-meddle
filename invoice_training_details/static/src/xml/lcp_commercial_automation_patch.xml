@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+    <t t-name="invoice_training_details.LcpCommercialAutomationPatch"
+       t-inherit="invoice_training_details.LcpPerTrainingField"
+       t-inherit-mode="extension">
+        <xpath expr="//MonetaryField[@name=&quot;'lcp_partner_cash_cost'&quot;]/.." position="replace"/>
+        <xpath expr="//FloatField[@name=&quot;'lcp_vat_rate'&quot;]" position="attributes">
+            <attribute name="readonly">props.readonly || line.data.lcp_vat_locked</attribute>
+        </xpath>
+    </t>
+</templates>

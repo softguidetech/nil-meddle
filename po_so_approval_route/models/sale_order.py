@@ -41,6 +41,44 @@ class SaleOrder(models.Model):
 
     amount_total = fields.Monetary(tracking=True)
 
+    # Keep every new/draft quotation on a USD pricelist.
+    # Prefer a pricelist literally named USD, then fall back to any active
+    # pricelist whose currency is USD for the current company.
+    def _get_usd_pricelist(self):
+        self.ensure_one()
+        usd_currency = self.env.ref('base.USD')
+        company_id = self.company_id.id or self.env.company.id
+
+        base_domain = [
+            ('currency_id', '=', usd_currency.id),
+            ('active', '=', True),
+            ('company_id', 'in', [False, company_id]),
+        ]
+
+        pricelist = self.env['product.pricelist'].search(
+            [('name', '=ilike', 'USD')] + base_domain,
+            order='company_id desc, id asc',
+            limit=1,
+        )
+        if not pricelist:
+            pricelist = self.env['product.pricelist'].search(
+                base_domain,
+                order='company_id desc, id asc',
+                limit=1,
+            )
+        return pricelist
+
+    @api.depends('partner_id', 'company_id')
+    def _compute_pricelist_id(self):
+        # Let Odoo initialize the field normally first, then force USD.
+        super()._compute_pricelist_id()
+        for order in self:
+            if order.state != 'draft':
+                continue
+            usd_pricelist = order._get_usd_pricelist()
+            if usd_pricelist:
+                order.pricelist_id = usd_pricelist
+
     # def _can_be_confirmed(self):
     #     self.ensure_one()
     #     return self.state in {'draft', 'sent'}
@@ -94,31 +132,12 @@ class SaleOrder(models.Model):
                     #     return super(SaleOrder, order).action_confirm()
 
     def action_confirm(self):
+        """Confirm immediately without requiring a custom SO Team/approval route."""
+        result = super().action_confirm()
         for order in self:
-            # if order.state not in ['draft', 'sent']:
-            #     continue
-
-            if not order.team_custom_id:
-                # Do default behaviour if SO Team is not set
-                super(SaleOrder, order).action_confirm()
-                # super(SaleOrder, order).button_confirm()
-            else:
-                # Generate approval route and send SO to approve
-                # raise ValidationError('hhhhhh')
-                order.generate_approval_route()
-                if order.next_approver:
-                    # If approval route is generated and there is next approver mark the order "to approve"
-                    order.write({'state': 'to approve'})
-                    # And send request to approve
-                    order.send_to_approve()
-                else:
-                    # If there are not approvers, do default behaviour and move SO to the "sale Order" state
-                    super(SaleOrder, order).button_approve()
-
-            # order._add_supplier_to_product()
-            if order.partner_id not in order.message_partner_ids:
+            if order.partner_id and order.partner_id not in order.message_partner_ids:
                 order.message_subscribe([order.partner_id.id])
-        return True
+        return result
 
     def generate_approval_route(self):
         """

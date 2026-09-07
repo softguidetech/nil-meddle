@@ -8,7 +8,7 @@ from odoo import api, fields, models
 class TrainingCourse(models.Model):
     _inherit = 'training.course'
 
-    # Cash partner input is a per-seat amount.
+    # Cash + EnterOne: this is the partner's cost per seat.
     lcp_partner_cash_cost = fields.Monetary(
         string='Cost / Seat',
         currency_field='lcp_currency_id',
@@ -31,15 +31,9 @@ class TrainingCourse(models.Model):
     )
 
     def _koenig_cash_discount_pct(self):
+        """Koenig Cash: exactly two seats receive 25% discount per seat."""
         self.ensure_one()
-        seats = max(self.no_of_student or 0, 0)
-        if seats <= 0:
-            return 0.0
-        if seats <= 2:
-            return 25.0
-        if seats <= 5:
-            return 30.0
-        return 45.0
+        return 25.0 if max(self.no_of_student or 0, 0) == 2 else 0.0
 
     @api.depends(
         'payment_method',
@@ -107,8 +101,8 @@ class TrainingCourse(models.Model):
         'lead_id.hotel_ids.lcp_training_course_id',
     )
     def _compute_lcp_per_training(self):
-        # Keep every existing LCP calculation first, then replace only the
-        # Cash partner portion requested here.
+        # Keep all existing instructor/logistics/CLC calculations, then
+        # replace only the Cash partner invoice calculation.
         super()._compute_lcp_per_training()
 
         for line in self:
@@ -118,8 +112,9 @@ class TrainingCourse(models.Model):
             seats = max(line.no_of_student or 0, 0)
             revenue = line.price or 0.0
 
-            # Remove the old partner-share part calculated by the parent,
-            # preserving instructor/logistics/venue/catering costs exactly.
+            # Parent total = operational costs + old partner share.
+            # Remove only the old partner-share amount, preserving every
+            # instructor/logistics/venue/catering calculation exactly.
             operational_costs = (
                 (line.lcp_total_costs or 0.0)
                 - (line.lcp_partner_share or 0.0)
@@ -128,16 +123,16 @@ class TrainingCourse(models.Model):
             partner_share = line.lcp_partner_share or 0.0
 
             if line.lcp_cost_learning_partner == 'EnterOne':
-                # Cash + EnterOne: partner gives one Cost / Seat.
-                # Partner invoice/share = Cost / Seat x number of seats.
+                # EnterOne Cash invoice = Cost / Seat x number of seats.
                 partner_share = (
                     (line.lcp_partner_cash_cost or 0.0)
                     * seats
                 )
 
             elif line.lcp_cost_learning_partner == 'Koenig':
-                # Cash + Koenig discount tiers:
-                # 1-2 seats = 25%, 3-5 = 30%, 6+ = 45%.
+                # Koenig Cash:
+                # - exactly 2 seats: 25% discount on each seat
+                # - all other seat counts: no automatic discount
                 discount_pct = line._koenig_cash_discount_pct()
                 discounted_seat_cost = (
                     (line.lcp_clcs_per_seat or 0.0)
@@ -146,8 +141,8 @@ class TrainingCourse(models.Model):
                 discounted_total = discounted_seat_cost * seats
 
                 if line.lcp_instructor_source == 'nil_me':
-                    # 55% of the discounted seat cost returns to NIL ME.
-                    # Therefore Koenig's payable share is the remaining 45%.
+                    # 55% returns to NIL ME, therefore Koenig's payable
+                    # partner invoice/share is the remaining 45%.
                     partner_share = discounted_total * 0.45
                 else:
                     partner_share = discounted_total
@@ -172,27 +167,31 @@ class TicketTicket(models.Model):
         'res.currency',
         string='Currency',
         required=True,
+        readonly=True,
         default=lambda self: self.env.ref('base.USD'),
     )
 
+    def _single_onsite_training(self, lead):
+        onsite = lead.training_course_ids.filtered(
+            lambda course: course.location == 'On site'
+        )
+        return onsite if len(onsite) == 1 else self.env['training.course']
+
     def _apply_training_defaults(self, vals):
         vals = dict(vals)
-        usd = self.env.ref('base.USD')
-        vals['currency_id'] = usd.id
+        vals['currency_id'] = self.env.ref('base.USD').id
 
         training_id = vals.get('lcp_training_course_id')
         lead_id = vals.get('ticket_lead_id')
 
         if not training_id and lead_id:
             lead = self.env['crm.lead'].browse(lead_id)
-            onsite = lead.training_course_ids.filtered(
-                lambda course: course.location == 'On site'
-            )
-            if len(onsite) == 1:
-                training_id = onsite.id
+            single = self._single_onsite_training(lead)
+            if single:
+                training_id = single.id
                 vals['lcp_training_course_id'] = training_id
 
-        if training_id and 'date' not in vals:
+        if training_id:
             training = self.env['training.course'].browse(training_id)
             if training.training_date_start:
                 vals['date'] = (
@@ -221,6 +220,20 @@ class TicketTicket(models.Model):
                 )
         return super().write(vals)
 
+    @api.onchange('ticket_lead_id')
+    def _onchange_ticket_lead_training(self):
+        for ticket in self:
+            ticket.currency_id = self.env.ref('base.USD')
+            if not ticket.ticket_lead_id:
+                continue
+            single = ticket._single_onsite_training(ticket.ticket_lead_id)
+            if single:
+                ticket.lcp_training_course_id = single
+                if single.training_date_start:
+                    ticket.date = (
+                        single.training_date_start - timedelta(days=1)
+                    )
+
     @api.onchange('lcp_training_course_id')
     def _onchange_lcp_training_course_id_dates(self):
         for ticket in self:
@@ -239,29 +252,33 @@ class HotelHotel(models.Model):
         'res.currency',
         string='Currency',
         required=True,
+        readonly=True,
         default=lambda self: self.env.ref('base.USD'),
     )
 
+    def _single_onsite_training(self, lead):
+        onsite = lead.training_course_ids.filtered(
+            lambda course: course.location == 'On site'
+        )
+        return onsite if len(onsite) == 1 else self.env['training.course']
+
     def _apply_training_defaults(self, vals):
         vals = dict(vals)
-        usd = self.env.ref('base.USD')
-        vals['currency_id'] = usd.id
+        vals['currency_id'] = self.env.ref('base.USD').id
 
         training_id = vals.get('lcp_training_course_id')
         lead_id = vals.get('hotel_lead_id')
 
         if not training_id and lead_id:
             lead = self.env['crm.lead'].browse(lead_id)
-            onsite = lead.training_course_ids.filtered(
-                lambda course: course.location == 'On site'
-            )
-            if len(onsite) == 1:
-                training_id = onsite.id
+            single = self._single_onsite_training(lead)
+            if single:
+                training_id = single.id
                 vals['lcp_training_course_id'] = training_id
 
         if training_id:
             training = self.env['training.course'].browse(training_id)
-            if training.training_date_start and 'date_from' not in vals:
+            if training.training_date_start:
                 vals['date_from'] = (
                     training.training_date_start - timedelta(days=1)
                 )
@@ -291,6 +308,22 @@ class HotelHotel(models.Model):
             if training.training_date_end:
                 vals['date_to'] = training.training_date_end
         return super().write(vals)
+
+    @api.onchange('hotel_lead_id')
+    def _onchange_hotel_lead_training(self):
+        for hotel in self:
+            hotel.currency_id = self.env.ref('base.USD')
+            if not hotel.hotel_lead_id:
+                continue
+            single = hotel._single_onsite_training(hotel.hotel_lead_id)
+            if single:
+                hotel.lcp_training_course_id = single
+                if single.training_date_start:
+                    hotel.date_from = (
+                        single.training_date_start - timedelta(days=1)
+                    )
+                if single.training_date_end:
+                    hotel.date_to = single.training_date_end
 
     @api.onchange('lcp_training_course_id')
     def _onchange_lcp_training_course_id_dates(self):

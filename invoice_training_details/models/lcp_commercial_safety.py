@@ -191,6 +191,11 @@ class CrmLead(models.Model):
         if total <= 0:
             raise UserError(_('Marco Instructor Total is zero. Fill the rate first.'))
 
+        training_month_date = course.training_date_end or course.training_date_start
+        if not training_month_date:
+            raise UserError(_('Set the Training date before creating Marco Incentive Vendor Bill.'))
+        due_date = fields.Date.end_of(training_month_date, 'month')
+
         customer = self.training_name or self.ordering_partner_id
         training = course.training_id.display_name or course.name or self.name
         description = 'Training: %s | Dates: %s - %s | Customer: %s' % (
@@ -205,6 +210,7 @@ class CrmLead(models.Model):
             'partner_id': partner.id,
             'currency_id': (course.lcp_currency_id or self.env.ref('base.USD')).id,
             'invoice_date': fields.Date.context_today(self),
+            'invoice_date_due': due_date,
             'invoice_origin': self.name,
             'ref': training,
             'crm_lead_id': self.id,

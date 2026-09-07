@@ -4,8 +4,8 @@ import { patch } from "@web/core/utils/patch";
 import { FormCompiler } from "@web/views/form/form_compiler";
 
 /*
- * Force Odoo form chatter to stay below the form
- * at every screen width / zoom level.
+ * Keep chatter below the form and mark forms that contain the repeated
+ * LCP page so CSS can remove Odoo's centered-sheet max width only there.
  */
 patch(FormCompiler.prototype, {
     compile(node, params) {
@@ -18,6 +18,12 @@ patch(FormCompiler.prototype, {
 
         if (!formRenderer) {
             return result;
+        }
+
+        if (result.querySelector?.(".o_lcp_full_width_page")) {
+            formRenderer.classList.add(
+                "o_nil_lcp_full_width"
+            );
         }
 
         const chatters = result.querySelectorAll(
@@ -33,12 +39,6 @@ patch(FormCompiler.prototype, {
         );
 
         for (const chatter of chatters) {
-
-            /*
-             * Odoo normally adds "o-aside" on wide screens.
-             * Remove the dynamic class so zoom / breakpoints
-             * cannot move chatter back to the right.
-             */
             chatter.removeAttribute(
                 "t-attf-class"
             );
@@ -51,10 +51,6 @@ patch(FormCompiler.prototype, {
                 "o_nil_bottom_chatter"
             );
 
-            /*
-             * Tell the Chatter component explicitly
-             * that it is NOT an aside.
-             */
             const chatterComponent =
                 chatter.querySelector(
                     "t[t-component='__comp__.mailComponents.Chatter']"
@@ -66,10 +62,6 @@ patch(FormCompiler.prototype, {
                     "false"
                 );
 
-                /*
-                 * Normal external chatter should not
-                 * behave as if it lives inside the sheet.
-                 */
                 if (
                     !chatter.closest(
                         ".o_form_sheet_bg"

@@ -11,6 +11,15 @@ class TrainingCourse(models.Model):
         string='Auto Training Price', default=False, copy=False
     )
 
+    def _lcp_expected_cash_price(self):
+        self.ensure_one()
+        if self.payment_method != 'cash':
+            return 0.0
+        costs = self._lcp_cash_all_costs()
+        if costs <= 0:
+            return 0.0
+        return costs * 1.5 * (1.0 + (self.lcp_vat_rate or 0.0) / 100.0)
+
     def _lcp_autofill_cash_price_if_blank(self):
         for line in self:
             if line.payment_method != 'cash':
@@ -18,23 +27,96 @@ class TrainingCourse(models.Model):
             if line.price and not line.lcp_auto_price_generated:
                 continue
             line._lcp_apply_country_vat()
-            costs = line._lcp_cash_all_costs()
-            if costs <= 0:
+            expected = line._lcp_expected_cash_price()
+            if expected <= 0:
                 continue
-            line.price = costs * 1.5 * (1.0 + (line.lcp_vat_rate or 0.0) / 100.0)
+            line.price = expected
             line.lcp_auto_price_generated = True
 
     def write(self, vals):
-        manual_price = (
+        should_reprice = bool({
+            'payment_method', 'no_of_student', 'training_date_start',
+            'training_date_end', 'duration', 'location', 'lcp_clcs_per_seat',
+            'lcp_instructor_source', 'lcp_instructor_md_rate',
+            'lcp_vendor_instructor_day', 'lcp_uber_day_rate',
+            'lcp_per_diem_rate', 'lcp_per_diem_days',
+            'lcp_cost_learning_partner', 'lcp_venue_cost',
+            'lcp_catering_cost', 'lcp_vat_rate',
+        }.intersection(vals)) and 'price' not in vals
+        auto_before = {
+            line.id: (line.lcp_auto_price_generated or not line.price)
+            for line in self
+        } if should_reprice else {}
+        price_touched = (
             'price' in vals
-            and not self.env.context.get('skip_lcp_price_flag')
             and 'lcp_auto_price_generated' not in vals
+            and not self.env.context.get('skip_lcp_price_flag')
         )
+
         result = super().write(vals)
-        if manual_price:
-            self.with_context(skip_lcp_price_flag=True).write({
-                'lcp_auto_price_generated': False,
-            })
+
+        if price_touched:
+            for line in self:
+                expected = line._lcp_expected_cash_price()
+                is_auto = bool(
+                    expected > 0
+                    and abs((line.price or 0.0) - expected) <= 0.01
+                )
+                line.with_context(skip_lcp_price_flag=True).write({
+                    'lcp_auto_price_generated': is_auto,
+                })
+
+        if should_reprice and not self.env.context.get('skip_lcp_reprice'):
+            for line in self:
+                if auto_before.get(line.id):
+                    line.with_context(skip_lcp_reprice=True)._lcp_autofill_cash_price_if_blank()
+
+        return result
+
+
+class TicketTicket(models.Model):
+    _inherit = 'ticket.ticket'
+
+    def _lcp_refresh_training_prices(self):
+        for lead in self.mapped('ticket_lead_id').filtered(lambda r: r):
+            for course in lead.training_course_ids.filtered(lambda c: c.payment_method == 'cash'):
+                course._lcp_autofill_cash_price_if_blank()
+
+    @classmethod
+    def _lcp_ticket_price_fields(cls):
+        return {'price', 'lcp_training_course_id', 'ticket_lead_id'}
+
+    @models.api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        records._lcp_refresh_training_prices()
+        return records
+
+    def write(self, vals):
+        result = super().write(vals)
+        if self._lcp_ticket_price_fields().intersection(vals):
+            self._lcp_refresh_training_prices()
+        return result
+
+
+class HotelHotel(models.Model):
+    _inherit = 'hotel.hotel'
+
+    def _lcp_refresh_training_prices(self):
+        for lead in self.mapped('hotel_lead_id').filtered(lambda r: r):
+            for course in lead.training_course_ids.filtered(lambda c: c.payment_method == 'cash'):
+                course._lcp_autofill_cash_price_if_blank()
+
+    @models.api.model_create_multi
+    def create(self, vals_list):
+        records = super().create(vals_list)
+        records._lcp_refresh_training_prices()
+        return records
+
+    def write(self, vals):
+        result = super().write(vals)
+        if {'price_without_tax', 'tax', 'lcp_training_course_id', 'hotel_lead_id'}.intersection(vals):
+            self._lcp_refresh_training_prices()
         return result
 
 

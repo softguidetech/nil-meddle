@@ -13,3 +13,4 @@ from . import lcp_partner_rules
 from . import lcp_commercial_automation
 from . import lcp_commercial_safety
 from . import lcp_marco_journal_fix
+from . import lcp_commercial_finishing

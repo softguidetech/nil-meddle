@@ -1,219 +1,220 @@
-<?xml version='1.0' encoding='UTF-8'?>
+<?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <data>
 
-    <record id="sale_order_form_quote_training" model="ir.ui.view">
-        <field name="name">sale.order.form.inherit.training</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="sale.view_order_form"/>
-        <field name="arch" type="xml">
-            <page name="order_lines" position="after">
-                <page id="training" name="Training">
-                    <group>
-                        <field name="training_name"/>
-                         <field name="training_vendor"/>
-                        <field name="training_type"/>
-                        <field name="instructor_id"/> 
-                         <button name="synch_order" string="Synch Order" class="oe_highlight" type="object"/>
-                    </group>
-                    <field name="training_course_ids">
-                        <tree editable="bottom">
-                            
-                            <field name="training_id"/>
-                            <field name="descriptions"/>
-                            <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            <field name="instructor_id"/>
-                            <field name="location"/>
-                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
-                            <field name="where_location2"/>
-                            <field name="payment_method"/>
-                            
-                            <!--<field name="name"/>-->
-                            <field name="no_of_student"/>
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="training_date_end"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <group>
-                        <group>
-                            <field name="total_training_price"/>
-                        </group>
-                        <!--<group>-->
-                        <!--    <field name="half_advance_payment_before"/>-->
-                        <!--    <field name="half_payment_after"/>-->
-                        <!--</group>-->
-                        <group>
-                            <field name="bank_details"/>
-                            </group>
-                    </group>
-                    <field name="term_and_cond" widget="nil_terms_editor" nolabel="1" class="w-100 o_nil_terms_full_width"/>
-                        <group>
-                        <group string="Report PDF Element Display">
-                            
-                            <field name="display_training_table"/>
-                            <field name="display_signature"/>
-                            <field name="display_stamp"/>
-                          
-                        </group>
-                        <group string="Column Display">
-                           
-                            <field name="display_instructor"/>
-                            <field name="display_location"/>
-                            <field name="display_downpayment"/>
-                            <field name="display_total"/>
-                            <field name="display_due_amount"/>
-                            <field name="display_where"/>
-                            <field name="display_description"/>
-                            
-                            
-                        </group>
-                        
-                       
-                    </group>
-                </page>
-                
-                <page id="pro" name="Professional Services">
-                    <group>
-                        <field name="service_name"/>
-                        <button name="synch_pro_order" string="Synch Order" class="oe_highlight" type="object"/>
-                    </group>
-                     <field name="pro_service_ids">
-                        <tree editable="bottom">
-                            
-                            <field name="training_id"/>
-                            <field name="descriptions"/>
-                          
-                          <field name="cost_clc"/>
-                            <field name="hyperlink"/>
-                            
-                            <field name="wor_hour_number"/>
-                            <!--<field name="location"/>-->
-                            <!--<field name="where_location" invisible="location != 'Customer Choice'"/>-->
-                            <!--<field name="payment_method"/>-->
-                            
-                            <!--<field name="name"/>-->
-                            <!--<field name="no_of_student"/>-->
-                            <field name="duration"/>
-                            <field name="training_date_start"/>
-                            <field name="hourly_rate"/>
-                            <field name="price"/>
-                        </tree>
-                    </field>
-                    <group>
-                        <group>
-                            <field name="total_service_price"/>
-                        </group>
-                        <!--<group>-->
-                        <!--    <field name="half_advance_payment_before"/>-->
-                        <!--    <field name="half_payment_after"/>-->
-                        <!--</group>-->
-                    </group>
-                    <group>
-                        <group string="Report PDF Element Display">
-                            
-                            <field name="display_training_table"/>
-                            <field name="display_signature"/>
-                            <field name="display_stamp"/>
-                          
-                        </group>
-                        <group string="Column Display">
-                           
-                            <field name="display_instructor"/>
-                            <field name="display_location"/>
-                            <field name="display_downpayment"/>
-                            <field name="display_total"/>
-                            <field name="display_due_amount"/>
-                            <field name="display_where"/>
-                            <field name="display_description"/>
-                            
-                            
-                        </group>
-                        <group>
-                            <field name="bank_details"/>
-                            </group>
-                        
-                       
-                    </group>
-                <field name="term_and_cond" widget="nil_terms_editor" nolabel="1" class="w-100 o_nil_terms_full_width"/>
-                        </page>
+        <record id="sale_team_tree" model="ir.ui.view">
+            <field name="name">sale.team.custom.tree</field>
+            <field name="model">sale.team.custom</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="active" invisible="True"/>
+                    <field name="name"/>
+                    <field name="user_id"/>
+                    <field name="company_id" groups="base.group_multi_company"/>
+                </tree>
+            </field>
+        </record>
 
-                <page id="extra_information" string="Extra Information">
-                    <group>
+        <record id="sale_team_form" model="ir.ui.view">
+            <field name="name">sale.team.custom.form</field>
+            <field name="model">sale.team.custom</field>
+            <field name="arch" type="xml">
+                <form string="so Team" class="o_sale_team">
+                    <sheet>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name"/>
+                            </h1>
+                        </div>
                         <group>
-                            <field name="clcs_qty"/>
-                            <field name="so_no"/>
-                            <field name="tr_expiry_date"/>
-                        </group>
-                    </group>
-                </page>
-
-                <page id="logistics" string="Logistics">
-                    <group>
-                        <group>
-                            <field name="instructor_logistics"/>
-                        </group>
-                    
-                        <!--<group string="Flights">-->
-                            <!--<group>-->
-                            <field name="ticket_ids">
-                            <tree editable="bottom">
-                                <field name="airline_id"/>
-                                <field name="origin_id"/>
-                                <field name="destination_id"/>
-                                <field name="date"/>
-                                <field name="duration"/>
-                                <field name="time_from" widget="timesheet_uom"/>
-                                <field name="time_to" widget="timesheet_uom"/>
-                                <field name="stop"/>
-                                <field name="class_type_id"/>
-                                <field name="currency_id"/>
-                                <field name="price"/>
-                            
-                            </tree>
-                            </field>
-                            <!--</group>-->
-                        <!--</group>-->
-                        
-                        <!--<group string="Hotels">-->
-                            <!--<group>-->
-                            <field name="hotel_ids">
-                            <tree editable="bottom">
-                                <field name="hotel_id"/>
-                                <field name="date_from"/>
-                                <field name="date_to"/>
-                                <field name="nights"/>
-                                <field name="location"/>
-                                <field name="pax"/>
-                                <field name="des"/>
-                                <field name="room_type"/>
-                                <field name="currency_id"/>
-                                <field name="price_without_tax"/>
-                                <field name="tax"/>
-                                <field name="price"/>
-                               
-                            </tree>
-                            </field>
-                            
-                           
-                            <group string="Visa Details">
-                                <field name="visa"/>
-                                <field name="start_date"/>
-                                <field name="to_date"/>
-                                <field name="book_details_id" widget="many2many_binary"/>
-                                <field name="details"/>
-                                <field name="cost"/>
-                                
+                            <group>
+                                <field name="user_id" domain="[('share', '=', False)]" widget="many2one_avatar_user"/>
                             </group>
                             <group>
-                                <field name="total_price_all"/>
+                                <field name="company_id" groups="base.group_multi_company"
+                                       options="{'no_create': True}"/>
                             </group>
-                    </group>
-                </page>
+                        </group>
+                        <group>
+                            <group>
+                                <field name="lock_amount_total"/>
+                            </group>
+                            <group></group>
+                        </group>
+                        <notebook>
+                            <page name="approvers" string="Approvers">
+                                <field name="approver_ids" nolabel="1">
+                                    <tree editable="bottom">
+                                        <field name="sequence" widget="handle"/>
+                                        <field name="user_id"/>
+                                        <field name="role"/>
+                                        <field name="min_amount"/>
+                                        <field name="max_amount"/>
+                                        <field name="company_currency_id" invisible="True"/>
+                                        <field name="lock_amount_total"/>
+                                        <field name="custom_condition_code"/>
+                                    </tree>
+                                </field>
+                                <div class="clearfix"/>
+                                <group>
+                                    <group>
+                                        <p colspan="2">
+                                            Please ensure that each approver is at least sale module user!
+                                            It is mandatory to avoid access issues.
+                                        </p>
+                                        <p colspan="2">
+                                            <ul>
+                                                <li>
+                                                    If <b>Minimum Amount</b> is not set,
+                                                    approver should approve each order.
+                                                </li>
+                                                <li>
+                                                    If <b>Minimum Amount</b> is set and
+                                                    <b>Total Amount</b>
+                                                    is less than <b>Minimum Amount</b>,
+                                                    then approver will be skipped.
+                                                </li>
+                                                <li>
+                                                    If <b>Maximum Amount</b> is set and
+                                                    <b>Total Amount</b>
+                                                    is greater than <b>Maximum Amount</b>,
+                                                    then the approver will be skipped.
+                                                </li>
+                                            </ul>
+                                        </p>
+                                    </group>
+                                    <group>
+                                        <p colspan="2">You can enter python expression to define custom condition to
+                                            include/exclude approver to/from so approval
+                                            workflow.
+                                        </p>
+                                        <p colspan="2">Returned value have to be set in the variable 'result'.</p>
+                                        <p colspan="2">Keywords: Use the "<b>so</b>" to get "sale.order" object
+                                            properties,
+                                            and the "USER" keyword for current
+                                            user's "res.users" object.
+                                        </p>
+                                        <p colspan="2">
+                                            Examples:
+                                            <ul>
+                                                <li>
+                                                    If you want to include additional approver only for vendors from
+                                                    United
+                                                    States:
+                                                    <br/>
+                                                    <code>result = so.partner_id.country_id.code == 'US'</code>
+                                                    <br/>
+                                                    ("code" is the ISO country code in two chars)
+                                                </li>
+                                                <li>
+                                                    Additional approver only for particular vendor:
+                                                    <br/>
+                                                    <code>result = so.partner_id.name == 'Gemini Furniture'</code>
+                                                </li>
+                                                <li>
+                                                    Add additional approver only for particular period (using Order
+                                                    Date):
+                                                    <br/>
+                                                    <code>result = '2021-08-09' &lt;= str(so.date_order) &lt;=
+                                                        '2021-08-15'
+                                                    </code>
+                                                </li>
+                                                <li>
+                                                    Add additional approver only for orders from particular company
+                                                    employee:
+                                                    <br/>
+                                                    <code>result = USER.company_id.name == 'YourCompany'</code>
+                                                </li>
+                                                <li>
+                                                    Add additional approver only for orders from particular department
+                                                    member:
+                                                    <br/>
+                                                    <code>result = USER.department_id.name == 'IT Department'</code>
+                                                    <br/>
+                                                    (Applicable only if HR module used)
+                                                </li>
+                                            </ul>
+                                        </p>
+                                    </group>
+                                </group>
+                            </page>
+                        </notebook>
+                    </sheet>
+                </form>
+            </field>
+        </record>
 
-            </page>
-        </field>
-    </record>
+        <!--        <record id="view_sale_order_filter_approver" model="ir.ui.view">-->
+        <!--            <field name="inherit_id" ref="sale.sale_order_view_search_inherit_quotation"/>-->
+        <!--            <field name="name">view_sale_order_filter_approver</field>-->
+        <!--            <field name="model">sale.order</field>-->
+        <!--            <field name="arch" type="xml">-->
+        <!--                <filter name="state" position="before">-->
+        <!--                    <filter name="waiting_for_approval" string="Waiting for Approval"-->
+        <!--                            domain="[('current_approver', '!=', False)]"/>-->
+        <!--                    <filter name="waiting_for_my_approval" string="Waiting for My Approval"-->
+        <!--                            domain="[('current_approver', '!=', False), ('current_approver.user_id', '=', uid)]"/>-->
+        <!--                    <separator/>-->
+        <!--                </filter>-->
+        <!--            </field>-->
+        <!--        </record>-->
 
+        <record id="sale_team_act_window" model="ir.actions.act_window">
+            <field name="name">so Teams</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">sale.team.custom</field>
+            <field name="view_mode">tree,form</field>
+            <field name="context">{}</field>
+            <field name="view_id" eval="False"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No team found. Let's create one!
+                </p>
+            </field>
+        </record>
+
+        <menuitem name="SO Teams" id="sale_team_menu" action="sale_team_act_window"
+                  parent="sale.menu_sale_config" sequence="50"/>
+
+
+        <record id="sale_order_approval_form" model="ir.ui.view">
+            <field name="name">sale.order.approval.form</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="model">sale.order</field>
+            <field name="arch" type="xml">
+                <!-- Approval button disabled: quotations confirm/sync immediately. -->
+                <xpath expr="//field[@name='payment_term_id']" position="after">
+                    <!-- Keep technical fields available to the model, but remove
+                         the approval requirement and UI from the quotation. -->
+                    <field name="so_order_approval_route" invisible="1"/>
+                    <field name="is_current_approver" invisible="1"/>
+                    <field name="team_custom_id" invisible="1"/>
+                </xpath>
+
+                <!-- USD pricelist is system-controlled. -->
+                <xpath expr="(//field[@name='pricelist_id'])[1]" position="attributes">
+                    <attribute name="readonly">1</attribute>
+                </xpath>
+                <xpath expr="//field[@name='state']" position="replace">
+                    <field name="state" widget="statusbar"/>
+                </xpath>
+                <!-- Standard Odoo Cancel button behavior restored. -->
+                <xpath expr="//notebook" position="inside">
+                    <!--                    <page name="approval_route" string="Approval Route"-->
+                    <!--                          attrs="{'invisible':[('team_custom_id', '=', False)]}">-->
+                    <page name="approval_route" string="Approval Route" invisible="1">
+                        <field name="approver_ids">
+                            <tree>
+                                <field name="user_id"/>
+                                <field name="role"/>
+                                <field name="state"/>
+                            </tree>
+                        </field>
+                        <field name="is_current_approver" invisible="True"/>
+                    </page>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
 </odoo>

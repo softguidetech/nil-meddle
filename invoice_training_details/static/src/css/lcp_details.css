@@ -42,76 +42,124 @@
     font-weight: 700;
 }
 
-/* Per-training LCP only. Keep the original page width. */
-.o_lcp_per_training {
+/* LCP must use the full CRM form width, not Odoo's centered sheet width. */
+.o_form_renderer:has(.o_lcp_per_training) > .o_form_sheet_bg,
+.o_form_renderer:has(.o_lcp_per_training) > .o_form_sheet_bg > .o_form_sheet,
+.o_form_sheet_bg:has(.o_lcp_per_training),
+.o_form_sheet_bg:has(.o_lcp_per_training) > .o_form_sheet,
+.o_form_sheet:has(.o_lcp_per_training) {
     width: 100% !important;
     max-width: none !important;
+    min-width: 0 !important;
 }
 
+.o_form_sheet_bg:has(.o_lcp_per_training) > .o_form_sheet {
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+}
+
+.o_lcp_per_training,
+.o_lcp_per_training.o_field_widget,
 .o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white {
+    display: block !important;
     width: 100% !important;
     max-width: none !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+}
+
+/* Do not add a second frame around each repeated LCP. */
+.o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white {
     border: 0 !important;
     border-radius: 0 !important;
     box-shadow: none !important;
     padding: 0 !important;
 }
 
-/* Remove all helper messages that were added by the per-training widget. */
+/* Hide only helper content added by the repeated widget. */
 .o_lcp_per_training > .alert,
 .o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white > .alert.alert-warning,
-.o_lcp_per_training .alert.alert-success.h-100.d-flex.align-items-center.mb-0 {
-    display: none !important;
-}
-
-/* Remove the extra descriptive subtitle and payment/location pills.
-   The training name stays in the LCP title. */
+.o_lcp_per_training .alert.alert-success.h-100.d-flex.align-items-center.mb-0,
 .o_lcp_per_training .card.bg-dark .small.text-white-50,
 .o_lcp_per_training .card.bg-dark .d-flex.gap-2.flex-wrap {
     display: none !important;
 }
 
-/* Clean, consistent palette for the repeated LCP. */
-.o_lcp_per_training .card.bg-dark {
-    background: #243447 !important;
-    color: #ffffff !important;
+/* Keep the exact colorful LCP palette shown in the approved layout. */
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(1) .card {
+    border-color: #714b67 !important;
+}
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(1) .fa {
+    color: #714b67 !important;
 }
 
-.o_lcp_per_training .card.bg-dark .fs-4,
-.o_lcp_per_training .card.bg-dark .fa {
-    color: #ffffff !important;
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(2) .card {
+    border-color: #17a2b8 !important;
+}
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(2) .fa {
+    color: #17a2b8 !important;
 }
 
-.o_lcp_per_training .badge.bg-primary,
-.o_lcp_per_training .badge.bg-success,
-.o_lcp_per_training .card-header.bg-primary,
-.o_lcp_per_training .card-header.bg-info,
-.o_lcp_per_training .card-header.bg-success {
-    background: #355b7d !important;
-    color: #ffffff !important;
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(3) .card {
+    border-color: #28a745 !important;
+}
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(3) .fa {
+    color: #28a745 !important;
 }
 
-.o_lcp_per_training .border-primary,
-.o_lcp_per_training .border-info,
-.o_lcp_per_training .border-success,
-.o_lcp_per_training .border-warning {
-    border-color: #7890a6 !important;
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(4) .card {
+    border-color: #e99d00 !important;
+}
+.o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(4) .fa {
+    color: #e99d00 !important;
 }
 
-.o_lcp_per_training .text-primary,
-.o_lcp_per_training .text-info,
-.o_lcp_per_training .text-success,
-.o_lcp_per_training .text-warning {
-    color: #355b7d !important;
+.o_lcp_per_training .alert-info {
+    background-color: #d1ecf1 !important;
+    border-color: #bee5eb !important;
+    color: #0c5460 !important;
 }
 
-.o_lcp_per_training .alert-info,
-.o_lcp_per_training .table-primary {
-    background: #edf3f8 !important;
-    border-color: #d8e3ec !important;
-    color: #22384a !important;
+.o_lcp_per_training .row.g-3.mb-3 > .col-12:nth-child(1) .card {
+    border-color: #714b67 !important;
+}
+.o_lcp_per_training .row.g-3.mb-3 > .col-12:nth-child(1) .card-header {
+    background-color: #714b67 !important;
+    color: #fff !important;
+}
+
+.o_lcp_per_training .row.g-3.mb-3 > .col-12:nth-child(2) .card {
+    border-color: #17a2b8 !important;
+}
+.o_lcp_per_training .row.g-3.mb-3 > .col-12:nth-child(2) .card-header {
+    background-color: #17a2b8 !important;
+    color: #fff !important;
+}
+
+.o_lcp_per_training .row.g-3.mb-3 > .col-12:nth-child(3) .card {
+    border-color: #28a745 !important;
+}
+.o_lcp_per_training .row.g-3.mb-3 > .col-12:nth-child(3) .card-header {
+    background-color: #28a745 !important;
+    color: #fff !important;
 }
 
 .o_lcp_per_training .table-warning {
-    background: #f3f5f7 !important;
+    background-color: #fbebcc !important;
+}
+
+.o_lcp_per_training .alert-success:not(.h-100) {
+    background-color: #d4edda !important;
+    border-color: #c3e6cb !important;
+    color: #155724 !important;
+}
+
+.o_lcp_per_training .badge.bg-primary {
+    background-color: #28527a !important;
+    color: #fff !important;
+}
+
+.o_lcp_per_training .badge.bg-success {
+    background-color: #28a745 !important;
+    color: #fff !important;
 }

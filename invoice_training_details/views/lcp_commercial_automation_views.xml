@@ -8,6 +8,7 @@
             <xpath expr="//page[@name='lcp_details']//field[@name='training_course_ids']/tree/field[@name='lcp_vat_rate']" position="after">
                 <field name="lcp_vat_locked" column_invisible="1"/>
                 <field name="lcp_allowed_instructor_ids" column_invisible="1"/>
+                <field name="lcp_auto_price_generated" column_invisible="1"/>
             </xpath>
             <xpath expr="//page[@name='lcp_details']//field[@name='training_course_ids']/tree/field[@name='instructor_id']" position="attributes">
                 <attribute name="domain">[('id', 'in', lcp_allowed_instructor_ids)]</attribute>

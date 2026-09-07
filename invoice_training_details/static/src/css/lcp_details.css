@@ -42,22 +42,27 @@
     font-weight: 700;
 }
 
-/* LCP must use the full CRM form width, not Odoo's centered sheet width. */
-.o_form_renderer:has(.o_lcp_per_training) > .o_form_sheet_bg,
-.o_form_renderer:has(.o_lcp_per_training) > .o_form_sheet_bg > .o_form_sheet,
-.o_form_sheet_bg:has(.o_lcp_per_training),
-.o_form_sheet_bg:has(.o_lcp_per_training) > .o_form_sheet,
-.o_form_sheet:has(.o_lcp_per_training) {
+/* =========================================================
+   REPEATED LCP: TRUE FULL WIDTH
+   ========================================================= */
+
+/* The FormCompiler marks only the CRM form that contains the repeated LCP.
+   Remove Odoo's centered sheet max-width on that form only. */
+.o_form_renderer.o_nil_lcp_full_width,
+.o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg,
+.o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg > .o_form_sheet {
     width: 100% !important;
     max-width: none !important;
     min-width: 0 !important;
 }
 
-.o_form_sheet_bg:has(.o_lcp_per_training) > .o_form_sheet {
+.o_form_renderer.o_nil_lcp_full_width > .o_form_sheet_bg > .o_form_sheet {
     margin-left: 0 !important;
     margin-right: 0 !important;
 }
 
+.o_lcp_full_width_page,
+.o_lcp_full_width_page .o_field_widget,
 .o_lcp_per_training,
 .o_lcp_per_training.o_field_widget,
 .o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white {
@@ -68,7 +73,12 @@
     box-sizing: border-box !important;
 }
 
-/* Do not add a second frame around each repeated LCP. */
+.o_lcp_full_width_page {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+/* Do not add a second narrow frame around each repeated LCP. */
 .o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white {
     border: 0 !important;
     border-radius: 0 !important;
@@ -76,16 +86,37 @@
     padding: 0 !important;
 }
 
-/* Hide only helper content added by the repeated widget. */
+/* =========================================================
+   REMOVE ONLY THE EXTRA NOTES
+   Keep training name + Cash/CLC + Online/On-site badges.
+   ========================================================= */
+
 .o_lcp_per_training > .alert,
 .o_lcp_per_training > .border.rounded.shadow-sm.p-3.mb-4.bg-white > .alert.alert-warning,
 .o_lcp_per_training .alert.alert-success.h-100.d-flex.align-items-center.mb-0,
-.o_lcp_per_training .card.bg-dark .small.text-white-50,
-.o_lcp_per_training .card.bg-dark .d-flex.gap-2.flex-wrap {
+.o_lcp_per_training .card.bg-dark .small.text-white-50 {
     display: none !important;
 }
 
-/* Keep the exact colorful LCP palette shown in the approved layout. */
+/* When Online hides the On-site card, let the remaining 3 input cards use
+   the whole row instead of leaving a blank quarter. */
+@media (min-width: 1200px) {
+    .o_lcp_per_training .row.g-3.mb-4:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0)
+        > .col-12:not(:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0)) {
+        flex: 0 0 auto !important;
+        width: 33.333333% !important;
+    }
+
+    .o_lcp_per_training .row.g-3.mb-4
+        > .col-12:has(.alert.alert-success.h-100.d-flex.align-items-center.mb-0) {
+        display: none !important;
+    }
+}
+
+/* =========================================================
+   APPROVED LCP COLOR PALETTE
+   ========================================================= */
+
 .o_lcp_per_training .row.g-3.mb-4 > .col-12:nth-child(1) .card {
     border-color: #714b67 !important;
 }

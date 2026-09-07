@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import fields, models, _
+from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
 
@@ -82,11 +82,7 @@ class TicketTicket(models.Model):
             for course in lead.training_course_ids.filtered(lambda c: c.payment_method == 'cash'):
                 course._lcp_autofill_cash_price_if_blank()
 
-    @classmethod
-    def _lcp_ticket_price_fields(cls):
-        return {'price', 'lcp_training_course_id', 'ticket_lead_id'}
-
-    @models.api.model_create_multi
+    @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
         records._lcp_refresh_training_prices()
@@ -94,7 +90,7 @@ class TicketTicket(models.Model):
 
     def write(self, vals):
         result = super().write(vals)
-        if self._lcp_ticket_price_fields().intersection(vals):
+        if {'price', 'lcp_training_course_id', 'ticket_lead_id'}.intersection(vals):
             self._lcp_refresh_training_prices()
         return result
 
@@ -107,7 +103,7 @@ class HotelHotel(models.Model):
             for course in lead.training_course_ids.filtered(lambda c: c.payment_method == 'cash'):
                 course._lcp_autofill_cash_price_if_blank()
 
-    @models.api.model_create_multi
+    @api.model_create_multi
     def create(self, vals_list):
         records = super().create(vals_list)
         records._lcp_refresh_training_prices()

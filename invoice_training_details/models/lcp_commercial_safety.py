@@ -169,7 +169,7 @@ class CrmLead(models.Model):
         company = self.company_id or self.env.company
         account = self.env['account.account'].with_company(company).search([
             ('name', 'ilike', 'Incentive'),
-            ('company_ids', 'in', [company.id]),
+            ('company_id', '=', company.id),
         ], limit=1)
         if not account:
             raise UserError(_(

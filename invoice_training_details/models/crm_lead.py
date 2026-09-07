@@ -339,6 +339,64 @@ class Lead(models.Model):
         })
         return quotation_context
 
+    def action_new_training_so(self):
+        """
+        Open a new quotation from the Training Lead, but assign the SO
+        salesperson to the user who clicks the New SO button.
+
+        When this SO is later invoiced, SaleOrder._prepare_invoice below
+        restores the invoice salesperson from the original CRM Lead.
+        """
+        self.ensure_one()
+
+        action = self.env["ir.actions.actions"]._for_xml_id(
+            "sale_crm.sale_action_quotations_new"
+        )
+
+        quotation_context = self._prepare_opportunity_quotation_context()
+        quotation_context.update({
+            'default_user_id': self.env.user.id,
+            'default_is_training_so': True,
+            'search_default_opportunity_id': self.id,
+        })
+
+        action['context'] = quotation_context
+        return action
+
+
+class SaleOrder(models.Model):
+    _inherit = 'sale.order'
+
+    is_training_so = fields.Boolean(
+        string='Training SO',
+        default=False,
+        copy=False
+    )
+
+    def _prepare_invoice(self):
+        """
+        For SOs created from the special New SO button:
+        - SO Salesperson = user who created the SO.
+        - Customer Invoice Salesperson = salesperson on the original CRM Lead.
+
+        Normal quotations/SOs keep Odoo's standard behavior.
+        """
+        self.ensure_one()
+        invoice_vals = super()._prepare_invoice()
+
+        if (
+            self.is_training_so
+            and self.opportunity_id
+            and self.opportunity_id.user_id
+        ):
+            lead_salesperson_id = self.opportunity_id.user_id.id
+            invoice_vals.update({
+                'invoice_user_id': lead_salesperson_id,
+                'user_id': lead_salesperson_id,
+            })
+
+        return invoice_vals
+
 
 class PurchaseOrder(models.Model):
     _inherit = 'purchase.order'

@@ -10,13 +10,12 @@ class CrmLead(models.Model):
     def _lcp_marco_bill(self, course):
         """Create Marco's incentive as a balanced Journal Entry.
 
-        The payable side always carries a maturity date equal to the last day
-        of the training month. If the Incentive account itself is configured
-        as receivable/payable, it also receives the same maturity date so the
-        entry remains valid under Odoo's accounting constraints.
+        Debit: Incentive expense account.
+        Credit: the company's USD bank account.
         """
         self.ensure_one()
         company = self.company_id or self.env.company
+        usd = self.env.ref('base.USD')
 
         incentive_account = self.env['account.account'].with_company(company).search([
             ('name', 'ilike', 'Incentive'),
@@ -27,23 +26,48 @@ class CrmLead(models.Model):
                 'No Incentive account was found in %s.'
             ) % company.display_name)
 
+        bank_journals = self.env['account.journal'].with_company(company).search([
+            ('company_id', '=', company.id),
+            ('type', '=', 'bank'),
+            ('active', '=', True),
+            ('default_account_id', '!=', False),
+        ])
+        usd_bank_journals = bank_journals.filtered(
+            lambda journal: (
+                journal.currency_id == usd
+                or journal.default_account_id.currency_id == usd
+            )
+        )
+
+        if len(usd_bank_journals) > 1:
+            named_usd = usd_bank_journals.filtered(
+                lambda journal: (
+                    'usd' in (journal.name or '').lower()
+                    or 'usd' in (journal.code or '').lower()
+                    or '$' in (journal.name or '')
+                )
+            )
+            if len(named_usd) == 1:
+                usd_bank_journals = named_usd
+
+        if not usd_bank_journals:
+            raise UserError(_(
+                'No active USD bank journal with a default bank account was found in %s.'
+            ) % company.display_name)
+        if len(usd_bank_journals) > 1:
+            raise UserError(_(
+                'More than one USD bank journal was found in %s: %s. '
+                'The Marco entry was not created to avoid crediting the wrong bank.'
+            ) % (
+                company.display_name,
+                ', '.join(usd_bank_journals.mapped('display_name')),
+            ))
+
+        bank_journal = usd_bank_journals[0]
+        bank_account = bank_journal.default_account_id
+
         instructor = course.instructor_id
         partner = self._lcp_instructor_partner(instructor)
-        payable_account = partner.with_company(company).property_account_payable_id
-        if not payable_account:
-            raise UserError(_(
-                'No payable account is configured for Marco in %s.'
-            ) % company.display_name)
-
-        journal = self.env['account.journal'].with_company(company).search([
-            ('company_id', '=', company.id),
-            ('type', '=', 'general'),
-            ('active', '=', True),
-        ], limit=1)
-        if not journal:
-            raise UserError(_(
-                'No active Miscellaneous/General journal was found in %s.'
-            ) % company.display_name)
 
         rate = (
             course.lcp_instructor_md_rate
@@ -61,11 +85,9 @@ class CrmLead(models.Model):
         move_date = course.training_date_end or course.training_date_start
         if not move_date:
             raise UserError(_('Set the Training date before creating Marco Incentive Journal Entry.'))
-        due_date = fields.Date.end_of(move_date, 'month')
 
-        currency = course.lcp_currency_id or self.env.ref('base.USD')
         company_currency = company.currency_id
-        company_amount = currency._convert(
+        company_amount = usd._convert(
             total,
             company_currency,
             company,
@@ -90,30 +112,29 @@ class CrmLead(models.Model):
         }
         credit_line = {
             'name': description,
-            'account_id': payable_account.id,
+            'account_id': bank_account.id,
             'partner_id': partner.id,
             'debit': 0.0,
             'credit': company_amount,
-            'date_maturity': due_date,
         }
 
         if incentive_account.account_type in ('asset_receivable', 'liability_payable'):
-            debit_line['date_maturity'] = due_date
+            debit_line['date_maturity'] = fields.Date.end_of(move_date, 'month')
 
-        if currency != company_currency:
+        if usd != company_currency:
             debit_line.update({
-                'currency_id': currency.id,
+                'currency_id': usd.id,
                 'amount_currency': total,
             })
             credit_line.update({
-                'currency_id': currency.id,
+                'currency_id': usd.id,
                 'amount_currency': -total,
             })
 
         move = self.env['account.move'].with_company(company).create({
             'move_type': 'entry',
             'company_id': company.id,
-            'journal_id': journal.id,
+            'journal_id': bank_journal.id,
             'date': move_date,
             'ref': training,
             'crm_lead_id': self.id,

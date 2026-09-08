@@ -24,13 +24,8 @@ class TrainingCourse(models.Model):
 
     @api.onchange('payment_method')
     def _onchange_reset_lcp_inputs_on_payment_method(self):
-        """A Cash/CLC switch starts the LCP numeric inputs from zero."""
+        """Changing Cash/CLC always starts the manual LCP numeric inputs from zero."""
         for line in self:
-            origin = line._origin
-            if not origin or not origin.id:
-                continue
-            if line.payment_method == origin.payment_method:
-                continue
             for field_name in LCP_NUMERIC_INPUT_FIELDS:
                 line[field_name] = 0
 

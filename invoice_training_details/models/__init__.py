@@ -18,3 +18,4 @@ from . import lcp_koenig_cash_slabs
 from . import lcp_koenig_po_fix
 from . import lcp_instructor_domain_fix
 from . import lcp_terms_footer
+from . import lcp_payment_method_preserve

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Invoice Training Details",
-    "version": "17.0.1.36",
+    "version": "17.0.1.38",
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
@@ -28,7 +28,7 @@
         "views/lcp_students_details_views.xml",
         "views/lcp_partner_po_value_views.xml",
         "views/lcp_per_training_views.xml",
-        "views/lcp_input_snapshot_views.xml",
+        "views/lcp_payment_method_reset_views.xml",
         "views/lcp_commercial_automation_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",

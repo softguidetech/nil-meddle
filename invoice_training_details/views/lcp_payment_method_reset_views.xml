@@ -5,6 +5,10 @@
         <field name="model">crm.lead</field>
         <field name="inherit_id" ref="invoice_training_details.crm_reveal_lead_opportunity_form_training"/>
         <field name="arch" type="xml">
+            <xpath expr="//page[@id='training']//field[@name='training_course_ids']/tree/field[@name='payment_method']" position="attributes">
+                <attribute name="widget">lcp_payment_method_reset</attribute>
+            </xpath>
+
             <xpath expr="//page[@id='training']//field[@name='training_course_ids']/tree/field[@name='payment_method']" position="after">
                 <field name="lcp_vat_rate" column_invisible="1"/>
                 <field name="lcp_clcs_per_seat" column_invisible="1"/>

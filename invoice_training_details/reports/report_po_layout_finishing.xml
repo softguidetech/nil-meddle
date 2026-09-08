@@ -69,6 +69,10 @@
             </div>
         </xpath>
 
+        <xpath expr="//table[@name='training_line_table']//span[normalize-space()='# Of Students']" position="replace">
+            <span>Seats</span>
+        </xpath>
+
         <xpath expr="//table[@name='training_line_table']" position="before">
             <style>
                 .po-header-meta,
@@ -101,6 +105,8 @@
                 <div>
                     <strong>End Customer:</strong>
                     <span t-if="o.end_customer_id" t-field="o.end_customer_id.name"/>
+                    <span t-elif="o.crm_lead_id and o.crm_lead_id.training_name"
+                          t-field="o.crm_lead_id.training_name.name"/>
                 </div>
             </div>
         </xpath>

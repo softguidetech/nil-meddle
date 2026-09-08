@@ -51,7 +51,6 @@ class CrmLead(models.Model):
             'crm_lead_id': self.id,
             'is_training_order': True,
             'po_training_type': 'training_vendor',
-            'payment_method': 'cash',
             'training_course_ids': [(6, 0, cash_courses.ids)],
             'order_line': lines,
             'term_and_cond': self._lcp_koenig_po_terms(cash_courses),

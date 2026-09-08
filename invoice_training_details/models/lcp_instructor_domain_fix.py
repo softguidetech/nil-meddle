@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, models
+from odoo import api, models, _
+from odoo.exceptions import ValidationError
 
 
 class TrainingCourse(models.Model):
@@ -24,3 +25,15 @@ class TrainingCourse(models.Model):
                 and (line.instructor_id.job_id.name or '').strip().lower() != 'instructor'
             ):
                 line.instructor_id = False
+
+    @api.constrains('lcp_instructor_source', 'instructor_id')
+    def _check_nilme_instructor_job_position(self):
+        for line in self:
+            if (
+                line.lcp_instructor_source == 'nil_me'
+                and line.instructor_id
+                and (line.instructor_id.job_id.name or '').strip().lower() != 'instructor'
+            ):
+                raise ValidationError(_(
+                    'When Instructor From is NIL ME, the selected employee must have Job Position "Instructor".'
+                ))

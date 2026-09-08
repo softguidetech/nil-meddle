@@ -16,3 +16,4 @@ from . import lcp_marco_journal_fix
 from . import lcp_commercial_finishing
 from . import lcp_koenig_cash_slabs
 from . import lcp_koenig_po_fix
+from . import lcp_instructor_domain_fix

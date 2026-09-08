@@ -81,8 +81,6 @@
                 table[name="training_line_table"] *,
                 .po-invoice-total-box,
                 .po-invoice-total-box *,
-                .po-party-details,
-                .po-party-details *,
                 .po-terms-content,
                 .po-terms-content *,
                 .po-bank-details,
@@ -100,28 +98,9 @@
             </style>
         </xpath>
 
-        <xpath expr="//div[@t-field='o.term_and_cond']" position="before">
-            <div class="po-party-details" style="margin:8px 0 10px 0;">
-                <div>
-                    <strong>End Customer:</strong>
-                    <span t-if="o.end_customer_id" t-field="o.end_customer_id.name"/>
-                    <span t-elif="o.crm_lead_id and o.crm_lead_id.training_name"
-                          t-field="o.crm_lead_id.training_name.name"/>
-                </div>
-            </div>
-        </xpath>
-
         <xpath expr="//div[@t-field='o.term_and_cond']" position="attributes">
             <attribute name="class">po-terms-content</attribute>
             <attribute name="style">width:100%;font-family:Arial,Helvetica,sans-serif;font-size:18px;line-height:1.35;</attribute>
-        </xpath>
-
-        <xpath expr="//div[@t-field='o.term_and_cond']" position="after">
-            <div class="po-party-details" style="margin-top:12px;page-break-inside:avoid;">
-                <div style="font-weight:700;margin-bottom:5px;">Students' Details:</div>
-                <div t-if="o.crm_lead_id and o.crm_lead_id.students_details"
-                     t-field="o.crm_lead_id.students_details"/>
-            </div>
         </xpath>
 
         <xpath expr="//span[@t-field='o.bank_details']/ancestor::p[1]" position="attributes">

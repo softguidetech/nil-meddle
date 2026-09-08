@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Keep signature/stamp in the natural document flow so the reserved
+         170px block does not push them alone onto a new PDF page. -->
+    <template id="report_quotation_signature_compact"
+              inherit_id="invoice_training_details.report_quotation_document_training">
+        <xpath expr="//div[contains(@t-if, 'o.company_id.stamp') and contains(@t-if, 'o.display_stamp') and contains(@t-if, 'o.company_id.signature')]"
+               position="replace">
+            <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"
+                 style="width:100%;margin:4px 0 0 0;padding:0;text-align:right;line-height:1;page-break-before:avoid;">
+                <div style="display:inline-block;text-align:right;white-space:nowrap;margin:0;padding:0;vertical-align:bottom;">
+                    <img t-if="o.company_id.signature and o.display_signature"
+                         t-att-src="image_data_uri(o.company_id.signature)"
+                         style="max-height:85px;max-width:125px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0 6px 0 0;padding:0;"
+                         alt="Signature"/>
+                    <img t-if="o.company_id.stamp and o.display_stamp"
+                         t-att-src="image_data_uri(o.company_id.stamp)"
+                         style="max-height:95px;max-width:115px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0;padding:0;"
+                         alt="Stamp"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+
+    <template id="report_po_signature_compact"
+              inherit_id="invoice_training_details.report_po_document_training">
+        <xpath expr="//div[contains(@t-if, 'o.company_id.stamp') and contains(@t-if, 'o.display_stamp') and contains(@t-if, 'o.company_id.signature')]"
+               position="replace">
+            <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"
+                 style="width:100%;margin:4px 0 0 0;padding:0;text-align:right;line-height:1;page-break-before:avoid;">
+                <div style="display:inline-block;text-align:right;white-space:nowrap;margin:0;padding:0;vertical-align:bottom;">
+                    <img t-if="o.company_id.signature and o.display_signature"
+                         t-att-src="image_data_uri(o.company_id.signature)"
+                         style="max-height:85px;max-width:125px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0 6px 0 0;padding:0;"
+                         alt="Signature"/>
+                    <img t-if="o.company_id.stamp and o.display_stamp"
+                         t-att-src="image_data_uri(o.company_id.stamp)"
+                         style="max-height:95px;max-width:115px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0;padding:0;"
+                         alt="Stamp"/>
+                </div>
+            </div>
+        </xpath>
+    </template>
+</odoo>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id="crm_training_lcp_snapshot_field" model="ir.ui.view">
+        <field name="name">crm.training.lcp.snapshot.field</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="invoice_training_details.crm_reveal_lead_opportunity_form_training"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@id='training']//field[@name='training_course_ids']/tree/field[@name='payment_method']" position="after">
+                <field name="lcp_input_snapshot" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+
+    <record id="crm_lcp_per_training_snapshot_field" model="ir.ui.view">
+        <field name="name">crm.lcp.per.training.snapshot.field</field>
+        <field name="model">crm.lead</field>
+        <field name="inherit_id" ref="invoice_training_details.crm_lead_view_form_lcp_per_training"/>
+        <field name="arch" type="xml">
+            <xpath expr="//page[@name='lcp_details']//field[@name='training_course_ids']/tree/field[@name='lcp_currency_id']" position="before">
+                <field name="lcp_input_snapshot" column_invisible="1"/>
+            </xpath>
+        </field>
+    </record>
+</odoo>

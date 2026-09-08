@@ -25,7 +25,10 @@
                                 <field name="training_date_start"/>
                                 <field name="training_date_end"/>
                                 <field name="price"/>
-                                <field name="instructor_id"/>
+                                <field name="lcp_allowed_instructor_ids" column_invisible="1"/>
+                                <field name="instructor_id"
+                                       domain="[('id', 'in', lcp_allowed_instructor_ids)]"
+                                       options="{'no_create': True, 'no_create_edit': True}"/>
 
                                 <field name="lcp_currency_id"/>
                                 <field name="lcp_so_no"/>

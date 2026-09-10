@@ -126,7 +126,7 @@
                 /* TRAINING TABLE VALUES */
                 table[name="training_line_table"] tbody td,
                 table[name="training_line_table"] tbody td * {
-                    font-size: 12px !important;
+                    font-size: 14px !important;
                 }
 
 

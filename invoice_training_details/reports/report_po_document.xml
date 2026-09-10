@@ -99,15 +99,19 @@
 
                     <style>
                         table[name="training_line_table"] th {
-                            font-size:16px !important;
                             background-color: #D9F4FA !important;
                             color: #075E68 !important;
                             text-align: center !important;
                             vertical-align: middle !important;
                             border-color: #9DDDE7 !important;
+                            font-size:16px !important;
+                        }
+                        table[name="training_line_table"] th *,
+                        table[name="training_line_table"] td,
+                        table[name="training_line_table"] td * {
+                            font-size:16px !important;
                         }
                         table[name="training_line_table"] td {
-                            font-size:16px !important;
                             text-align: center !important;
                             vertical-align: middle !important;
                         }
@@ -180,9 +184,13 @@
                                     </td>
                                     <td t-if="not is_cisco_u_all_access" style="font-size:18px;"><span t-field="training.duration"/></td>
                                     <td t-if="not is_cisco_u_all_access" style="font-size:18px;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
-                                    <td t-if="not is_cisco_u_all_access" style="font-size:18px; white-space:nowrap;">
-                                        <span t-if="is_clc_order" t-esc="'{}{:,.0f}'.format(o.currency_id.symbol or '', training.price or 0)"/>
-                                        <span t-if="not is_clc_order" t-field="training.price"/>
+                                    <td t-if="not is_cisco_u_all_access" style="font-size:18px;">
+                                        <t t-if="is_clc_order">
+                                            <span t-esc="(o.currency_id.symbol or '') + '{:,.0f}'.format(training.price or 0.0)"/>
+                                        </t>
+                                        <t t-if="not is_clc_order">
+                                            <span t-field="training.price"/>
+                                        </t>
                                     </td>
                                     <t t-if="item == 1">
                                         <td t-if="o.display_total" t-att-rowspan="total_rows" style="font-size:18px;"><span t-field="o.total_training_price"/></td>

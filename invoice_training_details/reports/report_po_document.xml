@@ -167,20 +167,20 @@
                             <t t-set="total_rows" t-value="len(o.training_course_ids)"/>
                             <t t-foreach="o.training_course_ids" t-as="training">
                                 <tr>
-                                    <td style="font-size:16px;"><span t-esc="item"/></td>
-                                    <td style="font-size:16px;"><span t-field="training.training_id"/></td>
-                                    <td t-if="o.display_instructor" style="font-size:16px;"><span t-field="training.instructor_id.name"/></td>
-                                    <td style="font-size:16px;"><span t-field="training.no_of_student"/></td>
-                                    <td t-if="not is_cisco_u_all_access" style="font-size:16px;">
+                                    <td style="font-size:9px;"><span t-esc="item"/></td>
+                                    <td style="font-size:9px;"><span t-field="training.training_id"/></td>
+                                    <td t-if="o.display_instructor" style="font-size:9px;"><span t-field="training.instructor_id.name"/></td>
+                                    <td style="font-size:9px;"><span t-field="training.no_of_student"/></td>
+                                    <td t-if="not is_cisco_u_all_access" style="font-size:9px;">
                                         <span t-if="o.display_location" t-field="training.location"/>
                                         <span t-if="o.display_location and o.display_where">, </span>
                                         <span t-if="o.display_where" t-field="training.where_location2"/>
                                     </td>
-                                    <td t-if="not is_cisco_u_all_access" style="font-size:16px;"><span t-field="training.duration"/></td>
-                                    <td t-if="not is_cisco_u_all_access" style="font-size:16px;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
-                                    <td t-if="not is_cisco_u_all_access" style="font-size:16px;"><span t-field="training.price"/></td>
+                                    <td t-if="not is_cisco_u_all_access" style="font-size:9px;"><span t-field="training.duration"/></td>
+                                    <td t-if="not is_cisco_u_all_access" style="font-size:9px;"><span t-field="training.training_date_start"/> - <span t-field="training.training_date_end"/></td>
+                                    <td t-if="not is_cisco_u_all_access" style="font-size:9px;"><span t-field="training.price"/></td>
                                     <t t-if="item == 1">
-                                        <td t-if="o.display_total" t-att-rowspan="total_rows" style="font-size:16px;"><span t-field="o.total_training_price"/></td>
+                                        <td t-if="o.display_total" t-att-rowspan="total_rows" style="font-size:9px;"><span t-field="o.total_training_price"/></td>
                                     </t>
                                 </tr>
                                 <t t-set="item" t-value="item + 1"/>

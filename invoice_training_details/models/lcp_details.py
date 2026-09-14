@@ -486,40 +486,6 @@ class CrmLead(models.Model):
             lead.lcp_total_uber_estimate = total_uber
 
     # =========================================================
-    # TRAINING PRICE SYNC FROM LCP
-    # If Training Price is empty, fill it from Total Rate Card.
-    # Once Training Price has any value, never overwrite it.
-    # =========================================================
-
-    def _sync_training_price_from_lcp_if_empty(self):
-        for lead in self:
-            if (
-                lead.lcp_payment_method == 'clc'
-                and not lead.total_training_price
-                and lead.lcp_total_rate_card
-            ):
-                lead.with_context(
-                    skip_lcp_training_price_sync=True
-                ).write({
-                    'total_training_price': lead.lcp_total_rate_card,
-                })
-
-    @api.onchange(
-        'lcp_rate_card_per_seat',
-        'training_course_ids',
-        'training_course_ids.no_of_student',
-        'training_course_ids.payment_method',
-    )
-    def _onchange_lcp_training_price(self):
-        for lead in self:
-            if (
-                lead.lcp_payment_method == 'clc'
-                and not lead.total_training_price
-                and lead.lcp_total_rate_card
-            ):
-                lead.total_training_price = lead.lcp_total_rate_card
-
-    # =========================================================
     # UBER SYNC TO EXISTING LOGISTICS -> UBER
     # =========================================================
 
@@ -568,12 +534,6 @@ class CrmLead(models.Model):
     def create(self, vals_list):
         leads = super().create(vals_list)
         leads._sync_lcp_uber_to_logistics()
-
-        if not self.env.context.get(
-            'skip_lcp_training_price_sync'
-        ):
-            leads._sync_training_price_from_lcp_if_empty()
-
         return leads
 
     def write(self, vals):
@@ -586,18 +546,6 @@ class CrmLead(models.Model):
             and 'lcp_uber_day_rate' in vals
         ):
             self._sync_lcp_uber_to_logistics()
-
-        if (
-            not self.env.context.get(
-                'skip_lcp_training_price_sync'
-            )
-            and 'total_training_price' not in vals
-            and {
-                'lcp_rate_card_per_seat',
-                'training_course_ids',
-            }.intersection(vals)
-        ):
-            self._sync_training_price_from_lcp_if_empty()
 
         return result
 
@@ -897,9 +845,9 @@ class TrainingCourse(models.Model):
     def create(self, vals_list):
         lines = super().create(vals_list)
 
-        leads = lines.mapped('lead_id')
-        leads._sync_lcp_uber_to_logistics()
-        leads._sync_training_price_from_lcp_if_empty()
+        lines.mapped(
+            'lead_id'
+        )._sync_lcp_uber_to_logistics()
 
         return lines
 
@@ -910,9 +858,6 @@ class TrainingCourse(models.Model):
 
         result = super().write(vals)
 
-        leads_after = self.mapped('lead_id')
-        affected_leads = leads_before | leads_after
-
         if {
             'training_date_start',
             'training_date_end',
@@ -920,14 +865,10 @@ class TrainingCourse(models.Model):
             'location',
             'lead_id',
         }.intersection(vals):
-            affected_leads._sync_lcp_uber_to_logistics()
-
-        if {
-            'no_of_student',
-            'payment_method',
-            'lead_id',
-        }.intersection(vals):
-            affected_leads._sync_training_price_from_lcp_if_empty()
+            (
+                leads_before
+                | self.mapped('lead_id')
+            )._sync_lcp_uber_to_logistics()
 
         return result
 
@@ -937,6 +878,5 @@ class TrainingCourse(models.Model):
         result = super().unlink()
 
         leads._sync_lcp_uber_to_logistics()
-        leads._sync_training_price_from_lcp_if_empty()
 
         return result

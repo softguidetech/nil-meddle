@@ -728,20 +728,30 @@ class HotelHotel(models.Model):
     des = fields.Char(string="Description")
     room_type = fields.Char(string="Room Type")
     currency_id = fields.Many2one('res.currency',string="Currency",required=True)
-    price_without_tax = fields.Monetary(string="Price",required=True)
-    tax = fields.Monetary(string="Taxes",required=True)
-    price = fields.Monetary(string="Price with Tax",compute='_compute_total')
+    price_without_tax = fields.Monetary(string="Price",required=True,default=0.0)
+    tax = fields.Monetary(string="Taxes",required=True,default=0.0)
+    price = fields.Monetary(string="Price with Tax",compute='_compute_total',inverse='_inverse_total')
     
+    @api.constrains('hotel_lead_id')
+    def _check_hotel_row_limit(self):
+        for lead in self.mapped('hotel_lead_id'):
+            if self.search_count([('hotel_lead_id', '=', lead.id)], limit=3) > 2:
+                raise UserError(_('Only two hotel rows are allowed per opportunity.'))
+
+    @api.depends('price_without_tax', 'tax')
     def _compute_total(self):
         for rec in self:
             rec.price = rec.price_without_tax + rec.tax
-            
-    def _compute_nights(self):
-        duration = 0
+
+    def _inverse_total(self):
+        # Preserve existing tax amounts and the total consumed by LCP.
         for rec in self:
-            duration = rec.date_to - rec.date_from
-            days= str(duration).replace(', 0:00:00','Nights')
-            rec.nights = days
+            rec.price_without_tax = rec.price - rec.tax
+
+    @api.depends('date_from', 'date_to')
+    def _compute_nights(self):
+        for rec in self:
+            rec.nights = str(max((rec.date_to - rec.date_from).days, 0)) if rec.date_from and rec.date_to else '0'
 class TicketTicket(models.Model):
     _name = 'ticket.ticket'
     _description='Tickets'   
@@ -760,6 +770,12 @@ class TicketTicket(models.Model):
     currency_id = fields.Many2one('res.currency',string="Currency",required=True)
     price = fields.Monetary(string="Price with Taxes",required=True)
     
+    @api.constrains('ticket_lead_id')
+    def _check_ticket_row_limit(self):
+        for lead in self.mapped('ticket_lead_id'):
+            if self.search_count([('ticket_lead_id', '=', lead.id)], limit=3) > 2:
+                raise UserError(_('Only two flight rows are allowed per opportunity.'))
+
 class AirlineAirline(models.Model):
     _name = 'airline.airline'
     _description= 'Airlines'
@@ -799,3 +815,4 @@ class ProductProduct(models.Model):
     
     cost_clc = fields.Char(string="CLCs Cost")
     hyperlink = fields.Char(string="Hyper Link")
+

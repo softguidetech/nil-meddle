@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Invoice Training Details",
-    "version": "17.0.1.40",
+    "version": "17.0.1.41",
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
@@ -49,6 +49,7 @@
 
     "assets": {
         "web.assets_backend": [
+            "invoice_training_details/static/src/js/logistics_two_rows.js",
             "invoice_training_details/static/src/css/lcp_details.css",
             "invoice_training_details/static/src/css/lcp_width_force.css",
             "invoice_training_details/static/src/css/nil_terms_editor.css",
@@ -68,3 +69,4 @@
     "application": False,
     "auto_install": False,
 }
+

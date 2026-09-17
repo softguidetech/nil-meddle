@@ -89,9 +89,9 @@
                     </group>
 
 
-                    <field name="ticket_ids">
+                    <field name="ticket_ids" widget="logistics_two_rows">
 
-                        <tree editable="bottom">
+                        <tree editable="bottom" limit="2">
 
                             <field name="airline_id"/>
 
@@ -101,15 +101,7 @@
 
                             <field name="date"/>
 
-                            <field name="duration"/>
-
-                            <field name="time_from" widget="timesheet_uom"/>
-
-                            <field name="time_to" widget="timesheet_uom"/>
-
                             <field name="stop"/>
-
-                            <field name="class_type_id"/>
 
                             <field name="currency_id"/>
 
@@ -120,9 +112,9 @@
                     </field>
 
 
-                    <field name="hotel_ids">
+                    <field name="hotel_ids" widget="logistics_two_rows">
 
-                        <tree editable="bottom">
+                        <tree editable="bottom" limit="2">
 
                             <field name="hotel_id"/>
 
@@ -132,19 +124,7 @@
 
                             <field name="nights"/>
 
-                            <field name="location"/>
-
-                            <field name="pax"/>
-
-                            <field name="des"/>
-
-                            <field name="room_type"/>
-
                             <field name="currency_id"/>
-
-                            <field name="price_without_tax"/>
-
-                            <field name="tax"/>
 
                             <field name="price"/>
 
@@ -500,3 +480,4 @@
     </record>
 
 </odoo>
+

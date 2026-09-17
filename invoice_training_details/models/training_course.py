@@ -73,6 +73,11 @@ class TrainingCourse(models.Model):
         string="Hyper Link"
     )
 
+    @api.depends('training_id.display_name', 'name')
+    def _compute_display_name(self):
+        for rec in self:
+            rec.display_name = rec.training_id.display_name or rec.name or 'Training'
+
     @api.onchange('training_date_start', 'training_date_end')
     def _onchange_training_dates(self):
         for rec in self:
@@ -81,3 +86,4 @@ class TrainingCourse(models.Model):
                     rec.training_date_end - rec.training_date_start
                 ).days + 1
                 rec.duration = str(duration) + ' days'
+

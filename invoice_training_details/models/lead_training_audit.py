@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from odoo import api, fields, models, _
+from odoo import Command, api, fields, models, _
 from odoo.exceptions import AccessError
 
 
@@ -14,6 +14,37 @@ class TrainingCourseAudit(models.Model):
         index=True,
         ondelete='set null',
     )
+
+    @api.model
+    def _nil_setup_ruba_access(self):
+        """Grant audit visibility only to the exact Odoo user base.user_admin."""
+        group = self.env.ref(
+            'invoice_training_details.group_training_audit_ruba',
+            raise_if_not_found=False,
+        )
+        ruba_user = self.env.ref(
+            'base.user_admin',
+            raise_if_not_found=False,
+        )
+        if not group or not ruba_user:
+            return True
+
+        members = (
+            self.env['res.users']
+            .sudo()
+            .with_context(active_test=False)
+            .search([('groups_id', 'in', group.id)])
+        )
+        for user in members:
+            if user.id != ruba_user.id:
+                user.sudo().write({
+                    'groups_id': [Command.unlink(group.id)],
+                })
+
+        ruba_user.sudo().write({
+            'groups_id': [Command.link(group.id)],
+        })
+        return True
 
 
 class TrainingCourse(models.Model):
@@ -41,14 +72,14 @@ class CrmLead(models.Model):
         compute='_compute_training_audit_visible',
     )
 
+    @api.model
+    def _nil_is_ruba_user(self):
+        ruba_user = self.env.ref('base.user_admin', raise_if_not_found=False)
+        return bool(ruba_user and self.env.user.id == ruba_user.id)
+
     @api.depends_context('uid')
     def _compute_training_audit_visible(self):
-        user = self.env.user
-        normalized = ' '.join((user.name or '').split()).casefold()
-        allowed = (
-            normalized == 'ruba khattam'
-            or user.has_group('base.group_system')
-        )
+        allowed = self._nil_is_ruba_user()
         for lead in self:
             lead.training_audit_visible = allowed
 
@@ -78,11 +109,10 @@ class CrmLead(models.Model):
     def action_view_training_audit(self):
         self.ensure_one()
 
-        normalized = ' '.join((self.env.user.name or '').split()).casefold()
-        if normalized == 'ruba khattam':
-            self.env['training.course.audit'].sudo()._nil_setup_ruba_access()
-        elif not self.env.user.has_group('base.group_system'):
+        if not self._nil_is_ruba_user():
             raise AccessError(_('You are not allowed to view the Training Change Log.'))
+
+        self.env['training.course.audit'].sudo()._nil_setup_ruba_access()
 
         action = self.env['ir.actions.actions']._for_xml_id(
             'invoice_training_details.action_training_course_audit'

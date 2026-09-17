@@ -4,6 +4,32 @@ from odoo import api, fields, models, _
 from odoo.exceptions import AccessError
 
 
+class TrainingCourseAudit(models.Model):
+    _inherit = 'training.course.audit'
+
+    lead_id = fields.Many2one(
+        'crm.lead',
+        string='Lead',
+        readonly=True,
+        index=True,
+        ondelete='set null',
+    )
+
+
+class TrainingCourse(models.Model):
+    _inherit = 'training.course'
+
+    def _nil_create_audit(self, values):
+        for rec in self:
+            payload = dict(values)
+            root = rec.source_training_course_id or rec
+            lead = root.lead_id or rec.lead_id
+            if lead:
+                payload['lead_id'] = lead.id
+            super(TrainingCourse, rec)._nil_create_audit(payload)
+        return True
+
+
 class CrmLead(models.Model):
     _inherit = 'crm.lead'
 
@@ -29,14 +55,15 @@ class CrmLead(models.Model):
     def _nil_training_audit_domain(self):
         self.ensure_one()
         source_ids = self.training_course_ids.ids
-        domain = [
+        return [
+            '|',
+            ('lead_id', '=', self.id),
             '|',
             '&',
             ('document_model', '=', 'crm.lead'),
             ('document_name', '=', self.display_name),
             ('source_training_course_id', 'in', source_ids or [0]),
         ]
-        return domain
 
     def _compute_training_audit_count(self):
         Audit = self.env['training.course.audit'].sudo()
@@ -53,8 +80,6 @@ class CrmLead(models.Model):
 
         normalized = ' '.join((self.env.user.name or '').split()).casefold()
         if normalized == 'ruba khattam':
-            # Ensure Ruba receives the private read group even if the module
-            # upgrade did not run the setup hook on a previous deployment.
             self.env['training.course.audit'].sudo()._nil_setup_ruba_access()
         elif not self.env.user.has_group('base.group_system'):
             raise AccessError(_('You are not allowed to view the Training Change Log.'))
@@ -64,7 +89,5 @@ class CrmLead(models.Model):
         )
         action['name'] = _('Change Log - %s') % self.display_name
         action['domain'] = self._nil_training_audit_domain()
-        action['context'] = {
-            'search_default_group_by_document_model': 0,
-        }
+        action['context'] = {}
         return action

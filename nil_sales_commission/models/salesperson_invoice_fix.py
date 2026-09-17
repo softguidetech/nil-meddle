@@ -8,24 +8,21 @@ class SalesCommission(models.Model):
 
     @api.model
     def _nil_get_fixed_salesperson_rate(self, salesperson):
-        """Return the fixed automatic rate for the actual Odoo salesperson name."""
+        """
+        Every invoice salesperson gets an automatic commission row.
+
+        Eligibility is NOT name-based. The salesperson comes from the invoice.
+        Baraa keeps the previously agreed 2% exception; every other salesperson
+        gets the standard 5% rate.
+        """
         if not salesperson:
             return 0.0
 
         name = self._nil_normalize_name(salesperson.name)
-
-        # Loudy is stored in Odoo as "Loudy Al Abdo". Keep common spelling
-        # variants so an existing user-name variation does not silently drop
-        # the salesperson commission row.
-        if name.startswith('loudy ') or name.startswith('lody '):
-            return 5.0
-
-        # Baraa keeps the fixed 2% rate regardless of the surname spelling
-        # used on the Odoo user record.
         if name == 'baraa' or name.startswith('baraa '):
             return 2.0
 
-        return 0.0
+        return 5.0
 
 
 class AccountMove(models.Model):
@@ -35,11 +32,10 @@ class AccountMove(models.Model):
         """
         Commission owner priority:
         1. Invoice Salesperson
-        2. CRM Lead Salesperson
-        3. Sale Order Salesperson
+        2. CRM Lead Salesperson only as a fallback
+        3. Sale Order Salesperson only as a fallback
 
-        The posted invoice is the authoritative commission document, so its
-        Salesperson must not be overridden by a stale CRM Lead assignment.
+        No salesperson name controls whether an invoice receives commission.
         """
         self.ensure_one()
 

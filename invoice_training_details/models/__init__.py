@@ -22,5 +22,7 @@ from . import lcp_payment_method_preserve
 from . import lcp_snapshot_compat
 from . import training_snapshot
 from . import training_snapshot_financials
+from . import training_change_reason
+from . import invoice_posted_training_lock
 from . import lcp_enterone_vendor_fix
 from . import so_logistics_fix

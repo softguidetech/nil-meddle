@@ -7,11 +7,13 @@
             <tree create="false" edit="false" delete="false">
                 <field name="changed_at"/>
                 <field name="changed_by_id"/>
+                <field name="document_model"/>
                 <field name="document_name"/>
                 <field name="operation"/>
                 <field name="field_label"/>
                 <field name="old_value"/>
                 <field name="new_value"/>
+                <field name="change_reason"/>
             </tree>
         </field>
     </record>
@@ -27,6 +29,7 @@
                             <field name="changed_at"/>
                             <field name="changed_by_id"/>
                             <field name="operation"/>
+                            <field name="document_model"/>
                             <field name="document_name"/>
                         </group>
                         <group>
@@ -39,6 +42,7 @@
                     <group>
                         <field name="old_value"/>
                         <field name="new_value"/>
+                        <field name="change_reason"/>
                     </group>
                 </sheet>
             </form>

@@ -9,10 +9,11 @@ class SalesCommission(models.Model):
     @api.depends(
         'invoice_id',
         'invoice_id.training_course_ids',
-        'invoice_id.training_course_ids.lcp_cost_learning_partner',
-        'invoice_id.training_course_ids.lcp_total_costs',
-        'invoice_id.training_course_ids.lcp_nilme_profit',
-        'invoice_id.training_course_ids.price',
+        'invoice_id.training_course_ids.source_training_course_id',
+        'invoice_id.training_course_ids.snapshot_lcp_learning_partner',
+        'invoice_id.training_course_ids.snapshot_lcp_revenue',
+        'invoice_id.training_course_ids.snapshot_lcp_total_costs',
+        'invoice_id.training_course_ids.snapshot_lcp_profit',
         'lead_id',
         'lead_id.training_course_ids',
         'lead_id.training_course_ids.lcp_cost_learning_partner',
@@ -22,11 +23,8 @@ class SalesCommission(models.Model):
     )
     def _compute_profit_margin_summary(self):
         """
-        Prefer the invoice's independent training snapshot.
-
-        Older invoices without snapshots fall back to the CRM training rows.
-        Posted invoice snapshots are locked, so historical profitability no
-        longer changes when somebody edits the CRM training later.
+        Use frozen invoice LCP values when an independent snapshot exists.
+        Old invoices without snapshots still fall back to the live CRM LCP.
         """
         for rec in self:
             invoice_courses = (
@@ -34,18 +32,38 @@ class SalesCommission(models.Model):
                 if rec.invoice_id
                 else self.env['training.course']
             )
-            courses = (
-                invoice_courses
-                or rec.lead_id.sudo().training_course_ids
+
+            snapshot_courses = invoice_courses.filtered(
+                'source_training_course_id'
             )
 
-            partners = sorted(
-                set(courses.mapped('lcp_cost_learning_partner'))
-                - {False, ''}
-            )
-            revenue = sum(courses.mapped('price'))
-            costs = sum(courses.mapped('lcp_total_costs'))
-            profit = sum(courses.mapped('lcp_nilme_profit'))
+            if snapshot_courses:
+                partners = sorted(
+                    set(snapshot_courses.mapped(
+                        'snapshot_lcp_learning_partner'
+                    )) - {False, ''}
+                )
+                revenue = sum(snapshot_courses.mapped(
+                    'snapshot_lcp_revenue'
+                ))
+                costs = sum(snapshot_courses.mapped(
+                    'snapshot_lcp_total_costs'
+                ))
+                profit = sum(snapshot_courses.mapped(
+                    'snapshot_lcp_profit'
+                ))
+            else:
+                courses = (
+                    invoice_courses
+                    or rec.lead_id.sudo().training_course_ids
+                )
+                partners = sorted(
+                    set(courses.mapped('lcp_cost_learning_partner'))
+                    - {False, ''}
+                )
+                revenue = sum(courses.mapped('price'))
+                costs = sum(courses.mapped('lcp_total_costs'))
+                profit = sum(courses.mapped('lcp_nilme_profit'))
 
             rec.profit_learning_partner = ', '.join(partners)
             rec.profit_total_costs = costs

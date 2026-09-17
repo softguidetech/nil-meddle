@@ -20,3 +20,4 @@ from . import lcp_instructor_domain_fix
 from . import lcp_terms_footer
 from . import lcp_payment_method_preserve
 from . import lcp_snapshot_compat
+from . import training_snapshot

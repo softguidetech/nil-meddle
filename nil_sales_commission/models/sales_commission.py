@@ -298,35 +298,23 @@ class SalesCommission(models.Model):
 
     @api.depends(
         'lead_id',
-        'lead_id.lcp_cost_learning_partner',
-        'lead_id.lcp_total_costs',
-        'lead_id.lcp_nilme_profit',
-        'lead_id.lcp_profit_margin',
+        'lead_id.training_course_ids',
+        'lead_id.training_course_ids.lcp_cost_learning_partner',
+        'lead_id.training_course_ids.lcp_total_costs',
+        'lead_id.training_course_ids.lcp_nilme_profit',
+        'lead_id.training_course_ids.price',
     )
     def _compute_profit_margin_summary(self):
         for rec in self:
-            lead = rec.lead_id.sudo()
-
-            if not lead:
-                rec.profit_learning_partner = ''
-                rec.profit_total_costs = 0.0
-                rec.profit_nilme_share = 0.0
-                rec.profit_margin_pct = 0.0
-                continue
-
-            # Read the displayed LCP Profit Margin block directly.
-            rec.profit_learning_partner = (
-                lead.lcp_cost_learning_partner or ''
-            )
-            rec.profit_total_costs = (
-                lead.lcp_total_costs or 0.0
-            )
-            rec.profit_nilme_share = (
-                lead.lcp_nilme_profit or 0.0
-            )
-            rec.profit_margin_pct = (
-                lead.lcp_profit_margin or 0.0
-            )
+            courses = rec.lead_id.sudo().training_course_ids
+            partners = sorted(set(courses.mapped('lcp_cost_learning_partner')) - {False, ''})
+            revenue = sum(courses.mapped('price'))
+            costs = sum(courses.mapped('lcp_total_costs'))
+            profit = sum(courses.mapped('lcp_nilme_profit'))
+            rec.profit_learning_partner = ', '.join(partners)
+            rec.profit_total_costs = costs
+            rec.profit_nilme_share = profit
+            rec.profit_margin_pct = profit / revenue if revenue else 0.0
 
     _sql_constraints = [
         (
@@ -1274,3 +1262,4 @@ class SalesCommission(models.Model):
             'target':
                 'current',
         }
+

@@ -2,7 +2,9 @@
 
 import re
 
-from odoo import api, models, fields
+from odoo import api, models, fields, _
+from odoo.exceptions import UserError
+from .sync_utils import sync_commands
 
 
 class SaleOrder(models.Model):
@@ -253,42 +255,49 @@ class SaleOrder(models.Model):
         for rec in self:
             rec.total_training_price = sum(rec.training_course_ids.mapped('price'))
             
+    def _check_nil_sync_draft(self):
+        self.ensure_one()
+        if self.state not in ('draft', 'sent'):
+            raise UserError(_('Synchronize only a draft quotation.'))
+
     def synch_order(self):
-        l = []
-       
-        for rec in self.training_course_ids:
-            val = {
+        self._check_nil_sync_draft()
+        items = []
+        for course in self.training_course_ids:
+            if not course.training_id:
+                raise UserError(_('Select a product for every training before synchronizing.'))
+            if course.lead_id and course.lcp_cost_learning_partner:
+                # Reuse the same pricing/tax rules as New SO, including EnterOne CLC.
+                vals = course.lead_id._lcp_sale_lines(course, self.company_id)[0][2]
+            else:
+                vals = {
+                    'product_id': course.training_id.id,
+                    'name': course.training_id.display_name,
+                    'product_uom_qty': 1,
+                    'price_unit': course.price,
+                }
+            items.append((course, vals))
+        self.write({'order_line': sync_commands(self.order_line, items, 'nil_sync_training_id')})
+        return True
 
-                'product_id': rec.training_id.id,
-                # 'product_id': rec.training_id.id,
-                'name': rec.training_id.name,
-                'product_uom_qty': 1,
-                'price_unit': rec.price,
-                # 'order_id': self.id,
-                
-            }
-            l.append((0, 0, val))
-            
-        
-        self.write({'order_line': []})
-        self.write({'order_line': l})
-            
     def synch_pro_order(self):
-        l = []
-       
-        for rec in self.pro_service_ids:
-            val = {
-
-                'product_id': rec.training_id.id,
-                # 'product_id': rec.training_id.id,
-                'name': rec.training_id.name,
+        self._check_nil_sync_draft()
+        items = []
+        for service in self.pro_service_ids:
+            if not service.training_id:
+                raise UserError(_('Select a product for every service before synchronizing.'))
+            items.append((service, {
+                'product_id': service.training_id.id,
+                'name': service.training_id.display_name,
                 'product_uom_qty': 1,
-                'price_unit': rec.price,
-                # 'order_id': self.id,
-                
-            }
-            l.append((0, 0, val))
-            
-        
-        self.write({'order_line': []})
-        self.write({'order_line': l})
+                'price_unit': service.price,
+            }))
+        self.write({'order_line': sync_commands(self.order_line, items, 'nil_sync_service_id')})
+        return True
+
+
+class SaleOrderLine(models.Model):
+    _inherit = 'sale.order.line'
+
+    nil_sync_training_id = fields.Many2one('training.course', copy=False, ondelete='set null', index=True)
+    nil_sync_service_id = fields.Many2one('pro.service', copy=False, ondelete='set null', index=True)

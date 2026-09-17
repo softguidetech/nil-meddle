@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Invoice Training Details",
-    "version": "17.0.1.41",
+    "version": "17.0.1.43",
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
@@ -21,7 +21,9 @@
 
     "data": [
         "data/report_paperformat.xml",
+        "security/training_audit_security.xml",
         "security/ir.model.access.csv",
+        "data/training_audit_setup.xml",
         "views/account_move_views.xml",
         "views/lcp_details_views.xml",
         "views/crm_lead_views.xml",
@@ -32,6 +34,7 @@
         "views/lcp_commercial_automation_views.xml",
         "views/sale_order_views.xml",
         "views/res_company_views.xml",
+        "views/training_audit_views.xml",
         "views/purchase_training_report.xml",
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",
@@ -69,4 +72,3 @@
     "application": False,
     "auto_install": False,
 }
-

@@ -9,7 +9,7 @@
                 <attribute name="default_order">sequence</attribute>
             </xpath>
             <xpath expr="//kanban/field[@name='stage_id']" position="after">
-                <field name="sequence" invisible="1"/>
+                <field name="sequence" widget="handle" invisible="1"/>
             </xpath>
         </field>
     </record>

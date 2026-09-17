@@ -5,7 +5,9 @@ import base64
 import qrcode
 from io import BytesIO
 
-from odoo import models, fields, api
+from odoo import models, fields, api, _
+from odoo.exceptions import UserError
+from .sync_utils import sync_commands
 
 
 class AccountMove(models.Model):
@@ -274,11 +276,25 @@ class AccountMove(models.Model):
                 rec.total_training_price = 0
 
     def synch_order(self):
-        lines = []
-        for rec in self.training_course_ids:
-            lines.append((0, 0, {
-                'product_id': rec.training_id.id,
+        self.ensure_one()
+        if self.state != 'draft':
+            raise UserError(_('Synchronize only a draft invoice.'))
+        if any(line.sale_line_ids or line.purchase_line_id for line in self.invoice_line_ids):
+            raise UserError(_('This invoice is linked to a sale or purchase order. Update it through its source order to preserve invoiced quantities and prices.'))
+        items = []
+        for course in self.training_course_ids:
+            if not course.training_id:
+                raise UserError(_('Select a product for every training before synchronizing.'))
+            items.append((course, {
+                'product_id': course.training_id.id,
                 'quantity': 1,
-                'price_unit': rec.price,
+                'price_unit': course.price,
             }))
-        self.write({'invoice_line_ids': lines})
+        self.write({'invoice_line_ids': sync_commands(self.invoice_line_ids, items, 'nil_sync_training_id')})
+        return True
+
+
+class AccountMoveLine(models.Model):
+    _inherit = 'account.move.line'
+
+    nil_sync_training_id = fields.Many2one('training.course', copy=False, ondelete='set null', index=True)

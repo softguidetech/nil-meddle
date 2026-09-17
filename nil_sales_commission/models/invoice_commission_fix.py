@@ -174,7 +174,7 @@ class AccountMove(models.Model):
                 continue
 
             lead = invoice._nil_get_commission_lead()
-            salesperson = invoice._nil_get_commission_salesperson()
+            salesperson = invoice._nil_get_deal_salesperson()
             basis = invoice._nil_commission_basis()
 
             date_allowed = bool(

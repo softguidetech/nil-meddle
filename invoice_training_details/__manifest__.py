@@ -27,6 +27,7 @@
         "views/account_move_views.xml",
         "views/lcp_details_views.xml",
         "views/crm_lead_views.xml",
+        "views/crm_manual_order_views.xml",
         "views/lead_training_audit_views.xml",
         "views/lcp_students_details_views.xml",
         "views/lcp_partner_po_value_views.xml",

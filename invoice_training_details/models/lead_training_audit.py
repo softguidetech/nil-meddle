@@ -2,6 +2,21 @@
 
 from odoo import Command, api, fields, models, _
 from odoo.exceptions import AccessError
+from odoo.tools import html2plaintext
+
+
+AUDIT_SKIP_LEAD_FIELDS = {
+    'write_date',
+    'write_uid',
+    'create_date',
+    'create_uid',
+    'message_ids',
+    'message_follower_ids',
+    'message_partner_ids',
+    'activity_ids',
+    'training_audit_count',
+    'training_audit_visible',
+}
 
 
 class TrainingCourseAudit(models.Model):
@@ -17,7 +32,7 @@ class TrainingCourseAudit(models.Model):
 
     @api.model
     def _nil_setup_ruba_access(self):
-        """Grant audit visibility only to the exact Odoo user base.user_admin."""
+        """Grant Change Log visibility only to the exact Ruba user."""
         group = self.env.ref(
             'invoice_training_details.group_training_audit_ruba',
             raise_if_not_found=False,
@@ -51,6 +66,7 @@ class TrainingCourse(models.Model):
     _inherit = 'training.course'
 
     def _nil_create_audit(self, values):
+        """Attach every Training/LCP line audit entry to its CRM Lead."""
         for rec in self:
             payload = dict(values)
             root = rec.source_training_course_id or rec
@@ -83,6 +99,113 @@ class CrmLead(models.Model):
         for lead in self:
             lead.training_audit_visible = allowed
 
+    def _nil_lead_audit_value(self, field_name):
+        """Human-readable value for any field written on the Lead."""
+        self.ensure_one()
+        field = self._fields[field_name]
+        value = self[field_name]
+
+        if field.type == 'many2one':
+            return value.display_name if value else ''
+
+        if field.type in ('many2many', 'one2many'):
+            names = value.mapped('display_name') if value else []
+            return ', '.join(names)
+
+        if field.type == 'selection':
+            try:
+                labels = dict(field._description_selection(self.env))
+                return str(labels.get(value, value) or '')
+            except Exception:
+                return str(value or '')
+
+        if field.type == 'html':
+            text = html2plaintext(value or '')
+            return ' '.join(text.split())
+
+        if field.type == 'binary':
+            return '[File attached]' if value else ''
+
+        if field.type == 'boolean':
+            return 'Yes' if value else 'No'
+
+        if value in (False, None):
+            return ''
+
+        return str(value)
+
+    def _nil_lead_audit_field_names(self, vals):
+        names = []
+        for name in vals:
+            field = self._fields.get(name)
+            if not field or name in AUDIT_SKIP_LEAD_FIELDS:
+                continue
+            # Skip pure computed output fields. Manual/inverse fields still pass.
+            if field.compute and not field.inverse:
+                continue
+            names.append(name)
+        return names
+
+    def _nil_create_lead_field_audit(
+        self,
+        field_name,
+        old_value,
+        new_value,
+    ):
+        self.ensure_one()
+        if old_value == new_value:
+            return True
+
+        field = self._fields[field_name]
+        self.env['training.course.audit'].sudo().create({
+            'lead_id': self.id,
+            'document_model': 'crm.lead',
+            'document_name': self.display_name,
+            'operation': 'update',
+            'field_name': field_name,
+            'field_label': field.string or field_name,
+            'old_value': old_value,
+            'new_value': new_value,
+            'changed_by_id': self.env.user.id,
+            'changed_at': fields.Datetime.now(),
+        })
+        return True
+
+    def write(self, vals):
+        """
+        Audit every real field edit written on the CRM Lead.
+
+        This deliberately includes standard CRM fields, custom fields, Studio
+        fields, Students' Details, External/Internal Notes, stage, salesperson,
+        ordering/end customer data, pricing and LCP lead-level inputs.
+        """
+        if self.env.context.get('nil_skip_lead_audit'):
+            return super().write(vals)
+
+        tracked_names = self._nil_lead_audit_field_names(vals)
+        before = {}
+        if tracked_names:
+            for lead in self:
+                before[lead.id] = {
+                    name: lead._nil_lead_audit_value(name)
+                    for name in tracked_names
+                }
+
+        result = super().write(vals)
+
+        if tracked_names:
+            for lead in self:
+                for name in tracked_names:
+                    old_value = before[lead.id][name]
+                    new_value = lead._nil_lead_audit_value(name)
+                    lead._nil_create_lead_field_audit(
+                        name,
+                        old_value,
+                        new_value,
+                    )
+
+        return result
+
     def _nil_training_audit_domain(self):
         self.ensure_one()
         source_ids = self.training_course_ids.ids
@@ -110,7 +233,7 @@ class CrmLead(models.Model):
         self.ensure_one()
 
         if not self._nil_is_ruba_user():
-            raise AccessError(_('You are not allowed to view the Training Change Log.'))
+            raise AccessError(_('You are not allowed to view the Change Log.'))
 
         self.env['training.course.audit'].sudo()._nil_setup_ruba_access()
 

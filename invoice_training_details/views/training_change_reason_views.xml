@@ -1,48 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
+    <!-- Legacy Change Reason views are disabled. The technical field stays in
+         the model only for backward compatibility with existing databases. -->
     <record id="crm_training_change_reason" model="ir.ui.view">
-        <field name="name">crm.training.change.reason</field>
-        <field name="model">crm.lead</field>
-        <field name="inherit_id" ref="invoice_training_details.crm_reveal_lead_opportunity_form_training"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='training_course_ids']/tree" position="inside">
-                <field name="nil_change_reason" string="Change Reason"/>
-            </xpath>
-        </field>
+        <field name="active" eval="False"/>
     </record>
 
     <record id="sale_training_change_reason" model="ir.ui.view">
-        <field name="name">sale.training.change.reason</field>
-        <field name="model">sale.order</field>
-        <field name="inherit_id" ref="invoice_training_details.sale_order_form_quote_training"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='training_course_ids']/tree" position="inside">
-                <field name="nil_change_reason" string="Change Reason"/>
-            </xpath>
-        </field>
+        <field name="active" eval="False"/>
     </record>
 
     <record id="purchase_training_change_reason" model="ir.ui.view">
-        <field name="name">purchase.training.change.reason</field>
-        <field name="model">purchase.order</field>
-        <field name="inherit_id" ref="invoice_training_details.purchase_order_form_crm_opportunity_link"/>
-        <field name="arch" type="xml">
-            <xpath expr="//field[@name='training_course_ids']/tree" position="inside">
-                <field name="nil_change_reason" string="Change Reason"/>
-            </xpath>
-        </field>
+        <field name="active" eval="False"/>
     </record>
 
+    <!-- Keep only the posted-customer-invoice training lock. -->
     <record id="invoice_training_change_reason_lock" model="ir.ui.view">
-        <field name="name">account.move.training.change.reason.lock</field>
+        <field name="name">account.move.training.posted.lock</field>
         <field name="model">account.move</field>
         <field name="inherit_id" ref="invoice_training_details.view_move_form_inherit_training"/>
+        <field name="active" eval="True"/>
         <field name="arch" type="xml">
             <xpath expr="//page[@name='Training']//field[@name='training_course_ids']" position="attributes">
                 <attribute name="readonly">state == 'posted' and move_type in ('out_invoice', 'out_refund')</attribute>
-            </xpath>
-            <xpath expr="//page[@name='Training']//field[@name='training_course_ids']/tree" position="inside">
-                <field name="nil_change_reason" string="Change Reason"/>
             </xpath>
         </field>
     </record>

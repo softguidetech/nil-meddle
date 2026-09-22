@@ -148,7 +148,7 @@
     <span t-if="is_cisco_u_all_access"># Of Subscriptions</span>
     <span t-if="not is_cisco_u_all_access"># Of Students</span>
 </th>
-<th t-if="is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Rate Total</th>
+<th t-if="is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Total Rate</th>
 <th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">
     <span t-if="o.display_location">Location</span>
     <span t-elif="o.display_where">Location1</span>

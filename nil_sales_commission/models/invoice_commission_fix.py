@@ -97,7 +97,51 @@ class AccountMove(models.Model):
         row = Commission.search([
             ('invoice_id', '=', self.id),
             ('auto_key', '=', auto_key),
-        ], limit=1)
+        ], order='id asc', limit=1)
+
+        # Older versions may have created the same automatic commission
+        # without auto_key. Reuse that row instead of creating a duplicate.
+        legacy_rows = Commission.search([
+            ('invoice_id', '=', self.id),
+            ('auto_key', '=', False),
+            ('salesperson_id', '=',
+             salesperson.id if salesperson else False),
+            ('commission_rate', '=', rate),
+            ('is_auto_ruba', '=', auto_key == 'ruba'),
+        ], order='id asc')
+
+        if not row and legacy_rows:
+            paid_legacy_rows = legacy_rows.filtered(
+                lambda rec: rec.state == 'paid'
+            )
+
+            row = (
+                paid_legacy_rows[:1]
+                if paid_legacy_rows
+                else legacy_rows[:1]
+            )
+
+            row.with_context(
+                nil_auto_sync=True,
+                nil_skip_paid_lock=True,
+            ).write({
+                'auto_key': auto_key,
+                'is_auto_ruba': auto_key == 'ruba',
+            })
+
+        # Remove only NON-PAID duplicate legacy automatic rows.
+        # Paid duplicates are preserved for accounting/audit safety.
+        if row and legacy_rows:
+            duplicate_rows = legacy_rows - row
+
+            unpaid_duplicates = duplicate_rows.filtered(
+                lambda rec: rec.state != 'paid'
+            )
+
+            if unpaid_duplicates:
+                unpaid_duplicates.with_context(
+                    nil_sync_cleanup=True
+                ).unlink()
 
         if excluded:
             target_state = 'excluded'
@@ -118,11 +162,15 @@ class AccountMove(models.Model):
         })
 
         if not row:
-            # Draft/cancelled invoices must not manufacture zero-value rows.
+            # Keep current eligibility logic unchanged.
             if not active or excluded:
                 return Commission
+
             values['state'] = 'draft'
-            return Commission.with_context(nil_auto_sync=True).create(values)
+
+            return Commission.with_context(
+                nil_auto_sync=True
+            ).create(values)
 
         # A previously paid row only stays Paid when nothing financial changed.
         if row.state == 'paid' and active and not excluded:
@@ -131,12 +179,23 @@ class AccountMove(models.Model):
                 * (rate or 0.0)
                 / 100.0
             )
+
             unchanged = (
-                abs((row.training_value or 0.0) - (values['training_value'] or 0.0)) < 0.000001
-                and abs((row.commission_rate or 0.0) - (rate or 0.0)) < 0.000001
+                abs(
+                    (row.training_value or 0.0)
+                    - (values['training_value'] or 0.0)
+                ) < 0.000001
+                and abs(
+                    (row.commission_rate or 0.0)
+                    - (rate or 0.0)
+                ) < 0.000001
                 and row.salesperson_id == salesperson
-                and abs((row.commission_amount or 0.0) - expected_amount) < 0.000001
+                and abs(
+                    (row.commission_amount or 0.0)
+                    - expected_amount
+                ) < 0.000001
             )
+
             if unchanged:
                 target_state = 'paid'
             else:
@@ -149,6 +208,7 @@ class AccountMove(models.Model):
         )
 
         write_values = dict(values)
+
         if row.state != 'paid':
             write_values['state'] = target_state
 
@@ -156,6 +216,7 @@ class AccountMove(models.Model):
             nil_auto_sync=True,
             nil_skip_paid_lock=True,
         ).write(write_values)
+
         return row
 
     def _nil_sync_sales_commission(self):
@@ -181,11 +242,13 @@ class AccountMove(models.Model):
                 invoice.invoice_date
                 and invoice.invoice_date > COMMISSION_CUTOFF_DATE
             )
+
             active = bool(
                 invoice.state == 'posted'
                 and date_allowed
                 and basis > 0.0
             )
+
             excluded = bool(invoice.exclude_from_commission)
 
             common_values = {
@@ -206,6 +269,7 @@ class AccountMove(models.Model):
 
             # Ruba 1% is the global automatic commission row.
             ruba_user = Commission._nil_get_ruba_user()
+
             invoice._nil_sync_one_auto_commission(
                 'ruba',
                 ruba_user,
@@ -219,6 +283,7 @@ class AccountMove(models.Model):
             fixed_rate = Commission._nil_get_fixed_salesperson_rate(
                 salesperson
             )
+
             fixed_row = Commission.search([
                 ('invoice_id', '=', invoice.id),
                 ('auto_key', '=', 'salesperson'),
@@ -233,6 +298,7 @@ class AccountMove(models.Model):
                     active,
                     excluded,
                 )
+
             elif fixed_row:
                 invoice._nil_sync_one_auto_commission(
                     'salesperson',
@@ -248,17 +314,25 @@ class AccountMove(models.Model):
     def _nil_commission_impacted_invoices(self):
         """Return customer invoices affected by these invoices/credit notes."""
         impacted = self.env['account.move']
+
         for move in self:
             if move.move_type == 'out_invoice':
                 impacted |= move
-            elif move.move_type == 'out_refund' and move.reversed_entry_id:
+
+            elif (
+                move.move_type == 'out_refund'
+                and move.reversed_entry_id
+            ):
                 impacted |= move.reversed_entry_id
+
         return impacted
 
     def _nil_sync_commission_impacts(self):
         impacted = self._nil_commission_impacted_invoices()
+
         if impacted:
             impacted._nil_sync_sales_commission()
+
         return True
 
     def action_post(self):
@@ -268,14 +342,17 @@ class AccountMove(models.Model):
 
     def write(self, vals):
         result = super().write(vals)
+
         watched = {
             'state',
             'invoice_date',
             'exclude_from_commission',
             'reversed_entry_id',
         }
+
         if watched.intersection(vals):
             self._nil_sync_commission_impacts()
+
         return result
 
     def button_draft(self):

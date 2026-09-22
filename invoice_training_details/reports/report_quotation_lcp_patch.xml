@@ -9,7 +9,8 @@
         </xpath>
 
         <xpath expr="//table[@name='training_line_table']//th[span[normalize-space()='Training Price']]" position="replace">
-            <th name="th_training_rate_card"
+            <th t-if="not is_cisco_u_all_access"
+                name="th_training_rate_card"
                 style="text-align:center; vertical-align:middle;">
                 <span t-if="lcp_enterone_clc_pdf">Rate Card</span>
                 <span t-else="">Training Price</span>
@@ -17,7 +18,8 @@
         </xpath>
 
         <xpath expr="//table[@name='training_line_table']//tbody//span[@t-field='training.price']/.." position="replace">
-            <td style="text-align:center; vertical-align:middle;">
+            <td t-if="not is_cisco_u_all_access"
+                style="text-align:center; vertical-align:middle;">
                 <span t-if="lcp_enterone_clc_pdf and training.payment_method == 'clc'"
                       t-esc="'$ {:,.2f}'.format(training.lcp_rate_card_per_seat or 0.0)"/>
                 <span t-else="" t-field="training.price"/>

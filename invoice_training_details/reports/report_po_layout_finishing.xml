@@ -143,7 +143,7 @@
         <xpath expr="//table[@name='training_line_table']//span[normalize-space()='# Of Students']"
                position="replace">
 
-            <span>Seats</span>
+            <span t-if="not is_cisco_u_all_access">Seats</span>
 
         </xpath>
 

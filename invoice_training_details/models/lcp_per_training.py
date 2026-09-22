@@ -289,6 +289,7 @@ class TrainingCourse(models.Model):
         'duration',
         'no_of_student',
         'price',
+        'training_id.name',
         'payment_method',
         'location',
         'lcp_vat_rate',
@@ -316,6 +317,9 @@ class TrainingCourse(models.Model):
             days = line._lcp_line_days()
             seats = max(line.no_of_student or 0, 0)
             is_online = line.location == 'Online'
+            is_cisco_u = 'cisco u' in (
+                (line.training_id.name or line.name or '').lower()
+            )
 
             # Pricing
             if line.payment_method == 'clc':
@@ -336,8 +340,12 @@ class TrainingCourse(models.Model):
                     else 0
                 )
                 total_rate_card = (
-                    (line.lcp_rate_card_per_seat or 0.0)
-                    * seats
+                    (line.price or 0.0)
+                    if is_cisco_u
+                    else (
+                        (line.lcp_rate_card_per_seat or 0.0)
+                        * seats
+                    )
                 )
             else:
                 total_clcs = 0.0
@@ -421,16 +429,24 @@ class TrainingCourse(models.Model):
             if line.lcp_instructor_source == 'nil_me':
                 nil_me_instructor_costs = (
                     total_instructor_cost
-                    + ticket_total
-                    + hotel_total
+                    if is_cisco_u
+                    else (
+                        total_instructor_cost
+                        + ticket_total
+                        + hotel_total
+                    )
                 )
 
             operational_costs = (
                 nil_me_instructor_costs
-                + venue_cost
-                + catering_cost
-                + total_uber
-                + total_per_diem
+                if is_cisco_u
+                else (
+                    nil_me_instructor_costs
+                    + venue_cost
+                    + catering_cost
+                    + total_uber
+                    + total_per_diem
+                )
             )
 
             revenue = line.price or 0.0
@@ -440,8 +456,13 @@ class TrainingCourse(models.Model):
                 enterone_share_base = (
                     total_rate_card
                     - total_instructor_cost
-                    - ticket_total
-                    - hotel_total
+                    if is_cisco_u
+                    else (
+                        total_rate_card
+                        - total_instructor_cost
+                        - ticket_total
+                        - hotel_total
+                    )
                 )
                 partner_share = (
                     max(enterone_share_base, 0.0) * 0.20

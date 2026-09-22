@@ -35,7 +35,7 @@
                          alt="Signature"/>
                     <img t-if="o.company_id.stamp and o.display_stamp"
                          t-att-src="image_data_uri(o.company_id.stamp)"
-                         style="max-height:95px;max-width:115px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0;padding:0;"
+                         style="max-height:125px;max-width:145px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0;padding:0;"
                          alt="Stamp"/>
                 </div>
             </div>

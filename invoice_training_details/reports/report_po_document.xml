@@ -134,7 +134,7 @@
                         }
 
                     </style>
-                    <t t-set="is_cisco_u_all_access" t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
+                    <t t-set="is_cisco_u_all_access" t-value="any('cisco u' in (name or '').lower() for name in o.training_course_ids.mapped('training_id.name'))"/>
                     <table t-if="o.display_training_table" class="table table-sm o_main_table table-bordered text-center" name="training_line_table">
                         <thead>
                             <tr>

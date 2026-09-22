@@ -18,7 +18,7 @@
                 <t t-set="is_clc_order"
                    t-value="not is_instructor_po and 'clc' in [(m or '').lower() for m in o.training_course_ids.mapped('payment_method')]"/>
                 <t t-set="is_cisco_u_all_access"
-                   t-value="not is_instructor_po and 'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
+                   t-value="not is_instructor_po and any('cisco u' in (name or '').lower() for name in o.training_course_ids.mapped('training_id.name'))"/>
 
                 <style>
                     .po-vendor-info, .po-vendor-info * {font-size:16px !important; line-height:1.45 !important;}
@@ -266,7 +266,7 @@
                          alt="Signature"/>
                     <img t-if="o.company_id.stamp and o.display_stamp"
                          t-att-src="image_data_uri(o.company_id.stamp)"
-                         style="max-height:105px; max-width:145px; width:auto; height:auto; object-fit:contain;"
+                         style="max-height:130px; max-width:175px; width:auto; height:auto; object-fit:contain;"
                          alt="Stamp"/>
                 </div>
 

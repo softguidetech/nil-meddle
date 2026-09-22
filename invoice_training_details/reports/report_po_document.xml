@@ -239,7 +239,7 @@
 
 <div class="row" style="margin-top:0; padding-top:0; padding-bottom:4px;">
     <div class="col-12">
-        <div t-field="o.term_and_cond" style="width:100%; font-size:22px;"/>
+        <div t-out="o._nil_work_order_terms_html()" style="width:100%; font-size:22px;"/>
     </div>
 </div>
 

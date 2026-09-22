@@ -252,6 +252,7 @@
 
 
                     <!-- Training Table -->
+                    <t t-set="is_cisco_u_all_access" t-value="'Cisco U All Access' in o.training_course_ids.mapped('training_id.name')"/>
                     <table t-if="o.display_training_table"
                            class="table table-sm o_main_table table-bordered text-center"
                            name="training_line_table">
@@ -268,7 +269,8 @@
 
                                 <th name="th_training_name"
                                     style="text-align:center; vertical-align:middle;">
-                                    <span>Training Name</span>
+                                    <span t-if="is_cisco_u_all_access">Subscription Name</span>
+                                    <span t-else="">Training Name</span>
                                 </th>
 
 
@@ -281,11 +283,13 @@
 
                                 <th name="th_of_students"
                                     style="text-align:center; vertical-align:middle;">
-                                    <span># Of Students</span>
+                                    <span t-if="is_cisco_u_all_access"># Of Subscriptions</span>
+                                    <span t-else=""># Of Students</span>
                                 </th>
 
 
-                                <th name="th_training_name"
+                                <th t-if="not is_cisco_u_all_access"
+                                    name="th_training_name"
                                     style="text-align:center; vertical-align:middle;">
 
                                     <span t-if="o.display_location">
@@ -299,19 +303,22 @@
                                 </th>
 
 
-                                <th name="th_duration"
+                                <th t-if="not is_cisco_u_all_access"
+                                    name="th_duration"
                                     style="text-align:center; vertical-align:middle;">
                                     <span>Duration</span>
                                 </th>
 
 
-                                <th name="th_training_date"
+                                <th t-if="not is_cisco_u_all_access"
+                                    name="th_training_date"
                                     style="text-align:center; vertical-align:middle;">
                                     <span>Training Dates</span>
                                 </th>
 
 
-                                <th name="th_training_date"
+                                <th t-if="not is_cisco_u_all_access"
+                                    name="th_training_date"
                                     style="text-align:center; vertical-align:middle;">
                                     <span>Training Price</span>
                                 </th>
@@ -363,7 +370,8 @@
                                     </td>
 
 
-                                    <td style="text-align:center; vertical-align:middle;">
+                                    <td t-if="not is_cisco_u_all_access"
+                                        style="text-align:center; vertical-align:middle;">
 
                                         <span t-if="o.display_location"
                                               t-field="training.location"/>
@@ -376,12 +384,14 @@
                                     </td>
 
 
-                                    <td style="text-align:center; vertical-align:middle;">
+                                    <td t-if="not is_cisco_u_all_access"
+                                        style="text-align:center; vertical-align:middle;">
                                         <span t-field="training.duration"/>
                                     </td>
 
 
-                                    <td style="text-align:center; vertical-align:middle;">
+                                    <td t-if="not is_cisco_u_all_access"
+                                        style="text-align:center; vertical-align:middle;">
 
                                         <span t-field="training.training_date_start"/>
 
@@ -392,7 +402,8 @@
                                     </td>
 
 
-                                    <td style="text-align:center; vertical-align:middle;">
+                                    <td t-if="not is_cisco_u_all_access"
+                                        style="text-align:center; vertical-align:middle;">
                                         <span t-field="training.price"/>
                                     </td>
 

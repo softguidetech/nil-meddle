@@ -148,6 +148,7 @@
     <span t-if="is_cisco_u_all_access"># Of Subscriptions</span>
     <span t-if="not is_cisco_u_all_access"># Of Students</span>
 </th>
+<th t-if="is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">Rate Total</th>
 <th t-if="not is_cisco_u_all_access" style="font-size:18px; text-align:center; vertical-align:middle;">
     <span t-if="o.display_location">Location</span>
     <span t-elif="o.display_where">Location1</span>
@@ -171,6 +172,10 @@
                                     <td style="font-size:9px;"><span t-field="training.training_id"/></td>
                                     <td t-if="o.display_instructor" style="font-size:9px;"><span t-field="training.instructor_id.name"/></td>
                                     <td style="font-size:9px;"><span t-field="training.no_of_student"/></td>
+                                    <td t-if="is_cisco_u_all_access" style="font-size:9px; text-align:center; vertical-align:middle;">
+                                        <span t-out="training.price or 0.0"
+                                              t-options="{&quot;widget&quot;: &quot;monetary&quot;, &quot;display_currency&quot;: o.currency_id}"/>
+                                    </td>
                                     <td t-if="not is_cisco_u_all_access" style="font-size:9px;">
                                         <span t-if="o.display_location" t-field="training.location"/>
                                         <span t-if="o.display_location and o.display_where">, </span>

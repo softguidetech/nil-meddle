@@ -6,7 +6,7 @@ RUBA_COMMISSION_RATE = 1.0
 RUBA_NAME = 'ruba khattam'
 
 FIXED_SALESPERSON_RATES = {
-    'loudy abdo': 5.0,
+    'loudy al abdo': 5.0,
     'baraa abo saleh': 2.0,
 }
 

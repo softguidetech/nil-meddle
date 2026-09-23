@@ -1,16 +1,55 @@
 # -*- coding: utf-8 -*-
 
-from odoo import models
+from odoo import api, models
 
 from .account_move import COMMISSION_CUTOFF_DATE
 from .sales_commission import RUBA_COMMISSION_RATE
 
 
+# =====================================================================
+# FIXED SALESPERSON RATES
+# =====================================================================
+
+class SalesCommission(models.Model):
+    _inherit = 'nil.sales.commission'
+
+    @api.model
+    def _nil_get_fixed_salesperson_rate(self, salesperson):
+        """
+        Fixed salesperson commission rates.
+
+        Loudy Al Abdo = 5%
+        Baraa Abo Saleh = 2%
+        """
+        if not salesperson:
+            return 0.0
+
+        normalized_name = self._nil_normalize_name(
+            salesperson.name
+        )
+
+        if normalized_name == 'loudy al abdo':
+            return 5.0
+
+        if normalized_name == 'baraa abo saleh':
+            return 2.0
+
+        return super()._nil_get_fixed_salesperson_rate(
+            salesperson
+        )
+
+
+# =====================================================================
+# INVOICE COMMISSION SYNC
+# =====================================================================
+
 class AccountMove(models.Model):
     _inherit = 'account.move'
 
     def _nil_commission_credit_notes(self):
-        """Posted credit notes that reverse this exact customer invoice."""
+        """
+        Posted credit notes reversing this exact customer invoice.
+        """
         self.ensure_one()
 
         if self.move_type != 'out_invoice':
@@ -25,10 +64,9 @@ class AccountMove(models.Model):
 
     def _nil_commission_basis(self):
         """
-        Commission follows the actual posted invoice value excluding tax.
+        Commission basis = actual posted invoice value excluding tax.
 
-        Standard posted credit notes linked through reversed_entry_id reduce
-        the basis immediately. A full credit therefore reduces it to zero.
+        Posted credit notes reduce the commission basis.
         """
         self.ensure_one()
 
@@ -59,8 +97,10 @@ class AccountMove(models.Model):
         target_state,
     ):
         """
-        If an already-paid automatic commission changes,
-        reverse its posted accounting entry first.
+        Protect already-paid commissions.
+
+        If a financial value changes after payment,
+        reverse the old accounting entry first.
         """
         if not commission:
             return commission
@@ -106,13 +146,10 @@ class AccountMove(models.Model):
         excluded,
     ):
         """
-        Keep ONE automatic commission row per invoice/type.
+        Maintain ONE automatic commission row
+        per invoice and commission type.
 
-        Important:
-        - Re-sync never creates duplicates.
-        - Existing Approved/Excluded decisions are preserved.
-        - Paid rows are protected.
-        - Old automatic rows are adopted where safe.
+        No duplicate automatic rows are created.
         """
         self.ensure_one()
 
@@ -121,26 +158,31 @@ class AccountMove(models.Model):
             .sudo()
         )
 
-        # ---------------------------------------------------------
-        # EXISTING AUTOMATIC ROW
-        # ---------------------------------------------------------
+        # =============================================================
+        # FIND EXISTING AUTOMATIC ROW
+        # =============================================================
+
         row = Commission.search([
             ('invoice_id', '=', self.id),
             ('auto_key', '=', auto_key),
         ], order='id asc', limit=1)
 
-        # ---------------------------------------------------------
-        # LEGACY ROWS
+        # =============================================================
+        # FIND LEGACY AUTOMATIC ROWS
         #
-        # Only attempt legacy adoption for Ruba or known fixed-rate
-        # salesperson rows.
+        # Older module versions may have created automatic rows
+        # without auto_key.
         #
-        # This avoids accidentally converting a manually-created
-        # 0% commission into an automatic salesperson commission.
-        # ---------------------------------------------------------
+        # For fixed-rate salespeople and Ruba we can safely identify
+        # the old automatic rows and reuse them.
+        # =============================================================
+
         legacy_rows = Commission.browse()
 
-        if auto_key == 'ruba' or rate > 0.0:
+        if (
+            auto_key == 'ruba'
+            or rate > 0.0
+        ):
             legacy_rows = Commission.search([
                 ('invoice_id', '=', self.id),
                 ('auto_key', '=', False),
@@ -149,7 +191,7 @@ class AccountMove(models.Model):
                     '=',
                     salesperson.id
                     if salesperson
-                    else False
+                    else False,
                 ),
                 ('commission_rate', '=', rate),
                 (
@@ -159,10 +201,12 @@ class AccountMove(models.Model):
                 ),
             ], order='id asc')
 
-        # ---------------------------------------------------------
-        # ADOPT OLD ROW INSTEAD OF CREATING DUPLICATE
-        # ---------------------------------------------------------
+        # =============================================================
+        # ADOPT ONE OLD ROW
+        # =============================================================
+
         if not row and legacy_rows:
+
             paid_legacy_rows = (
                 legacy_rows.filtered(
                     lambda rec:
@@ -185,12 +229,14 @@ class AccountMove(models.Model):
                     auto_key == 'ruba',
             })
 
-        # ---------------------------------------------------------
-        # REMOVE NON-PAID LEGACY DUPLICATES
+        # =============================================================
+        # REMOVE OLD NON-PAID DUPLICATES
         #
-        # Never automatically delete a Paid commission.
-        # ---------------------------------------------------------
+        # Paid historical rows are NEVER automatically deleted.
+        # =============================================================
+
         if row and legacy_rows:
+
             duplicate_rows = (
                 legacy_rows - row
             )
@@ -207,34 +253,48 @@ class AccountMove(models.Model):
                     nil_sync_cleanup=True
                 ).unlink()
 
-        # ---------------------------------------------------------
-        # STATUS
-        #
-        # Management decision must survive re-sync:
-        # Draft     = waiting for decision
-        # Pending   = approved
-        # Excluded  = rejected
-        # Paid      = paid
-        # ---------------------------------------------------------
+        # =============================================================
+        # TARGET STATUS
+        # =============================================================
+
+        salesperson_changed = bool(
+            row
+            and auto_key == 'salesperson'
+            and row.salesperson_id != salesperson
+        )
+
         if excluded:
             target_state = 'excluded'
 
         elif not active:
             target_state = 'cancelled'
 
-        elif row and row.state in (
-            'pending',
-            'excluded',
-            'paid',
+        elif (
+            salesperson_changed
+            and row
+            and row.state == 'excluded'
         ):
+            # A new salesperson must get a new management decision.
+            target_state = 'draft'
+
+        elif (
+            row
+            and row.state in (
+                'pending',
+                'excluded',
+                'paid',
+            )
+        ):
+            # Preserve management decision.
             target_state = row.state
 
         else:
             target_state = 'draft'
 
-        # ---------------------------------------------------------
+        # =============================================================
         # VALUES
-        # ---------------------------------------------------------
+        # =============================================================
+
         values = dict(common_values)
 
         values.update({
@@ -251,13 +311,12 @@ class AccountMove(models.Model):
                 bool(excluded),
         })
 
-        # ---------------------------------------------------------
+        # =============================================================
         # CREATE NEW ROW
-        #
-        # Only eligible posted invoices create a commission row.
-        # New row always starts Draft so management can decide.
-        # ---------------------------------------------------------
+        # =============================================================
+
         if not row:
+
             if not active or excluded:
                 return Commission
 
@@ -267,16 +326,16 @@ class AccountMove(models.Model):
                 nil_auto_sync=True
             ).create(values)
 
-        # ---------------------------------------------------------
-        # PAID COMMISSION
-        #
-        # Keep Paid only when nothing financially changed.
-        # ---------------------------------------------------------
+        # =============================================================
+        # PAID ROW CHECK
+        # =============================================================
+
         if (
             row.state == 'paid'
             and active
             and not excluded
         ):
+
             expected_amount = (
                 (values['training_value'] or 0.0)
                 * (rate or 0.0)
@@ -316,9 +375,10 @@ class AccountMove(models.Model):
             else:
                 target_state = 'draft'
 
-        # ---------------------------------------------------------
-        # PREPARE EXISTING ROW
-        # ---------------------------------------------------------
+        # =============================================================
+        # UPDATE EXISTING ROW
+        # =============================================================
+
         row = (
             self
             ._nil_prepare_auto_commission_for_update(
@@ -344,20 +404,32 @@ class AccountMove(models.Model):
 
     def _nil_sync_sales_commission(self):
         """
-        Synchronize commission ledger from Customer Invoices.
+        FINAL COMMISSION RULES
 
-        RULES:
+        1. Every eligible posted Customer Invoice is checked.
 
-        1. Every eligible posted Customer Invoice is reviewed.
-        2. The Salesperson written ON THE INVOICE is the salesperson
-           used for the salesperson commission row.
-        3. Every invoice with a Salesperson gets a salesperson row.
-        4. The row starts Draft.
-        5. Management decides Approve or Exclude.
-        6. Re-sync does not duplicate the invoice.
-        7. Approved / Excluded decisions are preserved.
-        8. Ruba's automatic 1% logic remains unchanged.
+        2. If the Invoice has a Salesperson,
+           that invoice MUST appear in the Commission Ledger.
+
+        3. Loudy Al Abdo = 5%.
+
+        4. Baraa Abo Saleh = 2%.
+
+        5. Other salespeople still appear in the ledger.
+
+        6. New salesperson commissions start as Draft.
+
+        7. Management decides:
+           Approve
+           or
+           Exclude
+
+        8. One automatic salesperson commission per invoice.
+           Re-sync never creates another one.
+
+        9. Ruba automatic 1% remains unchanged.
         """
+
         Commission = (
             self.env['nil.sales.commission']
             .sudo()
@@ -365,47 +437,48 @@ class AccountMove(models.Model):
 
         for invoice in self:
 
-            # -----------------------------------------------------
-            # CUSTOMER INVOICES ONLY
-            # -----------------------------------------------------
+            # =========================================================
+            # CUSTOMER INVOICE ONLY
+            # =========================================================
+
             if invoice.move_type != 'out_invoice':
                 continue
 
-            # -----------------------------------------------------
-            # RELATED CRM LEAD
-            # -----------------------------------------------------
+            # =========================================================
+            # CRM LEAD
+            # =========================================================
+
             lead = (
                 invoice
                 ._nil_get_commission_lead()
             )
 
-            # -----------------------------------------------------
+            # =========================================================
             # SALESPERSON
             #
             # IMPORTANT:
-            # Invoice Salesperson is the PRIMARY source.
-            #
-            # Only fall back to CRM/Sale Order if the invoice itself
-            # has no salesperson.
-            # -----------------------------------------------------
+            # Use the Salesperson ON THE INVOICE.
+            # =========================================================
+
             salesperson = (
                 invoice.invoice_user_id.sudo()
                 if invoice.invoice_user_id
-                else
-                invoice._nil_get_deal_salesperson()
+                else self.env['res.users']
             )
 
-            # -----------------------------------------------------
+            # =========================================================
             # COMMISSION BASIS
-            # -----------------------------------------------------
+            # =========================================================
+
             basis = (
                 invoice
                 ._nil_commission_basis()
             )
 
-            # -----------------------------------------------------
-            # ELIGIBILITY
-            # -----------------------------------------------------
+            # =========================================================
+            # DATE RULE
+            # =========================================================
+
             date_allowed = bool(
                 invoice.invoice_date
                 and (
@@ -413,6 +486,10 @@ class AccountMove(models.Model):
                     > COMMISSION_CUTOFF_DATE
                 )
             )
+
+            # =========================================================
+            # ACTIVE COMMISSION
+            # =========================================================
 
             active = bool(
                 invoice.state == 'posted'
@@ -424,9 +501,10 @@ class AccountMove(models.Model):
                 invoice.exclude_from_commission
             )
 
-            # -----------------------------------------------------
+            # =========================================================
             # COMMON VALUES
-            # -----------------------------------------------------
+            # =========================================================
+
             common_values = {
                 'invoice_id':
                     invoice.id,
@@ -461,9 +539,10 @@ class AccountMove(models.Model):
                     basis,
             }
 
-            # =====================================================
-            # 1) RUBA COMMISSION
-            # =====================================================
+            # =========================================================
+            # RUBA 1%
+            # =========================================================
+
             ruba_user = (
                 Commission
                 ._nil_get_ruba_user()
@@ -478,14 +557,13 @@ class AccountMove(models.Model):
                 excluded,
             )
 
-            # =====================================================
-            # 2) SALESPERSON COMMISSION
+            # =========================================================
+            # SALESPERSON COMMISSION
             #
-            # EVERY INVOICE WITH A SALESPERSON MUST APPEAR.
-            #
-            # No filtering based on Loudy/Baraa names.
-            # =====================================================
-            salesperson_row = (
+            # EVERY INVOICE WITH A SALESPERSON APPEARS.
+            # =========================================================
+
+            existing_salesperson_row = (
                 Commission.search([
                     (
                         'invoice_id',
@@ -509,28 +587,41 @@ class AccountMove(models.Model):
                     )
                 )
 
-                # For known fixed salespeople use configured rate.
+                # -----------------------------------------------------
+                # FIXED RATES
                 #
-                # If this salesperson does not have a fixed rate,
-                # preserve an already-existing rate rather than
-                # resetting it during every sync.
-                salesperson_rate = (
-                    fixed_rate
-                )
+                # Loudy Al Abdo = 5%
+                # Baraa Abo Saleh = 2%
+                # -----------------------------------------------------
 
-                if (
-                    fixed_rate <= 0.0
-                    and salesperson_row
-                    and (
-                        salesperson_row.salesperson_id
-                        == salesperson
+                if fixed_rate > 0.0:
+                    salesperson_rate = (
+                        fixed_rate
                     )
+
+                # -----------------------------------------------------
+                # OTHER SALESPERSON
+                #
+                # Keep an existing commission rate if one was already
+                # entered. Otherwise the row starts at 0%.
+                #
+                # The invoice STILL appears for management review.
+                # -----------------------------------------------------
+
+                elif (
+                    existing_salesperson_row
+                    and
+                    existing_salesperson_row.salesperson_id
+                    == salesperson
                 ):
                     salesperson_rate = (
-                        salesperson_row
+                        existing_salesperson_row
                         .commission_rate
                         or 0.0
                     )
+
+                else:
+                    salesperson_rate = 0.0
 
                 invoice._nil_sync_one_auto_commission(
                     'salesperson',
@@ -541,18 +632,18 @@ class AccountMove(models.Model):
                     excluded,
                 )
 
-            # -----------------------------------------------------
-            # Invoice no longer has salesperson.
-            #
-            # Remove only an UNPAID automatic salesperson row.
-            # Paid history must remain.
-            # -----------------------------------------------------
+            # =========================================================
+            # NO SALESPERSON ON INVOICE
+            # =========================================================
+
             elif (
-                salesperson_row
-                and salesperson_row.state
+                existing_salesperson_row
+                and
+                existing_salesperson_row.state
                 != 'paid'
             ):
-                salesperson_row.with_context(
+
+                existing_salesperson_row.with_context(
                     nil_sync_cleanup=True
                 ).unlink()
 
@@ -560,9 +651,9 @@ class AccountMove(models.Model):
 
     def _nil_commission_impacted_invoices(self):
         """
-        Return customer invoices affected
-        by invoices / credit notes.
+        Return invoices affected by invoice/refund changes.
         """
+
         impacted = (
             self.env['account.move']
         )
@@ -583,6 +674,10 @@ class AccountMove(models.Model):
         return impacted
 
     def _nil_sync_commission_impacts(self):
+        """
+        Re-sync affected invoices.
+        """
+
         impacted = (
             self
             ._nil_commission_impacted_invoices()

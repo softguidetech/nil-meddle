@@ -141,8 +141,10 @@ class CrmLead(models.Model):
                 else 0.0
             )
             net = max(total_revenue - flight - hotel - instructor, 0.0)
-            enterone = net * 0.20
-            nilme = net * 0.80
+            share_pct = course.lcp_partner_share_pct or 0.0
+            nilme_pct = 100.0 - share_pct
+            enterone = net * share_pct / 100.0
+            nilme = net * nilme_pct / 100.0
             nilme_invoice = nilme + flight + hotel + instructor
 
             rows = [
@@ -163,8 +165,16 @@ class CrmLead(models.Model):
                 ))
             rows.extend([
                 ('Total', self._lcp_money(net), True),
-                ('EnterOne Share 20%', self._lcp_money(enterone), False),
-                ('NIL ME Share 80%', self._lcp_money(nilme), False),
+                (
+                    'EnterOne Share %s%%' % ('%g' % share_pct),
+                    self._lcp_money(enterone),
+                    False,
+                ),
+                (
+                    'NIL ME Share %s%%' % ('%g' % nilme_pct),
+                    self._lcp_money(nilme),
+                    False,
+                ),
                 ('NIL ME Invoice', self._lcp_money(nilme_invoice), True),
             ])
             blocks.append(self._lcp_html_table('', rows))
@@ -187,8 +197,8 @@ class CrmLead(models.Model):
     def _lcp_sale_lines(self, courses, company):
         lines = super()._lcp_sale_lines(courses, company)
 
-        # EnterOne CLC SO amount = NIL ME 80% share of the remaining Rate Card
-        # + NIL ME instructor + flight + hotel.
+        # EnterOne CLC SO amount = NIL ME's remaining percentage share
+        # of the Rate Card + NIL ME instructor + flight + hotel.
         for course, command in zip(courses, lines):
             if not (
                 course.payment_method == 'clc'
@@ -221,8 +231,10 @@ class CrmLead(models.Model):
                 else 0.0
             )
             remaining = max(rate_card - flight - hotel - instructor, 0.0)
+            share_pct = course.lcp_partner_share_pct or 0.0
+            nilme_pct = 100.0 - share_pct
             nilme_invoice = (
-                (remaining * 0.80)
+                (remaining * nilme_pct / 100.0)
                 + instructor
                 + flight
                 + hotel

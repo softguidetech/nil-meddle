@@ -10,6 +10,7 @@ class TrainingCourse(models.Model):
         'payment_method',
         'price',
         'lcp_cost_learning_partner',
+        'lcp_partner_share_pct',
         'lcp_instructor_source',
         'lcp_total_rate_card',
         'lcp_total_instructor_md',
@@ -21,7 +22,7 @@ class TrainingCourse(models.Model):
         Final EnterOne CLC correction.
 
         Vendor instructor cost is already included in the Rate Card, so it
-        must NOT be deducted again before the 20% EnterOne split. Only a
+        must NOT be deducted again before the manual EnterOne split. Only a
         NIL ME instructor is a deductible instructor amount. Flight/hotel
         remain deductible exactly as shown in the EnterOne SO terms.
         """
@@ -53,7 +54,11 @@ class TrainingCourse(models.Model):
                 0.0,
             )
 
-            partner_share = share_base * 0.20
+            partner_share = (
+                share_base
+                * (line.lcp_partner_share_pct or 0.0)
+                / 100.0
+            )
             revenue = line.price or 0.0
             total_costs = operational_costs + partner_share
             profit = revenue - total_costs

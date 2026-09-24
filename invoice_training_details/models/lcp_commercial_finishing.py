@@ -2,6 +2,7 @@
 
 from html import escape
 
+from markupsafe import Markup
 from odoo import api, fields, models
 
 
@@ -140,8 +141,10 @@ class CrmLead(models.Model):
                 else 0.0
             )
             net = max(total_revenue - flight - hotel - instructor, 0.0)
-            enterone = net * 0.20
-            nilme = net * 0.80
+            share_pct = course.lcp_partner_share_pct or 0.0
+            nilme_pct = 100.0 - share_pct
+            enterone = net * share_pct / 100.0
+            nilme = net * nilme_pct / 100.0
             nilme_invoice = nilme + flight + hotel + instructor
 
             rows = [
@@ -162,8 +165,16 @@ class CrmLead(models.Model):
                 ))
             rows.extend([
                 ('Total', self._lcp_money(net), True),
-                ('EnterOne Share 20%', self._lcp_money(enterone), False),
-                ('NIL ME Share 80%', self._lcp_money(nilme), False),
+                (
+                    'EnterOne Share %s%%' % ('%g' % share_pct),
+                    self._lcp_money(enterone),
+                    False,
+                ),
+                (
+                    'NIL ME Share %s%%' % ('%g' % nilme_pct),
+                    self._lcp_money(nilme),
+                    False,
+                ),
                 ('NIL ME Invoice', self._lcp_money(nilme_invoice), True),
             ])
             blocks.append(self._lcp_html_table('', rows))
@@ -186,8 +197,8 @@ class CrmLead(models.Model):
     def _lcp_sale_lines(self, courses, company):
         lines = super()._lcp_sale_lines(courses, company)
 
-        # EnterOne CLC SO amount = NIL ME 80% share of the remaining Rate Card
-        # + NIL ME instructor + flight + hotel.
+        # EnterOne CLC SO amount = NIL ME's remaining percentage share
+        # of the Rate Card + NIL ME instructor + flight + hotel.
         for course, command in zip(courses, lines):
             if not (
                 course.payment_method == 'clc'
@@ -220,8 +231,10 @@ class CrmLead(models.Model):
                 else 0.0
             )
             remaining = max(rate_card - flight - hotel - instructor, 0.0)
+            share_pct = course.lcp_partner_share_pct or 0.0
+            nilme_pct = 100.0 - share_pct
             nilme_invoice = (
-                (remaining * 0.80)
+                (remaining * nilme_pct / 100.0)
                 + instructor
                 + flight
                 + hotel
@@ -235,6 +248,40 @@ class SaleOrder(models.Model):
     _inherit = 'sale.order'
 
     bank_details = fields.Html(default=False)
+
+    def _nil_work_order_terms_html(self):
+        """
+        Cisco U + EnterOne + CLC Work Orders must always render the current
+        LCP details instead of a stale copy saved in term_and_cond.
+        Other orders keep their existing term_and_cond exactly as-is.
+        """
+        self.ensure_one()
+        courses = self.training_course_ids
+        if not courses:
+            return Markup(self.term_and_cond or '')
+
+        is_cisco_u = any(
+            'cisco u' in ((course.training_id.name or course.name or '').lower())
+            for course in courses
+        )
+        is_enterone = all(
+            course.lcp_cost_learning_partner == 'EnterOne'
+            for course in courses
+        )
+        is_clc = any(course.payment_method == 'clc' for course in courses)
+
+        if not (is_cisco_u and is_enterone and is_clc):
+            return Markup(self.term_and_cond or '')
+
+        lead = self.opportunity_id
+        if not lead:
+            leads = courses.mapped('lead_id')
+            lead = leads[:1]
+
+        if not lead:
+            return Markup(self.term_and_cond or '')
+
+        return Markup(lead._lcp_enterone_so_terms(courses))
 
     @api.model
     def default_get(self, fields_list):

@@ -7,22 +7,31 @@ class TrainingCourse(models.Model):
     _inherit = 'training.course'
 
     def _koenig_cash_discount_pct(self):
-        """Koenig Cash discount is chosen by total seat count and applies to every seat.
+        """
+        Koenig Cash cumulative slab discount, returned as one effective
+        percentage so existing downstream calculations remain unchanged:
 
-        Exactly 2 seats: 25% discount on every seat.
-        3 to 5 seats: 30% discount on every seat.
-        6+ seats: 45% discount on every seat.
-        1 seat: no automatic discount.
+        - First 2 seats: 25% discount
+        - Seats 3 to 5: 30% discount
+        - Seat 6 onward: 45% discount
         """
         self.ensure_one()
+
         seats = max(self.no_of_student or 0, 0)
-        if seats == 2:
-            return 25.0
-        if 3 <= seats <= 5:
-            return 30.0
-        if seats >= 6:
-            return 45.0
-        return 0.0
+        if not seats:
+            return 0.0
+
+        first_two = min(seats, 2)
+        three_to_five = min(max(seats - 2, 0), 3)
+        six_onward = max(seats - 5, 0)
+
+        total_discount_units = (
+            (first_two * 25.0)
+            + (three_to_five * 30.0)
+            + (six_onward * 45.0)
+        )
+
+        return total_discount_units / seats
 
     def _koenig_cash_discounted_total(self):
         self.ensure_one()
@@ -56,7 +65,7 @@ class CrmLead(models.Model):
             rows = [
                 ('USD / Seat', self._lcp_money(seat_rate), False),
                 ('Seats', str(seats), False),
-                ('Discount', '{:.0f}% on every seat'.format(discount_pct), True),
+                ('Discount', 'Cumulative slabs: 25% first 2 / 30% seats 3-5 / 45% seat 6+', True),
                 ('Discounted Total', self._lcp_money(discounted_total), True),
             ]
             if course.lcp_instructor_source == 'nil_me':

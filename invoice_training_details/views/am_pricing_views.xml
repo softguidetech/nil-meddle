@@ -76,26 +76,26 @@
                 </group>
 
                 <div class="alert alert-info" role="alert">
-                    Select only the Cash trainings you want to send.
-                    The Account Manager receives selling prices only. LCP costs are not included.
+                    Select the Cash trainings you want to send. The Account Manager
+                    receives selling prices only. LCP costs and Markup are not sent.
                 </div>
 
-                <field name="line_ids" nolabel="1">
-                    <tree editable="bottom" create="false" delete="false">
-                        <field name="course_id" column_invisible="1" force_save="1"/>
-                        <field name="selected"/>
-                        <field name="training_name" readonly="1"/>
-                        <field name="description" readonly="1" optional="show"/>
-                        <field name="delivery_type" readonly="1"/>
-                        <field name="students" readonly="1"/>
-                        <field name="currency_id" column_invisible="1"/>
-                        <field name="cost_amount" column_invisible="1"/>
-                        <field name="vat_rate" readonly="1"/>
-                        <field name="price_before_vat" readonly="1"/>
-                        <field name="vat_amount" readonly="1"/>
-                        <field name="total" readonly="1"/>
-                    </tree>
-                </field>
+                <field name="available_course_ids" invisible="1"/>
+
+                <group string="Select Cash Trainings">
+                    <field name="selected_course_ids"
+                           widget="many2many_checkboxes"
+                           domain="[('id', 'in', available_course_ids)]"
+                           options="{'no_create': True, 'no_create_edit': True}"
+                           nolabel="1"/>
+                </group>
+
+                <separator string="Preview"/>
+
+                <field name="preview_html"
+                       widget="html"
+                       readonly="1"
+                       nolabel="1"/>
 
                 <group class="oe_subtotal_footer oe_right">
                     <field name="subtotal" readonly="1"/>
@@ -108,7 +108,9 @@
                             type="object"
                             string="Send to Account Manager"
                             class="btn-primary"/>
-                    <button string="Cancel" special="cancel" class="btn-secondary"/>
+                    <button string="Cancel"
+                            special="cancel"
+                            class="btn-secondary"/>
                 </footer>
             </form>
         </field>

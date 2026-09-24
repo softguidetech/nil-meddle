@@ -82,6 +82,7 @@
 
                 <field name="line_ids" nolabel="1">
                     <tree editable="bottom" create="false" delete="false">
+                        <field name="course_id" column_invisible="1"/>
                         <field name="selected"/>
                         <field name="training_name" readonly="1"/>
                         <field name="description" readonly="1" optional="show"/>

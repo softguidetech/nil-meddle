@@ -15,7 +15,6 @@
                             <field name="sent_at"/>
                         </group>
                         <group>
-                            <field name="markup_pct" groups="base.group_system"/>
                             <field name="currency_id"/>
                             <field name="subtotal"/>
                             <field name="vat_amount"/>
@@ -28,9 +27,9 @@
                     <field name="line_ids" nolabel="1">
                         <tree create="false" delete="false" edit="false">
                             <field name="training_name"/>
-                            <field name="description" optional="show"/>
                             <field name="delivery_type"/>
                             <field name="students"/>
+                            <field name="markup_pct" groups="base.group_system"/>
                             <field name="price_before_vat"/>
                             <field name="vat_rate"/>
                             <field name="vat_amount"/>
@@ -50,7 +49,6 @@
                 <field name="sent_at"/>
                 <field name="account_manager_id"/>
                 <field name="sent_by_id"/>
-                <field name="markup_pct" groups="base.group_system"/>
                 <field name="subtotal"/>
                 <field name="vat_amount"/>
                 <field name="total"/>
@@ -70,32 +68,39 @@
                                options="{'no_create': True, 'no_create_edit': True}"/>
                     </group>
                     <group>
-                        <field name="markup_pct"/>
                         <field name="currency_id"/>
                     </group>
                 </group>
 
                 <div class="alert alert-info" role="alert">
-                    Select the Cash trainings you want to send. The Account Manager
-                    receives selling prices only. LCP costs and Markup are not sent.
+                    Select the Cash trainings you want to send and set a separate Markup % for each training.
+                    The Account Manager receives selling prices only. LCP costs and Markup are not sent.
                 </div>
 
-                <field name="available_course_ids" invisible="1"/>
+                <field name="currency_mismatch" invisible="1"/>
 
-                <group string="Select Cash Trainings">
-                    <field name="selected_course_ids"
-                           widget="many2many_checkboxes"
-                           domain="[('id', 'in', available_course_ids)]"
-                           options="{'no_create': True, 'no_create_edit': True}"
-                           nolabel="1"/>
-                </group>
+                <div class="alert alert-warning"
+                     role="alert"
+                     invisible="not currency_mismatch">
+                    Selected trainings use different currencies. Select trainings with the same currency.
+                </div>
 
-                <separator string="Preview"/>
-
-                <field name="preview_html"
-                       widget="html"
-                       readonly="1"
-                       nolabel="1"/>
+                <field name="line_ids" nolabel="1">
+                    <tree editable="bottom" create="false" delete="false">
+                        <field name="course_id" column_invisible="1"/>
+                        <field name="currency_id" column_invisible="1"/>
+                        <field name="cost_amount" column_invisible="1"/>
+                        <field name="selected"/>
+                        <field name="training_name" readonly="1"/>
+                        <field name="delivery_type" readonly="1"/>
+                        <field name="students" readonly="1"/>
+                        <field name="markup_pct"/>
+                        <field name="price_before_vat" readonly="1"/>
+                        <field name="vat_rate" readonly="1"/>
+                        <field name="vat_amount" readonly="1"/>
+                        <field name="total" readonly="1"/>
+                    </tree>
+                </field>
 
                 <group class="oe_subtotal_footer oe_right">
                     <field name="subtotal" readonly="1"/>
@@ -138,7 +143,6 @@
                             <field name="sent_at"/>
                             <field name="account_manager_id"/>
                             <field name="sent_by_id"/>
-                            <field name="markup_pct" groups="base.group_system"/>
                             <field name="subtotal"/>
                             <field name="vat_amount"/>
                             <field name="total"/>

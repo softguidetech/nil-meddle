@@ -60,7 +60,12 @@ class TrainingCourse(models.Model):
         seats = max(self.no_of_student or 0, 0)
         seat_rate = self.lcp_clcs_per_seat or 0.0
         if self.lcp_cost_learning_partner == 'EnterOne':
-            return seat_rate * seats
+            return (
+                seat_rate
+                * seats
+                * (self.lcp_partner_share_pct or 0.0)
+                / 100.0
+            )
         if self.lcp_cost_learning_partner == 'Koenig':
             discount = self._koenig_cash_discount_pct()
             discounted = seat_rate * (1.0 - discount / 100.0) * seats
@@ -111,7 +116,7 @@ class TrainingCourse(models.Model):
         'duration', 'location', 'lcp_clcs_per_seat', 'lcp_instructor_source',
         'lcp_instructor_md_rate', 'lcp_vendor_instructor_day', 'lcp_uber_day_rate',
         'lcp_per_diem_rate', 'lcp_per_diem_days', 'lcp_cost_learning_partner',
-        'lcp_venue_cost', 'lcp_catering_cost', 'lcp_vat_rate'
+        'lcp_partner_share_pct', 'lcp_venue_cost', 'lcp_catering_cost', 'lcp_vat_rate'
     )
     def _onchange_lcp_commercial_values(self):
         for line in self:

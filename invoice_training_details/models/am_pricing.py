@@ -320,9 +320,24 @@ class AmPricingWizard(models.TransientModel):
                 )
             )
 
+        notify_users = self.account_manager_id
+        if self.lead_id.user_id:
+            notify_users |= self.lead_id.user_id
+
+        notify_partners = notify_users.mapped('partner_id').filtered(lambda p: p)
+        mention_links = [
+            Markup(
+                '<a href="#" data-oe-model="res.partner" data-oe-id="%s">@%s</a>'
+            ) % (
+                partner.id,
+                escape(partner.name or ''),
+            )
+            for partner in notify_partners
+        ]
+        mentions_html = Markup(', ').join(mention_links)
+
         body = Markup(
-            '<p><strong>Pricing ready for Account Manager</strong></p>'
-            '<p>Account Manager: %s</p>'
+            '<p><strong>Pricing ready</strong> for %s</p>'
             '<table style="border-collapse:collapse;width:100%%;">'
             '<thead><tr>'
             '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
@@ -337,7 +352,7 @@ class AmPricingWizard(models.TransientModel):
             '<strong>VAT:</strong> %s<br/>'
             '<strong>Total:</strong> %s</p>'
         ) % (
-            escape(self.account_manager_id.name),
+            mentions_html,
             Markup(''.join(rows)),
             escape(formatLang(
                 self.env,
@@ -358,7 +373,7 @@ class AmPricingWizard(models.TransientModel):
 
         self.lead_id.message_post(
             body=body,
-            partner_ids=[self.account_manager_id.partner_id.id],
+            partner_ids=notify_partners.ids,
             subtype_xmlid='mail.mt_note',
         )
 

@@ -4,6 +4,7 @@ from markupsafe import Markup, escape
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError, ValidationError
+from odoo.tools.misc import formatLang
 
 
 class AmPricing(models.Model):
@@ -295,13 +296,14 @@ class AmPricingWizard(models.TransientModel):
         if not self.account_manager_id:
             raise UserError(_('Select an Account Manager.'))
 
+        selected_currency = currencies[:1]
         pricing = self.env['am.pricing'].create({
             'lead_id': self.lead_id.id,
             'account_manager_id': self.account_manager_id.id,
             'sent_by_id': self.env.user.id,
             'sent_at': fields.Datetime.now(),
             'markup_pct': self.markup_pct,
-            'currency_id': self.currency_id.id,
+            'currency_id': selected_currency.id,
             'line_ids': [
                 (0, 0, {
                     'course_id': line.course_id.id,
@@ -318,7 +320,7 @@ class AmPricingWizard(models.TransientModel):
             ],
         })
 
-        currency = self.currency_id
+        currency = selected_currency
         rows = []
         for line in pricing.line_ids:
             delivery = dict(line._fields['delivery_type'].selection).get(
@@ -329,6 +331,7 @@ class AmPricingWizard(models.TransientModel):
                 '<tr>'
                 '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
                 '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
+                '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
                 '<td style="padding:6px;border:1px solid #ddd;text-align:center;">%s</td>'
                 '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%s</td>'
                 '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%s%%</td>'
@@ -337,21 +340,23 @@ class AmPricingWizard(models.TransientModel):
                 '</tr>'
                 % (
                     escape(line.training_name or ''),
+                    escape(line.description or ''),
                     escape(delivery),
                     line.students,
-                    escape(currency.format(line.price_before_vat)),
+                    escape(formatLang(self.env, line.price_before_vat, currency_obj=currency)),
                     ('%g' % (line.vat_rate or 0.0)),
-                    escape(currency.format(line.vat_amount)),
-                    escape(currency.format(line.total)),
+                    escape(formatLang(self.env, line.vat_amount, currency_obj=currency)),
+                    escape(formatLang(self.env, line.total, currency_obj=currency)),
                 )
             )
 
         body = Markup(
             '<p><strong>Pricing ready for Account Manager</strong></p>'
-            '<p>Account Manager: %s<br/>Markup applied: %s%%</p>'
+            '<p>Account Manager: %s</p>'
             '<table style="border-collapse:collapse;width:100%%;">'
             '<thead><tr>'
             '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
+            '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Description</th>'
             '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
             '<th style="padding:6px;border:1px solid #ddd;">Students</th>'
             '<th style="padding:6px;border:1px solid #ddd;">Price Before VAT</th>'
@@ -364,11 +369,10 @@ class AmPricingWizard(models.TransientModel):
             '<strong>Total:</strong> %s</p>'
         ) % (
             escape(self.account_manager_id.name),
-            ('%g' % self.markup_pct),
             Markup(''.join(rows)),
-            escape(currency.format(pricing.subtotal)),
-            escape(currency.format(pricing.vat_amount)),
-            escape(currency.format(pricing.total)),
+            escape(formatLang(self.env, pricing.subtotal, currency_obj=currency)),
+            escape(formatLang(self.env, pricing.vat_amount, currency_obj=currency)),
+            escape(formatLang(self.env, pricing.total, currency_obj=currency)),
         )
 
         self.lead_id.message_post(

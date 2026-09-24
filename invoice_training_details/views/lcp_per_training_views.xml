@@ -43,6 +43,7 @@
                                 <field name="lcp_per_diem_days"/>
                                 <field name="lcp_cost_learning_partner"/>
                                 <field name="lcp_partner_share_pct"/>
+                                <field name="lcp_markup_pct"/>
                                 <field name="lcp_partner_cash_cost"/>
                                 <field name="lcp_venue_cost"/>
                                 <field name="lcp_catering_cost"/>

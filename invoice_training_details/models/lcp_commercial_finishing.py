@@ -9,15 +9,13 @@ class TrainingCourse(models.Model):
     _inherit = 'training.course'
 
     def _lcp_sync_clc_price_to_rate_card(self):
-        """Fill CLC Training Price from Total Rate Card only when Price is blank."""
-        for line in self.filtered(
-            lambda rec: rec.payment_method == 'clc' and not rec.price
-        ):
+        """Keep every CLC Training Price equal to Rate Card / Seat x Seats."""
+        for line in self.filtered(lambda rec: rec.payment_method == 'clc'):
             total_rate_card = (
                 (line.lcp_rate_card_per_seat or 0.0)
                 * max(line.no_of_student or 0, 0)
             )
-            if total_rate_card:
+            if abs((line.price or 0.0) - total_rate_card) > 0.000001:
                 line.with_context(skip_lcp_clc_price_sync=True).write({
                     'price': total_rate_card,
                 })
@@ -25,7 +23,7 @@ class TrainingCourse(models.Model):
     @api.onchange('payment_method', 'no_of_student', 'lcp_rate_card_per_seat')
     def _onchange_lcp_clc_price_to_rate_card(self):
         for line in self:
-            if line.payment_method == 'clc' and not line.price:
+            if line.payment_method == 'clc':
                 line.price = (
                     (line.lcp_rate_card_per_seat or 0.0)
                     * max(line.no_of_student or 0, 0)

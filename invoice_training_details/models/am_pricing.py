@@ -128,6 +128,29 @@ class AmPricingLine(models.Model):
         string='Students',
         readonly=True,
     )
+    payment_method = fields.Selection(
+        [('cash', 'Cash'), ('clc', 'CLC')],
+        string='Payment Method',
+        readonly=True,
+    )
+    rate_card_per_seat = fields.Monetary(
+        string='Rate Card / Seat',
+        currency_field='currency_id',
+        readonly=True,
+    )
+    clcs_per_seat = fields.Float(
+        string='CLCs / Seat',
+        readonly=True,
+    )
+    total_clcs_with_vat = fields.Integer(
+        string='Total CLCs + VAT',
+        readonly=True,
+    )
+    training_value = fields.Monetary(
+        string='Training Value',
+        currency_field='currency_id',
+        readonly=True,
+    )
     markup_pct = fields.Float(
         string='Markup %',
         digits=(16, 2),
@@ -186,7 +209,7 @@ class AmPricingWizard(models.TransientModel):
     line_ids = fields.One2many(
         'am.pricing.wizard.line',
         'wizard_id',
-        string='Cash Trainings',
+        string='Trainings',
     )
     currency_mismatch = fields.Boolean(
         string='Currency Mismatch',
@@ -244,7 +267,7 @@ class AmPricingWizard(models.TransientModel):
 
         selected = self.line_ids.filtered('selected')
         if not selected:
-            raise UserError(_('Select at least one Cash training.'))
+            raise UserError(_('Select at least one training.'))
 
         if selected.filtered(lambda line: line.markup_pct < 0):
             raise UserError(_('Markup % cannot be negative.'))
@@ -265,6 +288,11 @@ class AmPricingWizard(models.TransientModel):
                 'training_name': line.training_name,
                 'delivery_type': line.delivery_type,
                 'students': line.students,
+                'payment_method': line.payment_method,
+                'rate_card_per_seat': line.rate_card_per_seat,
+                'clcs_per_seat': line.clcs_per_seat,
+                'total_clcs_with_vat': line.total_clcs_with_vat,
+                'training_value': line.training_value,
                 'markup_pct': line.markup_pct,
                 'price_before_vat': line.price_before_vat,
                 'vat_rate': line.vat_rate,
@@ -281,13 +309,47 @@ class AmPricingWizard(models.TransientModel):
             'line_ids': line_commands,
         })
 
-        rows = []
+        cash_rows = []
+        clc_rows = []
         for line in pricing.line_ids:
             delivery = dict(
                 line._fields['delivery_type'].selection
             ).get(line.delivery_type, line.delivery_type or '')
 
-            rows.append(
+            if line.payment_method == 'clc':
+                clc_rows.append(
+                    '<tr>'
+                    '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:center;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;"><strong>%s</strong></td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%g</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%g%%</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;"><strong>%s</strong></td>'
+                    '</tr>'
+                    % (
+                        escape(line.training_name or ''),
+                        escape(delivery),
+                        line.students,
+                        escape(formatLang(
+                            self.env,
+                            line.rate_card_per_seat,
+                            currency_obj=currency,
+                        )),
+                        escape(formatLang(
+                            self.env,
+                            line.training_value,
+                            currency_obj=currency,
+                        )),
+                        line.clcs_per_seat or 0.0,
+                        line.vat_rate or 0.0,
+                        line.total_clcs_with_vat or 0,
+                    )
+                )
+                continue
+
+            cash_rows.append(
                 '<tr>'
                 '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
                 '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
@@ -320,6 +382,40 @@ class AmPricingWizard(models.TransientModel):
                 )
             )
 
+        pricing_tables = []
+        if cash_rows:
+            pricing_tables.append(
+                '<p><strong>Cash Pricing</strong></p>'
+                '<table style="border-collapse:collapse;width:100%%;">'
+                '<thead><tr>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Students</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Price Before VAT</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">VAT</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">VAT Amount</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Total</th>'
+                '</tr></thead><tbody>%s</tbody></table>'
+                % ''.join(cash_rows)
+            )
+
+        if clc_rows:
+            pricing_tables.append(
+                '<p><strong>CLC Pricing</strong></p>'
+                '<table style="border-collapse:collapse;width:100%%;">'
+                '<thead><tr>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Students</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Rate Card / Seat</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Training Value</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">CLCs / Seat</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">VAT</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Total CLCs + VAT</th>'
+                '</tr></thead><tbody>%s</tbody></table>'
+                % ''.join(clc_rows)
+            )
+
         notify_users = self.account_manager_id
         if self.lead_id.user_id:
             notify_users |= self.lead_id.user_id
@@ -338,22 +434,13 @@ class AmPricingWizard(models.TransientModel):
 
         body = Markup(
             '<p><strong>Pricing ready</strong> for %s</p>'
-            '<table style="border-collapse:collapse;width:100%%;">'
-            '<thead><tr>'
-            '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
-            '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">Students</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">Price Before VAT</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">VAT</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">VAT Amount</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">Total</th>'
-            '</tr></thead><tbody>%s</tbody></table>'
+            '%s'
             '<p><strong>Subtotal:</strong> %s<br/>'
             '<strong>VAT:</strong> %s<br/>'
             '<strong>Total:</strong> %s</p>'
         ) % (
             mentions_html,
-            Markup(''.join(rows)),
+            Markup(''.join(pricing_tables)),
             escape(formatLang(
                 self.env,
                 pricing.subtotal,
@@ -430,6 +517,24 @@ class AmPricingWizardLine(models.TransientModel):
         string='Students',
         readonly=True,
     )
+    payment_method = fields.Selection(
+        [('cash', 'Cash'), ('clc', 'CLC')],
+        string='Payment Method',
+        readonly=True,
+    )
+    rate_card_per_seat = fields.Monetary(
+        string='Rate Card / Seat',
+        currency_field='currency_id',
+        readonly=True,
+    )
+    clcs_per_seat = fields.Float(
+        string='CLCs / Seat',
+        readonly=True,
+    )
+    total_clcs_with_vat = fields.Integer(
+        string='Total CLCs + VAT',
+        readonly=True,
+    )
     currency_id = fields.Many2one(
         'res.currency',
         string='Currency',
@@ -478,22 +583,28 @@ class AmPricingWizardLine(models.TransientModel):
             if line.markup_pct < 0:
                 raise ValidationError(_('Markup % cannot be negative.'))
 
-    @api.depends('training_value', 'vat_rate')
+    @api.depends('training_value', 'vat_rate', 'payment_method')
     def _compute_prices(self):
         for line in self:
-            gross_total = line.training_value or 0.0
+            training_value = line.training_value or 0.0
+
+            if line.payment_method == 'clc':
+                line.price_before_vat = training_value
+                line.vat_amount = 0.0
+                line.total = training_value
+                continue
+
             vat_rate = line.vat_rate or 0.0
-
             if vat_rate:
-                price_before_vat = gross_total / (1.0 + (vat_rate / 100.0))
+                price_before_vat = training_value / (1.0 + (vat_rate / 100.0))
             else:
-                price_before_vat = gross_total
+                price_before_vat = training_value
 
-            vat_amount = gross_total - price_before_vat
+            vat_amount = training_value - price_before_vat
 
             line.price_before_vat = price_before_vat
             line.vat_amount = vat_amount
-            line.total = gross_total
+            line.total = training_value
 
 
 class CrmLead(models.Model):
@@ -509,11 +620,15 @@ class CrmLead(models.Model):
     def action_open_am_pricing_wizard(self):
         self.ensure_one()
 
-        cash_courses = self.training_course_ids.filtered(
-            lambda course: course.payment_method == 'cash'
+        pricing_courses = self.training_course_ids.filtered(
+            lambda course: course.payment_method in ('cash', 'clc')
         )
-        if not cash_courses:
-            raise UserError(_('This opportunity has no Cash trainings to send.'))
+        if not pricing_courses:
+            raise UserError(_('This opportunity has no Cash or CLC trainings to send.'))
+
+        pricing_courses.filtered(
+            lambda course: course.payment_method == 'clc'
+        )._lcp_sync_clc_price_to_rate_card()
 
         wizard = self.env['am.pricing.wizard'].create({
             'lead_id': self.id,
@@ -522,7 +637,7 @@ class CrmLead(models.Model):
 
         line_commands = []
         usd = self.env.ref('base.USD')
-        for course in cash_courses:
+        for course in pricing_courses:
             currency = course.lcp_currency_id or usd
             line_commands.append((0, 0, {
                 'course_id': course.id,
@@ -533,9 +648,29 @@ class CrmLead(models.Model):
                 ),
                 'delivery_type': course.location or False,
                 'students': course.no_of_student or 0,
+                'payment_method': course.payment_method,
                 'currency_id': currency.id,
+                'rate_card_per_seat': (
+                    course.lcp_rate_card_per_seat or 0.0
+                    if course.payment_method == 'clc'
+                    else 0.0
+                ),
+                'clcs_per_seat': (
+                    course.lcp_clcs_per_seat or 0.0
+                    if course.payment_method == 'clc'
+                    else 0.0
+                ),
+                'total_clcs_with_vat': (
+                    course.lcp_total_clcs_with_vat or 0
+                    if course.payment_method == 'clc'
+                    else 0
+                ),
                 'cost_amount': course.lcp_total_costs or 0.0,
-                'markup_pct': course.lcp_markup_pct or 0.0,
+                'markup_pct': (
+                    course.lcp_markup_pct or 0.0
+                    if course.payment_method == 'cash'
+                    else 0.0
+                ),
                 'training_value': course.price or 0.0,
                 'vat_rate': course.lcp_vat_rate or 0.0,
                 'selected': False,

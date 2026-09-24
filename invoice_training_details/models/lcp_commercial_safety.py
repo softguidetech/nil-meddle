@@ -21,7 +21,7 @@ class TrainingCourse(models.Model):
         self.ensure_one()
         if self.payment_method != 'cash':
             return 0.0
-        costs = self._lcp_cash_all_costs()
+        costs = self.lcp_total_costs or 0.0
         if costs <= 0:
             return 0.0
         return costs * (1.0 + ((self.lcp_markup_pct or 0.0) / 100.0))

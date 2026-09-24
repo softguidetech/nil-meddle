@@ -30,7 +30,13 @@ class TrainingCourse(models.Model):
         costs = self.lcp_total_costs or 0.0
         if costs <= 0:
             return 0.0
-        return costs * (1.0 + ((self.lcp_markup_pct or 0.0) / 100.0))
+        value_before_vat = (
+            costs * (1.0 + ((self.lcp_markup_pct or 0.0) / 100.0))
+        )
+        return (
+            value_before_vat
+            * (1.0 + ((self.lcp_vat_rate or 0.0) / 100.0))
+        )
 
     def _lcp_autofill_cash_price_if_blank(self):
         for line in self:

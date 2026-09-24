@@ -73,8 +73,9 @@
                 </group>
 
                 <div class="alert alert-info" role="alert">
-                    Select the Cash trainings you want to send and set a separate Markup % for each training.
-                    The Account Manager receives selling prices only. LCP costs and Markup are not sent.
+                    Select the Cash trainings you want to send.
+                    Prices are taken directly from each Training Value in the LCP.
+                    LCP costs and Markup are not sent to the Account Manager.
                 </div>
 
                 <field name="currency_mismatch" invisible="1"/>
@@ -94,7 +95,6 @@
                         <field name="training_name" readonly="1"/>
                         <field name="delivery_type" readonly="1"/>
                         <field name="students" readonly="1"/>
-                        <field name="markup_pct"/>
                         <field name="price_before_vat" readonly="1"/>
                         <field name="vat_rate" readonly="1"/>
                         <field name="vat_amount" readonly="1"/>

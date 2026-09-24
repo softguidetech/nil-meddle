@@ -465,7 +465,9 @@ class TrainingCourse(models.Model):
                     )
                 )
                 partner_share = (
-                    max(enterone_share_base, 0.0) * 0.20
+                    max(enterone_share_base, 0.0)
+                    * (line.lcp_partner_share_pct or 0.0)
+                    / 100.0
                 )
                 profit = net_after_costs - partner_share
 

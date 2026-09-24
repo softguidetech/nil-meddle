@@ -50,7 +50,7 @@
                 <field name="sent_at"/>
                 <field name="account_manager_id"/>
                 <field name="sent_by_id"/>
-                <field name="markup_pct"/>
+                <field name="markup_pct" groups="base.group_system"/>
                 <field name="subtotal"/>
                 <field name="vat_amount"/>
                 <field name="total"/>

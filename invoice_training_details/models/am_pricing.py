@@ -421,7 +421,6 @@ class AmPricingWizardLine(models.TransientModel):
     course_id = fields.Many2one(
         'training.course',
         string='Training Source',
-        required=True,
         readonly=True,
     )
     training_name = fields.Char(string='Training', readonly=True)

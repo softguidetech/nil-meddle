@@ -309,13 +309,47 @@ class AmPricingWizard(models.TransientModel):
             'line_ids': line_commands,
         })
 
-        rows = []
+        cash_rows = []
+        clc_rows = []
         for line in pricing.line_ids:
             delivery = dict(
                 line._fields['delivery_type'].selection
             ).get(line.delivery_type, line.delivery_type or '')
 
-            rows.append(
+            if line.payment_method == 'clc':
+                clc_rows.append(
+                    '<tr>'
+                    '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:center;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%s</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;"><strong>%s</strong></td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%g</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;">%g%%</td>'
+                    '<td style="padding:6px;border:1px solid #ddd;text-align:right;"><strong>%s</strong></td>'
+                    '</tr>'
+                    % (
+                        escape(line.training_name or ''),
+                        escape(delivery),
+                        line.students,
+                        escape(formatLang(
+                            self.env,
+                            line.rate_card_per_seat,
+                            currency_obj=currency,
+                        )),
+                        escape(formatLang(
+                            self.env,
+                            line.training_value,
+                            currency_obj=currency,
+                        )),
+                        line.clcs_per_seat or 0.0,
+                        line.vat_rate or 0.0,
+                        line.total_clcs_with_vat or 0,
+                    )
+                )
+                continue
+
+            cash_rows.append(
                 '<tr>'
                 '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
                 '<td style="padding:6px;border:1px solid #ddd;">%s</td>'
@@ -348,6 +382,40 @@ class AmPricingWizard(models.TransientModel):
                 )
             )
 
+        pricing_tables = []
+        if cash_rows:
+            pricing_tables.append(
+                '<p><strong>Cash Pricing</strong></p>'
+                '<table style="border-collapse:collapse;width:100%;">'
+                '<thead><tr>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Students</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Price Before VAT</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">VAT</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">VAT Amount</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Total</th>'
+                '</tr></thead><tbody>%s</tbody></table>'
+                % ''.join(cash_rows)
+            )
+
+        if clc_rows:
+            pricing_tables.append(
+                '<p><strong>CLC Pricing</strong></p>'
+                '<table style="border-collapse:collapse;width:100%;">'
+                '<thead><tr>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
+                '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Students</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Rate Card / Seat</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Training Value</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">CLCs / Seat</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">VAT</th>'
+                '<th style="padding:6px;border:1px solid #ddd;">Total CLCs + VAT</th>'
+                '</tr></thead><tbody>%s</tbody></table>'
+                % ''.join(clc_rows)
+            )
+
         notify_users = self.account_manager_id
         if self.lead_id.user_id:
             notify_users |= self.lead_id.user_id
@@ -366,22 +434,13 @@ class AmPricingWizard(models.TransientModel):
 
         body = Markup(
             '<p><strong>Pricing ready</strong> for %s</p>'
-            '<table style="border-collapse:collapse;width:100%%;">'
-            '<thead><tr>'
-            '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
-            '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">Students</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">Price Before VAT</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">VAT</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">VAT Amount</th>'
-            '<th style="padding:6px;border:1px solid #ddd;">Total</th>'
-            '</tr></thead><tbody>%s</tbody></table>'
+            '%s'
             '<p><strong>Subtotal:</strong> %s<br/>'
             '<strong>VAT:</strong> %s<br/>'
             '<strong>Total:</strong> %s</p>'
         ) % (
             mentions_html,
-            Markup(''.join(rows)),
+            Markup(''.join(pricing_tables)),
             escape(formatLang(
                 self.env,
                 pricing.subtotal,

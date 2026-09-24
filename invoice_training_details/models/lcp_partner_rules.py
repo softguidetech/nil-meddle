@@ -123,10 +123,13 @@ class TrainingCourse(models.Model):
             partner_share = line.lcp_partner_share or 0.0
 
             if line.lcp_cost_learning_partner == 'EnterOne':
-                # EnterOne Cash invoice = Cost / Seat x number of seats.
+                # EnterOne Cash keeps the existing USD / Seat x Seats base,
+                # but the partner share percentage is entered manually in LCP.
                 partner_share = (
-                    (line.lcp_partner_cash_cost or 0.0)
+                    (line.lcp_clcs_per_seat or 0.0)
                     * seats
+                    * (line.lcp_partner_share_pct or 0.0)
+                    / 100.0
                 )
 
             elif line.lcp_cost_learning_partner == 'Koenig':

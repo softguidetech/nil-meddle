@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class TrainingCourse(models.Model):
@@ -16,6 +16,12 @@ class TrainingCourse(models.Model):
         digits=(16, 2),
         default=0.0,
     )
+
+    @api.constrains('lcp_markup_pct')
+    def _check_lcp_markup_pct(self):
+        for line in self:
+            if (line.lcp_markup_pct or 0.0) < 0:
+                raise ValidationError(_('Markup % cannot be negative.'))
 
     def _lcp_expected_cash_price(self):
         self.ensure_one()

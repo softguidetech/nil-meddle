@@ -209,8 +209,10 @@ class CrmLead(models.Model):
             hotel = course.lcp_hotel_total or 0.0
             instructor = course.lcp_total_instructor_md or 0.0 if course.lcp_instructor_source == 'nil_me' else 0.0
             net = max(rate_card - flight - hotel - instructor, 0.0)
-            enterone = net * 0.20
-            nilme = net * 0.80
+            share_pct = course.lcp_partner_share_pct or 0.0
+            nilme_pct = 100.0 - share_pct
+            enterone = net * share_pct / 100.0
+            nilme = net * nilme_pct / 100.0
             rows = [
                 ('Total Rate Card', self._lcp_money(rate_card), True),
                 ('Deductible amounts', '', True),
@@ -221,8 +223,16 @@ class CrmLead(models.Model):
                 rows.append(('NIL ME Instructor', self._lcp_money(instructor), False))
             rows += [
                 ('Total', self._lcp_money(net), True),
-                ('EnterOne Share 20%', self._lcp_money(enterone), False),
-                ('NIL ME Share 80%', self._lcp_money(nilme), False),
+                (
+                    'EnterOne Share %s%%' % ('%g' % share_pct),
+                    self._lcp_money(enterone),
+                    False,
+                ),
+                (
+                    'NIL ME Share %s%%' % ('%g' % nilme_pct),
+                    self._lcp_money(nilme),
+                    False,
+                ),
                 ('NIL ME Invoice', self._lcp_money(nilme + flight + hotel + instructor), True),
             ]
             blocks.append(self._lcp_html_table(course.training_id.display_name or course.name or 'Training', rows))

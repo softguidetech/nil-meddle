@@ -94,10 +94,14 @@ class TrainingCourse(models.Model):
                 continue
             line._lcp_apply_country_vat()
             costs = line.lcp_total_costs or 0.0
-            line.price = (
+            value_before_vat = (
                 costs * (1.0 + ((line.lcp_markup_pct or 0.0) / 100.0))
                 if costs > 0
                 else 0.0
+            )
+            line.price = (
+                value_before_vat
+                * (1.0 + ((line.lcp_vat_rate or 0.0) / 100.0))
             )
 
     def _lcp_sync_to_lead_logistics(self):
@@ -385,9 +389,13 @@ class CrmLead(models.Model):
                     if course.payment_method == 'cash' and not course.price:
                         costs = course.lcp_total_costs or 0.0
                         if costs > 0:
-                            data['price'] = (
+                            value_before_vat = (
                                 costs
                                 * (1.0 + ((course.lcp_markup_pct or 0.0) / 100.0))
+                            )
+                            data['price'] = (
+                                value_before_vat
+                                * (1.0 + ((rate if rate is not None else course.lcp_vat_rate) or 0.0) / 100.0)
                             )
                     if data:
                         course.with_context(skip_lcp_logistics_sync=True).write(data)

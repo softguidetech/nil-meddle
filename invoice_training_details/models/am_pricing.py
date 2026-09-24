@@ -466,15 +466,19 @@ class AmPricingWizardLine(models.TransientModel):
     @api.depends('training_value', 'vat_rate')
     def _compute_prices(self):
         for line in self:
-            price_before_vat = line.training_value or 0.0
-            vat_amount = (
-                price_before_vat
-                * (line.vat_rate or 0.0)
-                / 100.0
-            )
+            gross_total = line.training_value or 0.0
+            vat_rate = line.vat_rate or 0.0
+
+            if vat_rate:
+                price_before_vat = gross_total / (1.0 + (vat_rate / 100.0))
+            else:
+                price_before_vat = gross_total
+
+            vat_amount = gross_total - price_before_vat
+
             line.price_before_vat = price_before_vat
             line.vat_amount = vat_amount
-            line.total = price_before_vat + vat_amount
+            line.total = gross_total
 
 
 class CrmLead(models.Model):

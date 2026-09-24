@@ -451,7 +451,15 @@ class AmPricingWizard(models.TransientModel):
                 '<th style="padding:6px;border:1px solid #ddd;">VAT Amount</th>'
                 '<th style="padding:6px;border:1px solid #ddd;">Total</th>'
                 '</tr></thead><tbody>%s</tbody></table>'
-                % ''.join(cash_rows)
+                '<p><strong>Cash Total:</strong> %s</p>'
+                % (
+                    ''.join(cash_rows),
+                    escape(formatLang(
+                        self.env,
+                        pricing.cash_total,
+                        currency_obj=currency,
+                    )),
+                )
             )
 
         if clc_rows:
@@ -465,7 +473,11 @@ class AmPricingWizard(models.TransientModel):
                 '<th style="padding:6px;border:1px solid #ddd;">CLCs / Seat</th>'
                 '<th style="padding:6px;border:1px solid #ddd;">Total CLCs + VAT</th>'
                 '</tr></thead><tbody>%s</tbody></table>'
-                % ''.join(clc_rows)
+                '<p><strong>CLC Total:</strong> %s CLCs</p>'
+                % (
+                    ''.join(clc_rows),
+                    pricing.clc_total or 0,
+                )
             )
 
         notify_users = self.account_manager_id
@@ -484,30 +496,12 @@ class AmPricingWizard(models.TransientModel):
         ]
         mentions_html = Markup(', ').join(mention_links)
 
-        totals_html = []
-        if pricing.has_cash_pricing:
-            totals_html.append(
-                '<strong>Cash Total:</strong> %s'
-                % escape(formatLang(
-                    self.env,
-                    pricing.cash_total,
-                    currency_obj=currency,
-                ))
-            )
-        if pricing.has_clc_pricing:
-            totals_html.append(
-                '<strong>CLC Total:</strong> %s CLCs'
-                % (pricing.clc_total or 0)
-            )
-
         body = Markup(
             '<p><strong>Pricing ready</strong> for %s</p>'
             '%s'
-            '<p>%s</p>'
         ) % (
             mentions_html,
             Markup(''.join(pricing_tables)),
-            Markup('<br/>'.join(totals_html)),
         )
 
         self.lead_id.message_post(

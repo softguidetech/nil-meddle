@@ -80,7 +80,7 @@
                                                         readonly="true"/>
                                     </div>
 
-                                    <div t-if="line.data.payment_method === 'clc' &amp;&amp; line.data.lcp_cost_learning_partner !== 'EnterOne'"
+                                    <div t-if="line.data.payment_method === 'clc'"
                                          class="mt-3">
                                         <div class="small text-muted fw-bold mb-1">Partner Share %</div>
                                         <FloatField record="line"

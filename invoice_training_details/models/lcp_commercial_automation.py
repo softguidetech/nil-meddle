@@ -90,12 +90,15 @@ class TrainingCourse(models.Model):
 
     def _lcp_autofill_cash_price_if_blank(self):
         for line in self:
-            if line.payment_method != 'cash' or line.price:
+            if line.payment_method != 'cash':
                 continue
             line._lcp_apply_country_vat()
-            costs = line._lcp_cash_all_costs()
-            if costs > 0:
-                line.price = costs * 1.5 * (1.0 + (line.lcp_vat_rate or 0.0) / 100.0)
+            costs = line.lcp_total_costs or 0.0
+            line.price = (
+                costs * (1.0 + ((line.lcp_markup_pct or 0.0) / 100.0))
+                if costs > 0
+                else 0.0
+            )
 
     def _lcp_sync_to_lead_logistics(self):
         for lead in self.mapped('lead_id').filtered(lambda r: r):
@@ -111,7 +114,7 @@ class TrainingCourse(models.Model):
         'duration', 'location', 'lcp_clcs_per_seat', 'lcp_instructor_source',
         'lcp_instructor_md_rate', 'lcp_vendor_instructor_day', 'lcp_uber_day_rate',
         'lcp_per_diem_rate', 'lcp_per_diem_days', 'lcp_cost_learning_partner',
-        'lcp_venue_cost', 'lcp_catering_cost', 'lcp_vat_rate'
+        'lcp_venue_cost', 'lcp_catering_cost', 'lcp_vat_rate', 'lcp_markup_pct'
     )
     def _onchange_lcp_commercial_values(self):
         for line in self:
@@ -380,9 +383,12 @@ class CrmLead(models.Model):
                     rate = course._lcp_country_vat_rate()
                     data = {'lcp_vat_rate': rate} if rate is not None else {}
                     if course.payment_method == 'cash' and not course.price:
-                        costs = course._lcp_cash_all_costs()
+                        costs = course.lcp_total_costs or 0.0
                         if costs > 0:
-                            data['price'] = costs * 1.5 * (1.0 + ((rate if rate is not None else course.lcp_vat_rate) or 0.0) / 100.0)
+                            data['price'] = (
+                                costs
+                                * (1.0 + ((course.lcp_markup_pct or 0.0) / 100.0))
+                            )
                     if data:
                         course.with_context(skip_lcp_logistics_sync=True).write(data)
         if not self.env.context.get('skip_lcp_logistics_sync') and {'venue', 'ctrng', 'uber'}.intersection(vals):

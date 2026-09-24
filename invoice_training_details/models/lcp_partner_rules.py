@@ -31,9 +31,31 @@ class TrainingCourse(models.Model):
     )
 
     def _koenig_cash_discount_pct(self):
-        """Koenig Cash: exactly two seats receive 25% discount per seat."""
+        """
+        Koenig Cash slab discount, expressed as one effective percentage
+        so the existing downstream calculations remain unchanged:
+
+        - First 2 seats: 25% discount
+        - Seats 3 to 5: 30% discount
+        - Seat 6 onward: 45% discount
+        """
         self.ensure_one()
-        return 25.0 if max(self.no_of_student or 0, 0) == 2 else 0.0
+
+        seats = max(self.no_of_student or 0, 0)
+        if not seats:
+            return 0.0
+
+        first_two = min(seats, 2)
+        three_to_five = min(max(seats - 2, 0), 3)
+        six_onward = max(seats - 5, 0)
+
+        total_discount_units = (
+            (first_two * 25.0)
+            + (three_to_five * 30.0)
+            + (six_onward * 45.0)
+        )
+
+        return total_discount_units / seats
 
     @api.depends(
         'payment_method',

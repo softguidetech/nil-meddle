@@ -429,6 +429,12 @@ class AmPricingWizardLine(models.TransientModel):
         string='Markup %',
         digits=(16, 2),
         default=0.0,
+        readonly=True,
+    )
+    training_value = fields.Monetary(
+        string='Training Value',
+        currency_field='currency_id',
+        readonly=True,
     )
     vat_rate = fields.Float(
         string='VAT %',
@@ -457,13 +463,10 @@ class AmPricingWizardLine(models.TransientModel):
             if line.markup_pct < 0:
                 raise ValidationError(_('Markup % cannot be negative.'))
 
-    @api.depends('cost_amount', 'markup_pct', 'vat_rate')
+    @api.depends('training_value', 'vat_rate')
     def _compute_prices(self):
         for line in self:
-            price_before_vat = (
-                (line.cost_amount or 0.0)
-                * (1.0 + ((line.markup_pct or 0.0) / 100.0))
-            )
+            price_before_vat = line.training_value or 0.0
             vat_amount = (
                 price_before_vat
                 * (line.vat_rate or 0.0)
@@ -513,8 +516,9 @@ class CrmLead(models.Model):
                 'students': course.no_of_student or 0,
                 'currency_id': currency.id,
                 'cost_amount': course.lcp_total_costs or 0.0,
+                'markup_pct': course.lcp_markup_pct or 0.0,
+                'training_value': course.price or 0.0,
                 'vat_rate': course.lcp_vat_rate or 0.0,
-                'markup_pct': 0.0,
                 'selected': False,
             }))
 

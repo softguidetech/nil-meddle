@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from odoo import api, fields, models, _
-from odoo.exceptions import UserError
+from odoo.exceptions import UserError, ValidationError
 
 
 class TrainingCourse(models.Model):
@@ -11,25 +11,33 @@ class TrainingCourse(models.Model):
         string='Auto Training Price', default=False, copy=False
     )
 
+    lcp_markup_pct = fields.Float(
+        string='Markup %',
+        digits=(16, 2),
+        default=0.0,
+    )
+
+    @api.constrains('lcp_markup_pct')
+    def _check_lcp_markup_pct(self):
+        for line in self:
+            if (line.lcp_markup_pct or 0.0) < 0:
+                raise ValidationError(_('Markup % cannot be negative.'))
+
     def _lcp_expected_cash_price(self):
         self.ensure_one()
         if self.payment_method != 'cash':
             return 0.0
-        costs = self._lcp_cash_all_costs()
+        costs = self.lcp_total_costs or 0.0
         if costs <= 0:
             return 0.0
-        return costs * 1.5 * (1.0 + (self.lcp_vat_rate or 0.0) / 100.0)
+        return costs * (1.0 + ((self.lcp_markup_pct or 0.0) / 100.0))
 
     def _lcp_autofill_cash_price_if_blank(self):
         for line in self:
             if line.payment_method != 'cash':
                 continue
-            if line.price and not line.lcp_auto_price_generated:
-                continue
             line._lcp_apply_country_vat()
             expected = line._lcp_expected_cash_price()
-            if expected <= 0:
-                continue
             line.price = expected
             line.lcp_auto_price_generated = True
 
@@ -41,10 +49,14 @@ class TrainingCourse(models.Model):
             'lcp_vendor_instructor_day', 'lcp_uber_day_rate',
             'lcp_per_diem_rate', 'lcp_per_diem_days',
             'lcp_cost_learning_partner', 'lcp_venue_cost',
-            'lcp_catering_cost', 'lcp_vat_rate',
+            'lcp_catering_cost', 'lcp_vat_rate', 'lcp_markup_pct',
         }.intersection(vals)) and 'price' not in vals
         auto_before = {
-            line.id: (line.lcp_auto_price_generated or not line.price)
+            line.id: (
+                line.lcp_auto_price_generated
+                or not line.price
+                or 'lcp_markup_pct' in vals
+            )
             for line in self
         } if should_reprice else {}
         price_touched = (

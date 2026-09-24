@@ -386,7 +386,7 @@ class AmPricingWizard(models.TransientModel):
         if cash_rows:
             pricing_tables.append(
                 '<p><strong>Cash Pricing</strong></p>'
-                '<table style="border-collapse:collapse;width:100%;">'
+                '<table style="border-collapse:collapse;width:100%%;">'
                 '<thead><tr>'
                 '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
                 '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'
@@ -402,7 +402,7 @@ class AmPricingWizard(models.TransientModel):
         if clc_rows:
             pricing_tables.append(
                 '<p><strong>CLC Pricing</strong></p>'
-                '<table style="border-collapse:collapse;width:100%;">'
+                '<table style="border-collapse:collapse;width:100%%;">'
                 '<thead><tr>'
                 '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Training</th>'
                 '<th style="padding:6px;border:1px solid #ddd;text-align:left;">Delivery Type</th>'

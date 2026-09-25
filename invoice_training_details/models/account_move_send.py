@@ -20,3 +20,17 @@ class AccountMoveSend(models.AbstractModel):
                 return report
 
         return super()._get_default_pdf_report_id(move)
+
+    @api.model
+    def _get_default_mail_template_id(self, move):
+        """Use the editable NIL invoice email template for customer invoices."""
+        if move.move_type == 'out_invoice':
+            template = self.env.ref(
+                'invoice_training_details.mail_template_nil_invoice_sending',
+                raise_if_not_found=False,
+            )
+            if template:
+                return template
+
+        return super()._get_default_mail_template_id(move)
+

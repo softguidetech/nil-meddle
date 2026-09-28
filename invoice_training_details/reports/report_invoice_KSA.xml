@@ -10,7 +10,10 @@
                     <t t-set="forced_vat" t-value="o.fiscal_position_id.foreign_vat"/>
                     <div class="row">
                         <div class="col-12">
-                            <span class="h4 text-info">TAX INVOICE</span>
+                            <span class="h4 text-info">
+                                <t t-if="o.move_type in ('out_refund', 'in_refund')">TAX CREDIT NOTE</t>
+                                <t t-else="">TAX INVOICE</t>
+                            </span>
                         </div>
                     </div>
 
@@ -68,7 +71,10 @@
                             <div>
                                 <table class="table table-borderless">
                                     <tr class="p-0">
-                                        <td class="p-0">INVOICE</td>
+                                        <td class="p-0">
+                                            <t t-if="o.move_type in ('out_refund', 'in_refund')">CREDIT NOTE</t>
+                                            <t t-else="">INVOICE</t>
+                                        </td>
                                         <td class="p-0"><span t-field="o.name"/></td>
                                     </tr>
                                     <tr class="p-0">
@@ -214,6 +220,7 @@
                                                     <span t-out="company_per_unit" t-options='{"widget": "float", "precision": 6}'>0.000000</span>
                                                 </td>
                                             </tr>
+
                                             <tr class="border-black o_total">
     <td style="background-color:#fff;"><strong>Untaxed Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
     <td style="background-color:#fff;" class="text-end">
@@ -227,6 +234,7 @@
         <span t-out="tax_amount_company" t-options='{"widget": "monetary", "display_currency": o.company_id.currency_id}'>0.00</span>
     </td>
 </tr>
+
                                             <tr class="border-black o_total">
                                                 <td style="background-color:#fff;"><strong>Total Currency @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
                                                 <td style="background-color:#fff;" class="text-end">

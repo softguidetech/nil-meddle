@@ -30,8 +30,7 @@
                 <field name="customer_id"/>
 
                 <field name="currency_id"
-                       string="Currency"
-                       optional="show"/>
+                       string="Currency"/>
 
                 <field name="training_value"
                        sum="Total Training Value"/>
@@ -331,7 +330,7 @@
 
                 <filter name="group_salesperson"
                         string="Commission For"
-                        context="{'group_by': 'salesperson_id'}"/>
+                        context="{'group_by': ['currency_id', 'salesperson_id']}"/>
 
                 <filter name="group_customer"
                         string="Customer"
@@ -386,7 +385,7 @@
                ref="view_sales_commission_search"/>
         <!-- Excluded rows disappear from the normal working ledger. -->
         <field name="domain">[('state', '!=', 'excluded')]</field>
-        <field name="context">{'group_by': 'currency_id'}</field>
+        <field name="context">{'group_by': ['currency_id', 'salesperson_id']}</field>
     </record>
 
     <record id="action_sales_commission_excluded" model="ir.actions.act_window">

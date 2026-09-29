@@ -539,8 +539,9 @@ class SalesCommission(models.Model):
                     if ruba_user
                     else vals.get('salesperson_id')
                 )
-                vals['commission_rate'] = (
-                    RUBA_COMMISSION_RATE
+                vals.setdefault(
+                    'commission_rate',
+                    RUBA_COMMISSION_RATE,
                 )
                 vals['is_auto_ruba'] = True
 
@@ -670,9 +671,6 @@ class SalesCommission(models.Model):
                     ruba_user.id
                     if ruba_user
                     else rec.salesperson_id.id
-                )
-                rec_vals['commission_rate'] = (
-                    RUBA_COMMISSION_RATE
                 )
                 rec_vals['is_auto_ruba'] = True
 
@@ -872,9 +870,6 @@ class SalesCommission(models.Model):
                     rec._nil_get_ruba_user()
                 )
                 rec.salesperson_id = ruba_user
-                rec.commission_rate = (
-                    RUBA_COMMISSION_RATE
-                )
 
             elif rec.auto_key == 'salesperson':
                 rec.commission_rate = (

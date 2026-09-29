@@ -578,7 +578,18 @@ class AccountMove(models.Model):
                 ], order='id asc', limit=1)
             )
 
-            if salesperson:
+            is_ruba_salesperson = bool(
+                salesperson
+                and
+                Commission._nil_normalize_name(
+                    salesperson.name
+                ) == 'ruba khattam'
+            )
+
+            if (
+                salesperson
+                and not is_ruba_salesperson
+            ):
 
                 fixed_rate = (
                     Commission
@@ -633,7 +644,11 @@ class AccountMove(models.Model):
                 )
 
             # =========================================================
-            # NO SALESPERSON ON INVOICE
+            # NO SALESPERSON / RUBA IS THE SALESPERSON
+            #
+            # Ruba already has her dedicated automatic 1% row.
+            # Do not create a second generic salesperson row for her.
+            # Clean any old non-paid generic Ruba row during re-sync.
             # =========================================================
 
             elif (

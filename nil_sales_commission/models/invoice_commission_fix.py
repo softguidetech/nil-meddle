@@ -548,10 +548,31 @@ class AccountMove(models.Model):
                 ._nil_get_ruba_user()
             )
 
+            existing_ruba_row = (
+                Commission.search([
+                    (
+                        'invoice_id',
+                        '=',
+                        invoice.id,
+                    ),
+                    (
+                        'auto_key',
+                        '=',
+                        'ruba',
+                    ),
+                ], order='id asc', limit=1)
+            )
+
+            ruba_rate = (
+                existing_ruba_row.commission_rate
+                if existing_ruba_row
+                else RUBA_COMMISSION_RATE
+            )
+
             invoice._nil_sync_one_auto_commission(
                 'ruba',
                 ruba_user,
-                RUBA_COMMISSION_RATE,
+                ruba_rate,
                 common_values,
                 active,
                 excluded,

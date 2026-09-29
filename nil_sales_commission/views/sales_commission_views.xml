@@ -167,7 +167,7 @@
                                    readonly="state == 'paid' or auto_key in ('ruba', 'salesperson')"/>
 
                             <field name="commission_rate"
-                                   readonly="state == 'paid' or auto_key in ('ruba', 'salesperson')"/>
+                                   readonly="state == 'paid' or auto_key == 'salesperson'"/>
 
                             <field name="currency_id"
                                    readonly="state == 'paid'"/>

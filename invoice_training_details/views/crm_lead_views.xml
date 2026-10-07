@@ -234,7 +234,7 @@
                 </page>
 
 
-                <page id="pro" name="Professional Services" invisible="1">
+                <page id="pro" name="Professional Services">
 
                     <group>
                         <field name="ordering_partner_id"/>
@@ -245,6 +245,8 @@
                         <tree editable="bottom">
 
                             <field name="training_id"/>
+
+                            <field name="descriptions" string="Service Description"/>
 
                             <field name="end_customer_id"/>
 

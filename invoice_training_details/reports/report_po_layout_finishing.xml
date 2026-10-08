@@ -23,8 +23,8 @@
                     </div>
 
 
-                    <div style="margin-bottom:5px;">
-                        <strong>Company Address:</strong>
+<div class="po-customer-address" style="margin-bottom:5px;">
+    <strong>Company Address:</strong>
 
                         <span t-if="o.partner_id.street"
                               t-field="o.partner_id.street"/>

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <!-- Informational order details only, never invoice/accounting lines. -->
+    <template id="downpayment_source_sale_items_block">
+        <t t-set="nil_source_items"
+           t-value="o._nil_downpayment_source_sale_lines()"/>
+
+        <div t-if="nil_source_items"
+             style="margin:12px 0 10px 0;page-break-inside:avoid;font-family:Arial,Helvetica,sans-serif;">
+            <div style="font-size:17px;font-weight:700;margin-bottom:4px;">
+                Original Sales Order Items (Reference Only)
+            </div>
+            <div style="font-size:12px;margin-bottom:8px;">
+                These original order items are shown for reference only.
+                Only the down payment above is invoiced on this document.
+            </div>
+            <table class="table table-sm table-bordered"
+                   style="width:100%;border-collapse:collapse;font-size:14px;">
+                <thead>
+                    <tr style="background-color:#F6F7F8;">
+                        <th style="text-align:left;padding:6px;">Original SO Item / Description</th>
+                        <th style="text-align:center;padding:6px;white-space:nowrap;">Ordered Qty</th>
+                        <th style="text-align:right;padding:6px;white-space:nowrap;">SO Unit Price</th>
+                        <th style="text-align:right;padding:6px;white-space:nowrap;">SO Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-foreach="nil_source_items" t-as="nil_so_line">
+                        <tr>
+                            <td style="text-align:left;padding:6px;white-space:pre-line;word-wrap:break-word;">
+                                <span t-field="nil_so_line.name"/>
+                            </td>
+                            <td style="text-align:center;padding:6px;white-space:nowrap;">
+                                <span t-field="nil_so_line.product_uom_qty"/>
+                                <span t-field="nil_so_line.product_uom"/>
+                            </td>
+                            <td style="text-align:right;padding:6px;white-space:nowrap;">
+                                <span t-field="nil_so_line.price_unit"
+                                      t-options="{'widget': 'monetary', 'display_currency': nil_so_line.currency_id}"/>
+                            </td>
+                            <td style="text-align:right;padding:6px;white-space:nowrap;">
+                                <span t-field="nil_so_line.price_subtotal"
+                                      t-options="{'widget': 'monetary', 'display_currency': nil_so_line.currency_id}"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </div>
+    </template>
+
+    <!-- Apply exclusively to the Professional Services invoice PDF. -->
+    <template id="downpayment_source_sale_items_ps_invoice"
+              inherit_id="invoice_training_details.report_invoice_pro_document_training">
+        <xpath expr="//table[@name='invoice_line_table']" position="after">
+            <t t-call="invoice_training_details.downpayment_source_sale_items_block"/>
+        </xpath>
+    </template>
+</odoo>

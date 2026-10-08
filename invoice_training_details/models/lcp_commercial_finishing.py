@@ -38,7 +38,14 @@ class TrainingCourse(models.Model):
 
     def write(self, vals):
         result = super().write(vals)
-        if not self.env.context.get('skip_lcp_clc_price_sync'):
+        if (
+            not self.env.context.get('skip_lcp_clc_price_sync')
+            and {
+                'payment_method',
+                'no_of_student',
+                'lcp_rate_card_per_seat',
+            }.intersection(vals)
+        ):
             self._lcp_sync_clc_price_to_rate_card()
         return result
 

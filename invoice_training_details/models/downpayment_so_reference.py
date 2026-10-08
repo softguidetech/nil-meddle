@@ -74,9 +74,3 @@ class AccountMove(models.Model):
             lambda line: not line.display_type and not line.is_downpayment
         ).sorted(key=lambda line: (line.order_id.id, line.sequence, line.id))
 
-    def _nil_downpayment_source_pro_services(self):
-        """Return professional-service items from the ORIGINAL sale order."""
-        self.ensure_one()
-        return self._nil_downpayment_source_sale_orders().mapped('pro_service_ids').sorted(
-            key=lambda service: service.id
-        )

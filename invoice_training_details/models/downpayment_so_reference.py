@@ -20,7 +20,7 @@ class AccountMove(models.Model):
 
         # The core sale.advance.payment.inv wizard creates invoice lines
         # linked to sale.order.line records with is_downpayment=True.
-        billed_lines = self.invoice_line_ids.filtered(
+        billed_lines = self.invoice_line_ids.sudo().filtered(
             lambda line: line.display_type == 'product'
         )
         if not billed_lines:

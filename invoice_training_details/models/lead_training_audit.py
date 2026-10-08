@@ -106,10 +106,23 @@ class CrmLead(models.Model):
         value = self[field_name]
 
         if field.type == 'many2one':
-            return value.display_name if value else ''
+            if not value:
+                return ''
+            name = value.display_name
+            return name if isinstance(name, str) else ''
 
         if field.type in ('many2many', 'one2many'):
-            names = value.mapped('display_name') if value else []
+            names = []
+            for record in value:
+                name = record.display_name
+                if not isinstance(name, str) or not name.strip():
+                    # Some custom line records have no name. Keep a stable
+                    # audit label instead of passing False into str.join().
+                    name = '%s #%s' % (
+                        record._description or record._name,
+                        record.id,
+                    )
+                names.append(name)
             return ', '.join(names)
 
         if field.type == 'selection':

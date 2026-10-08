@@ -49,14 +49,7 @@
         </div>
     </template>
 
-    <!-- Invoice templates are loaded earlier; inherit their final version. -->
-    <template id="downpayment_source_sale_items_training_invoice"
-              inherit_id="invoice_training_details.report_invoice_document_training">
-        <xpath expr="//table[@name='invoice_line_table']" position="after">
-            <t t-call="invoice_training_details.downpayment_source_sale_items_block"/>
-        </xpath>
-    </template>
-
+    <!-- Apply exclusively to the Professional Services invoice PDF. -->
     <template id="downpayment_source_sale_items_ps_invoice"
               inherit_id="invoice_training_details.report_invoice_pro_document_training">
         <xpath expr="//table[@name='invoice_line_table']" position="after">

@@ -8,7 +8,7 @@
              Odoo 17 external_layout_standard adds a <div class="pt-5">
              before the report body. That pt-5 is the extra blank space.
              Keep the structure, remove ONLY that padding. -->
-        <xpath expr="//div[contains(@t-attf-class, 'article')]/div[@class='pt-5']"
+        <xpath expr="//div[contains(@t-attf-class, 'article')]/div[hasclass('pt-5')]"
                position="attributes">
             <attribute name="class"></attribute>
             <attribute name="style">padding-top:0 !important; margin-top:0 !important;</attribute>

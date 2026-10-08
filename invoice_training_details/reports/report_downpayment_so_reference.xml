@@ -1,77 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
-    <!-- A purely informational snapshot of the ORIGINAL sales order. -->
+    <!-- Informational, ORIGINAL sale.order.line products only.
+         This template is called directly from the Professional Services PDF.
+         It does NOT create/edit invoice lines or change taxes or totals. -->
     <template id="downpayment_source_sale_items_block">
-        <t t-set="nil_source_services"
-           t-value="o._nil_downpayment_source_pro_services()"/>
         <t t-set="nil_source_items"
            t-value="o._nil_downpayment_source_sale_lines()"/>
 
-        <div t-if="nil_source_services or nil_source_items"
+        <div t-if="nil_source_items"
              style="margin:12px 0 10px 0;page-break-inside:avoid;font-family:Arial,Helvetica,sans-serif;">
             <div style="font-size:17px;font-weight:700;margin-bottom:4px;">
                 Original Sales Order Items (Reference Only)
             </div>
             <div style="font-size:12px;margin-bottom:8px;">
-                The items below are shown for reference only.
-                Only the down payment listed above is charged on this invoice.
+                These items are shown for reference only and are not charged on this invoice.
+                The billed amount is the down payment above.
             </div>
 
-            <!-- PS documents use custom pro.service items on the originating SO. -->
-            <table t-if="nil_source_services"
-                   class="table table-sm table-bordered"
+            <table class="table table-sm table-bordered"
                    style="width:100%;border-collapse:collapse;font-size:14px;">
                 <thead>
                     <tr style="background-color:#F6F7F8;">
-                        <th style="text-align:left;padding:6px;">Service Name</th>
-                        <th style="text-align:left;padding:6px;">Service Description</th>
-                        <th style="text-align:center;padding:6px;">Qty</th>
-                        <th style="text-align:center;padding:6px;">Duration</th>
-                        <th style="text-align:center;padding:6px;">Dates</th>
-                        <th style="text-align:right;padding:6px;">Original Price</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <t t-foreach="nil_source_services" t-as="nil_service">
-                        <tr>
-                            <td style="text-align:left;padding:6px;">
-                                <span t-if="nil_service.training_id"
-                                      t-field="nil_service.training_id"/>
-                                <span t-else="" t-field="nil_service.name"/>
-                            </td>
-                            <td style="text-align:left;padding:6px;word-wrap:break-word;">
-                                <span t-field="nil_service.descriptions"/>
-                            </td>
-                            <td style="text-align:center;padding:6px;">
-                                <span t-field="nil_service.no_of_student"/>
-                            </td>
-                            <td style="text-align:center;padding:6px;">
-                                <span t-field="nil_service.duration"/>
-                            </td>
-                            <td style="text-align:center;padding:6px;">
-                                <span t-if="nil_service.training_date_start"
-                                      t-field="nil_service.training_date_start"/>
-                                <span t-if="nil_service.training_date_start and nil_service.training_date_end"> - </span>
-                                <span t-if="nil_service.training_date_end"
-                                      t-field="nil_service.training_date_end"/>
-                            </td>
-                            <td style="text-align:right;padding:6px;white-space:nowrap;">
-                                <span t-out="nil_service.price or 0.0"
-                                      t-options="{'widget': 'monetary', 'display_currency': o.currency_id}"/>
-                            </td>
-                        </tr>
-                    </t>
-                </tbody>
-            </table>
-
-            <!-- Fallback: orders made with native sale.order.line products. -->
-            <table t-if="not nil_source_services and nil_source_items"
-                   class="table table-sm table-bordered"
-                   style="width:100%;border-collapse:collapse;font-size:14px;">
-                <thead>
-                    <tr style="background-color:#F6F7F8;">
-                        <th style="text-align:left;padding:6px;">Original SO Item / Description</th>
-                        <th style="text-align:center;padding:6px;white-space:nowrap;">Ordered Qty</th>
+                        <th style="text-align:left;padding:6px;">Product</th>
+                        <th style="text-align:left;padding:6px;">Description</th>
+                        <th style="text-align:center;padding:6px;white-space:nowrap;">Qty</th>
                         <th style="text-align:right;padding:6px;white-space:nowrap;">SO Unit Price</th>
                         <th style="text-align:right;padding:6px;white-space:nowrap;">SO Subtotal</th>
                     </tr>
@@ -79,19 +31,21 @@
                 <tbody>
                     <t t-foreach="nil_source_items" t-as="nil_so_line">
                         <tr>
+                            <td style="text-align:left;padding:6px;word-wrap:break-word;">
+                                <span t-field="nil_so_line.product_id"/>
+                            </td>
                             <td style="text-align:left;padding:6px;white-space:pre-line;word-wrap:break-word;">
                                 <span t-field="nil_so_line.name"/>
                             </td>
                             <td style="text-align:center;padding:6px;white-space:nowrap;">
                                 <span t-field="nil_so_line.product_uom_qty"/>
-                                <span t-field="nil_so_line.product_uom"/>
                             </td>
                             <td style="text-align:right;padding:6px;white-space:nowrap;">
-                                <span t-field="nil_so_line.price_unit"
+                                <span t-out="nil_so_line.price_unit"
                                       t-options="{'widget': 'monetary', 'display_currency': nil_so_line.currency_id}"/>
                             </td>
                             <td style="text-align:right;padding:6px;white-space:nowrap;">
-                                <span t-field="nil_so_line.price_subtotal"
+                                <span t-out="nil_so_line.price_subtotal"
                                       t-options="{'widget': 'monetary', 'display_currency': nil_so_line.currency_id}"/>
                             </td>
                         </tr>
@@ -99,13 +53,5 @@
                 </tbody>
             </table>
         </div>
-    </template>
-
-    <!-- Only the Professional Services PDF, never Training UAE/KSA. -->
-    <template id="downpayment_source_sale_items_ps_invoice"
-              inherit_id="invoice_training_details.report_invoice_pro_document_training">
-        <xpath expr="//table[@name='invoice_line_table']" position="after">
-            <t t-call="invoice_training_details.downpayment_source_sale_items_block"/>
-        </xpath>
     </template>
 </odoo>

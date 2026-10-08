@@ -23,13 +23,27 @@ class AccountMove(models.Model):
         billed_lines = self.invoice_line_ids.sudo().filtered(
             lambda line: line.display_type == 'product'
         )
-        if not billed_lines or any(not line.is_downpayment for line in billed_lines):
+        if not billed_lines:
+            return empty
+
+        # Some older/customized down-payment lines have the correct invoice
+        # description but have not retained Odoo's is_downpayment flag.
+        # Accept those only when EVERY actual product line is a down payment.
+        def _is_downpayment_line(line):
+            label = (line.name or '').strip().lower()
+            return (
+                line.is_downpayment
+                or label.startswith('down payment')
+                or label.startswith('downpayment')
+            )
+
+        if any(not _is_downpayment_line(line) for line in billed_lines):
             return empty
 
         # Prefer the actual invoice-line -> SO-line relation.
         linked_so_lines = billed_lines.mapped('sale_line_ids')
-        if linked_so_lines and any(not line.is_downpayment for line in linked_so_lines):
-            return empty
+        # Invoice-line labels are the primary check above. A sale-line flag
+        # may also be absent in an older customized down-payment workflow.
         orders = linked_so_lines.mapped('order_id')
 
         # Fallback when older invoices lack the M2M relation. The invoice
@@ -60,9 +74,3 @@ class AccountMove(models.Model):
             lambda line: not line.display_type and not line.is_downpayment
         ).sorted(key=lambda line: (line.order_id.id, line.sequence, line.id))
 
-    def _nil_downpayment_source_pro_services(self):
-        """Return professional-service items from the ORIGINAL sale order."""
-        self.ensure_one()
-        return self._nil_downpayment_source_sale_orders().mapped('pro_service_ids').sorted(
-            key=lambda service: service.id
-        )

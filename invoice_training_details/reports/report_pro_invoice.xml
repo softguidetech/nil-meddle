@@ -10,9 +10,8 @@
           <!-- ===== HEADER - SAME STYLE AS PO ===== -->
           <div class="row">
             <div class="col-18">
-              <span t-if="o.move_type == 'out_refund'" style="font-size:30px; font-weight:bold; color:#0DCAF0;">CREDIT NOTE</span>
-              <span t-elif="o.tax_totals and o.tax_totals.get('subtotals')" style="font-size:30px; font-weight:bold; color:#0DCAF0;">PROFORMA TAX INVOICE</span>
-              <span t-else="" style="font-size:30px; font-weight:bold; color:#0DCAF0;">INVOICE</span>
+              <span t-if="o.move_type == 'out_refund'" style="font-size:30px; font-weight:bold; color:#0DCAF0;">TAX CREDIT NOTE</span>
+              <span t-else="" style="font-size:30px; font-weight:bold; color:#0DCAF0;">TAX INVOICE</span>
             </div>
           </div>
 
@@ -58,9 +57,8 @@
                 <table class="table table-borderless">
                   <tr>
                     <td style="font-size:20px; vertical-align:middle;">
-                      <span t-if="o.move_type == 'out_refund'">CREDIT NOTE</span>
-                      <span t-elif="o.tax_totals and o.tax_totals.get('subtotals')">PROFORMA TAX INVOICE</span>
-                      <span t-else="">INVOICE</span>
+                      <span t-if="o.move_type == 'out_refund'">TAX CREDIT NOTE</span>
+                      <span t-else="">TAX INVOICE</span>
                     </td>
                     <td style="font-size:20px; vertical-align:middle;"><span t-field="o.name"/></td>
                   </tr>
@@ -107,6 +105,9 @@
               </t>
             </tbody>
           </table>
+
+          <!-- Read-only original Order Lines; never added to accounting lines. -->
+          <t t-call="invoice_training_details.downpayment_source_sale_items_block"/>
 
           <!-- ===== PROFESSIONAL SERVICES TABLE ===== -->
           <table t-if="o.display_training_table" class="table table-sm table-bordered text-center" style="font-size: 18px;">

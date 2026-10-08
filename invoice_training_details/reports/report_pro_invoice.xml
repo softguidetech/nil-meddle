@@ -171,7 +171,6 @@
                             </t>
                         </tbody>
                     </table>
-
                     
                     
                     <div id="right-elements" t-attf-class="#{'col-5' if report_type != 'html' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">

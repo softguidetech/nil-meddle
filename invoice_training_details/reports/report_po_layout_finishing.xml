@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <odoo>
 
@@ -34,15 +35,18 @@
                             <span t-field="o.partner_id.street2"/>
                         </t>
 
-                        <t t-if="o.partner_id.city">
-                            <t t-if="o.partner_id.street or o.partner_id.street2">, </t>
-                            <span t-field="o.partner_id.city"/>
-                        </t>
+                        <div t-if="o.partner_id.city or o.partner_id.country_id"
+                             style="margin-top:3px;">
 
-                        <t t-if="o.partner_id.country_id">
-                            <t t-if="o.partner_id.street or o.partner_id.street2 or o.partner_id.city">, </t>
-                            <span t-field="o.partner_id.country_id.name"/>
-                        </t>
+                            <span t-if="o.partner_id.city"
+                                  t-field="o.partner_id.city"/>
+
+                            <t t-if="o.partner_id.city and o.partner_id.country_id">, </t>
+
+                            <span t-if="o.partner_id.country_id"
+                                  t-field="o.partner_id.country_id.name"/>
+
+                        </div>
 
                     </div>
 

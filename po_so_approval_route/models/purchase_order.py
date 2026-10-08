@@ -11,8 +11,11 @@ class PurchaseOrder(models.Model):
                                                string="Use Approval Route", readonly=True)
 
     team_id = fields.Many2one(
-        comodel_name="purchase.team", string="Purchase Team", domain="[('company_id', '=', company_id)]",
-        readonly=True, states={'draft': [('readonly', False)], 'sent': [('readonly', False)]}, ondelete="restrict"
+        comodel_name="purchase.team",
+        string="Purchase Team",
+        domain="[('company_id', '=', company_id)]",
+        readonly=True,
+        ondelete="restrict",
     )
 
     approver_ids = fields.One2many(

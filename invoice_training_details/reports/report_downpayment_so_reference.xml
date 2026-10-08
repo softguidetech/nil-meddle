@@ -18,7 +18,7 @@
                 </colgroup>
                 <thead>
                     <tr style="background-color:#F6F7F8;">
-                        <th style="padding:6px 9px;text-align:left;vertical-align:middle;">DESCRIPTION</th>
+                        <th style="padding:6px 9px;text-align:center;vertical-align:middle;">DESCRIPTION</th>
                         <th style="padding:6px 5px;text-align:center;vertical-align:middle;">QTY</th>
                         <th style="padding:6px 5px;text-align:center;vertical-align:middle;">RATE</th>
                         <th style="padding:6px 5px;text-align:center;vertical-align:middle;">AMOUNT</th>

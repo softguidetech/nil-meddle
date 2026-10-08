@@ -97,12 +97,12 @@
                     <table class="table table-sm o_main_table table-borderless" name="invoice_line_table">
                         <thead class="bg-light text-info">
                             <tr>
-                                <th name="th_description" class="text-start"><span>DESCRIPTION</span></th>
-                                <th name="th_quantity" class="text-end"><span>QTY</span></th>
-                                <th name="th_rate" class="text-end"><span>RATE</span></th>
-                                <th name="th_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}"><span>Taxes</span></th>
-                                <th name="th_amount" class="text-end"><span>Taxable Amount</span></th>
-                                <th name="th_amount" class="text-end"><span>Total Tax.inc</span></th>
+                                <th name="th_description" class="text-start" style="text-align:center !important;vertical-align:middle;"><span>DESCRIPTION</span></th>
+                                <th name="th_quantity" class="text-end" style="text-align:center !important;vertical-align:middle;"><span>QTY</span></th>
+                                <th name="th_rate" class="text-end" style="text-align:center !important;vertical-align:middle;"><span>RATE</span></th>
+                                <th name="th_taxes" t-attf-class="text-end {{ 'd-none d-md-table-cell' if report_type == 'html' else '' }}" style="text-align:center !important;vertical-align:middle;"><span>Taxes</span></th>
+                                <th name="th_amount" class="text-end" style="text-align:center !important;vertical-align:middle;"><span>Taxable Amount</span></th>
+                                <th name="th_amount" class="text-end" style="text-align:center !important;vertical-align:middle;"><span>Total Tax.inc</span></th>
                             </tr>
                         </thead>
                         <tbody>
@@ -137,8 +137,8 @@
                         <thead>
                             <tr>
                                 <th style="text-align:center;vertical-align:middle;">Item</th>
-                                <th style="text-align:left;vertical-align:middle;">Service Name</th>
-                                <th style="text-align:left;vertical-align:middle;">Service Description</th>
+                                <th style="text-align:center;vertical-align:middle;">Service Name</th>
+                                <th style="text-align:center;vertical-align:middle;">Service Description</th>
                                 <th t-if="o.display_instructor" style="text-align:center;vertical-align:middle;">Instructor Name</th>
                                 <th style="text-align:center;vertical-align:middle;"># Of Students</th>
                                 <th t-if="o.display_location" style="text-align:center;vertical-align:middle;">Location</th>
@@ -176,10 +176,27 @@
                     </table>
 
 
+                    <!-- Let the summary fit the actual labels and figures, with only
+                         a little comfortable cell space. Keep the UAE Training look. -->
+                    <style>
+                        table.nil-ps-summary {
+                            width: auto !important;
+                            table-layout: auto !important;
+                            margin-left: auto !important;
+                            margin-right: 0 !important;
+                        }
+                        table.nil-ps-summary td {
+                            padding: 4px 8px !important;
+                            white-space: nowrap !important;
+                            vertical-align: middle !important;
+                        }
+                    </style>
+
                     <div id="right-elements" t-attf-class="#{'col-5' if report_type != 'html' else 'col-12 col-md-5'} ms-5 d-inline-block float-end">
                                 <div id="total" class="clearfix row">
                                     <div class="ms-auto">
-                                        <table class="table table-sm table-borderless avoid-page-break-inside" style="background-color:#fff;">
+                                        <table class="table table-sm table-borderless avoid-page-break-inside nil-ps-summary"
+                                               style="background-color:#fff;width:auto !important;max-width:100%;table-layout:auto !important;margin-left:auto !important;margin-right:0 !important;white-space:nowrap;">
 
                                             <!-- Keep the UAE Training summary styling, with
                                                  order total and advance invoice due distinct. -->

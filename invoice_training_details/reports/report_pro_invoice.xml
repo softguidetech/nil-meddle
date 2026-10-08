@@ -295,6 +295,22 @@
                                             <!-- ================== /CURRENCY (ONLY CHANGE HERE) ================== -->
                                            
                                         </table>
+
+                                        <!-- PS stamp and signature directly below the tax/total summary. -->
+                                        <div t-if="(o.company_id.stamp and o.display_stamp) or (o.company_id.signature and o.display_signature)"
+                                             class="text-end"
+                                             style="text-align:right;white-space:nowrap;margin-top:6px;page-break-inside:avoid;">
+                                            <img t-if="o.company_id.stamp and o.display_stamp"
+                                                 class="pt-2"
+                                                 t-att-src="image_data_uri(o.company_id.stamp)"
+                                                 style="max-height:125px;max-width:135px;width:auto;height:auto;vertical-align:bottom;display:inline-block;"
+                                                 alt="Stamp"/>
+                                            <img t-if="o.company_id.signature and o.display_signature"
+                                                 class="pt-2"
+                                                 t-att-src="image_data_uri(o.company_id.signature)"
+                                                 style="max-height:125px;max-width:135px;width:auto;height:auto;vertical-align:bottom;display:inline-block;"
+                                                 alt="Signature"/>
+                                        </div>
                                     </div>
                             </div>
                     </div>
@@ -328,7 +344,7 @@
                         </div>
                     </div>
 
-                    <!-- 3) QR Code THIRD + 4) Stamp/Signature far right bottom corner -->
+                    <!-- 3) QR Code THIRD; stamp and signature are under totals above. -->
                     <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
                         <!-- QR on the left -->
                         <div name="ksa_qr" class="col-4">
@@ -339,14 +355,6 @@
 
                         <!-- Spacer -->
                         <div class="col-4"></div>
-
-                        <!-- Stamp + Signature at extreme right -->
-                        <div class="col-4 text-end" style="padding-right: 0;">
-                            <div class="d-flex flex-column align-items-end" style="gap: 10px;">
-                                <img t-if="o.company_id.stamp and o.display_stamp" class="pt-2" t-att-src="image_data_uri(o.company_id.stamp)" style="max-height: 200px;" alt="Stamp"/>
-                                <img t-if="o.company_id.signature and o.display_signature" class="pt-2" t-att-src="image_data_uri(o.company_id.signature)" style="max-height: 200px;" alt="Signature"/>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- ================== /REORDERED BOTTOM SECTION ================== -->

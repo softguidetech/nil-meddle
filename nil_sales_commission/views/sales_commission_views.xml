@@ -330,7 +330,7 @@
 
                 <filter name="group_salesperson"
                         string="Commission For"
-                        context="{'group_by': ['currency_id', 'salesperson_id']}"/>
+                        context="{'group_by': 'salesperson_id'}"/>
 
                 <filter name="group_customer"
                         string="Customer"

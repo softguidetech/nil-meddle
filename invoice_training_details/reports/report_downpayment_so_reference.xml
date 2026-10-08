@@ -25,7 +25,7 @@
                                     <span t-field="nil_so_line.product_id"/>
                                 </div>
                                 <div t-if="nil_so_line.name"
-                                     style="font-size:12px;font-weight:400;text-align:center;white-space:pre-line;word-wrap:break-word;margin:0;">
+                                     style="font-size:12px;font-weight:400;text-align:center;white-space:normal;word-wrap:break-word;margin:0;">
                                     <span t-field="nil_so_line.name"/>
                                 </div>
                             </td>

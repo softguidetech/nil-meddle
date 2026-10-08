@@ -155,7 +155,7 @@
           <!-- ===== TAX & AMOUNTS TABLE (ALIGNED) ===== -->
           <div class="row pt-3 pb-2" style="page-break-inside:avoid;">
             <div class="col-12" style="display:flex; justify-content:flex-end;">
-              <table class="table table-sm table-borderless" style="width:380px; border-collapse:collapse; font-size:16px;">
+              <table class="table table-sm table-borderless" style="width:380px;max-width:100%;margin-left:auto;margin-right:0;border-collapse:collapse;font-size:16px;">
                 <t t-set="tax_totals" t-value="o.tax_totals"/>
 
                 <!-- Subtotals -->
@@ -201,32 +201,42 @@
                   </tr>
                 </t>
 
-                <!-- Company Currency Section -->
-                <t t-if="tax_totals.get('subtotals')">
-                  <tr><td colspan="2" style="padding-top:10px;"><strong>Taxes AED</strong></td></tr>
-                  <tr>
-                    <td>Exchange Rate</td>
-                    <td style="text-align:right;">
-                      <span t-esc="'1 USD = %.2f %s' % (o.currency_id._convert(1, o.company_id.currency_id, o.company_id, o.invoice_date or fields.Date.today()), o.company_id.currency_id.name)"/>
-                    </td>
-                  </tr>
-                  <tr><td>Untaxed Amount @ <span t-field="o.company_id.currency_id.symbol"/></td>
-                    <td style="text-align:right;">
-                      <span t-out="o.currency_id._convert(o.amount_untaxed, o.company_id.currency_id)"/>
-                    </td>
-                  </tr>
-                  <tr><td>VAT @ <span t-field="o.company_id.currency_id.symbol"/></td>
-                    <td style="text-align:right;">
-                      <span t-out="o.currency_id._convert(o.amount_tax, o.company_id.currency_id)"/>
-                    </td>
-                  </tr>
-                  <tr style="border-top:1px solid #ddd;">
-                    <td><strong>Total with VAT @ <span t-field="o.company_id.currency_id.symbol"/></strong></td>
-                    <td style="text-align:right;">
-                      <span t-out="o.currency_id._convert(o.amount_total, o.company_id.currency_id)"/>
-                    </td>
-                  </tr>
-                </t>
+                <!-- Same monetary summary used by the UAE Training invoice,
+                     always visible, including zero-tax down payments. -->
+                <t t-set="nil_company_currency" t-value="o.company_id.currency_id"/>
+                <t t-set="nil_invoice_currency" t-value="o.currency_id"/>
+                <t t-set="nil_rate_date" t-value="o.invoice_date or o.date or o.create_date"/>
+                <t t-set="nil_company_per_unit"
+                   t-value="nil_invoice_currency._get_conversion_rate(nil_invoice_currency, nil_company_currency, o.company_id, nil_rate_date) if nil_invoice_currency and nil_company_currency else 1.0"/>
+
+                <tr style="border-top:1px solid #ddd;">
+                  <td style="padding:6px 8px;"><strong><span t-esc="nil_company_currency.name"/> per Unit</strong></td>
+                  <td style="padding:6px 8px;text-align:right;">
+                    <span t-out="nil_company_per_unit"
+                          t-options="{'widget':'float','precision':6}"/>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 8px;"><strong>Untaxed Currency @ <span t-esc="nil_company_currency.name"/></strong></td>
+                  <td style="padding:6px 8px;text-align:right;">
+                    <span t-out="o.amount_untaxed * nil_company_per_unit"
+                          t-options="{'widget':'monetary','display_currency':nil_company_currency}"/>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding:6px 8px;"><strong>Tax Currency @ <span t-esc="nil_company_currency.name"/></strong></td>
+                  <td style="padding:6px 8px;text-align:right;">
+                    <span t-out="o.amount_tax * nil_company_per_unit"
+                          t-options="{'widget':'monetary','display_currency':nil_company_currency}"/>
+                  </td>
+                </tr>
+                <tr style="border-top:1px solid #ddd;">
+                  <td style="padding:6px 8px;"><strong>Total Currency @ <span t-esc="nil_company_currency.name"/></strong></td>
+                  <td style="padding:6px 8px;text-align:right;">
+                    <span t-out="o.amount_total * nil_company_per_unit"
+                          t-options="{'widget':'monetary','display_currency':nil_company_currency}"/>
+                  </td>
+                </tr>
               </table>
             </div>
           </div>

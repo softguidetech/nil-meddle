@@ -5,7 +5,7 @@
               inherit_id="invoice_training_details.report_po_document_training">
 
         <!-- HEADER -->
-        <xpath expr="//div[@class='row pt-3 pb-3']" position="replace">
+        <xpath expr="//div[hasclass('row', 'pt-3', 'pb-3')]" position="replace">
 
             <div class="row pt-3 pb-3 po-header-meta"
                  style="font-family:Arial,Helvetica,sans-serif;font-size:18px;line-height:1.35;">

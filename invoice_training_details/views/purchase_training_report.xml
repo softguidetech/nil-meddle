@@ -2,301 +2,256 @@
 <odoo>
     <template id="purchase_order_training_report_only"
               inherit_id="purchase.report_purchaseorder_document">
-
-        <!-- The effective parent view on this database does not contain
-             the address t-set. Set the address context to False immediately
-             before rendering the PO body for manual orders. web.address_layout
-             then does not emit the duplicate To/Name recipient block. -->
-        <xpath expr="//div[hasclass('page')]" position="before">
+        <!-- Entirely independent manual PO rendering. It inherits only the
+             proven web.external_layout node, never fragile stock header XPaths.
+             The original CRM and training reports stay as they were. -->
+        <xpath expr="//t[@t-call='web.external_layout']" position="before">
             <t t-if="not o.is_training_order and not o.crm_lead_id"
-               t-set="address" t-value="False"/>
-        </xpath>
-
-        <!-- The large centred stock Odoo title disappears for manual POs.
-             The sole manual heading is below, left aligned like PO00806. -->
-        <xpath expr="//div[hasclass('page')]/div[hasclass('mt-4')]" position="replace">
-            <div t-if="o.is_training_order or o.crm_lead_id" class="mt-4">
-                <h2 t-if="o.state in ['draft', 'sent', 'to approve']">Request for Quotation #<span t-field="o.name"/></h2>
-                <h2 t-if="o.state in ['purchase', 'done']">Purchase Order #<span t-field="o.name"/></h2>
-                <h2 t-if="o.state == 'cancel'">Cancelled Purchase Order #<span t-field="o.name"/></h2>
-            </div>
-        </xpath>
-
-        <!-- Remove the standard Buyer/Requested By information block only
-             for manual POs. CRM POs retain all their standard information. -->
-        <xpath expr="//div[@id='informations']" position="replace">
-            <div t-if="o.is_training_order or o.crm_lead_id" id="informations" class="row mt-4 mb32">
-                <div t-if="o.user_id" class="col-3 bm-2">
-                    <strong>Buyer:</strong>
-                    <p t-field="o.user_id" class="m-0"/>
-                </div>
-                <div t-if="o.partner_ref" class="col-3 bm-2">
-                    <strong>Your Order Reference:</strong>
-                    <p t-field="o.partner_ref" class="m-0"/>
-                </div>
-                <div t-if="o.state in ['purchase','done'] and o.date_approve" class="col-3 bm-2">
-                    <strong>Order Date:</strong>
-                    <p t-field="o.date_approve" class="m-0"/>
-                </div>
-                <div t-elif="o.date_order" class="col-3 bm-2">
-                    <strong>Order Deadline:</strong>
-                    <p t-field="o.date_order" class="m-0"/>
-                </div>
-            </div>
-        </xpath>
-
-        <!-- Purchase Orders created with Purchases > New: standard report only. -->
-        <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]"
-               position="attributes">
-            <attribute name="class" add="po-default-purchase-lines" separator=" "/>
-            <attribute name="style">display:table !important; width:100% !important; min-width:100% !important; max-width:100% !important; table-layout:auto !important; border-collapse:collapse !important;</attribute>
-        </xpath>
-        <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]"
-               position="before">
-            <style type="text/css">
-                /* CRM Purchase Order style, with original content untouched. */
-                .po-manual-purchase-page h2 {
-                    color: #0DCAF0 !important;
-                    font-size: 30px !important;
-                    line-height: 1.25 !important;
-                    font-weight: 700 !important;
-                }
-                .po-manual-purchase-page #informations,
-                .po-manual-purchase-page #informations strong,
-                .po-manual-purchase-page #informations p,
-                .po-manual-purchase-page #informations span {
-                    font-size: 16px !important;
-                    line-height: 1.4 !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines {
-                    display: table !important;
-                    width: 100% !important;
-                    min-width: 100% !important;
-                    max-width: 100% !important;
-                    table-layout: auto !important;
-                    margin: 10px 0 0 0 !important;
-                    border-collapse: collapse !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines thead {
-                    display: table-header-group !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines tr {
-                    page-break-inside: avoid !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines th,
-                .po-manual-purchase-page table.po-default-purchase-lines th * {
-                    font-size: 16px !important;
-                    font-weight: 700 !important;
-                    line-height: 1.35 !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines td,
-                .po-manual-purchase-page table.po-default-purchase-lines td * {
-                    font-size: 16px !important;
-                    line-height: 1.4 !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines th {
-                    background-color: #D9F4FA !important;
-                    color: #075E68 !important;
-                    border: 1px solid #9DDDE7 !important;
-                    padding: 6px 7px !important;
-                    vertical-align: middle !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines td {
-                    border: 1px solid #CFE5EA !important;
-                    padding: 6px 7px !important;
-                    vertical-align: middle !important;
-                }
-                .po-manual-purchase-page table.po-default-purchase-lines td#product {
-                    white-space: normal !important;
-                    overflow-wrap: break-word;
-                    word-wrap: break-word;
-                }
-            </style>
-        </xpath>
-
-        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
-            <attribute name="t-call">invoice_training_details.custom_invoice_report_layout</attribute>
-            <attribute name="t-if">not o.is_training_order</attribute>
-        </xpath>
-
-
-        <!-- Visual styling matched to CRM-originated PO00806.
-             All standard purchase line fields, pricing and notes remain unchanged. -->
-        <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]"
-               position="before">
-            <t t-if="not o.is_training_order and not o.crm_lead_id">
-                <style type="text/css">
-                    /* Original title, buyer and address are handled by QWeb conditions below.
-                       This guarantees a single title and single vendor block in PDF. */
-                    .po-manual-purchase-page .nil-manual-po-title {
-                        margin: 0 0 16px 0 !important;
-                        color: #0DCAF0 !important;
-                        font-size: 30px !important;
-                        font-weight: 700 !important;
-                        line-height: 1.25 !important;
-                    }
-                    .po-manual-purchase-page .nil-manual-po-header {
-                        margin: 12px 0 20px 0 !important;
-                        font-family: Arial, Helvetica, sans-serif !important;
-                        font-size: 16px !important;
-                        line-height: 1.4 !important;
-                    }
-                    .po-manual-purchase-page .nil-manual-po-header strong {
-                        font-size: 16px !important;
-                        font-weight: 700 !important;
-                    }
-                    .po-manual-purchase-page .nil-manual-po-meta {
-                        margin-left: auto !important;
-                        margin-right: 0 !important;
-                        width: auto !important;
-                        border-collapse: collapse !important;
-                    }
-                    .po-manual-purchase-page .nil-manual-po-meta td {
-                        border: 0 !important;
-                        padding: 2px 6px !important;
-                        vertical-align: top !important;
-                        font-size: 16px !important;
-                        line-height: 1.4 !important;
-                    }
-                    .po-manual-purchase-page .nil-manual-po-meta td:last-child {
-                        white-space: nowrap !important;
-                    }
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals tr,
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals td,
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals th,
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals span,
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals strong {
-                        background: #fff !important;
-                        background-color: #fff !important;
-                        font-size: 16px !important;
-                    }
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals td,
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals th {
-                        padding: 6px 9px !important;
-                        border: 1px solid #CFE5EA !important;
-                    }
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals td:first-child {
-                        color: #075E68 !important;
-                        font-weight:700 !important;
-                    }
-                    .po-manual-purchase-page table.nil-manual-po-attached-totals td:last-child {
-                        text-align:right !important;
-                        font-weight:700 !important;
-                    }
-                    .po-manual-purchase-page #total table {
-                        width: 100% !important;
-                        border-collapse: collapse !important;
-                        background: #ffffff !important;
-                    }
-                    .po-manual-purchase-page #total table tr,
-                    .po-manual-purchase-page #total table td,
-                    .po-manual-purchase-page #total table th,
-                    .po-manual-purchase-page #total table span,
-                    .po-manual-purchase-page #total table strong {
-                        background: #ffffff !important;
-                        background-color: #ffffff !important;
-                        font-size: 16px !important;
-                    }
-                    .po-manual-purchase-page #total table td,
-                    .po-manual-purchase-page #total table th {
-                        border: 1px solid #CFE5EA !important;
-                        padding: 5px 8px !important;
-                        vertical-align: middle !important;
-                    }
-                    .po-manual-purchase-page #total table td:first-child {
-                        color: #075E68 !important;
-                        font-weight: 700 !important;
-                    }
-                    .po-manual-purchase-page #total table td:last-child {
-                        color: #171717 !important;
-                        font-weight: 700 !important;
-                        text-align: right !important;
-                    }
-                </style>
-                <h2 class="nil-manual-po-title">
-                    <t t-if="o.state in ['draft', 'sent', 'to approve']">Request for Quotation</t>
-                    <t t-elif="o.state in ['purchase', 'done']">Purchase Order</t>
-                    <t t-else="">Cancelled Purchase Order</t>
-                </h2>
-                <div class="row nil-manual-po-header" style="page-break-inside:avoid;">
-                    <div class="col-8" style="padding-left:0;">
-                        <div><strong>Company Name:</strong></div>
-                        <div t-if="o.partner_id.is_company" t-field="o.partner_id.name"/>
-                        <div t-else="" t-field="o.partner_id.parent_id.name"/>
-                        <div style="margin-top:5px;"><strong>Address:</strong></div>
-                        <div t-field="o.partner_id"
-                             t-options='{"widget":"contact","fields":["address","phone","vat"],"no_marker":True,"phone_icons":True}'/>
-                        <div t-if="not o.partner_id.is_company">
-                            <strong>Attention:</strong> <span t-field="o.partner_id.name"/>
+               t-call="invoice_training_details.custom_invoice_report_layout">
+                <t t-set="o" t-value="o.with_context(lang=o.partner_id.lang)"/>
+                <t t-set="address" t-value="False"/>
+                <t t-set="information_block" t-value="False"/>
+                <div class="page nil-manual-purchase-page">
+                    <style type="text/css">
+                        .nil-manual-purchase-page {
+                            font-family: Arial, Helvetica, sans-serif !important;
+                            font-size: 16px !important;
+                            line-height: 1.4 !important;
+                        }
+                        .nil-manual-purchase-page .nil-manual-po-title {
+                            margin: 2px 0 20px 0 !important;
+                            color: #0DCAF0 !important;
+                            font-size: 30px !important;
+                            font-weight: 700 !important;
+                        }
+                        .nil-manual-purchase-page .nil-manual-po-partner {
+                            margin: 0 0 15px 0 !important;
+                            font-size: 16px !important;
+                        }
+                        .nil-manual-purchase-page .nil-manual-po-meta {
+                            width: 100% !important;
+                            border-collapse: collapse !important;
+                            margin: 0 !important;
+                        }
+                        .nil-manual-purchase-page .nil-manual-po-meta td {
+                            background:#fff !important;
+                            padding: 2px 3px !important;
+                            border: 0 !important;
+                            font-size: 16px !important;
+                            vertical-align: top !important;
+                        }
+                        .nil-manual-purchase-page .nil-manual-po-meta td:last-child {
+                            text-align:right !important;
+                            white-space: nowrap !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-products {
+                            display: table !important;
+                            width:100% !important;
+                            min-width:100% !important;
+                            max-width:100% !important;
+                            table-layout:fixed !important;
+                            border-collapse:collapse !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-products thead th,
+                        .nil-manual-purchase-page table.nil-manual-po-products thead th * {
+                            background:#D9F4FA !important;
+                            color:#075E68 !important;
+                            font-size:16px !important;
+                            font-weight:700 !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-products td,
+                        .nil-manual-purchase-page table.nil-manual-po-products td * {
+                            font-size:16px !important;
+                            line-height:1.35 !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-products th {
+                            background:#D9F4FA !important;
+                            border:1px solid #9DDDE7 !important;
+                            padding:7px 5px !important;
+                            text-align:center !important;
+                            vertical-align:middle !important;
+                            word-wrap:break-word;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-products td {
+                            background:#fff !important;
+                            border:1px solid #CFE5EA !important;
+                            padding:7px 5px !important;
+                            vertical-align:middle !important;
+                            overflow-wrap:break-word;
+                            word-wrap:break-word;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-products td#product {
+                            text-align:left !important;
+                            white-space:normal !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-products tbody tr {
+                            page-break-inside: avoid !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-totals tr,
+                        .nil-manual-purchase-page table.nil-manual-po-totals td,
+                        .nil-manual-purchase-page table.nil-manual-po-totals td *,
+                        .nil-manual-purchase-page table.nil-manual-po-totals th,
+                        .nil-manual-purchase-page table.nil-manual-po-totals th * {
+                            background:#fff !important;
+                            background-color:#fff !important;
+                            font-size:16px !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-totals td,
+                        .nil-manual-purchase-page table.nil-manual-po-totals th {
+                            border:1px solid #CFE5EA !important;
+                            padding:6px 9px !important;
+                        }
+                        .nil-manual-purchase-page table.nil-manual-po-totals td:last-child {
+                            text-align:right !important;
+                            font-weight:700 !important;
+                        }
+                    </style>
+                    <h2 class="nil-manual-po-title">
+                        <t t-if="o.state in ['draft', 'sent', 'to approve']">Request for Quotation</t>
+                        <t t-elif="o.state in ['purchase', 'done']">Purchase Order</t>
+                        <t t-else="">Cancelled Purchase Order</t>
+                    </h2>
+                    <div class="row nil-manual-po-partner" style="page-break-inside:avoid;">
+                        <div class="col-8" style="padding-left:0;">
+                            <div><strong>Company Name:</strong></div>
+                            <div t-if="o.partner_id.is_company" t-field="o.partner_id.name"/>
+                            <div t-else="" t-field="o.partner_id.parent_id.name"/>
+                            <div style="margin-top:6px;"><strong>Address:</strong></div>
+                            <div t-field="o.partner_id"
+                                 t-options='{"widget":"contact","fields":["address","phone","vat"],"no_marker":True,"phone_icons":False}'/>
+                            <div t-if="not o.partner_id.is_company">
+                                <strong>Attention:</strong> <span t-field="o.partner_id.name"/>
+                            </div>
+                            <div t-if="o.partner_id.email">
+                                <strong>Email:</strong> <span t-field="o.partner_id.email"/>
+                            </div>
+                            <div t-if="o.dest_address_id">
+                                <strong>Shipping address:</strong>
+                                <span t-field="o.dest_address_id"
+                                      t-options='{"widget":"contact","fields":["address","name","phone"],"no_marker":True}'/>
+                            </div>
                         </div>
-                        <div t-if="o.partner_id.email">
-                            <strong>Email:</strong> <span t-field="o.partner_id.email"/>
+                        <div class="col-4" style="padding-right:0;">
+                            <table class="nil-manual-po-meta table table-borderless">
+                                <tr><td>Purchase Order</td><td><span t-field="o.name"/></td></tr>
+                                <tr t-if="o.state in ['purchase', 'done'] and o.date_approve">
+                                    <td>Date</td><td><span t-field="o.date_approve" t-options='{"widget":"date","format":"dd/MM/yy"}'/></td>
+                                </tr>
+                                <tr t-elif="o.date_order">
+                                    <td>Date</td><td><span t-field="o.date_order" t-options='{"widget":"date","format":"dd/MM/yy"}'/></td>
+                                </tr>
+                                <tr t-if="o.partner_ref">
+                                    <td>Reference</td><td><span t-field="o.partner_ref"/></td>
+                                </tr>
+                            </table>
                         </div>
                     </div>
-                    <div class="col-4" style="padding-right:0;">
-                        <table class="nil-manual-po-meta table table-borderless">
-                            <tr>
-                                <td>Purchase Order</td>
-                                <td><span t-field="o.name"/></td>
-                            </tr>
-                            <tr t-if="o.state in ['purchase', 'done'] and o.date_approve">
-                                <td>Date</td>
-                                <td><span t-field="o.date_approve" t-options='{"widget":"date","format":"dd/MM/yy"}'/></td>
-                            </tr>
-                            <tr t-elif="o.date_order">
-                                <td>Date</td>
-                                <td><span t-field="o.date_order" t-options='{"widget":"date","format":"dd/MM/yy"}'/></td>
-                            </tr>
-                            <tr t-if="o.partner_ref">
-                                <td>Your Order Reference</td>
-                                <td><span t-field="o.partner_ref"/></td>
-                            </tr>
-                        </table>
+                    <table class="nil-manual-po-products table table-sm table-bordered" name="nil_manual_purchase_items" style="width:100% !important; min-width:100% !important; max-width:100% !important; table-layout:fixed !important; border-collapse:collapse !important; margin-top:12px; margin-bottom:0;">
+                                    <colgroup>
+                                        <col style="width:35%;"/>
+                                        <col style="width:13%;"/>
+                                        <col style="width:9%;"/>
+                                        <col style="width:12%;"/>
+                                        <col style="width:7%;"/>
+                                        <col style="width:10%;"/>
+                                        <col style="width:14%;"/>
+                                    </colgroup>
+                                    <thead style="display:table-header-group;">
+                                        <tr>
+                                            <th name="th_description"><strong>Description</strong></th>
+                                            <th name="th_date_req" class="text-center"><strong>Date Req.</strong></th>
+                                            <th name="th_quantity" class="text-end"><strong>Qty</strong></th>
+                                            <th name="th_price_unit" class="text-end"><strong>Unit Price</strong></th>
+                                            <th name="th_discount" class="text-end"><strong>Disc.</strong></th>
+                                            <th name="th_taxes" class="text-end"><strong>Taxes</strong></th>
+                                            <th name="th_subtotal" class="text-end">
+                                                <strong>Amount</strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <t t-set="current_subtotal" t-value="0"/>
+                                        <t t-foreach="o.order_line" t-as="line">
+                                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>
+                    
+                                            <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                                <t t-if="not line.display_type">
+                                                    <td id="product">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span t-field="line.date_planned"/>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span t-field="line.product_qty"/>
+                                                        <span t-field="line.product_uom.name" groups="uom.group_uom"/>
+                                                        <span t-if="line.product_packaging_id">
+                                                            (<span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="line.product_packaging_id"/>)
+                                                        </span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span t-field="line.price_unit"/>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span class="text-align-bottom"><span t-field="line.discount"/>%</span>
+                                                    </td>
+                                                    <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.taxes_id])"/>
+                                                    <td name="td_taxes" t-attf-class="text-end {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
+                                                        <span t-out="taxes">Tax 15%</span>
+                                                    </td>
+                                                    <td class="text-end">
+                                                        <span t-field="line.price_subtotal"
+                                                            t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
+                                                    </td>
+                                                </t>
+                                                <t t-if="line.display_type == 'line_section'">
+                                                    <td colspan="99" id="section">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                    <t t-set="current_section" t-value="line"/>
+                                                    <t t-set="current_subtotal" t-value="0"/>
+                                                </t>
+                                                <t t-if="line.display_type == 'line_note'">
+                                                    <td colspan="99" id="note">
+                                                        <span t-field="line.name"/>
+                                                    </td>
+                                                </t>
+                                            </tr>
+                                            <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
+                                                <tr class="is-subtotal text-end">
+                                                    <td colspan="99" id="subtotal">
+                                                        <strong class="mr16">Subtotal</strong>
+                                                        <span
+                                                            t-esc="current_subtotal"
+                                                            t-options='{"widget": "monetary", "display_currency": o.currency_id}'
+                                                        />
+                                                    </td>
+                                                </tr>
+                                            </t>
+                                        </t>
+                                    </tbody>
+                                    <tfoot style="display:table-row-group;">
+                                        <tr class="nil-manual-po-total-row" style="page-break-inside:avoid;">
+                                            <td colspan="7" style="background:#fff !important; border:1px solid #CFE5EA !important; padding:0 !important;">
+                                                <table class="nil-manual-po-totals" align="right"
+                                                       style="width:42% !important; min-width:265px !important; max-width:100% !important; border-collapse:collapse !important; margin:0 !important; float:right;">
+                                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                                    <t t-call="purchase.document_tax_totals"/>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                    <div t-if="o.notes" style="margin-top:20px; font-size:16px;">
+                        <p t-field="o.notes"/>
                     </div>
                 </div>
             </t>
         </xpath>
-
-        <!-- Totals are rendered within the product table for manual POs,
-             with the original tax breakdown and amounts from Odoo unchanged. -->
-        <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]" position="inside">
-            <tfoot t-if="not o.is_training_order and not o.crm_lead_id">
-                <tr class="nil-manual-po-total-row" style="page-break-inside:avoid;">
-                    <td colspan="99" style="padding:0 !important; border:1px solid #CFE5EA !important; background:#fff !important;">
-                        <div style="width:100%; text-align:right; margin:0; padding:0;">
-                            <table class="nil-manual-po-attached-totals" style="display:inline-table !important; width:auto !important; min-width:260px !important; max-width:100% !important; margin:0 !important; border-collapse:collapse !important;">
-                                <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                <t t-call="purchase.document_tax_totals"/>
-                            </table>
-                        </div>
-                    </td>
-                </tr>
-            </tfoot>
+        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+            <attribute name="t-if">not o.is_training_order and o.crm_lead_id</attribute>
+            <attribute name="t-call">invoice_training_details.custom_invoice_report_layout</attribute>
         </xpath>
-
-        <!-- Physically replace the detached total block, rendering it only
-             for CRM-linked orders. Manual purchase totals live in tfoot. -->
-        <xpath expr="//div[@id='total']" position="replace">
-            <div t-if="o.is_training_order or o.crm_lead_id"
-                 id="total" class="row justify-content-end">
-                <div class="col-4">
-                    <table class="table table-sm table-borderless">
-                        <t t-set="tax_totals" t-value="o.tax_totals"/>
-                        <t t-call="purchase.document_tax_totals"/>
-                    </table>
-                </div>
-            </div>
-        </xpath>
-
-        <!-- The standard Purchases report body only. -->
-        <xpath expr="//div[hasclass('page')]" position="attributes">
-            <attribute name="class" add="po-manual-purchase-page" separator=" "/>
-        </xpath>
-
-        <!-- The live parent report does not contain the expected Buyer
-             node, so do not target a non-existent element during upgrade.
-             Requested By conditional formatting will be handled separately
-             after inspecting the effective Odoo QWeb view. -->
 
         <xpath expr="//t[@t-call='invoice_training_details.custom_invoice_report_layout']" position="after">
             <t t-if="o.is_training_order"

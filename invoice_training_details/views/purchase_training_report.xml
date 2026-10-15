@@ -80,10 +80,10 @@
             <attribute name="class" add="po-manual-purchase-page" separator=" "/>
         </xpath>
 
-        <!-- Keep requester for CRM-linked POs; hide for manually created POs. -->
-        <xpath expr="//div[@id='informations']/div[@t-if='o.user_id']" position="attributes">
-            <attribute name="t-if">o.user_id and o.crm_lead_id</attribute>
-        </xpath>
+        <!-- The live parent report does not contain the expected Buyer
+             node, so do not target a non-existent element during upgrade.
+             Requested By conditional formatting will be handled separately
+             after inspecting the effective Odoo QWeb view. -->
 
         <xpath expr="//t[@t-call='invoice_training_details.custom_invoice_report_layout']" position="after">
             <t t-if="o.is_training_order"

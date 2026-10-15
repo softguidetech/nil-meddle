@@ -32,3 +32,5 @@ from . import so_logistics_fix
 from . import crm_manual_order
 
 from . import am_pricing
+
+from . import po_subject

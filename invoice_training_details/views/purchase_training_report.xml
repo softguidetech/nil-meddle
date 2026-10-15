@@ -3,23 +3,56 @@
     <template id="purchase_order_training_report_only"
               inherit_id="purchase.report_purchaseorder_document">
 
-        <!-- Remove the original Odoo vendor address and title ONLY for a manual
-             Purchases PO. The same vendor details appear in the CRM-style block
-             and the PO number remains beside the date. -->
-        <xpath expr="//t[@t-set='address']" position="attributes">
-            <attribute name="t-if">o.is_training_order or o.crm_lead_id</attribute>
+        <!-- Replace inherited blocks at source, rather than hiding rendered
+             duplicates with CSS. Preserve standard content for CRM-originated POs. -->
+        <xpath expr="//t[@t-set='address']" position="replace">
+            <t t-set="address" t-value="False"/>
+            <t t-if="o.is_training_order or o.crm_lead_id">
+                <t t-set="address">
+                    <div t-field="o.partner_id"
+                         t-options='{"widget":"contact","fields":["address","name","phone","vat"],"no_marker":True,"phone_icons":True}'/>
+                </t>
+            </t>
         </xpath>
-        <xpath expr="//div[hasclass('page')]/div[hasclass('mt-4')]" position="attributes">
-            <attribute name="t-if">o.is_training_order or o.crm_lead_id</attribute>
+
+        <!-- The large centred stock Odoo title disappears for manual POs.
+             The sole manual heading is below, left aligned like PO00806. -->
+        <xpath expr="//div[hasclass('page')]/div[hasclass('mt-4')]" position="replace">
+            <div t-if="o.is_training_order or o.crm_lead_id" class="mt-4">
+                <h2 t-if="o.state in ['draft', 'sent', 'to approve']">Request for Quotation #<span t-field="o.name"/></h2>
+                <h2 t-if="o.state in ['purchase', 'done']">Purchase Order #<span t-field="o.name"/></h2>
+                <h2 t-if="o.state == 'cancel'">Cancelled Purchase Order #<span t-field="o.name"/></h2>
+            </div>
         </xpath>
-        <xpath expr="//div[@id='informations']" position="attributes">
-            <attribute name="t-if">o.is_training_order or o.crm_lead_id</attribute>
+
+        <!-- Remove the standard Buyer/Requested By information block only
+             for manual POs. CRM POs retain all their standard information. -->
+        <xpath expr="//div[@id='informations']" position="replace">
+            <div t-if="o.is_training_order or o.crm_lead_id" id="informations" class="row mt-4 mb32">
+                <div t-if="o.user_id" class="col-3 bm-2">
+                    <strong>Buyer:</strong>
+                    <p t-field="o.user_id" class="m-0"/>
+                </div>
+                <div t-if="o.partner_ref" class="col-3 bm-2">
+                    <strong>Your Order Reference:</strong>
+                    <p t-field="o.partner_ref" class="m-0"/>
+                </div>
+                <div t-if="o.state in ['purchase','done'] and o.date_approve" class="col-3 bm-2">
+                    <strong>Order Date:</strong>
+                    <p t-field="o.date_approve" class="m-0"/>
+                </div>
+                <div t-elif="o.date_order" class="col-3 bm-2">
+                    <strong>Order Deadline:</strong>
+                    <p t-field="o.date_order" class="m-0"/>
+                </div>
+            </div>
         </xpath>
 
         <!-- Purchase Orders created with Purchases > New: standard report only. -->
         <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]"
                position="attributes">
             <attribute name="class" add="po-default-purchase-lines" separator=" "/>
+            <attribute name="style">display:table !important; width:100% !important; min-width:100% !important; max-width:100% !important; table-layout:auto !important; border-collapse:collapse !important;</attribute>
         </xpath>
         <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]"
                position="before">
@@ -131,6 +164,28 @@
                     .po-manual-purchase-page .nil-manual-po-meta td:last-child {
                         white-space: nowrap !important;
                     }
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals tr,
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals td,
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals th,
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals span,
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals strong {
+                        background: #fff !important;
+                        background-color: #fff !important;
+                        font-size: 16px !important;
+                    }
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals td,
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals th {
+                        padding: 6px 9px !important;
+                        border: 1px solid #CFE5EA !important;
+                    }
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals td:first-child {
+                        color: #075E68 !important;
+                        font-weight:700 !important;
+                    }
+                    .po-manual-purchase-page table.nil-manual-po-attached-totals td:last-child {
+                        text-align:right !important;
+                        font-weight:700 !important;
+                    }
                     .po-manual-purchase-page #total table {
                         width: 100% !important;
                         border-collapse: collapse !important;
@@ -203,6 +258,37 @@
                     </div>
                 </div>
             </t>
+        </xpath>
+
+        <!-- Totals are rendered within the product table for manual POs,
+             with the original tax breakdown and amounts from Odoo unchanged. -->
+        <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]" position="inside">
+            <tfoot t-if="not o.is_training_order and not o.crm_lead_id">
+                <tr class="nil-manual-po-total-row" style="page-break-inside:avoid;">
+                    <td colspan="99" style="padding:0 !important; border:1px solid #CFE5EA !important; background:#fff !important;">
+                        <div style="width:100%; text-align:right; margin:0; padding:0;">
+                            <table class="nil-manual-po-attached-totals" style="display:inline-table !important; width:auto !important; min-width:260px !important; max-width:100% !important; margin:0 !important; border-collapse:collapse !important;">
+                                <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                <t t-call="purchase.document_tax_totals"/>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tfoot>
+        </xpath>
+
+        <!-- Physically replace the detached total block, rendering it only
+             for CRM-linked orders. Manual purchase totals live in tfoot. -->
+        <xpath expr="//div[@id='total']" position="replace">
+            <div t-if="o.is_training_order or o.crm_lead_id"
+                 id="total" class="row justify-content-end">
+                <div class="col-4">
+                    <table class="table table-sm table-borderless">
+                        <t t-set="tax_totals" t-value="o.tax_totals"/>
+                        <t t-call="purchase.document_tax_totals"/>
+                    </table>
+                </div>
+            </div>
         </xpath>
 
         <!-- The standard Purchases report body only. -->

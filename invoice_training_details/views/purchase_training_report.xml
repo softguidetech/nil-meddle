@@ -75,6 +75,105 @@
             <attribute name="t-if">not o.is_training_order</attribute>
         </xpath>
 
+
+        <!-- Visual styling matched to CRM-originated PO00806.
+             All standard purchase line fields, pricing and notes remain unchanged. -->
+        <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]"
+               position="before">
+            <t t-if="not o.is_training_order and not o.crm_lead_id">
+                <style type="text/css">
+                    /* The original information values are repeated below in CRM layout;
+                       hide the old block and its Buyer/Requested By for manual POs. */
+                    .po-manual-purchase-page #informations {
+                        display: none !important;
+                    }
+                    /* The title stays in the CRM-style location, with the PO number in the right column. */
+                    .po-manual-purchase-page > .mt-4 h2 {
+                        display: none !important;
+                    }
+                    .po-manual-purchase-page .nil-manual-po-title {
+                        margin: 0 0 16px 0 !important;
+                        color: #0DCAF0 !important;
+                        font-size: 30px !important;
+                        font-weight: 700 !important;
+                        line-height: 1.25 !important;
+                    }
+                    .po-manual-purchase-page .nil-manual-po-header {
+                        margin: 12px 0 20px 0 !important;
+                        font-family: Arial, Helvetica, sans-serif !important;
+                        font-size: 16px !important;
+                        line-height: 1.4 !important;
+                    }
+                    .po-manual-purchase-page .nil-manual-po-header strong {
+                        font-size: 16px !important;
+                        font-weight: 700 !important;
+                    }
+                    .po-manual-purchase-page .nil-manual-po-meta {
+                        margin-left: auto !important;
+                        margin-right: 0 !important;
+                        width: auto !important;
+                        border-collapse: collapse !important;
+                    }
+                    .po-manual-purchase-page .nil-manual-po-meta td {
+                        border: 0 !important;
+                        padding: 2px 6px !important;
+                        vertical-align: top !important;
+                        font-size: 16px !important;
+                        line-height: 1.4 !important;
+                    }
+                    .po-manual-purchase-page .nil-manual-po-meta td:last-child {
+                        white-space: nowrap !important;
+                    }
+                    .po-manual-purchase-page #total table {
+                        border-collapse: collapse !important;
+                    }
+                    .po-manual-purchase-page #total table td {
+                        font-size: 16px !important;
+                        border: 1px solid #CFE5EA !important;
+                        padding: 5px 7px !important;
+                    }
+                </style>
+                <h2 class="nil-manual-po-title">
+                    <t t-if="o.state in ['draft', 'sent', 'to approve']">Request for Quotation</t>
+                    <t t-elif="o.state in ['purchase', 'done']">Purchase Order</t>
+                    <t t-else="">Cancelled Purchase Order</t>
+                </h2>
+                <div class="row nil-manual-po-header" style="page-break-inside:avoid;">
+                    <div class="col-8" style="padding-left:0;">
+                        <div><strong>Company Name:</strong></div>
+                        <div t-if="o.partner_id.is_company" t-field="o.partner_id.name"/>
+                        <div t-else="" t-field="o.partner_id.parent_id.name"/>
+                        <div style="margin-top:5px;"><strong>Address:</strong></div>
+                        <div t-field="o.partner_id"
+                             t-options='{"widget":"contact","fields":["address","phone","vat"],"no_marker":True,"phone_icons":True}'/>
+                        <div t-if="not o.partner_id.is_company">
+                            <strong>Attention:</strong> <span t-field="o.partner_id.name"/>
+                        </div>
+                    </div>
+                    <div class="col-4" style="padding-right:0;">
+                        <table class="nil-manual-po-meta table table-borderless">
+                            <tr>
+                                <td>Purchase Order</td>
+                                <td><span t-field="o.name"/></td>
+                            </tr>
+                            <tr t-if="o.state in ['purchase', 'done'] and o.date_approve">
+                                <td>Order Date</td>
+                                <td><span t-field="o.date_approve"/></td>
+                            </tr>
+                            <tr t-elif="o.date_order">
+                                <td>Order Deadline</td>
+                                <td><span t-field="o.date_order"/></td>
+                            </tr>
+                            <tr t-if="o.partner_ref">
+                                <td>Your Order Reference</td>
+                                <td><span t-field="o.partner_ref"/></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </t>
+        </xpath>
+
         <!-- The standard Purchases report body only. -->
         <xpath expr="//div[hasclass('page')]" position="attributes">
             <attribute name="class" add="po-manual-purchase-page" separator=" "/>

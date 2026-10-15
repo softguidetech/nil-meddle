@@ -41,6 +41,7 @@
         "views/res_company_views.xml",
         "views/training_audit_views.xml",
         "views/training_change_reason_views.xml",
+        "views/po_subject_views.xml",
         "views/purchase_training_report.xml",
         "reports/custom_invoice_layout.xml",
         "reports/report_invoice.xml",

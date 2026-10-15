@@ -178,27 +178,6 @@
                 }
 
 
-                /* PO TABLE FIT: CONTENT WIDTH (never stretch to full page) */
-                table[name="training_line_table"] {
-                    display: inline-table !important;
-                    width: auto !important;
-                    max-width: 100% !important;
-                    table-layout: auto !important;
-                    margin-left: 0 !important;
-                    margin-right: 0 !important;
-                }
-
-                table[name="training_line_table"] th,
-                table[name="training_line_table"] td {
-                    padding: 5px 7px !important;
-                    vertical-align: middle !important;
-                }
-
-                table[name="training_line_table"] tbody td {
-                    overflow-wrap: break-word;
-                    word-wrap: break-word;
-                }
-
                 /* TRAINING TABLE HEADERS */
                 table[name="training_line_table"] thead th,
                 table[name="training_line_table"] thead th * {
@@ -209,7 +188,7 @@
                 /* TRAINING TABLE VALUES */
                 table[name="training_line_table"] tbody td,
                 table[name="training_line_table"] tbody td * {
-                    font-size: 17px !important;
+                    font-size: 15px !important;
                 }
 
 

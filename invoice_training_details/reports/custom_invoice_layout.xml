@@ -149,6 +149,61 @@
 
                 </div>
 
+                <!-- Manual Purchases PDF: repeat ONLY PO number and order date
+                     in the shared company header from page 2 onward.
+                     Do not duplicate the first-page PO details or vendor data. -->
+                <t t-if="o and o._name == 'purchase.order' and not o.is_training_order and not o.crm_lead_id">
+                    <div class="nil_manual_purchase_repeat_meta"
+                         style="display:none; width:100%; margin:4px 0 0 0; padding:0;
+                                text-align:right; font-size:14px; line-height:1.3;">
+                        <table align="right"
+                               style="display:inline-table; width:auto; margin:0 0 0 auto;
+                                      border:0; border-collapse:collapse; font-size:14px;">
+                            <tr>
+                                <td style="padding:1px 12px 1px 2px; border:0; text-align:left;">
+                                    Purchase Order
+                                </td>
+                                <td style="padding:1px 0; border:0; text-align:right; white-space:nowrap;">
+                                    <span t-field="o.name"/>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td style="padding:1px 12px 1px 2px; border:0; text-align:left;">Date</td>
+                                <td style="padding:1px 0; border:0; text-align:right; white-space:nowrap;">
+                                    <span t-if="o.state in ('purchase', 'done') and o.date_approve"
+                                          t-field="o.date_approve"
+                                          t-options='{"widget":"date","format":"dd/MM/yy"}'/>
+                                    <span t-elif="o.date_order"
+                                          t-field="o.date_order"
+                                          t-options='{"widget":"date","format":"dd/MM/yy"}'/>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+
+                    <script type="text/javascript">
+                        <![CDATA[
+                        (function () {
+                            var vars = {};
+                            var parts = document.location.search.substring(1).split('&');
+                            for (var i = 0; i < parts.length; i++) {
+                                var pair = parts[i].split('=', 2);
+                                if (pair.length === 2) {
+                                    vars[pair[0]] = unescape(pair[1]);
+                                }
+                            }
+                            // Odoo's PDF header typically supplies sitepage, while
+                            // wkhtmltopdf may supply page. Support either name.
+                            var pageNumber = parseInt(vars.sitepage || vars.page || '1', 10);
+                            var blocks = document.getElementsByClassName('nil_manual_purchase_repeat_meta');
+                            for (var j = 0; j < blocks.length; j++) {
+                                blocks[j].style.display = pageNumber > 1 ? 'block' : 'none';
+                            }
+                        })();
+                        ]]>
+                    </script>
+                </t>
+
                 <!-- PO / WO continuation details: PAGE 2+ ONLY -->
                 <t t-if="o and o.env.context.get('po_repeat_meta')">
 

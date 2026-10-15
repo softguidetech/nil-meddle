@@ -146,102 +146,85 @@
                             </table>
                         </div>
                     </div>
-                    <table class="nil-manual-po-products table table-sm table-bordered" name="nil_manual_purchase_items" style="width:100% !important; min-width:100% !important; max-width:100% !important; table-layout:fixed !important; border-collapse:collapse !important; margin-top:12px; margin-bottom:0;">
-                                    <colgroup>
-                                        <col style="width:35%;"/>
-                                        <col style="width:13%;"/>
-                                        <col style="width:9%;"/>
-                                        <col style="width:12%;"/>
-                                        <col style="width:7%;"/>
-                                        <col style="width:10%;"/>
-                                        <col style="width:14%;"/>
-                                    </colgroup>
-                                    <thead style="display:table-header-group;">
-                                        <tr>
-                                            <th name="th_description"><strong>Description</strong></th>
-                                            <th name="th_date_req" class="text-center"><strong>Date Req.</strong></th>
-                                            <th name="th_quantity" class="text-end"><strong>Qty</strong></th>
-                                            <th name="th_price_unit" class="text-end"><strong>Unit Price</strong></th>
-                                            <th name="th_discount" class="text-end"><strong>Disc.</strong></th>
-                                            <th name="th_taxes" class="text-end"><strong>Taxes</strong></th>
-                                            <th name="th_subtotal" class="text-end">
-                                                <strong>Amount</strong>
-                                            </th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
+                    <!-- Manual Purchases PO: only the five requested item columns. -->
+                    <table class="nil-manual-po-products table table-sm table-bordered"
+                           name="nil_manual_purchase_items"
+                           style="width:100% !important; min-width:100% !important; max-width:100% !important; table-layout:fixed !important; border-collapse:collapse !important; margin-top:12px; margin-bottom:0;">
+                        <colgroup>
+                            <col style="width:24%;"/>
+                            <col style="width:42%;"/>
+                            <col style="width:8%;"/>
+                            <col style="width:13%;"/>
+                            <col style="width:13%;"/>
+                        </colgroup>
+                        <thead style="display:table-header-group;">
+                            <tr>
+                                <th name="th_product"><strong>Product</strong></th>
+                                <th name="th_description"><strong>Description</strong></th>
+                                <th name="th_quantity" class="text-center"><strong>Qty</strong></th>
+                                <th name="th_price_unit" class="text-end"><strong>Unit Price</strong></th>
+                                <th name="th_subtotal" class="text-end"><strong>Amount</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-set="current_subtotal" t-value="0"/>
+                            <t t-foreach="o.order_line" t-as="line">
+                                <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>
+                                <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
+                                    <t t-if="not line.display_type">
+                                        <td>
+                                            <span t-field="line.product_id.name"/>
+                                        </td>
+                                        <td id="product">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <td class="text-center">
+                                            <span t-field="line.product_qty"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.price_unit"/>
+                                        </td>
+                                        <td class="text-end">
+                                            <span t-field="line.price_subtotal"
+                                                  t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
+                                        </td>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_section'">
+                                        <td colspan="5" id="section">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                        <t t-set="current_section" t-value="line"/>
                                         <t t-set="current_subtotal" t-value="0"/>
-                                        <t t-foreach="o.order_line" t-as="line">
-                                            <t t-set="current_subtotal" t-value="current_subtotal + line.price_subtotal"/>
-                    
-                                            <tr t-att-class="'bg-200 fw-bold o_line_section' if line.display_type == 'line_section' else 'fst-italic o_line_note' if line.display_type == 'line_note' else ''">
-                                                <t t-if="not line.display_type">
-                                                    <td id="product">
-                                                        <span t-field="line.name"/>
-                                                    </td>
-                                                    <td class="text-center">
-                                                        <span t-field="line.date_planned"/>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <span t-field="line.product_qty"/>
-                                                        <span t-field="line.product_uom.name" groups="uom.group_uom"/>
-                                                        <span t-if="line.product_packaging_id">
-                                                            (<span t-field="line.product_packaging_qty" t-options='{"widget": "integer"}'/> <span t-field="line.product_packaging_id"/>)
-                                                        </span>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <span t-field="line.price_unit"/>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <span class="text-align-bottom"><span t-field="line.discount"/>%</span>
-                                                    </td>
-                                                    <t t-set="taxes" t-value="', '.join([(tax.invoice_label or tax.name) for tax in line.taxes_id])"/>
-                                                    <td name="td_taxes" t-attf-class="text-end {{ 'text-nowrap' if len(taxes) &lt; 10 else '' }}">
-                                                        <span t-out="taxes">Tax 15%</span>
-                                                    </td>
-                                                    <td class="text-end">
-                                                        <span t-field="line.price_subtotal"
-                                                            t-options='{"widget": "monetary", "display_currency": o.currency_id}'/>
-                                                    </td>
-                                                </t>
-                                                <t t-if="line.display_type == 'line_section'">
-                                                    <td colspan="99" id="section">
-                                                        <span t-field="line.name"/>
-                                                    </td>
-                                                    <t t-set="current_section" t-value="line"/>
-                                                    <t t-set="current_subtotal" t-value="0"/>
-                                                </t>
-                                                <t t-if="line.display_type == 'line_note'">
-                                                    <td colspan="99" id="note">
-                                                        <span t-field="line.name"/>
-                                                    </td>
-                                                </t>
-                                            </tr>
-                                            <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
-                                                <tr class="is-subtotal text-end">
-                                                    <td colspan="99" id="subtotal">
-                                                        <strong class="mr16">Subtotal</strong>
-                                                        <span
-                                                            t-esc="current_subtotal"
-                                                            t-options='{"widget": "monetary", "display_currency": o.currency_id}'
-                                                        />
-                                                    </td>
-                                                </tr>
-                                            </t>
-                                        </t>
-                                    </tbody>
-                                    <tfoot style="display:table-row-group;">
-                                        <tr class="nil-manual-po-total-row" style="page-break-inside:avoid;">
-                                            <td colspan="7" style="background:#fff !important; border:1px solid #CFE5EA !important; padding:0 !important;">
-                                                <table class="nil-manual-po-totals" align="right"
-                                                       style="width:42% !important; min-width:265px !important; max-width:100% !important; border-collapse:collapse !important; margin:0 !important; float:right;">
-                                                    <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                                    <t t-call="purchase.document_tax_totals"/>
-                                                </table>
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
+                                    </t>
+                                    <t t-if="line.display_type == 'line_note'">
+                                        <td colspan="5" id="note">
+                                            <span t-field="line.name"/>
+                                        </td>
+                                    </t>
+                                </tr>
+                                <t t-if="current_section and (line_last or o.order_line[line_index+1].display_type == 'line_section')">
+                                    <tr class="is-subtotal text-end">
+                                        <td colspan="5" id="subtotal">
+                                            <strong class="mr16">Subtotal</strong>
+                                            <span t-esc="current_subtotal"
+                                                  t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
+                                        </td>
+                                    </tr>
+                                </t>
+                            </t>
+                        </tbody>
+                        <tfoot style="display:table-row-group;">
+                            <tr class="nil-manual-po-total-row" style="page-break-inside:avoid;">
+                                <td colspan="5" style="background:#fff !important; border:1px solid #CFE5EA !important; padding:0 !important;">
+                                    <table class="nil-manual-po-totals" align="right"
+                                           style="width:42% !important; min-width:265px !important; max-width:100% !important; border-collapse:collapse !important; margin:0 !important; float:right;">
+                                        <t t-set="tax_totals" t-value="o.tax_totals"/>
+                                        <t t-call="purchase.document_tax_totals"/>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
                     <div t-if="o.notes" style="margin-top:20px; font-size:16px;">
                         <p t-field="o.notes"/>
                     </div>

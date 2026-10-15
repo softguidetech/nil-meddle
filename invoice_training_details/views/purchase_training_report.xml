@@ -87,6 +87,17 @@
                     .po-manual-purchase-page #informations {
                         display: none !important;
                     }
+                    /* The title stays in the CRM-style location, with the PO number in the right column. */
+                    .po-manual-purchase-page > .mt-4 h2 {
+                        display: none !important;
+                    }
+                    .po-manual-purchase-page .nil-manual-po-title {
+                        margin: 0 0 16px 0 !important;
+                        color: #0DCAF0 !important;
+                        font-size: 30px !important;
+                        font-weight: 700 !important;
+                        line-height: 1.25 !important;
+                    }
                     .po-manual-purchase-page .nil-manual-po-header {
                         margin: 12px 0 20px 0 !important;
                         font-family: Arial, Helvetica, sans-serif !important;
@@ -122,6 +133,11 @@
                         padding: 5px 7px !important;
                     }
                 </style>
+                <h2 class="nil-manual-po-title">
+                    <t t-if="o.state in ['draft', 'sent', 'to approve']">Request for Quotation</t>
+                    <t t-elif="o.state in ['purchase', 'done']">Purchase Order</t>
+                    <t t-else="">Cancelled Purchase Order</t>
+                </h2>
                 <div class="row nil-manual-po-header" style="page-break-inside:avoid;">
                     <div class="col-8" style="padding-left:0;">
                         <div><strong>Company Name:</strong></div>

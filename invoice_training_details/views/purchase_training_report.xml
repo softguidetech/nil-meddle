@@ -3,16 +3,13 @@
     <template id="purchase_order_training_report_only"
               inherit_id="purchase.report_purchaseorder_document">
 
-        <!-- Replace inherited blocks at source, rather than hiding rendered
-             duplicates with CSS. Preserve standard content for CRM-originated POs. -->
-        <xpath expr="//t[@t-set='address']" position="replace">
-            <t t-set="address" t-value="False"/>
-            <t t-if="o.is_training_order or o.crm_lead_id">
-                <t t-set="address">
-                    <div t-field="o.partner_id"
-                         t-options='{"widget":"contact","fields":["address","name","phone","vat"],"no_marker":True,"phone_icons":True}'/>
-                </t>
-            </t>
+        <!-- The effective parent view on this database does not contain
+             the address t-set. Set the address context to False immediately
+             before rendering the PO body for manual orders. web.address_layout
+             then does not emit the duplicate To/Name recipient block. -->
+        <xpath expr="//div[hasclass('page')]" position="before">
+            <t t-if="not o.is_training_order and not o.crm_lead_id"
+               t-set="address" t-value="False"/>
         </xpath>
 
         <!-- The large centred stock Odoo title disappears for manual POs.

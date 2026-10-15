@@ -159,8 +159,8 @@
                         </colgroup>
                         <thead style="display:table-header-group;">
                             <tr>
-                                <th name="th_product"><strong>Product</strong></th>
-                                <th name="th_description"><strong>Description</strong></th>
+                                <th name="th_product"><strong>Service</strong></th>
+                                <th name="th_description"><strong>Service Description</strong></th>
                                 <th name="th_quantity" class="text-center"><strong>Qty</strong></th>
                                 <th name="th_price_unit" class="text-end"><strong>Unit Price</strong></th>
                                 <th name="th_subtotal" class="text-end"><strong>Amount</strong></th>

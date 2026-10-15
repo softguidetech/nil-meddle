@@ -146,6 +146,12 @@
                             </table>
                         </div>
                     </div>
+                    <!-- Optional editable Subject, below order details and above items. -->
+                    <div t-if="o.nil_po_subject" class="nil-manual-po-subject"
+                         style="margin:8px 0 14px 0; font-size:16px !important; line-height:1.4; page-break-inside:avoid;">
+                        <strong>Subject:</strong>
+                        <span t-field="o.nil_po_subject"/>
+                    </div>
                     <!-- Manual Purchases PO: only the five requested item columns. -->
                     <table class="nil-manual-po-products table table-sm table-bordered"
                            name="nil_manual_purchase_items"

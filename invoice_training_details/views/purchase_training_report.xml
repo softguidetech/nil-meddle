@@ -151,11 +151,11 @@
                            name="nil_manual_purchase_items"
                            style="width:100% !important; min-width:100% !important; max-width:100% !important; table-layout:fixed !important; border-collapse:collapse !important; margin-top:12px; margin-bottom:0;">
                         <colgroup>
-                            <col style="width:24%;"/>
+                            <col style="width:23%;"/>
                             <col style="width:42%;"/>
                             <col style="width:8%;"/>
-                            <col style="width:13%;"/>
-                            <col style="width:13%;"/>
+                            <col style="width:13.5%;"/>
+                            <col style="width:13.5%;"/>
                         </colgroup>
                         <thead style="display:table-header-group;">
                             <tr>
@@ -213,18 +213,29 @@
                                 </t>
                             </t>
                         </tbody>
-                        <tfoot style="display:table-row-group;">
-                            <tr class="nil-manual-po-total-row" style="page-break-inside:avoid;">
-                                <td colspan="5" style="background:#fff !important; border:1px solid #CFE5EA !important; padding:0 !important;">
-                                    <table class="nil-manual-po-totals" align="right"
-                                           style="width:42% !important; min-width:265px !important; max-width:100% !important; border-collapse:collapse !important; margin:0 !important; float:right;">
-                                        <t t-set="tax_totals" t-value="o.tax_totals"/>
-                                        <t t-call="purchase.document_tax_totals"/>
-                                    </table>
+                    </table>
+                    <!-- No empty footer cell: the two bordered total cells line up
+                         directly with the final two 13.5% product columns. -->
+                    <div class="nil-manual-po-total-wrapper"
+                         style="width:100%; margin-top:-1px; page-break-inside:avoid; display:block;">
+                        <table class="nil-manual-po-grand-total" align="right"
+                               style="float:right; width:27% !important; max-width:27% !important; table-layout:fixed !important; border-collapse:collapse !important; margin:0 !important;">
+                            <colgroup>
+                                <col style="width:50%;"/>
+                                <col style="width:50%;"/>
+                            </colgroup>
+                            <tr>
+                                <td style="background:#fff !important; color:#075E68 !important; font-size:16px !important; font-weight:700 !important; text-align:left !important; padding:7px 8px !important; border:1px solid #CFE5EA !important;">
+                                    Total
+                                </td>
+                                <td style="background:#fff !important; color:#171717 !important; font-size:16px !important; font-weight:700 !important; text-align:right !important; white-space:nowrap !important; padding:7px 8px !important; border:1px solid #CFE5EA !important;">
+                                    <span t-field="o.amount_total"
+                                          t-options='{"widget":"monetary","display_currency":o.currency_id}'/>
                                 </td>
                             </tr>
-                        </tfoot>
-                    </table>
+                        </table>
+                        <div style="clear:both; height:0; line-height:0;"/>
+                    </div>
                     <div t-if="o.notes" style="margin-top:20px; font-size:16px;">
                         <p t-field="o.notes"/>
                     </div>

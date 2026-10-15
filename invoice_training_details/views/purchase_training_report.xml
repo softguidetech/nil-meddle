@@ -248,12 +248,7 @@
                 </div>
             </t>
         </xpath>
-        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
-            <attribute name="t-if">not o.is_training_order and o.crm_lead_id</attribute>
-            <attribute name="t-call">invoice_training_details.custom_invoice_report_layout</attribute>
-        </xpath>
-
-        <xpath expr="//t[@t-call='invoice_training_details.custom_invoice_report_layout']" position="after">
+        <xpath expr="//t[@t-call='web.external_layout']" position="after">
             <t t-if="o.is_training_order"
                t-call="invoice_training_details.custom_invoice_report_layout">
 
@@ -518,5 +513,10 @@
 
             </t>
         </xpath>
+        <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+            <attribute name="t-if">not o.is_training_order and o.crm_lead_id</attribute>
+            <attribute name="t-call">invoice_training_details.custom_invoice_report_layout</attribute>
+        </xpath>
+
     </template>
 </odoo>

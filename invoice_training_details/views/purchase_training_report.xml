@@ -11,25 +11,58 @@
         <xpath expr="//table[contains(concat(' ', normalize-space(@class), ' '), ' o_main_table ')]"
                position="before">
             <style type="text/css">
-                table.po-default-purchase-lines {
+                /* CRM Purchase Order style, with original content untouched. */
+                .po-manual-purchase-page h2 {
+                    color: #0DCAF0 !important;
+                    font-size: 30px !important;
+                    line-height: 1.25 !important;
+                    font-weight: 700 !important;
+                }
+                .po-manual-purchase-page #informations,
+                .po-manual-purchase-page #informations strong,
+                .po-manual-purchase-page #informations p,
+                .po-manual-purchase-page #informations span {
+                    font-size: 16px !important;
+                    line-height: 1.4 !important;
+                }
+                .po-manual-purchase-page table.po-default-purchase-lines {
                     display: inline-table !important;
                     width: auto !important;
                     max-width: 100% !important;
                     table-layout: auto !important;
+                    margin: 10px 0 0 0 !important;
+                    border-collapse: collapse !important;
                 }
-                table.po-default-purchase-lines th,
-                table.po-default-purchase-lines th *,
-                table.po-default-purchase-lines td,
-                table.po-default-purchase-lines td * {
-                    font-size: 14px !important;
+                .po-manual-purchase-page table.po-default-purchase-lines thead {
+                    display: table-header-group !important;
+                }
+                .po-manual-purchase-page table.po-default-purchase-lines tr {
+                    page-break-inside: avoid !important;
+                }
+                .po-manual-purchase-page table.po-default-purchase-lines th,
+                .po-manual-purchase-page table.po-default-purchase-lines th * {
+                    font-size: 16px !important;
+                    font-weight: 700 !important;
                     line-height: 1.35 !important;
                 }
-                table.po-default-purchase-lines th,
-                table.po-default-purchase-lines td {
-                    padding: 5px 7px !important;
+                .po-manual-purchase-page table.po-default-purchase-lines td,
+                .po-manual-purchase-page table.po-default-purchase-lines td * {
+                    font-size: 16px !important;
+                    line-height: 1.4 !important;
+                }
+                .po-manual-purchase-page table.po-default-purchase-lines th {
+                    background-color: #D9F4FA !important;
+                    color: #075E68 !important;
+                    border: 1px solid #9DDDE7 !important;
+                    padding: 6px 7px !important;
                     vertical-align: middle !important;
                 }
-                table.po-default-purchase-lines td#product {
+                .po-manual-purchase-page table.po-default-purchase-lines td {
+                    border: 1px solid #CFE5EA !important;
+                    padding: 6px 7px !important;
+                    vertical-align: middle !important;
+                }
+                .po-manual-purchase-page table.po-default-purchase-lines td#product {
                     white-space: normal !important;
                     overflow-wrap: break-word;
                     word-wrap: break-word;
@@ -38,10 +71,21 @@
         </xpath>
 
         <xpath expr="//t[@t-call='web.external_layout']" position="attributes">
+            <attribute name="t-call">invoice_training_details.custom_invoice_report_layout</attribute>
             <attribute name="t-if">not o.is_training_order</attribute>
         </xpath>
 
-        <xpath expr="//t[@t-call='web.external_layout']" position="after">
+        <!-- The standard Purchases report body only. -->
+        <xpath expr="//div[hasclass('page')]" position="attributes">
+            <attribute name="class" add="po-manual-purchase-page" separator=" "/>
+        </xpath>
+
+        <!-- Keep requester for CRM-linked POs; hide for manually created POs. -->
+        <xpath expr="//div[@id='informations']/div[@t-if='o.user_id']" position="attributes">
+            <attribute name="t-if">o.user_id and o.crm_lead_id</attribute>
+        </xpath>
+
+        <xpath expr="//t[@t-call='invoice_training_details.custom_invoice_report_layout']" position="after">
             <t t-if="o.is_training_order"
                t-call="invoice_training_details.custom_invoice_report_layout">
 

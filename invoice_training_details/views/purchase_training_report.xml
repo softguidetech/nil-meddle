@@ -277,10 +277,18 @@
             </tfoot>
         </xpath>
 
-        <!-- The original totals container stays only for CRM-linked POs,
-             so the manual PO never has a second or detached total. -->
-        <xpath expr="//div[@id='total']" position="attributes">
-            <attribute name="t-if">o.is_training_order or o.crm_lead_id</attribute>
+        <!-- Physically replace the detached total block, rendering it only
+             for CRM-linked orders. Manual purchase totals live in tfoot. -->
+        <xpath expr="//div[@id='total']" position="replace">
+            <div t-if="o.is_training_order or o.crm_lead_id"
+                 id="total" class="row justify-content-end">
+                <div class="col-4">
+                    <table class="table table-sm table-borderless">
+                        <t t-set="tax_totals" t-value="o.tax_totals"/>
+                        <t t-call="purchase.document_tax_totals"/>
+                    </table>
+                </div>
+            </div>
         </xpath>
 
         <!-- The standard Purchases report body only. -->

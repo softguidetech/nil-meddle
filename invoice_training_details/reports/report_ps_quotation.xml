@@ -385,60 +385,53 @@
                                    margin:0 0 0 auto;
                                ">
 
-                            <!-- Tax totals -->
-                            <t t-set="tax_totals"
-                               t-value="o.tax_totals"/>
-
-                            <t t-if="tax_totals.get('subtotals')">
-
-                                <t t-foreach="tax_totals.get('subtotals')"
-                                   t-as="subtotal">
-
-                                    <tr class="border-grey o_subtotal">
-
+                            <!-- Same quote totals/tax labels and styling, with
+                                 decimal display matching Unit Price and Total. -->
+                            <t t-set="tax_totals" t-value="o.tax_totals or {}"/>
+                            <t t-foreach="tax_totals.get('subtotals', [])" t-as="subtotal">
+                                <tr class="border-grey o_subtotal">
+                                    <td style="background-color:#fff;">
+                                        <strong t-out="subtotal['name']">Untaxed Amount</strong>
+                                    </td>
+                                    <td style="background-color:#fff;text-align:right;">
+                                        <span t-att-class="oe_subtotal_footer_separator">
+                                            <t t-call="invoice_training_details.ps_quotation_compact_money">
+                                                <t t-set="nil_ps_money_amount" t-value="subtotal['amount']"/>
+                                            </t>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <t t-foreach="tax_totals.get('groups_by_subtotal', {}).get(subtotal['name'], [])"
+                                   t-as="amount_by_group">
+                                    <tr>
                                         <td style="background-color:#fff;">
-                                            <strong t-out="subtotal['name']">
-                                                Untaxed Amount
-                                            </strong>
+                                            <span t-out="amount_by_group['tax_group_name']"/>
+                                            <t t-if="tax_totals.get('display_tax_base') and not amount_by_group.get('hide_base_amount')">
+                                                <span> on </span>
+                                                <t t-call="invoice_training_details.ps_quotation_compact_money">
+                                                    <t t-set="nil_ps_money_amount" t-value="amount_by_group['tax_group_base_amount']"/>
+                                                </t>
+                                            </t>
                                         </td>
-
-                                        <td style="
-                                            background-color:#fff;
-                                            text-align:right;
-                                        ">
-                                            <span t-att-class="oe_subtotal_footer_separator"
-                                                  t-out="subtotal['formatted_amount']"/>
+                                        <td style="background-color:#fff;text-align:right;">
+                                            <t t-call="invoice_training_details.ps_quotation_compact_money">
+                                                <t t-set="nil_ps_money_amount" t-value="amount_by_group['tax_group_amount']"/>
+                                            </t>
                                         </td>
-
                                     </tr>
-
-                                    <t t-set="subtotal_to_show"
-                                       t-value="subtotal['name']"/>
-
-                                    <t t-call="account.tax_groups_totals"/>
-
                                 </t>
-
                             </t>
 
-                            <!-- Total Amount -->
+                            <!-- Preserve the original total row and amount exactly. -->
                             <tr class="border-grey o_total">
-
                                 <td style="background-color:#fff;">
                                     <strong>Total Amount</strong>
                                 </td>
-
-                                <td style="
-                                    background-color:#fff;
-                                    text-align:right;
-                                ">
-                                    <span t-out="o.amount_total"
-                                          t-options="{
-                                              &quot;widget&quot;: &quot;monetary&quot;,
-                                              &quot;display_currency&quot;: o.currency_id
-                                          }"/>
+                                <td style="background-color:#fff;text-align:right;">
+                                    <t t-call="invoice_training_details.ps_quotation_compact_money">
+                                        <t t-set="nil_ps_money_amount" t-value="o.amount_total"/>
+                                    </t>
                                 </td>
-
                             </tr>
 
                         </table>

@@ -307,8 +307,22 @@
                             word-break:normal !important;
                         }
                         table.nil_ps_quotation_items .nil_ps_col_custom {
-                            min-width:110px;
-                            width:18%;
+                            min-width:85px;
+                            width:12% !important;
+                            max-width:105px;
+                        }
+                        /* The editable column heading contains a span.  Unlike
+                           the other headings, the global table * color rule
+                           otherwise overrides its teal title color. */
+                        table.nil_ps_quotation_items thead th.nil_ps_col_custom,
+                        table.nil_ps_quotation_items thead th.nil_ps_col_custom span {
+                            color:#075E68 !important;
+                            font-weight:700 !important;
+                        }
+                        table.nil_ps_quotation_items tbody td.nil_ps_col_custom,
+                        table.nil_ps_quotation_items tbody td.nil_ps_col_custom span {
+                            color:#000 !important;
+                            font-weight:400 !important;
                         }
                     </style>
                     <table t-if="o.pro_service_ids"

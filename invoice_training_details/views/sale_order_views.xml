@@ -80,8 +80,9 @@
                         <button name="synch_pro_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
                      <field name="nil_ps_custom_heading" invisible="1"/>
+                    <field name="nil_ps_custom_heading_2" invisible="1"/>
                     <div class="alert alert-info" role="alert" style="margin:6px 0 10px 0;">
-                        Click the last column heading to write your own title. Enter a different value in that column for each service row. Leave blank if not needed.
+                        Click either of the two custom column headings to enter its title. Each column has an independent editable value per service row. Leave columns blank if unused.
                     </div>
                     <field name="pro_service_ids" widget="nil_ps_editable_column">
                         <tree editable="bottom">
@@ -91,6 +92,7 @@
                             <field name="hourly_rate" string="Unit Price"/>
                             <field name="price" string="Total" readonly="1" force_save="1"/>
                             <field name="nil_custom_value" string="Custom Column" placeholder="Write this row's value..."/>
+                            <field name="nil_custom_value_2" string="Custom Column 2" placeholder="Write the second value..."/>
                         </tree>
                     </field>
                     <group>

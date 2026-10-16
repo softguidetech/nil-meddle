@@ -2,6 +2,7 @@
 
 from . import training_course
 from . import pro_service
+from . import pro_service_column_heading
 from . import account_move
 from . import downpayment_so_reference
 from . import account_move_send

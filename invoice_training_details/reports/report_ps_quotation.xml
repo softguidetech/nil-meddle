@@ -264,18 +264,18 @@
                             width:100% !important;
                             table-layout:fixed !important;
                             border-collapse:collapse !important;
-                            font-size:14px !important;
+                            font-size:15px !important;
                         }
                         table.nil_ps_quotation_items thead th {
                             padding:6px 5px !important;
-                            font-size:14px !important;
+                            font-size:15px !important;
                             line-height:1.35 !important;
                             vertical-align:middle !important;
                             word-wrap:break-word !important;
                         }
                         table.nil_ps_quotation_items tbody td,
                         table.nil_ps_quotation_items tbody td * {
-                            font-size:14px !important;
+                            font-size:15px !important;
                             line-height:1.35 !important;
                         }
                         table.nil_ps_quotation_items tbody td {
@@ -287,7 +287,7 @@
                     <table t-if="o.pro_service_ids"
                            class="table table-sm o_main_table table-bordered text-center nil_ps_quotation_items"
                            name="training_line_table"
-                           style="width:100%;table-layout:fixed;font-size:14px;">
+                           style="width:100%;table-layout:fixed;font-size:15px;">
 
                         <!-- Adjust widths for zero, one or two visible custom columns. -->
                         <colgroup t-if="nil_ps_show_custom_1 and nil_ps_show_custom_2">
@@ -351,7 +351,11 @@
                                         <span t-out="int(round(service.wor_hour_number or 0))"/>
                                     </td>
                                     <td style="text-align:center;vertical-align:middle;white-space:nowrap;">
-                                        <span t-out="service.hourly_rate or 0.0"
+                                        <t t-set="nil_ps_unit_price" t-value="service.hourly_rate or 0.0"/>
+                                        <span t-if="abs(nil_ps_unit_price - round(nil_ps_unit_price)) &lt; 0.000001"
+                                              t-out="('{:,.0f}'.format(nil_ps_unit_price) + ' ' + (o.currency_id.symbol or o.currency_id.name)) if o.currency_id.position == 'after' else ((o.currency_id.symbol or o.currency_id.name) + ' ' + '{:,.0f}'.format(nil_ps_unit_price))"/>
+                                        <span t-else=""
+                                              t-out="nil_ps_unit_price"
                                               t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                     </td>
                                     <td style="text-align:center;vertical-align:middle;white-space:nowrap;">

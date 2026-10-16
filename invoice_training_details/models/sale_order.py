@@ -286,11 +286,14 @@ class SaleOrder(models.Model):
         for service in self.pro_service_ids:
             if not service.training_id:
                 raise UserError(_('Select a product for every service before synchronizing.'))
+            # New PS lines use Qty × Unit Price. Retain legacy totals for
+            # previously saved lines that did not have a quantity/rate.
+            uses_units = bool(service.wor_hour_number or service.hourly_rate)
             items.append((service, {
                 'product_id': service.training_id.id,
                 'name': service.training_id.display_name,
-                'product_uom_qty': 1,
-                'price_unit': service.price,
+                'product_uom_qty': service.wor_hour_number if uses_units else 1,
+                'price_unit': service.hourly_rate if uses_units else service.price,
             }))
         self.write({'order_line': sync_commands(self.order_line, items, 'nil_sync_service_id')})
         return True

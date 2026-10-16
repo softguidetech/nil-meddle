@@ -240,28 +240,19 @@
                         <field name="ordering_partner_id"/>
                     </group>
 
+                    <div class="alert alert-info" role="alert" style="margin:6px 0 10px 0;">
+                        Optional column: enter any heading in <strong>Custom Title</strong> and its value in <strong>Custom Value</strong> at the end of each service row. Leave both blank if not needed.
+                    </div>
                     <field name="pro_service_ids">
-
                         <tree editable="bottom">
-
-                            <field name="training_id"/>
-
-                            <field name="descriptions" string="Service Description"/>
-
-                            <field name="end_customer_id"/>
-
-                            <field name="cisco_am"/>
-
-                            <field name="con_per"/>
-
-                            <field name="duration"/>
-
-                            <field name="training_date_end"/>
-
-                            <field name="price"/>
-
+                            <field name="training_id" string="Service Name"/>
+                            <field name="descriptions" string="Description"/>
+                            <field name="wor_hour_number" string="Qty"/>
+                            <field name="hourly_rate" string="Unit Price"/>
+                            <field name="price" string="Total" readonly="1" force_save="1"/>
+                            <field name="nil_custom_title" string="Custom Title" placeholder="Write your column heading..."/>
+                            <field name="nil_custom_value" string="Custom Value" placeholder="Write any value..."/>
                         </tree>
-
                     </field>
 
                     <group>

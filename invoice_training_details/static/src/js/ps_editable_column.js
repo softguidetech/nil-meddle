@@ -1,7 +1,7 @@
 /** @odoo-module **/
 
 // Keep Odoo's normal x2many inline editing, adding/removing rows, and totals.
-// Only replace the single custom-value column's static header with a live input.
+// Replace the TWO independent custom-value columns' static headers with live inputs.
 import { registry } from "@web/core/registry";
 import { X2ManyField, x2ManyField } from "@web/views/fields/x2many/x2many_field";
 import { ListRenderer } from "@web/views/list/list_renderer";
@@ -27,9 +27,13 @@ export class NilPSListRenderer extends ListRenderer {
         if (!this.props.headingRecord.isInEdition) {
             return;
         }
-        const heading = ev.target.value.trim();
-        if (heading !== (this.props.headingRecord.data.nil_ps_custom_heading || "")) {
-            await this.props.headingRecord.update({ nil_ps_custom_heading: heading });
+        const headingField = ev.currentTarget.dataset.headingField;
+        if (!["nil_ps_custom_heading", "nil_ps_custom_heading_2"].includes(headingField)) {
+            return;
+        }
+        const heading = ev.currentTarget.value.trim();
+        if (heading !== (this.props.headingRecord.data[headingField] || "")) {
+            await this.props.headingRecord.update({ [headingField]: heading });
         }
     }
 }

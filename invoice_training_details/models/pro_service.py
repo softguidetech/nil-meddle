@@ -16,7 +16,12 @@ class ProService(models.Model):
     end_customer_id = fields.Many2one("res.partner", string="End Customer")
     training_date_start = fields.Date(string='Training Date start')
     training_date_end = fields.Date(string='Delivery Date')
-    price = fields.Float(string='Total', readonly=False)
+    price = fields.Float(
+        string='Total',
+        compute='_compute_nil_ps_total',
+        store=True,
+        readonly=True,
+    )
     pro_move_id = fields.Many2one('account.move', string='Move')
     pro_lead_id = fields.Many2one('crm.lead', string='Lead')
     pro_sale_id = fields.Many2one('sale.order', string='Sale Order')
@@ -47,42 +52,19 @@ class ProService(models.Model):
     cost_clc = fields.Char(related='training_id.product_tmpl_id.cost_clc',string="Cost Clc")
     hyperlink = fields.Char(related='training_id.product_tmpl_id.hyperlink',string="Hyper Link")
     
-    @api.onchange('wor_hour_number', 'hourly_rate')
-    def _onchange_nil_ps_line_total(self):
-        """Update the inline list immediately while Qty / Unit Price are edited."""
+    nil_custom_value_2 = fields.Char(
+        string='Custom Value 2',
+        help='Optional: independent value for the second custom column.',
+    )
+
+    @api.depends('wor_hour_number', 'hourly_rate')
+    def _compute_nil_ps_total(self):
+        """Always calculate Total from Qty × Unit Price, even for existing rows."""
         for service in self:
-            service.price = (service.wor_hour_number or 0.0) * (service.hourly_rate or 0.0)
-
-    @api.model_create_multi
-    def create(self, vals_list):
-        """Compute totals for new lines; preserve legacy price-only imports."""
-        prepared = []
-        for values in vals_list:
-            vals = dict(values)
-            if 'wor_hour_number' in vals or 'hourly_rate' in vals:
-                vals['price'] = (
-                    (vals.get('wor_hour_number') or 0.0)
-                    * (vals.get('hourly_rate') or 0.0)
-                )
-            prepared.append(vals)
-        return super().create(prepared)
-
-    def write(self, vals):
-        """Only reprice lines whose quantity or rate was explicitly edited.
-
-        Historical service lines and posted invoices are never bulk-repriced
-        merely because the module is upgraded or another field changes.
-        """
-        if not ({'wor_hour_number', 'hourly_rate'} & vals.keys()):
-            return super().write(vals)
-
-        for service in self:
-            write_vals = dict(vals)
-            qty = write_vals.get('wor_hour_number', service.wor_hour_number) or 0.0
-            unit_price = write_vals.get('hourly_rate', service.hourly_rate) or 0.0
-            write_vals['price'] = qty * unit_price
-            super(ProService, service).write(write_vals)
-        return True
+            service.price = (
+                (service.wor_hour_number or 0.0)
+                * (service.hourly_rate or 0.0)
+            )
 
     # def _compute_date(self):
         

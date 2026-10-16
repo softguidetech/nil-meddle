@@ -79,18 +79,18 @@
                         <field name="service_name"/>
                         <button name="synch_pro_order" string="Synch Order" class="oe_highlight" type="object"/>
                     </group>
-                     <div class="alert alert-info" role="alert" style="margin:6px 0 10px 0;">
-                        Optional column: enter any heading in <strong>Custom Title</strong> and its value in <strong>Custom Value</strong> at the end of each service row. Leave both blank if not needed.
+                     <field name="nil_ps_custom_heading" invisible="1"/>
+                    <div class="alert alert-info" role="alert" style="margin:6px 0 10px 0;">
+                        Click the last column heading to write your own title. Enter a different value in that column for each service row. Leave blank if not needed.
                     </div>
-                    <field name="pro_service_ids">
+                    <field name="pro_service_ids" widget="nil_ps_editable_column">
                         <tree editable="bottom">
                             <field name="training_id" string="Service Name"/>
                             <field name="descriptions" string="Description"/>
                             <field name="wor_hour_number" string="Qty"/>
                             <field name="hourly_rate" string="Unit Price"/>
                             <field name="price" string="Total" readonly="1" force_save="1"/>
-                            <field name="nil_custom_title" string="Custom Title" placeholder="Write your column heading..."/>
-                            <field name="nil_custom_value" string="Custom Value" placeholder="Write any value..."/>
+                            <field name="nil_custom_value" string="Custom Column" placeholder="Write this row's value..."/>
                         </tree>
                     </field>
                     <group>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 {
     "name": "Invoice Training Details",
-    "version": "17.0.1.72",
+    "version": "17.0.1.73",
     "summary": "Enhancements for Invoice Training Details",
     "description": "Customizations for invoicing related to training services, including improved reporting and CRM integration.",
     "category": "Customization",
@@ -56,6 +56,7 @@
         "reports/report_action.xml",
         "reports/report_invoice_KSA.xml",
         "reports/report_downpayment_so_reference.xml",
+        "reports/report_ps_quotation.xml",
     ],
 
     "assets": {

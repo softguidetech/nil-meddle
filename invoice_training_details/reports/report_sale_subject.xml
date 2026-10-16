@@ -31,13 +31,16 @@
         </xpath>
     </template>
 
-    <!-- Separate PS Quotation action. -->
+    <!-- PS Quotation ONLY: print the subject value, without the Subject: label. -->
     <template id="report_ps_quotation_subject"
               inherit_id="invoice_training_details.report_ps_quotation_document">
         <xpath expr="//table[@name='training_line_table']" position="before">
-            <t t-call="invoice_training_details.sale_subject_report_block">
-                <t t-set="sale_subject_record" t-value="o"/>
-            </t>
+            <div t-if="o.nil_so_subject and o.nil_so_subject.strip()"
+                 class="nil-sale-report-subject"
+                 style="margin:8px 0 14px 0;font-size:18px !important;font-weight:700 !important;line-height:1.4;page-break-inside:avoid;text-align:left;">
+                <span t-field="o.nil_so_subject"
+                      style="font-size:18px !important;font-weight:700 !important;"/>
+            </div>
         </xpath>
     </template>
 

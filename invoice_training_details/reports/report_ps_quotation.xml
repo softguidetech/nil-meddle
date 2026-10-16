@@ -257,10 +257,66 @@
                        t-value="any((line.nil_custom_value or '').strip() for line in o.pro_service_ids)"/>
                     <t t-set="nil_ps_show_custom_2"
                        t-value="any((line.nil_custom_value_2 or '').strip() for line in o.pro_service_ids)"/>
+                    <style>
+                        /* Keep every PS Quotation column visually consistent,
+                           and reserve genuine width for the optional free-text columns. */
+                        table.nil_ps_quotation_items {
+                            width:100% !important;
+                            table-layout:fixed !important;
+                            border-collapse:collapse !important;
+                            font-size:14px !important;
+                        }
+                        table.nil_ps_quotation_items thead th {
+                            padding:6px 5px !important;
+                            font-size:14px !important;
+                            line-height:1.35 !important;
+                            vertical-align:middle !important;
+                            word-wrap:break-word !important;
+                        }
+                        table.nil_ps_quotation_items tbody td,
+                        table.nil_ps_quotation_items tbody td * {
+                            font-size:14px !important;
+                            line-height:1.35 !important;
+                        }
+                        table.nil_ps_quotation_items tbody td {
+                            padding:6px 5px !important;
+                            vertical-align:middle !important;
+                            word-wrap:break-word !important;
+                        }
+                    </style>
                     <table t-if="o.pro_service_ids"
-                           class="table table-sm o_main_table table-bordered text-center"
+                           class="table table-sm o_main_table table-bordered text-center nil_ps_quotation_items"
                            name="training_line_table"
-                           style="width:100%;table-layout:auto;font-size:15px;">
+                           style="width:100%;table-layout:fixed;font-size:14px;">
+
+                        <!-- Adjust widths for zero, one or two visible custom columns. -->
+                        <colgroup t-if="nil_ps_show_custom_1 and nil_ps_show_custom_2">
+                            <col style="width:4%;"/>
+                            <col style="width:18%;"/>
+                            <col style="width:21%;"/>
+                            <col style="width:6%;"/>
+                            <col style="width:13%;"/>
+                            <col style="width:13%;"/>
+                            <col style="width:12.5%;"/>
+                            <col style="width:12.5%;"/>
+                        </colgroup>
+                        <colgroup t-elif="nil_ps_show_custom_1 or nil_ps_show_custom_2">
+                            <col style="width:4%;"/>
+                            <col style="width:20%;"/>
+                            <col style="width:24%;"/>
+                            <col style="width:7%;"/>
+                            <col style="width:14%;"/>
+                            <col style="width:14%;"/>
+                            <col style="width:17%;"/>
+                        </colgroup>
+                        <colgroup t-else="">
+                            <col style="width:5%;"/>
+                            <col style="width:30%;"/>
+                            <col style="width:31%;"/>
+                            <col style="width:7%;"/>
+                            <col style="width:13.5%;"/>
+                            <col style="width:13.5%;"/>
+                        </colgroup>
                         <thead>
                             <tr>
                                 <th style="text-align:center;vertical-align:middle;">Item</th>
@@ -292,20 +348,25 @@
                                         <span t-field="service.descriptions"/>
                                     </td>
                                     <td style="text-align:center;vertical-align:middle;">
-                                        <span t-field="service.wor_hour_number"/>
+                                        <span t-out="int(round(service.wor_hour_number or 0))"/>
                                     </td>
                                     <td style="text-align:center;vertical-align:middle;white-space:nowrap;">
                                         <span t-out="service.hourly_rate or 0.0"
                                               t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                     </td>
                                     <td style="text-align:center;vertical-align:middle;white-space:nowrap;">
-                                        <span t-out="(service.wor_hour_number or 0.0) * (service.hourly_rate or 0.0)"
+                                        <t t-set="nil_ps_line_total"
+                                           t-value="(service.wor_hour_number or 0.0) * (service.hourly_rate or 0.0)"/>
+                                        <span t-if="abs(nil_ps_line_total - round(nil_ps_line_total)) &lt; 0.000001"
+                                              t-out="('{:,.0f}'.format(nil_ps_line_total) + ' ' + (o.currency_id.symbol or o.currency_id.name)) if o.currency_id.position == 'after' else ((o.currency_id.symbol or o.currency_id.name) + ' ' + '{:,.0f}'.format(nil_ps_line_total))"/>
+                                        <span t-else=""
+                                              t-out="nil_ps_line_total"
                                               t-options="{'widget':'monetary','display_currency':o.currency_id}"/>
                                     </td>
-                                    <td t-if="nil_ps_show_custom_1" style="text-align:left;vertical-align:middle;">
+                                    <td t-if="nil_ps_show_custom_1" style="text-align:left;vertical-align:middle;white-space:normal;word-wrap:break-word;">
                                         <span t-field="service.nil_custom_value"/>
                                     </td>
-                                    <td t-if="nil_ps_show_custom_2" style="text-align:left;vertical-align:middle;">
+                                    <td t-if="nil_ps_show_custom_2" style="text-align:left;vertical-align:middle;white-space:normal;word-wrap:break-word;">
                                         <span t-field="service.nil_custom_value_2"/>
                                     </td>
                                 </tr>
@@ -483,11 +544,11 @@
                         <div style="display:inline-block;text-align:right;white-space:nowrap;margin:0;padding:0;vertical-align:bottom;">
                             <img t-if="o.company_id.signature and o.display_signature"
                                  t-att-src="image_data_uri(o.company_id.signature)"
-                                 style="max-height:85px;max-width:125px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0 6px 0 0;padding:0;"
+                                 style="max-height:100px;max-width:145px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0 6px 0 0;padding:0;"
                                  alt="Signature"/>
                             <img t-if="o.company_id.stamp and o.display_stamp"
                                  t-att-src="image_data_uri(o.company_id.stamp)"
-                                 style="max-height:95px;max-width:115px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0;padding:0;"
+                                 style="max-height:115px;max-width:135px;width:auto;height:auto;object-fit:contain;vertical-align:bottom;display:inline-block;margin:0;padding:0;"
                                  alt="Stamp"/>
                         </div>
                     </div>

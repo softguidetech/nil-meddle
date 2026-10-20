@@ -192,6 +192,32 @@
                 }
 
 
+                /* Each training cost row takes only the lines required by
+                   its content; rich-text descriptions cannot add p margins. */
+                table[name="training_line_table"] thead th {
+                    padding:3px 4px !important;
+                    line-height:1.18 !important;
+                    height:auto !important;
+                }
+                table[name="training_line_table"] tbody tr,
+                table[name="training_line_table"] tbody td {
+                    height:auto !important;
+                    min-height:0 !important;
+                }
+                table[name="training_line_table"] tbody td {
+                    padding:2px 4px !important;
+                    line-height:1.18 !important;
+                }
+                table[name="training_line_table"] tbody td *,
+                table[name="training_line_table"] tbody td p,
+                table[name="training_line_table"] tbody td div {
+                    line-height:1.18 !important;
+                    margin-top:0 !important;
+                    margin-bottom:0 !important;
+                    padding-top:0 !important;
+                    padding-bottom:0 !important;
+                }
+
                 .po-invoice-total-box tr.o_total td,
                 .po-invoice-total-box tr.o_total td *,
                 .po-invoice-total-box tr.o_total strong,

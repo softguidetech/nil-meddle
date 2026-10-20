@@ -218,6 +218,32 @@
                     padding-bottom:0 !important;
                 }
 
+                /* Work-order revenue/deductions summary lives inside the
+                   HTML Terms field, not the training course table. Keep rows
+                   only slightly taller than their text; retain cell colors,
+                   borders and monetary values. */
+                .po-wo-closing .po-terms-content table,
+                .po-wo-closing .po-terms-content table tr,
+                .po-wo-closing .po-terms-content table td,
+                .po-wo-closing .po-terms-content table th {
+                    height:auto !important;
+                    min-height:0 !important;
+                }
+                .po-wo-closing .po-terms-content table td,
+                .po-wo-closing .po-terms-content table th {
+                    padding:2px 6px !important;
+                    line-height:1.18 !important;
+                    vertical-align:middle !important;
+                }
+                .po-wo-closing .po-terms-content table td *,
+                .po-wo-closing .po-terms-content table th * {
+                    margin-top:0 !important;
+                    margin-bottom:0 !important;
+                    padding-top:0 !important;
+                    padding-bottom:0 !important;
+                    line-height:1.18 !important;
+                }
+
                 .po-invoice-total-box tr.o_total td,
                 .po-invoice-total-box tr.o_total td *,
                 .po-invoice-total-box tr.o_total strong,
@@ -270,13 +296,14 @@
                position="attributes">
 
             <attribute name="style">
+                position:absolute;
+                right:32px;
+                bottom:8px;
                 max-height:160px;
                 max-width:190px;
                 width:auto;
                 height:auto;
                 object-fit:contain;
-                vertical-align:bottom;
-                display:inline-block;
             </attribute>
 
         </xpath>

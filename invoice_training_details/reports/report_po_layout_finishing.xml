@@ -231,8 +231,8 @@
                 }
                 .po-wo-closing .po-terms-content table td,
                 .po-wo-closing .po-terms-content table th {
-                    padding:3px 7px !important;
-                    line-height:1.22 !important;
+                    padding:2px 6px !important;
+                    line-height:1.18 !important;
                     vertical-align:middle !important;
                 }
                 .po-wo-closing .po-terms-content table td *,
@@ -241,7 +241,7 @@
                     margin-bottom:0 !important;
                     padding-top:0 !important;
                     padding-bottom:0 !important;
-                    line-height:1.22 !important;
+                    line-height:1.18 !important;
                 }
 
                 .po-invoice-total-box tr.o_total td,

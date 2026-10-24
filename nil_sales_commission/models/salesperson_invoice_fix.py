@@ -9,9 +9,9 @@ class SalesCommission(models.Model):
     @api.model
     def _nil_get_fixed_salesperson_rate(self, salesperson):
         """
-        Every invoice salesperson gets an automatic commission row.
+        Eligible invoice salespeople get an automatic commission row.
 
-        Eligibility is NOT name-based. The salesperson comes from the invoice.
+        Ruba Khattam is explicitly excluded; salesperson comes from the invoice.
         Baraa keeps the previously agreed 2% exception; every other salesperson
         gets the standard 5% rate.
         """
@@ -19,6 +19,8 @@ class SalesCommission(models.Model):
             return 0.0
 
         name = self._nil_normalize_name(salesperson.name)
+        if name == 'ruba khattam':
+            return 0.0
         if name == 'baraa' or name.startswith('baraa '):
             return 2.0
 

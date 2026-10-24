@@ -33,7 +33,8 @@
                        column_invisible="1"/>
 
                 <field name="training_value"
-                       sum="Total Training Value"/>
+                       string="Total Rate Card"
+                       sum="Total Rate Card"/>
 
                 <field name="commission_rate"/>
 
@@ -173,6 +174,7 @@
                                    readonly="state == 'paid'"/>
 
                             <field name="training_value"
+                                   string="Total Rate Card"
                                    readonly="state == 'paid'"/>
 
                             <field name="commission_amount"
@@ -187,10 +189,10 @@
                     </group>
 
                     <separator string="Profit Margin"
-                               invisible="not lead_id"/>
+                               invisible="not lead_id and not invoice_id"/>
 
                     <div class="d-flex flex-wrap gap-2 w-100 mt-2 mb-3"
-                         invisible="not lead_id"
+                         invisible="not lead_id and not invoice_id"
                          style="width: 100%;">
 
                         <div class="border rounded p-2 bg-light"
@@ -243,6 +245,36 @@
                         </div>
 
                     </div>
+
+                    <group string="LCP Cost Breakdown"
+                           invisible="not lead_id and not invoice_id">
+                        <group>
+                            <field name="profit_total_rate_card"
+                                   readonly="1"/>
+                            <field name="profit_instructor_cost"
+                                   readonly="1"/>
+                            <field name="profit_partner_share"
+                                   readonly="1"/>
+                            <field name="profit_logistics_cost"
+                                   readonly="1"/>
+                            <field name="profit_total_costs"
+                                   readonly="1"/>
+                        </group>
+                        <group>
+                            <field name="profit_ticket_cost"
+                                   readonly="1"/>
+                            <field name="profit_hotel_cost"
+                                   readonly="1"/>
+                            <field name="profit_per_diem_cost"
+                                   readonly="1"/>
+                            <field name="profit_uber_cost"
+                                   readonly="1"/>
+                            <field name="profit_venue_cost"
+                                   readonly="1"/>
+                            <field name="profit_catering_cost"
+                                   readonly="1"/>
+                        </group>
+                    </group>
 
                     <group string="Payment / Accounting"
                            invisible="state in ('draft', 'excluded', 'cancelled')">
@@ -318,10 +350,6 @@
                         string="Excluded"
                         domain="[('state', '=', 'excluded')]"/>
 
-                <filter name="ruba_auto"
-                        string="Ruba 1%"
-                        domain="[('auto_key', '=', 'ruba')]"/>
-
                 <filter name="fixed_sales"
                         string="Loudy / Baraa Fixed"
                         domain="[('auto_key', '=', 'salesperson')]"/>
@@ -380,7 +408,7 @@
         <field name="search_view_id"
                ref="view_sales_commission_search"/>
         <!-- Excluded rows disappear from the normal working ledger. -->
-        <field name="domain">[('state', '!=', 'excluded')]</field>
+        <field name="domain">[('state', '!=', 'excluded'), ('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
     </record>
 
     <record id="action_sales_commission_excluded" model="ir.actions.act_window">
@@ -390,7 +418,7 @@
         <field name="search_view_id"
                ref="view_sales_commission_search"/>
         <!-- Dedicated place to recover excluded rows. -->
-        <field name="domain">[('state', '=', 'excluded')]</field>
+        <field name="domain">[('state', '=', 'excluded'), ('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
     </record>
 
     <record id="action_sales_commission_analysis" model="ir.actions.act_window">
@@ -399,6 +427,7 @@
         <field name="view_mode">pivot,tree,form</field>
         <field name="search_view_id"
                ref="view_sales_commission_search"/>
+        <field name="domain">[('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
     </record>
 
     <menuitem id="menu_nil_commission_root"

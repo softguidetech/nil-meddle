@@ -620,6 +620,16 @@ class SalesCommission(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
+        if not self.env.context.get('nil_auto_sync'):
+            if vals.get('auto_key') == 'ruba':
+                raise ValidationError(_('Ruba commissions are disabled.'))
+            if vals.get('salesperson_id'):
+                owner = self.env['res.users'].sudo().browse(
+                    vals['salesperson_id']
+                )
+                if self._nil_normalize_name(owner.name) == RUBA_NAME:
+                    raise ValidationError(_('Ruba commissions are disabled.'))
+
         protected_fields = {
             'invoice_id',
             'lead_id',

@@ -21,7 +21,7 @@
     <record id="sales_commission_rule_manager" model="ir.rule">
         <field name="name">Commission Manager: all commissions</field>
         <field name="model_id" ref="model_nil_sales_commission"/>
-        <field name="domain_force">[(1, '=', 1)]</field>
+        <field name="domain_force">[('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
         <field name="groups"
                eval="[(4, ref('nil_sales_commission.group_nil_commission_manager'))]"/>
         <field name="perm_read" eval="True"/>

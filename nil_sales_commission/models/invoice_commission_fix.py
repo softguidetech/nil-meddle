@@ -3,7 +3,6 @@
 from odoo import api, models
 
 from .account_move import COMMISSION_CUTOFF_DATE
-from .sales_commission import RUBA_COMMISSION_RATE
 
 
 # =====================================================================
@@ -63,32 +62,54 @@ class AccountMove(models.Model):
         ])
 
     def _nil_commission_basis(self):
-        """
-        Commission basis = actual posted invoice value excluding tax.
-
-        Posted credit notes reduce the commission basis.
-        """
+        """Use the Total Rate Card from the existing LCP, never invoice revenue."""
         self.ensure_one()
-
-        if (
-            self.move_type != 'out_invoice'
-            or self.state != 'posted'
-        ):
+        if self.move_type != 'out_invoice' or self.state != 'posted':
             return 0.0
 
-        invoiced = abs(
-            float(self.amount_untaxed or 0.0)
+        invoice_courses = self.sudo().training_course_ids
+        originals = invoice_courses.mapped('source_training_course_id').exists()
+        lead = self._nil_get_commission_lead().sudo()
+        courses = (
+            originals
+            or invoice_courses
+            or (lead.training_course_ids.sudo() if lead else self.env['training.course'])
         )
 
+        def lcp_rate_card(course):
+            # Cash trainings can have lcp_total_rate_card = 0 in the legacy
+            # LCP. The entered per-seat rate is still the Rate Card, never
+            # the invoice selling price.
+            return (
+                course.lcp_total_rate_card
+                or (
+                    (course.lcp_rate_card_per_seat or 0.0)
+                    * max(course.no_of_student or 0, 0)
+                )
+                or course.snapshot_lcp_rate_card
+                or 0.0
+            )
+
+        rate_card = sum(lcp_rate_card(c) for c in courses)
+        if not rate_card and lead:
+            rate_card = (
+                lead.lcp_total_rate_card
+                or (
+                    (lead.lcp_rate_card_per_seat or 0.0)
+                    * sum(lead.training_course_ids.mapped('no_of_student'))
+                )
+                or 0.0
+            )
+
+        # Posted credit notes reduce the eligible portion proportionally.
+        invoiced = abs(float(self.amount_untaxed or 0.0))
         credited = sum(
             abs(float(move.amount_untaxed or 0.0))
             for move in self._nil_commission_credit_notes()
         )
-
-        return max(
-            invoiced - credited,
-            0.0,
-        )
+        if invoiced and credited:
+            rate_card *= max(1.0 - min(credited / invoiced, 1.0), 0.0)
+        return max(float(rate_card or 0.0), 0.0)
 
     def _nil_prepare_auto_commission_for_update(
         self,
@@ -326,6 +347,18 @@ class AccountMove(models.Model):
                 nil_auto_sync=True
             ).create(values)
 
+        # Changing the basis must not automatically reverse previously
+        # settled accounting entries. Credit notes remain actionable.
+        if (
+            row.state == 'paid'
+            and self.state == 'posted'
+            and self.invoice_date
+            and self.invoice_date > COMMISSION_CUTOFF_DATE
+            and not excluded
+            and not self._nil_commission_credit_notes()
+        ):
+            return row
+
         # =============================================================
         # PAID ROW CHECK
         # =============================================================
@@ -427,7 +460,7 @@ class AccountMove(models.Model):
         8. One automatic salesperson commission per invoice.
            Re-sync never creates another one.
 
-        9. Ruba automatic 1% remains unchanged.
+        9. Ruba commissions are disabled.
         """
 
         Commission = (
@@ -539,44 +572,21 @@ class AccountMove(models.Model):
                     basis,
             }
 
-            # =========================================================
-            # RUBA 1%
-            # =========================================================
-
-            ruba_user = (
-                Commission
-                ._nil_get_ruba_user()
-            )
-
-            existing_ruba_row = (
-                Commission.search([
-                    (
-                        'invoice_id',
-                        '=',
-                        invoice.id,
-                    ),
-                    (
-                        'auto_key',
-                        '=',
-                        'ruba',
-                    ),
-                ], order='id asc', limit=1)
-            )
-
-            ruba_rate = (
-                existing_ruba_row.commission_rate
-                if existing_ruba_row
-                else RUBA_COMMISSION_RATE
-            )
-
-            invoice._nil_sync_one_auto_commission(
-                'ruba',
-                ruba_user,
-                ruba_rate,
-                common_values,
-                active,
-                excluded,
-            )
+            # Ruba is no longer eligible. Keep paid historical journal
+            # entries for audit; cancel unpaid legacy automatic rows.
+            old_ruba_rows = Commission.search([
+                ('invoice_id', '=', invoice.id),
+                '|',
+                ('auto_key', '=', 'ruba'),
+                ('is_auto_ruba', '=', True),
+            ])
+            for row in old_ruba_rows.filtered(
+                lambda rec: rec.state not in ('paid', 'cancelled')
+            ):
+                row.with_context(
+                    nil_auto_sync=True,
+                    nil_skip_paid_lock=True,
+                ).write({'state': 'cancelled'})
 
             # =========================================================
             # SALESPERSON COMMISSION

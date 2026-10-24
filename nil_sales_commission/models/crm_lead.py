@@ -24,6 +24,9 @@ class CrmLead(models.Model):
         for lead in self:
             lead.commission_count = Commission.search_count([
                 ('lead_id', '=', lead.id),
+                ('auto_key', '!=', 'ruba'),
+                ('is_auto_ruba', '=', False),
+                ('salesperson_id.name', 'not ilike', 'Ruba Khattam'),
             ])
 
     @api.model_create_multi
@@ -138,7 +141,10 @@ class CrmLead(models.Model):
         )
 
         action['domain'] = [
-            ('lead_id', '=', self.id)
+            ('lead_id', '=', self.id),
+            ('auto_key', '!=', 'ruba'),
+            ('is_auto_ruba', '=', False),
+            ('salesperson_id.name', 'not ilike', 'Ruba Khattam'),
         ]
 
         action['context'] = {
@@ -156,7 +162,15 @@ class CrmLead(models.Model):
                 else False,
         }
 
-        commissions = self.commission_ids
+        commissions = self.commission_ids.filtered(
+            lambda row: (
+                row.auto_key != 'ruba'
+                and not row.is_auto_ruba
+                and self.env['nil.sales.commission']._nil_normalize_name(
+                    row.salesperson_id.name
+                ) != 'ruba khattam'
+            )
+        )
 
         if len(commissions) == 1:
 

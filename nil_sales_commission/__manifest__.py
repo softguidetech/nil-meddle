@@ -1,6 +1,6 @@
 {
     'name': 'NIL Sales Commission',
-    'version': '17.0.2.0.2',
+    'version': '17.0.2.1.0',
     'category': 'CRM',
     'summary': 'Invoice-based sales commission ledger',
     'description': """
@@ -8,10 +8,10 @@ NIL Sales Commission
 ====================
 - Creates one commission record per posted customer invoice dated after 31-May-2026.
 - Automatically backfills existing eligible invoices on module install/upgrade.
-- Commission is 5% of the invoice amount excluding VAT/tax.
+- Commission is calculated on the LCP Total Rate Card, not invoice revenue.
 - Pending commissions have no accounting entry.
 - Marking a commission as Paid creates and posts the accounting journal entry.
-- Detailed commission ledger and pivot analysis.
+- Ruba is excluded from new commission rows and all commission views.\n- LCP profit margin and expense breakdown is shown read-only in the ledger.\n- Detailed commission ledger and pivot analysis.
 - Access is restricted to the dedicated NIL Commission Manager group.
     """,
     'author': 'NIL ME',

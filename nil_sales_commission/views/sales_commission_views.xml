@@ -408,7 +408,7 @@
         <field name="search_view_id"
                ref="view_sales_commission_search"/>
         <!-- Excluded rows disappear from the normal working ledger. -->
-        <field name="domain">[('state', '!=', 'excluded'), ('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
+        <field name="domain">[('state', '!=', 'excluded'), ('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
     </record>
 
     <record id="action_sales_commission_excluded" model="ir.actions.act_window">
@@ -418,7 +418,7 @@
         <field name="search_view_id"
                ref="view_sales_commission_search"/>
         <!-- Dedicated place to recover excluded rows. -->
-        <field name="domain">[('state', '=', 'excluded'), ('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
+        <field name="domain">[('state', '=', 'excluded'), ('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
     </record>
 
     <record id="action_sales_commission_analysis" model="ir.actions.act_window">
@@ -427,7 +427,7 @@
         <field name="view_mode">pivot,tree,form</field>
         <field name="search_view_id"
                ref="view_sales_commission_search"/>
-        <field name="domain">[('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
+        <field name="domain">[('auto_key', '!=', 'ruba'), ('is_auto_ruba', '=', False), '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam')]</field>
     </record>
 
     <menuitem id="menu_nil_commission_root"

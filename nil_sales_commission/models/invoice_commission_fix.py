@@ -272,14 +272,26 @@ class AccountMove(models.Model):
                     excluded,
                 )
             elif fixed_row:
-                invoice._nil_sync_one_auto_commission(
-                    'salesperson',
-                    fixed_row.salesperson_id,
-                    fixed_row.commission_rate,
-                    common_values,
-                    False,
-                    excluded,
+                fixed_owner = Commission._nil_normalize_name(
+                    fixed_row.salesperson_id.name
                 )
+                if fixed_owner == 'ruba khattam':
+                    # Never reverse already-posted payment entries implicitly.
+                    # Unpaid legacy rows are hidden and marked cancelled.
+                    if fixed_row.state not in ('paid', 'cancelled'):
+                        fixed_row.with_context(
+                            nil_auto_sync=True,
+                            nil_skip_paid_lock=True,
+                        ).write({'state': 'cancelled'})
+                else:
+                    invoice._nil_sync_one_auto_commission(
+                        'salesperson',
+                        fixed_row.salesperson_id,
+                        fixed_row.commission_rate,
+                        common_values,
+                        False,
+                        excluded,
+                    )
 
         return True
 

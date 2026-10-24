@@ -3,7 +3,6 @@
 from odoo import models
 
 from .account_move import COMMISSION_CUTOFF_DATE
-from .sales_commission import RUBA_COMMISSION_RATE
 
 
 class AccountMove(models.Model):
@@ -24,22 +23,51 @@ class AccountMove(models.Model):
 
     def _nil_commission_basis(self):
         """
-        Commission follows the actual posted invoice value excluding tax.
+        Use Total Rate Card already calculated in LCP, never invoice revenue.
 
-        Standard posted credit notes linked through reversed_entry_id reduce
-        the basis immediately. A full credit therefore reduces it to zero.
+        Invoice training snapshots identify the relevant original CRM training
+        rows. Existing posted credit notes still reduce the commission in
+        proportion to the reversed invoice, without changing any LCP formula.
         """
         self.ensure_one()
-
         if self.move_type != 'out_invoice' or self.state != 'posted':
             return 0.0
 
+        invoice_courses = self.sudo().training_course_ids
+        source_courses = invoice_courses.mapped('source_training_course_id').exists()
+        lead = self._nil_get_commission_lead().sudo()
+
+        if source_courses:
+            rate_card = sum(source_courses.mapped('lcp_total_rate_card'))
+        elif lead and lead.training_course_ids:
+            rate_card = sum(
+                lead.training_course_ids.sudo().mapped('lcp_total_rate_card')
+            )
+        elif invoice_courses:
+            # Archived invoice copies without a linked original CRM course.
+            snapshot_rate_card = sum(
+                invoice_courses.mapped('snapshot_lcp_rate_card')
+            )
+            rate_card = (
+                snapshot_rate_card
+                if snapshot_rate_card
+                else sum(invoice_courses.mapped('lcp_total_rate_card'))
+            )
+        elif lead:
+            rate_card = lead.lcp_total_rate_card or 0.0
+        else:
+            rate_card = 0.0
+
+        # Credit notes affect eligibility, NOT the Rate Card source.
         invoiced = abs(float(self.amount_untaxed or 0.0))
         credited = sum(
             abs(float(move.amount_untaxed or 0.0))
             for move in self._nil_commission_credit_notes()
         )
-        return max(invoiced - credited, 0.0)
+        if invoiced and credited:
+            rate_card *= max(1.0 - min(credited / invoiced, 1.0), 0.0)
+
+        return max(float(rate_card or 0.0), 0.0)
 
     def _nil_prepare_auto_commission_for_update(
         self,
@@ -163,7 +191,7 @@ class AccountMove(models.Model):
         Final invoice-based synchronization.
 
         Automatic commission is one row per invoice/type, calculated from the
-        actual untaxed posted invoice amount after posted standard credit notes.
+        LCP Total Rate Card (adjusted for linked posted credit notes).
         Re-running this method updates the same rows and never duplicates them.
         Manual rows are left untouched.
         """
@@ -199,21 +227,31 @@ class AccountMove(models.Model):
                     else False
                 ),
                 'company_id': invoice.company_id.id,
-                'currency_id': invoice.currency_id.id,
+                'currency_id': (
+                    lead.currency_id.id
+                    if lead and lead.currency_id
+                    else invoice.currency_id.id
+                ),
                 'commission_date': invoice.invoice_date,
                 'training_value': basis,
             }
 
-            # Ruba 1% is the global automatic commission row.
-            ruba_user = Commission._nil_get_ruba_user()
-            invoice._nil_sync_one_auto_commission(
-                'ruba',
-                ruba_user,
-                RUBA_COMMISSION_RATE,
-                common_values,
-                active,
-                excluded,
-            )
+            # Ruba is no longer eligible. Keep historical paid accounting
+            # entries untouched; retire unpaid automatic rows. Visibility is
+            # enforced separately in all commission ledger entry points.
+            old_ruba = Commission.search([
+                ('invoice_id', '=', invoice.id),
+                '|',
+                ('auto_key', '=', 'ruba'),
+                ('is_auto_ruba', '=', True),
+            ])
+            for row in old_ruba.filtered(
+                lambda item: item.state not in ('paid', 'cancelled')
+            ):
+                row.with_context(
+                    nil_auto_sync=True,
+                    nil_skip_paid_lock=True,
+                ).write({'state': 'cancelled'})
 
             # Loudy/Baraa keep their configured fixed salesperson percentages.
             fixed_rate = Commission._nil_get_fixed_salesperson_rate(

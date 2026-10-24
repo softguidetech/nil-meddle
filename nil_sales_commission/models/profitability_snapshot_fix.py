@@ -136,6 +136,23 @@ class SalesCommission(models.Model):
                     if len(courses) == 1
                     else (profit / revenue if revenue else 0.0)
                 )
+                # Pre-per-training LCP leads may hold the populated results
+                # at the CRM lead level, while legacy training copies are 0.
+                if lead and not costs and lead.lcp_total_costs:
+                    costs = lead.lcp_total_costs
+                    profit = lead.lcp_nilme_profit
+                    margin = lead.lcp_profit_margin
+                    partner_share = lead.lcp_partner_share
+                    instructor = lead.lcp_total_instructor_cost
+                    logistics = lead.lcp_total_logistics
+                    tickets = lead.lcp_ticket_total
+                    hotels = lead.lcp_hotel_total
+                    per_diem = lead.lcp_total_per_diem
+                    uber = lead.lcp_total_uber_estimate
+                    if not rate_card:
+                        rate_card = lead.lcp_total_rate_card
+                    if not partners and lead.lcp_cost_learning_partner:
+                        partners = [lead.lcp_cost_learning_partner]
             elif lead:
                 partners = [lead.lcp_cost_learning_partner] if lead.lcp_cost_learning_partner else []
                 costs = lead.lcp_total_costs

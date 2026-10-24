@@ -11,7 +11,9 @@ NIL Sales Commission
 - Commission is calculated on the LCP Total Rate Card, not invoice revenue.
 - Pending commissions have no accounting entry.
 - Marking a commission as Paid creates and posts the accounting journal entry.
-- Ruba is excluded from new commission rows and all commission views.\n- LCP profit margin and expense breakdown is shown read-only in the ledger.\n- Detailed commission ledger and pivot analysis.
+- Ruba is excluded from new commission rows and all commission views.
+- LCP profit margin and expense breakdown is shown read-only in the ledger.
+- Detailed commission ledger and pivot analysis.
 - Access is restricted to the dedicated NIL Commission Manager group.
     """,
     'author': 'NIL ME',

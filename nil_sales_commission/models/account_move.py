@@ -422,6 +422,10 @@ class AccountMove(models.Model):
 
         Commission._nil_prepare_invoice_commission_migration()
 
+        # Clean old duplicates before replaying any invoice sync.
+        # This only archives commission rows, never accounting invoices.
+        Commission._nil_deduplicate_invoice_commissions()
+
         # Explicitly run the backfill across ALL companies/branches,
         # including Saudi, regardless of which company is currently active
         # in the Odoo company selector.
@@ -439,6 +443,8 @@ class AccountMove(models.Model):
         ])
 
         invoices._nil_sync_sales_commission()
+        # Final idempotent safety pass after syncing older invoices.
+        Commission._nil_deduplicate_invoice_commissions()
         return True
 
     def action_post(self):

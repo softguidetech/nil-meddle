@@ -26,7 +26,7 @@ class CrmLead(models.Model):
                 ('lead_id', '=', lead.id),
                 ('auto_key', '!=', 'ruba'),
                 ('is_auto_ruba', '=', False),
-                ('salesperson_id.name', 'not ilike', 'Ruba Khattam'),
+                '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam'),
             ])
 
     @api.model_create_multi
@@ -144,7 +144,7 @@ class CrmLead(models.Model):
             ('lead_id', '=', self.id),
             ('auto_key', '!=', 'ruba'),
             ('is_auto_ruba', '=', False),
-            ('salesperson_id.name', 'not ilike', 'Ruba Khattam'),
+            '|', ('salesperson_id', '=', False), ('salesperson_id.name', 'not ilike', 'Ruba Khattam'),
         ]
 
         action['context'] = {

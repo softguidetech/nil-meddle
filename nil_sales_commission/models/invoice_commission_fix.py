@@ -132,7 +132,10 @@ class AccountMove(models.Model):
         # Keep the original cancellation/credit-note reversal behavior.
         if (
             row and row.state == 'paid'
-            and active and not excluded
+            and self.state == 'posted'
+            and self.invoice_date
+            and self.invoice_date > COMMISSION_CUTOFF_DATE
+            and not excluded
             and not self._nil_commission_credit_notes()
         ):
             return row

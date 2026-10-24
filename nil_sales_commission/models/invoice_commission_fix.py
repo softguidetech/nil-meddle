@@ -127,6 +127,16 @@ class AccountMove(models.Model):
             ('auto_key', '=', auto_key),
         ], limit=1)
 
+        # Do not reverse a settled journal entry simply because the
+        # commission basis was switched from Invoice Value to Rate Card.
+        # Keep the original cancellation/credit-note reversal behavior.
+        if (
+            row and row.state == 'paid'
+            and active and not excluded
+            and not self._nil_commission_credit_notes()
+        ):
+            return row
+
         if excluded:
             target_state = 'excluded'
         elif not active:

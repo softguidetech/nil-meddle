@@ -326,6 +326,46 @@ class SalesCommission(models.Model):
             rec.profit_margin_pct = profit / revenue if revenue else 0.0
 
     @api.model
+    def _nil_invoice_business_key(self, invoice):
+        """
+        Same invoice may have multiple account.move IDs in legacy data.
+        Keep different companies, customers, dates and currencies separate.
+        """
+        if invoice.name and invoice.name.strip() not in ('/', ''):
+            return (
+                'number',
+                invoice.company_id.id,
+                invoice.partner_id.id,
+                invoice.invoice_date,
+                invoice.currency_id.id,
+                invoice.name.strip().casefold(),
+            )
+        return ('id', invoice.id)
+
+    @api.model
+    def _nil_existing_invoice_commission(self, invoice, exclude_ids=None):
+        """Find an active commission for the same logical accounting invoice."""
+        if not invoice:
+            return self.browse()
+        domain = [
+            ('active', '=', True),
+            ('invoice_id', '!=', False),
+        ]
+        if invoice.name and invoice.name.strip() not in ('/', ''):
+            domain.extend([
+                ('invoice_id.company_id', '=', invoice.company_id.id),
+                ('invoice_id.partner_id', '=', invoice.partner_id.id),
+                ('invoice_id.invoice_date', '=', invoice.invoice_date),
+                ('invoice_id.currency_id', '=', invoice.currency_id.id),
+                ('invoice_id.name', '=', invoice.name),
+            ])
+        else:
+            domain.append(('invoice_id', '=', invoice.id))
+        if exclude_ids:
+            domain.append(('id', 'not in', exclude_ids))
+        return self.sudo().search(domain, order='id asc', limit=1)
+
+    @api.model
     def _nil_deduplicate_invoice_commissions(self):
         """
         Enforce exactly one visible commission row per customer invoice.
@@ -353,10 +393,9 @@ class SalesCommission(models.Model):
         )
         grouped = {}
         for row in all_rows:
-            grouped.setdefault(
-                row.invoice_id.id, Commission.browse()
-            )
-            grouped[row.invoice_id.id] |= row
+            key = self._nil_invoice_business_key(row.invoice_id)
+            grouped.setdefault(key, Commission.browse())
+            grouped[key] |= row
 
         state_priority = {
             'paid': 0,
@@ -561,19 +600,21 @@ class SalesCommission(models.Model):
     def create(self, vals_list):
         sequence = self.env['ir.sequence']
 
-        seen_invoice_ids = set()
+        seen_invoice_keys = set()
         for vals in vals_list:
             invoice_id = vals.get('invoice_id')
             if invoice_id and vals.get('active', True):
-                if invoice_id in seen_invoice_ids or self.sudo().search_count([
-                    ('invoice_id', '=', invoice_id),
-                    ('active', '=', True),
-                ]):
+                invoice = self.env['account.move'].sudo().browse(invoice_id)
+                key = self._nil_invoice_business_key(invoice)
+                if (
+                    key in seen_invoice_keys
+                    or self._nil_existing_invoice_commission(invoice)
+                ):
                     raise ValidationError(_(
-                        'This invoice already has a commission entry. '
-                        'Only one commission row per invoice is allowed.'
+                        'This invoice number already has a commission entry '
+                        'for the same company, customer and date.'
                     ))
-                seen_invoice_ids.add(invoice_id)
+                seen_invoice_keys.add(key)
 
             owner = (
                 self.env['res.users'].sudo().browse(vals['salesperson_id'])
@@ -737,15 +778,14 @@ class SalesCommission(models.Model):
                 invoice_id = vals.get('invoice_id', rec.invoice_id.id)
                 will_be_active = vals.get('active', rec.active)
                 if invoice_id and will_be_active:
-                    conflict = self.sudo().search([
-                        ('invoice_id', '=', invoice_id),
-                        ('active', '=', True),
-                        ('id', '!=', rec.id),
-                    ], limit=1)
+                    invoice = self.env['account.move'].sudo().browse(invoice_id)
+                    conflict = self._nil_existing_invoice_commission(
+                        invoice, exclude_ids=rec.ids
+                    )
                     if conflict:
                         raise ValidationError(_(
-                            'This invoice already has a commission entry. '
-                            'Only one commission row per invoice is allowed.'
+                            'This invoice number already has a commission entry '
+                            'for the same company, customer and date.'
                         ))
 
         if not self.env.context.get('nil_auto_sync'):

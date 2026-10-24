@@ -62,54 +62,89 @@ class AccountMove(models.Model):
         ])
 
     def _nil_commission_basis(self):
-        """Use the Total Rate Card from the existing LCP, never invoice revenue."""
+        """
+        Read commission basis from the deal's LCP, never the invoice amount.
+
+        CLC: the LCP Total Rate Card.
+        Cash: the agreed customer Selling Price on the LCP training row.
+        """
         self.ensure_one()
         if self.move_type != 'out_invoice' or self.state != 'posted':
             return 0.0
 
         invoice_courses = self.sudo().training_course_ids
-        originals = invoice_courses.mapped('source_training_course_id').exists()
+        original_courses = invoice_courses.mapped(
+            'source_training_course_id'
+        ).exists()
         lead = self._nil_get_commission_lead().sudo()
         courses = (
-            originals
+            original_courses
             or invoice_courses
-            or (lead.training_course_ids.sudo() if lead else self.env['training.course'])
+            or (
+                lead.training_course_ids.sudo()
+                if lead else self.env['training.course']
+            )
         )
 
-        def lcp_rate_card(course):
-            # Cash trainings can have lcp_total_rate_card = 0 in the legacy
-            # LCP. The entered per-seat rate is still the Rate Card, never
-            # the invoice selling price.
-            return (
-                course.lcp_total_rate_card
-                or (
-                    (course.lcp_rate_card_per_seat or 0.0)
-                    * max(course.no_of_student or 0, 0)
-                )
-                or course.snapshot_lcp_rate_card
-                or 0.0
+        def lcp_basis(course):
+            method = (
+                course.payment_method
+                or (lead.lcp_payment_method if lead else False)
             )
+            if method == 'cash':
+                # LCP customer selling price is not the invoice subtotal.
+                return max(float(
+                    course.price
+                    or course.snapshot_lcp_revenue
+                    or 0.0
+                ), 0.0)
 
-        rate_card = sum(lcp_rate_card(c) for c in courses)
-        if not rate_card and lead:
-            rate_card = (
-                lead.lcp_total_rate_card
-                or (
-                    (lead.lcp_rate_card_per_seat or 0.0)
-                    * sum(lead.training_course_ids.mapped('no_of_student'))
+            if method == 'clc':
+                # Rate Card is the official CLC basis, not NIL ME Share.
+                return max(float(
+                    course.lcp_total_rate_card
+                    or course.snapshot_lcp_rate_card
+                    or (
+                        (course.lcp_rate_card_per_seat or 0.0)
+                        * max(course.no_of_student or 0, 0)
+                    )
+                    or 0.0
+                ), 0.0)
+
+            return 0.0
+
+        basis = sum(lcp_basis(course) for course in courses)
+
+        if not basis and lead:
+            # Compatibility for historical opportunities with lead-level
+            # LCP values but no usable invoice training snapshots.
+            if lead.lcp_payment_method == 'cash':
+                basis = (
+                    sum(lead.training_course_ids.mapped('price'))
+                    or lead.total_training_price
+                    or 0.0
                 )
-                or 0.0
-            )
+            elif lead.lcp_payment_method == 'clc':
+                basis = (
+                    lead.lcp_total_rate_card
+                    or (
+                        (lead.lcp_rate_card_per_seat or 0.0)
+                        * (lead.lcp_total_seats or 0)
+                    )
+                    or 0.0
+                )
 
-        # Posted credit notes reduce the eligible portion proportionally.
+        # Credit notes reduce eligibility proportionally. Invoice revenue
+        # is only used for this fraction, NEVER as commission basis.
         invoiced = abs(float(self.amount_untaxed or 0.0))
         credited = sum(
             abs(float(move.amount_untaxed or 0.0))
             for move in self._nil_commission_credit_notes()
         )
         if invoiced and credited:
-            rate_card *= max(1.0 - min(credited / invoiced, 1.0), 0.0)
-        return max(float(rate_card or 0.0), 0.0)
+            basis *= max(1.0 - min(credited / invoiced, 1.0), 0.0)
+
+        return max(float(basis or 0.0), 0.0)
 
     def _nil_prepare_auto_commission_for_update(
         self,

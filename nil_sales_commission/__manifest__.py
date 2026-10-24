@@ -1,6 +1,6 @@
 {
     'name': 'NIL Sales Commission',
-    'version': '17.0.2.1.1',
+    'version': '17.0.2.1.2',
     'category': 'CRM',
     'summary': 'Invoice-based sales commission ledger',
     'description': """
@@ -8,7 +8,7 @@ NIL Sales Commission
 ====================
 - Creates one commission record per posted customer invoice dated after 31-May-2026.
 - Automatically backfills existing eligible invoices on module install/upgrade.
-- CLC commission uses LCP Total Rate Card; Cash uses LCP customer Selling Price, never invoice amount.
+- All commissions use LCP Total Rate Card only, including Cash and CLC; never use invoice value or Selling Price.
 - Pending commissions have no accounting entry.
 - Marking a commission as Paid creates and posts the accounting journal entry.
 - Ruba commission is disabled and hidden from ledger and analysis.

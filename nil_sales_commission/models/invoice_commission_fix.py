@@ -378,16 +378,15 @@ class AccountMove(models.Model):
             if not active or excluded:
                 return Commission
 
-            # An invoice/salesperson already recorded manually must not
-            # acquire a second automatic commission row.
-            existing_manual = Commission.search([
+            # One invoice, one active commission. Respect any existing
+            # manual/legacy/other salesperson row, regardless of auto_key.
+            # Never create a second invoice line with a different owner.
+            existing_invoice_row = Commission.search([
                 ('invoice_id', '=', self.id),
-                ('salesperson_id', '=', salesperson.id if salesperson else False),
-                ('auto_key', '=', False),
-                ('is_auto_ruba', '=', False),
+                ('active', '=', True),
             ], order='id asc', limit=1)
-            if existing_manual:
-                return existing_manual
+            if existing_invoice_row:
+                return existing_invoice_row
 
             values['state'] = 'draft'
 

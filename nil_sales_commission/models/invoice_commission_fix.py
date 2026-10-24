@@ -381,10 +381,9 @@ class AccountMove(models.Model):
             # One invoice, one active commission. Respect any existing
             # manual/legacy/other salesperson row, regardless of auto_key.
             # Never create a second invoice line with a different owner.
-            existing_invoice_row = Commission.search([
-                ('invoice_id', '=', self.id),
-                ('active', '=', True),
-            ], order='id asc', limit=1)
+            existing_invoice_row = Commission._nil_existing_invoice_commission(
+                self
+            )
             if existing_invoice_row:
                 return existing_invoice_row
 

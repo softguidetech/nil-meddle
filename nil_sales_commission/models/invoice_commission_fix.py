@@ -81,7 +81,7 @@ class AccountMove(models.Model):
         def actual_rate_card(course):
             # Read the already computed LCP Total Rate Card. An explicitly
             # entered Rate Card/Seat and its seats are a valid equivalent.
-            # Never infer a Rate Card from course.price or invoice revenue.
+            # Never infer a Rate Card from Selling Price or invoice revenue.
             return max(float(
                 course.lcp_total_rate_card
                 or course.snapshot_lcp_rate_card

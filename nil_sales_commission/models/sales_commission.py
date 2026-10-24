@@ -76,8 +76,8 @@ class SalesCommission(models.Model):
     )
 
     training_value = fields.Monetary(
-        string='LCP Rate Card / Cash Selling Price',
-        help='CLC: Total Rate Card from LCP. Cash: Customer Selling Price from LCP, not invoice amount.',
+        string='Total Rate Card',
+        help='Commission basis: Total Rate Card entered/calculated in LCP for every payment method.',
         currency_field='currency_id',
         required=True,
         default=0.0,

@@ -33,8 +33,8 @@
                        string="Currency"/>
 
                 <field name="training_value"
-                       string="Total Rate Card"
-                       sum="Total Rate Card"/>
+                       string="LCP Rate Card / Cash Price"
+                       sum="Total LCP Commission Basis"/>
 
                 <field name="commission_rate"/>
 
@@ -174,7 +174,7 @@
                                    readonly="state == 'paid'"/>
 
                             <field name="training_value"
-                                   string="Total Rate Card"
+                                   string="LCP Rate Card / Cash Price"
                                    readonly="state == 'paid'"/>
 
                             <field name="commission_amount"

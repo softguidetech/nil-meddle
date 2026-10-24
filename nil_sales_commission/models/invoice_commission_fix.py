@@ -107,23 +107,32 @@ class AccountMove(models.Model):
                 actual_rate_card(course) for course in invoice_courses
             )
 
-        # Some historic invoice training copies have zero or missing LCP
-        # Rate Card although the CRM Lead has the correct original LCP.
+        # Do not copy an entire CRM Lead's Rate Card onto each invoice.
+        # Fallback is permitted only if the Lead unambiguously belongs to
+        # this ONE posted invoice. Otherwise leave the missing rate at zero.
         if not total_rate_card and lead:
-            if lead.training_course_ids:
-                total_rate_card = sum(
-                    actual_rate_card(course)
-                    for course in lead.training_course_ids.sudo()
+            related_invoices = lead._nil_get_related_commission_invoices().filtered(
+                lambda move: (
+                    move.move_type == 'out_invoice'
+                    and move.state == 'posted'
+                    and move.company_id == self.company_id
                 )
-            if not total_rate_card:
-                total_rate_card = max(float(
-                    lead.lcp_total_rate_card
-                    or (
-                        (lead.lcp_rate_card_per_seat or 0.0)
-                        * max(lead.lcp_total_seats or 0, 0)
+            )
+            if len(related_invoices) == 1 and related_invoices.id == self.id:
+                if lead.training_course_ids:
+                    total_rate_card = sum(
+                        actual_rate_card(course)
+                        for course in lead.training_course_ids.sudo()
                     )
-                    or 0.0
-                ), 0.0)
+                if not total_rate_card:
+                    total_rate_card = max(float(
+                        lead.lcp_total_rate_card
+                        or (
+                            (lead.lcp_rate_card_per_seat or 0.0)
+                            * max(lead.lcp_total_seats or 0, 0)
+                        )
+                        or 0.0
+                    ), 0.0)
 
         # Credit notes proportionally reverse the commission entitlement,
         # but the commission base itself always originates from LCP Rate Card.
@@ -368,6 +377,17 @@ class AccountMove(models.Model):
 
             if not active or excluded:
                 return Commission
+
+            # An invoice/salesperson already recorded manually must not
+            # acquire a second automatic commission row.
+            existing_manual = Commission.search([
+                ('invoice_id', '=', self.id),
+                ('salesperson_id', '=', salesperson.id if salesperson else False),
+                ('auto_key', '=', False),
+                ('is_auto_ruba', '=', False),
+            ], order='id asc', limit=1)
+            if existing_manual:
+                return existing_manual
 
             values['state'] = 'draft'
 

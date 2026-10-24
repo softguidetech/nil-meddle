@@ -59,11 +59,24 @@ class SalesCommission(models.Model):
         compute_sudo=True,
     )
 
+    profit_lcp_source = fields.Char(
+        string='LCP Source',
+        compute='_compute_profit_margin_summary',
+        compute_sudo=True,
+    )
+
     @api.depends(
         'invoice_id',
         'invoice_id.training_course_ids',
         'invoice_id.training_course_ids.source_training_course_id',
+        'invoice_id.training_course_ids.snapshot_lcp_total_costs',
+        'invoice_id.training_course_ids.snapshot_lcp_profit',
+        'invoice_id.training_course_ids.snapshot_lcp_revenue',
         'lead_id',
+        'lead_id.cost_details_ids.margin1',
+        'lead_id.cost_details_ids.nilme_share',
+        'lead_id.cost_details_ids.margin',
+        'lead_id.cost_details_ids.learning_partner',
         'lead_id.training_course_ids',
         'lead_id.training_course_ids.lcp_total_rate_card',
         'lead_id.training_course_ids.lcp_cost_learning_partner',
@@ -106,10 +119,20 @@ class SalesCommission(models.Model):
                 if rec.invoice_id
                 else self.env['crm.lead']
             )
-            courses = (
-                source_courses
-                or (lead.training_course_ids.sudo() if lead else self.env['training.course'])
-                or invoice_courses
+            lead_courses = (
+                lead.training_course_ids.sudo()
+                if lead
+                else self.env['training.course']
+            )
+            courses = source_courses or lead_courses or invoice_courses
+            source_label = (
+                'Original CRM LCP'
+                if source_courses
+                else 'CRM LCP'
+                if lead_courses
+                else 'Invoice LCP'
+                if invoice_courses
+                else 'No linked LCP'
             )
 
             if courses:
@@ -174,6 +197,53 @@ class SalesCommission(models.Model):
                 instructor = logistics = tickets = hotels = 0.0
                 per_diem = uber = venue = catering = margin = 0.0
 
+            # Recover frozen invoice financials only when the chosen live
+            # LCP source has no expenses. Never overwrite a nonzero live LCP.
+            frozen = invoice_courses.filtered(
+                lambda course: (
+                    bool(course.snapshot_lcp_total_costs)
+                    or bool(course.snapshot_lcp_rate_card)
+                    or bool(course.snapshot_lcp_profit)
+                )
+            )
+            if frozen and not costs and any(
+                course.snapshot_lcp_total_costs for course in frozen
+            ):
+                costs = sum(frozen.mapped('snapshot_lcp_total_costs'))
+                profit = sum(frozen.mapped('snapshot_lcp_profit'))
+                partner_share = sum(frozen.mapped('snapshot_lcp_partner_share'))
+                logistics = sum(frozen.mapped('snapshot_lcp_logistics'))
+                frozen_rate = sum(frozen.mapped('snapshot_lcp_rate_card'))
+                if frozen_rate:
+                    rate_card = frozen_rate
+                frozen_revenue = sum(frozen.mapped('snapshot_lcp_revenue'))
+                margin = profit / frozen_revenue if frozen_revenue else 0.0
+                frozen_partners = sorted(set(
+                    frozen.mapped('snapshot_lcp_learning_partner')
+                ) - {False, ''})
+                if frozen_partners:
+                    partners = frozen_partners
+                source_label = 'Invoice LCP snapshot'
+
+            # Older LCP versions stored the completed margin in cost.details.
+            # This fallback reads its already computed values, never sums
+            # duplicate lead-wide cost rows or changes their formulas.
+            if lead and not costs and lead.cost_details_ids:
+                legacy = lead.sudo().cost_details_ids.filtered(
+                    lambda detail: bool(detail.margin1)
+                )[:1]
+                if legacy:
+                    costs = legacy.margin1
+                    profit = legacy.nilme_share
+                    margin = legacy.margin
+                    partner_share = legacy.training_vendor
+                    instructor = legacy.ins_time
+                    logistics = legacy.total_price_all
+                    if legacy.learning_partner:
+                        partners = [legacy.learning_partner]
+                    source_label = 'Legacy LCP cost details'
+
+            rec.profit_lcp_source = source_label
             rec.profit_learning_partner = ', '.join(partners)
             rec.profit_total_costs = costs
             rec.profit_nilme_share = profit

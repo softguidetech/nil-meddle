@@ -7,10 +7,8 @@
         <field name="sequence">100</field>
     </record>
 
-    <!-- Ruba Khattam remains an admin user; her own commission rows are hidden. 
-         Ruba Khattam is the admin user in this database.
-         Reset membership on every module upgrade so ONLY Ruba remains
-         in Commission Manager. -->
+    <!-- Preserve the commission manager's administrative access.
+         Commission visibility rules separately hide all Ruba entries. -->
     <record id="group_nil_commission_manager" model="res.groups">
         <field name="name">Commission Manager</field>
         <field name="category_id"

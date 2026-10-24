@@ -76,7 +76,7 @@ class SalesCommission(models.Model):
     )
 
     training_value = fields.Monetary(
-        string='Revenu',
+        string='Total Rate Card',
         currency_field='currency_id',
         required=True,
         default=0.0,
@@ -469,6 +469,19 @@ class SalesCommission(models.Model):
         sequence = self.env['ir.sequence']
 
         for vals in vals_list:
+            owner = (
+                self.env['res.users'].sudo().browse(vals['salesperson_id'])
+                if vals.get('salesperson_id')
+                else self.env['res.users']
+            )
+            if (
+                vals.get('auto_key') == 'ruba'
+                or (
+                    owner and self._nil_normalize_name(owner.name) == RUBA_NAME
+                )
+            ):
+                raise ValidationError(_('Ruba commissions are disabled.'))
+
             if vals.get(
                 'name',
                 _('New')
@@ -524,9 +537,7 @@ class SalesCommission(models.Model):
 
                 vals.setdefault(
                     'training_value',
-                    lead.total_training_price
-                    if lead
-                    else 0.0,
+                    invoice._nil_commission_basis(),
                 )
 
             auto_key = vals.get('auto_key')
@@ -612,6 +623,16 @@ class SalesCommission(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
+        if not self.env.context.get('nil_auto_sync'):
+            if vals.get('auto_key') == 'ruba':
+                raise ValidationError(_('Ruba commissions are disabled.'))
+            if vals.get('salesperson_id'):
+                owner = self.env['res.users'].sudo().browse(
+                    vals['salesperson_id']
+                )
+                if self._nil_normalize_name(owner.name) == RUBA_NAME:
+                    raise ValidationError(_('Ruba commissions are disabled.'))
+
         protected_fields = {
             'invoice_id',
             'lead_id',
@@ -854,11 +875,7 @@ class SalesCommission(models.Model):
                     else invoice.currency_id
                 )
 
-                rec.training_value = (
-                    lead.total_training_price
-                    if lead
-                    else rec.training_value
-                )
+                rec.training_value = invoice._nil_commission_basis()
 
                 rec.commission_date = (
                     invoice.invoice_date

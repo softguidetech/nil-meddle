@@ -1,6 +1,6 @@
 {
     'name': 'NIL Sales Commission',
-    'version': '17.0.2.1.0',
+    'version': '17.0.2.1.1',
     'category': 'CRM',
     'summary': 'Invoice-based sales commission ledger',
     'description': """

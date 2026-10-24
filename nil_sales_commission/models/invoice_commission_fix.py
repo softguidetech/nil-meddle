@@ -63,88 +63,81 @@ class AccountMove(models.Model):
 
     def _nil_commission_basis(self):
         """
-        Read commission basis from the deal's LCP, never the invoice amount.
+        Commission basis = LCP Total Rate Card for every payment method.
 
-        CLC: the LCP Total Rate Card.
-        Cash: the agreed customer Selling Price on the LCP training row.
+        NEVER use the invoice amount, customer selling price, NIL ME share,
+        revenue, profit or Cash USD/Seat to manufacture a Rate Card.
         """
         self.ensure_one()
         if self.move_type != 'out_invoice' or self.state != 'posted':
             return 0.0
 
         invoice_courses = self.sudo().training_course_ids
-        original_courses = invoice_courses.mapped(
+        originals = invoice_courses.mapped(
             'source_training_course_id'
         ).exists()
         lead = self._nil_get_commission_lead().sudo()
-        courses = (
-            original_courses
-            or invoice_courses
-            or (
-                lead.training_course_ids.sudo()
-                if lead else self.env['training.course']
-            )
-        )
 
-        def lcp_basis(course):
-            method = (
-                course.payment_method
-                or (lead.lcp_payment_method if lead else False)
-            )
-            if method == 'cash':
-                # LCP customer selling price is not the invoice subtotal.
-                return max(float(
-                    course.price
-                    or course.snapshot_lcp_revenue
-                    or 0.0
-                ), 0.0)
-
-            if method == 'clc':
-                # Rate Card is the official CLC basis, not NIL ME Share.
-                return max(float(
-                    course.lcp_total_rate_card
-                    or course.snapshot_lcp_rate_card
-                    or (
-                        (course.lcp_rate_card_per_seat or 0.0)
-                        * max(course.no_of_student or 0, 0)
-                    )
-                    or 0.0
-                ), 0.0)
-
-            return 0.0
-
-        basis = sum(lcp_basis(course) for course in courses)
-
-        if not basis and lead:
-            # Compatibility for historical opportunities with lead-level
-            # LCP values but no usable invoice training snapshots.
-            if lead.lcp_payment_method == 'cash':
-                basis = (
-                    sum(lead.training_course_ids.mapped('price'))
-                    or lead.total_training_price
-                    or 0.0
+        def actual_rate_card(course):
+            # Read the already computed LCP Total Rate Card. An explicitly
+            # entered Rate Card/Seat and its seats are a valid equivalent.
+            # Never infer a Rate Card from course.price or invoice revenue.
+            return max(float(
+                course.lcp_total_rate_card
+                or course.snapshot_lcp_rate_card
+                or (
+                    (course.lcp_rate_card_per_seat or 0.0)
+                    * max(course.no_of_student or 0, 0)
                 )
-            elif lead.lcp_payment_method == 'clc':
-                basis = (
+                or 0.0
+            ), 0.0)
+
+        # Prefer the original CRM LCP behind each invoice training line.
+        # Old invoices may lack this link, so use their saved LCP snapshot.
+        if originals:
+            total_rate_card = sum(
+                actual_rate_card(course) for course in originals
+            )
+            if not total_rate_card:
+                total_rate_card = sum(
+                    actual_rate_card(course) for course in invoice_courses
+                )
+        else:
+            total_rate_card = sum(
+                actual_rate_card(course) for course in invoice_courses
+            )
+
+        # Some historic invoice training copies have zero or missing LCP
+        # Rate Card although the CRM Lead has the correct original LCP.
+        if not total_rate_card and lead:
+            if lead.training_course_ids:
+                total_rate_card = sum(
+                    actual_rate_card(course)
+                    for course in lead.training_course_ids.sudo()
+                )
+            if not total_rate_card:
+                total_rate_card = max(float(
                     lead.lcp_total_rate_card
                     or (
                         (lead.lcp_rate_card_per_seat or 0.0)
-                        * (lead.lcp_total_seats or 0)
+                        * max(lead.lcp_total_seats or 0, 0)
                     )
                     or 0.0
-                )
+                ), 0.0)
 
-        # Credit notes reduce eligibility proportionally. Invoice revenue
-        # is only used for this fraction, NEVER as commission basis.
+        # Credit notes proportionally reverse the commission entitlement,
+        # but the commission base itself always originates from LCP Rate Card.
         invoiced = abs(float(self.amount_untaxed or 0.0))
         credited = sum(
             abs(float(move.amount_untaxed or 0.0))
             for move in self._nil_commission_credit_notes()
         )
         if invoiced and credited:
-            basis *= max(1.0 - min(credited / invoiced, 1.0), 0.0)
+            total_rate_card *= max(
+                1.0 - min(credited / invoiced, 1.0), 0.0
+            )
 
-        return max(float(basis or 0.0), 0.0)
+        return max(float(total_rate_card or 0.0), 0.0)
 
     def _nil_prepare_auto_commission_for_update(
         self,

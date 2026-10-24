@@ -249,6 +249,8 @@
                     <group string="LCP Cost Breakdown"
                            invisible="not lead_id and not invoice_id">
                         <group>
+                            <field name="profit_lcp_source"
+                                   readonly="1"/>
                             <field name="profit_total_rate_card"
                                    readonly="1"/>
                             <field name="profit_instructor_cost"

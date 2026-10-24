@@ -17,6 +17,14 @@ class SalesCommission(models.Model):
     _order = 'commission_date desc, id desc'
     _rec_name = 'name'
 
+    # Archived duplicates remain in the database for audit and are excluded
+    # from all standard Odoo searches, lists, totals, and analyses.
+    active = fields.Boolean(
+        string='Active',
+        default=True,
+        index=True,
+    )
+
     name = fields.Char(
         string='Commission Reference',
         required=True,
@@ -317,6 +325,90 @@ class SalesCommission(models.Model):
             rec.profit_nilme_share = profit
             rec.profit_margin_pct = profit / revenue if revenue else 0.0
 
+    @api.model
+    def _nil_deduplicate_invoice_commissions(self):
+        """
+        Enforce exactly one visible commission row per customer invoice.
+
+        Do NOT delete or reverse historical commissions. Keep a paid row
+        first, otherwise an approved/draft row, and archive every other
+        row for the invoice, including legacy Ruba rows. No invoices,
+        invoice lines, LCP fields, or posted accounting moves are changed.
+
+        The unique partial index also prevents concurrent duplicate
+        commission creation, irrespective of auto_key (including NULL).
+        """
+        Commission = self.sudo().with_context(active_test=False)
+
+        # Initialize pre-existing records from older module versions.
+        self.env.cr.execute(
+            "UPDATE nil_sales_commission SET active = TRUE "
+            "WHERE active IS NULL"
+        )
+        Commission.invalidate_model(['active'])
+
+        all_rows = Commission.search(
+            [('invoice_id', '!=', False)],
+            order='invoice_id asc, id asc',
+        )
+        grouped = {}
+        for row in all_rows:
+            grouped.setdefault(
+                row.invoice_id.id, Commission.browse()
+            )
+            grouped[row.invoice_id.id] |= row
+
+        state_priority = {
+            'paid': 0,
+            'pending': 1,
+            'draft': 2,
+            'excluded': 3,
+            'cancelled': 4,
+        }
+        for rows in grouped.values():
+            eligible = rows.filtered(
+                lambda row: (
+                    row.auto_key != 'ruba'
+                    and not row.is_auto_ruba
+                    and self._nil_normalize_name(
+                        row.salesperson_id.name
+                    ) != RUBA_NAME
+                )
+            )
+            keeper = Commission.browse()
+            if eligible:
+                invoice_owner = rows[0].invoice_id.invoice_user_id
+                keeper = sorted(
+                    eligible,
+                    key=lambda row: (
+                        state_priority.get(row.state, 5),
+                        0 if invoice_owner and row.salesperson_id == invoice_owner else 1,
+                        row.id,
+                    ),
+                )[0]
+
+            other_rows = rows - keeper
+            to_archive = other_rows.filtered('active')
+            if to_archive:
+                # Bypass custom paid-entry write recalculations. Archiving
+                # must never modify the amount/state or post reversals.
+                super(SalesCommission, to_archive).write({
+                    'active': False,
+                })
+
+            if keeper and not keeper.active:
+                super(SalesCommission, keeper).write({
+                    'active': True,
+                })
+
+        self.env.cr.execute("""
+            CREATE UNIQUE INDEX IF NOT EXISTS
+                nil_commission_one_active_row_per_invoice
+            ON nil_sales_commission (invoice_id)
+            WHERE invoice_id IS NOT NULL AND active IS TRUE
+        """)
+        return True
+
     _sql_constraints = [
         (
             'auto_invoice_commission_unique',
@@ -469,7 +561,20 @@ class SalesCommission(models.Model):
     def create(self, vals_list):
         sequence = self.env['ir.sequence']
 
+        seen_invoice_ids = set()
         for vals in vals_list:
+            invoice_id = vals.get('invoice_id')
+            if invoice_id and vals.get('active', True):
+                if invoice_id in seen_invoice_ids or self.sudo().search_count([
+                    ('invoice_id', '=', invoice_id),
+                    ('active', '=', True),
+                ]):
+                    raise ValidationError(_(
+                        'This invoice already has a commission entry. '
+                        'Only one commission row per invoice is allowed.'
+                    ))
+                seen_invoice_ids.add(invoice_id)
+
             owner = (
                 self.env['res.users'].sudo().browse(vals['salesperson_id'])
                 if vals.get('salesperson_id')
@@ -624,6 +729,25 @@ class SalesCommission(models.Model):
         return super().create(vals_list)
 
     def write(self, vals):
+        if (
+            'invoice_id' in vals
+            or ('active' in vals and vals['active'])
+        ):
+            for rec in self:
+                invoice_id = vals.get('invoice_id', rec.invoice_id.id)
+                will_be_active = vals.get('active', rec.active)
+                if invoice_id and will_be_active:
+                    conflict = self.sudo().search([
+                        ('invoice_id', '=', invoice_id),
+                        ('active', '=', True),
+                        ('id', '!=', rec.id),
+                    ], limit=1)
+                    if conflict:
+                        raise ValidationError(_(
+                            'This invoice already has a commission entry. '
+                            'Only one commission row per invoice is allowed.'
+                        ))
+
         if not self.env.context.get('nil_auto_sync'):
             if vals.get('auto_key') == 'ruba':
                 raise ValidationError(_('Ruba commissions are disabled.'))

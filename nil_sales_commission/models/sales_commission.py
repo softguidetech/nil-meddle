@@ -440,6 +440,50 @@ class SalesCommission(models.Model):
                     'active': True,
                 })
 
+        # Flush existing ORM archives before checking real database rows.
+        # Legacy data can still contain multiple active commissions sharing
+        # the same invoice_id, which makes the unique-index creation fail.
+        Commission.flush_model([
+            'active', 'invoice_id', 'auto_key', 'is_auto_ruba', 'state',
+        ])
+        # Prevent concurrent INSERT/UPDATE from recreating duplicate active
+        # commission rows between the cleanup and unique-index creation.
+        # Reads continue and the lock releases with the upgrade transaction.
+        self.env.cr.execute(
+            "LOCK TABLE nil_sales_commission IN SHARE ROW EXCLUSIVE MODE"
+        )
+        self.env.cr.execute("""
+            WITH ranked AS (
+                SELECT
+                    id,
+                    ROW_NUMBER() OVER (
+                        PARTITION BY invoice_id
+                        ORDER BY
+                            CASE WHEN auto_key = 'ruba'
+                                      OR COALESCE(is_auto_ruba, FALSE)
+                                 THEN 1 ELSE 0 END,
+                            CASE state
+                                WHEN 'paid' THEN 0
+                                WHEN 'pending' THEN 1
+                                WHEN 'draft' THEN 2
+                                WHEN 'excluded' THEN 3
+                                ELSE 4
+                            END,
+                            id
+                    ) AS row_rank
+                FROM nil_sales_commission
+                WHERE invoice_id IS NOT NULL AND active IS TRUE
+            )
+            UPDATE nil_sales_commission AS commission
+               SET active = FALSE
+              FROM ranked
+             WHERE commission.id = ranked.id
+               AND ranked.row_rank > 1
+        """)
+        # Preserve all historical commissions and accounting entries;
+        # only archive extra active commission rows.
+        Commission.invalidate_model(['active'])
+
         self.env.cr.execute("""
             CREATE UNIQUE INDEX IF NOT EXISTS
                 nil_commission_one_active_row_per_invoice

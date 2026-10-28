@@ -661,7 +661,7 @@ class AccountMove(models.Model):
             # =========================================================
 
             existing_salesperson_row = (
-                Commission.search([
+                Commission.with_context(active_test=False).search([
                     (
                         'invoice_id',
                         '=',
@@ -672,7 +672,7 @@ class AccountMove(models.Model):
                         '=',
                         'salesperson',
                     ),
-                ], order='id asc', limit=1)
+                ], order='active desc, id asc', limit=1)
             )
 
             is_ruba_salesperson = bool(

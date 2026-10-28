@@ -220,10 +220,30 @@ class AccountMove(models.Model):
         # FIND EXISTING AUTOMATIC ROW
         # =============================================================
 
-        row = Commission.search([
+        # The SQL unique constraint (invoice_id, auto_key) also covers
+        # archived rows. A normal Odoo search hides active=False records
+        # and would incorrectly reassign a legacy row to an occupied key.
+        row = Commission.with_context(active_test=False).search([
             ('invoice_id', '=', self.id),
             ('auto_key', '=', auto_key),
-        ], order='id asc', limit=1)
+        ], order='active desc, id asc', limit=1)
+
+        if row and not row.active:
+            # Keep the visible commission selected by deduplication,
+            # without touching archived history or paid journal entries.
+            visible_row = Commission._nil_existing_invoice_commission(self)
+            if visible_row:
+                return visible_row
+
+            # When nothing is visible, reuse an eligible archived,
+            # unpaid auto row instead of creating a duplicate SQL key.
+            # Never reactivate a paid historical record via sync.
+            if not active or excluded or row.state == 'paid':
+                return row
+            row.with_context(
+                nil_auto_sync=True,
+                nil_skip_paid_lock=True,
+            ).write({'active': True})
 
         # =============================================================
         # FIND LEGACY AUTOMATIC ROWS
